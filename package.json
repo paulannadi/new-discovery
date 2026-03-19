@@ -13,7 +13,7 @@
     "react-dom": "^19.0.0",
     "lucide-react": "^0.469.0",
     "sonner": "^1.7.2",
-    "react-day-picker": "^8.10.1",
+    "react-day-picker": "^9.0.0",
     "date-fns": "^3.6.0",
     "next-themes": "^0.4.4",
     "class-variance-authority": "^0.7.1",
