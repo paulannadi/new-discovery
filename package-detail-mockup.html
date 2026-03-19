@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Package Detail — Redesign Mockup</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #222; font-size: 15px; }
+
+  /* ── MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; animation: fadeIn 0.18s ease; }
+  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+  .modal { background: #fff; border-radius: 16px; width: 100%; max-width: 780px; max-height: 90vh; display: flex; flex-direction: column; animation: slideUp 0.2s ease; overflow: hidden; }
+  .modal.modal-wide { max-width: 1040px; }
+  @keyframes slideUp { from { transform: translateY(16px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid #ebebeb; flex-shrink: 0; }
+  .modal-title { font-size: 17px; font-weight: 700; }
+  .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #555; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+  .modal-close:hover { background: #f5f5f5; color: #222; }
+  .modal-body { overflow-y: auto; padding: 24px; flex: 1; }
+
+  /* Modal — photos grid */
+  .modal-photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .modal-photo-grid img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 8px; display: block; }
+  .modal-photo-grid img:first-child { grid-column: 1 / -1; aspect-ratio: 16/7; }
+
+  /* Modal — amenities */
+  .modal-amenities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 24px; }
+  .modal-amenity { display: flex; align-items: center; gap: 12px; font-size: 14px; color: #333; padding: 4px 0; }
+  .modal-amenity-icon { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+  .modal-section-label { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin: 20px 0 12px; }
+  .modal-section-label:first-child { margin-top: 0; }
+
+  /* Modal — reviews */
+  .modal-score-header { display: flex; align-items: center; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid #ebebeb; margin-bottom: 20px; }
+  .modal-score-number { font-size: 52px; font-weight: 800; color: #1a7a4a; line-height: 1; }
+  .modal-score-label { font-size: 20px; font-weight: 700; }
+  .modal-score-sub { font-size: 13px; color: #777; margin-top: 4px; }
+  .modal-reviews-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .modal-review { border: 1px solid #ebebeb; border-radius: 12px; padding: 18px; }
+  .modal-review-text { font-size: 14px; color: #333; line-height: 1.65; font-style: italic; margin-bottom: 12px; }
+  .modal-reviewer { font-size: 13px; color: #777; font-weight: 500; }
+
+  /* Modal — description */
+  .modal-description p { color: #444; line-height: 1.75; font-size: 15px; margin-bottom: 16px; }
+
+  /* Modal — room facilities */
+  .modal-facilities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 24px; }
+  .modal-facility { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #333; }
+  .modal-facility-icon { font-size: 17px; width: 24px; text-align: center; flex-shrink: 0; }
+
+  /* ── NAV ── */
+  .nav { position: sticky; top: 0; z-index: 100; background: #fff; border-bottom: 1px solid #ebebeb; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-weight: 700; font-size: 18px; color: #c8102e; letter-spacing: -0.5px; }
+  .nav-back { display: flex; align-items: center; gap: 6px; color: #444; font-size: 14px; cursor: pointer; text-decoration: none; }
+  .nav-back:hover { color: #222; }
+
+  /* ── PHOTO GALLERY ── */
+  .gallery { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 260px 260px; gap: 6px; padding: 20px 24px; position: relative; }
+  .gallery-hero { grid-row: 1 / 3; border-radius: 12px 0 0 12px; overflow: hidden; }
+  .gallery-side { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .gallery-side-inner { display: grid; grid-template-rows: 1fr 1fr; gap: 6px; }
+  .gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .gallery-side-inner > div { overflow: hidden; }
+  .gallery-side-inner > div:first-child { border-radius: 0 12px 0 0; }
+  .gallery-side-inner > div:last-child { border-radius: 0 0 12px 0; }
+  .gallery-btn { position: absolute; bottom: 36px; right: 40px; background: #fff; border: 1.5px solid #222; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .gallery-btn:hover { background: #f5f5f5; }
+
+  /* ── MAIN LAYOUT ── */
+  .page-body { max-width: 1160px; margin: 0 auto; padding: 0 24px 80px; display: grid; grid-template-columns: 1fr 380px; gap: 64px; align-items: start; }
+
+  /* ── LEFT COLUMN ── */
+  .left-col { padding-top: 32px; }
+  .hotel-header h1 { font-size: 26px; font-weight: 700; line-height: 1.25; margin-bottom: 6px; }
+  .hotel-meta { display: flex; align-items: center; gap: 12px; color: #555; font-size: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .stars { display: flex; gap: 2px; color: #f5a623; font-size: 14px; }
+  .trustyou-badge { display: inline-flex; align-items: center; gap: 6px; background: #f0faf5; border: 1px solid #b3dfcc; border-radius: 6px; padding: 3px 8px; font-size: 13px; font-weight: 600; color: #1a7a4a; }
+  .trustyou-badge span { font-weight: 400; color: #555; }
+  .location-tag { color: #555; font-size: 13px; }
+
+  .highlights { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+  .pill { background: #f7f7f7; border: 1px solid #e0e0e0; border-radius: 20px; padding: 6px 13px; font-size: 13px; font-weight: 500; color: #333; display: flex; align-items: center; gap: 5px; }
+  .pill.green { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+
+  .divider { border: none; border-top: 1px solid #ebebeb; margin: 28px 0; }
+
+  .section-title { font-size: 18px; font-weight: 700; margin-bottom: 14px; }
+  .hotel-description { color: #444; line-height: 1.7; font-size: 15px; }
+  .show-more { color: #222; font-weight: 600; font-size: 14px; text-decoration: underline; cursor: pointer; margin-top: 10px; display: inline-block; }
+
+  /* ── AMENITIES ── */
+  .amenities-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 8px; margin-bottom: 8px; }
+  .amenity { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #333; }
+  .amenity-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+
+  /* ── REVIEWS ── */
+  .reviews-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .score-big { font-size: 42px; font-weight: 800; color: #1a7a4a; line-height: 1; }
+  .score-label { font-size: 18px; font-weight: 700; }
+  .score-sub { font-size: 13px; color: #777; margin-top: 2px; }
+  .reviews-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .review-card { border: 1px solid #ebebeb; border-radius: 12px; padding: 16px; }
+  .review-quote { font-size: 14px; color: #333; line-height: 1.6; font-style: italic; margin-bottom: 10px; }
+  .reviewer { font-size: 13px; color: #777; font-weight: 500; }
+
+  /* ── MAP ── */
+  .map-placeholder { background: #e8f0fe; border-radius: 12px; height: 200px; display: flex; align-items: center; justify-content: center; color: #4a6cf7; font-weight: 600; font-size: 14px; margin-bottom: 8px; position: relative; overflow: hidden; }
+  .map-placeholder::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='29' fill='none' stroke='%234a6cf7' stroke-width='0.5' opacity='0.3'/%3E%3C/svg%3E") repeat; opacity: 0.4; }
+  .map-pin { font-size: 24px; }
+  .map-label { font-size: 13px; color: #555; }
+
+  /* ── ROOM SECTION ── */
+  .room-section { }
+  .room-gallery { display: grid; grid-template-columns: 1.6fr 1fr; gap: 6px; height: 220px; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+  .room-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .room-gallery-side { display: grid; grid-template-rows: 1fr 1fr; gap: 6px; }
+  .room-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+  .room-title { font-size: 20px; font-weight: 700; }
+  .room-meta { display: flex; gap: 10px; margin-top: 4px; font-size: 13px; color: #666; align-items: center; }
+  .room-board-badge { background: #fff3cd; border: 1px solid #fcd34d; color: #92400e; border-radius: 5px; padding: 3px 9px; font-size: 12px; font-weight: 600; }
+  .upgrade-btn { border: 1.5px solid #c8102e; color: #c8102e; background: white; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+  .upgrade-btn:hover { background: #fff0f2; }
+  .room-facilities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 16px; margin-top: 4px; }
+  .room-facility { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #444; }
+  .room-facility-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+
+  /* ── FLIGHTS SECTION ── */
+  .flights-section { margin-top: 16px; }
+  .flights-toggle { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; cursor: pointer; border-top: 1px solid #ebebeb; border-bottom: 1px solid #ebebeb; }
+  .flights-toggle-label { font-size: 16px; font-weight: 600; }
+  .flights-toggle-meta { font-size: 13px; color: #777; margin-top: 2px; }
+  .toggle-icon { font-size: 18px; color: #777; transition: transform 0.2s; }
+  .flights-content { padding: 20px 0; display: flex; flex-direction: column; gap: 12px; }
+  .flight-card { border: 1px solid #ebebeb; border-radius: 12px; padding: 16px 20px; }
+  .flight-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .airline-info { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+  .airline-dot { width: 28px; height: 28px; background: #003399; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 700; }
+  .cabin-badge { background: #fef3c7; color: #92400e; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+  .flight-route { display: flex; align-items: center; gap: 12px; font-size: 15px; }
+  .flight-time { font-weight: 700; font-size: 18px; }
+  .flight-airport { color: #777; font-size: 12px; margin-top: 1px; }
+  .flight-duration { flex: 1; text-align: center; }
+  .flight-duration-line { height: 1px; background: #ddd; position: relative; margin: 4px 0; }
+  .flight-duration-line::after { content: '▶'; position: absolute; right: -6px; top: -8px; font-size: 10px; color: #ddd; }
+  .flight-duration-text { font-size: 12px; color: #777; }
+  .flight-direct { font-size: 12px; color: #16a34a; font-weight: 500; }
+  .flight-baggage { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; font-size: 13px; color: #777; display: flex; align-items: center; gap: 6px; }
+  .change-link { color: #c8102e; font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; margin-top: 8px; display: inline-block; }
+
+  /* ── RIGHT COLUMN (STICKY BOOKING WIDGET) ── */
+  .right-col { position: sticky; top: 80px; padding-top: 32px; }
+  .booking-widget { border: 1.5px solid #ebebeb; border-radius: 16px; padding: 24px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+  .widget-price { margin-bottom: 20px; }
+  .price-main { font-size: 28px; font-weight: 800; }
+  .price-sub { color: #777; font-size: 13px; margin-top: 2px; }
+  .price-total { font-size: 13px; color: #444; margin-top: 4px; }
+  .price-total strong { color: #222; }
+
+  /* ── PRICE TREND CHART ── */
+  .trend-section { margin-bottom: 16px; }
+  .trend-label { font-size: 12px; color: #777; margin-bottom: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; }
+  .trend-chart { display: flex; align-items: flex-end; gap: 3px; height: 40px; }
+  .trend-bar { flex: 1; border-radius: 3px 3px 0 0; transition: opacity 0.15s; cursor: pointer; position: relative; }
+  .trend-bar:hover { opacity: 0.8; }
+  .trend-bar.selected { background: #c8102e !important; }
+  .trend-bar.cheapest { background: #16a34a !important; }
+  .trend-months { display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; color: #aaa; }
+
+  /* ── RATE CALENDAR ── */
+  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .cal-month { font-size: 15px; font-weight: 700; }
+  .cal-nav { background: none; border: 1px solid #e0e0e0; border-radius: 6px; width: 28px; height: 28px; cursor: pointer; font-size: 14px; color: #555; display: flex; align-items: center; justify-content: center; }
+  .cal-nav:hover { background: #f5f5f5; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-day-name { text-align: center; font-size: 11px; font-weight: 600; color: #aaa; padding: 4px 0; text-transform: uppercase; }
+  .cal-day { text-align: center; padding: 5px 2px; border-radius: 6px; cursor: pointer; transition: background 0.1s; min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+  .cal-day:hover:not(.empty):not(.disabled) { background: #f5f5f5; }
+  .cal-day.selected { background: #c8102e; color: white; }
+  .cal-day.selected .cal-price { color: rgba(255,255,255,0.85); }
+  .cal-day.cheapest-day:not(.selected) { background: #f0fdf4; }
+  .cal-day.cheapest-day:not(.selected) .cal-price { color: #16a34a; }
+  .cal-day.empty, .cal-day.disabled { cursor: default; opacity: 0.3; }
+  .cal-day-num { font-size: 12px; font-weight: 600; }
+  .cal-price { font-size: 10px; color: #777; line-height: 1; }
+  .cal-legend { display: flex; gap: 12px; margin-top: 8px; font-size: 11px; color: #777; }
+  .cal-legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+
+  /* ── CTA ── */
+  .cta-btn { width: 100%; background: #c8102e; color: white; border: none; border-radius: 10px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.15s; letter-spacing: -0.2px; }
+  .cta-btn:hover { background: #a50d25; }
+  .cta-includes { text-align: center; font-size: 12px; color: #777; margin-top: 10px; line-height: 1.5; }
+  .cta-includes strong { color: #444; }
+
+  /* ── MOBILE STICKY FOOTER ── */
+  .mobile-footer { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1.5px solid #ebebeb; padding: 12px 20px; z-index: 200; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); }
+  .mobile-footer-price { font-size: 18px; font-weight: 800; }
+  .mobile-footer-sub { font-size: 12px; color: #777; }
+  .mobile-footer-btn { background: #c8102e; color: white; border: none; border-radius: 8px; padding: 12px 20px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; gap: 0; }
+    .right-col { position: static; padding-top: 0; order: -1; }
+    .booking-widget { border-radius: 0; border-left: none; border-right: none; border-top: none; box-shadow: none; padding: 20px; }
+    .gallery { grid-template-columns: 1fr; grid-template-rows: 240px; }
+    .gallery-hero { grid-row: 1; border-radius: 0; }
+    .gallery-side { display: none; }
+    .mobile-footer { display: flex; }
+    .page-body { padding-bottom: 120px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-back" href="#">
+    ← Back to results
+  </a>
+  <div class="nav-logo">DYNAMIC HOLIDAYS</div>
+  <div style="width:120px"></div>
+</nav>
+
+<!-- PHOTO GALLERY -->
+<div class="gallery">
+  <div class="gallery-hero">
+    <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80" alt="Hotel exterior" />
+  </div>
+  <div class="gallery-side">
+    <div class="gallery-side-inner">
+      <div><img src="https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&q=80" alt="Pool" /></div>
+      <div><img src="https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=400&q=80" alt="Beach" /></div>
+    </div>
+    <div class="gallery-side-inner">
+      <div><img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&q=80" alt="Room" /></div>
+      <div><img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?w=400&q=80" alt="Restaurant" /></div>
+    </div>
+  </div>
+  <button class="gallery-btn" onclick="openModal('modal-photos')">⊞ Show all 38 photos</button>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+
+  <!-- LEFT COLUMN -->
+  <div class="left-col">
+
+    <!-- Hotel Header -->
+    <div class="hotel-header">
+      <h1>Krystal Cancun</h1>
+      <div class="hotel-meta">
+        <div class="stars">★★★★</div>
+        <div class="trustyou-badge">77 <span>Good · 7,987 reviews · TRUSTYOU</span></div>
+        <div class="location-tag">📍 Hotel Zone, Cancún</div>
+      </div>
+    </div>
+
+    <!-- Highlight Pills -->
+    <div class="highlights">
+      <div class="pill">✈️ Direct flight included</div>
+      <div class="pill">🍽️ Bed &amp; breakfast</div>
+      <div class="pill">🏖️ Beachfront</div>
+      <div class="pill green">✓ Free cancellation</div>
+      <div class="pill">🧳 Checked baggage</div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- Description -->
+    <div class="section-title">About this hotel</div>
+    <p class="hotel-description">
+      Krystal Cancun is a beachfront resort located at the heart of the Hotel Zone, steps from Cancún's famous turquoise waters. The property features a stunning outdoor pool complex, multiple restaurants serving Mexican and international cuisine, and direct access to a white-sand beach.
+    </p>
+    <p class="hotel-description" style="margin-top:10px">
+      Rooms are spacious and contemporary with floor-to-ceiling windows. The hotel is well-positioned for both relaxation and exploring — Cancún's nightlife, shopping centres, and Mayan ruins are all within easy reach.
+    </p>
+    <span class="show-more" onclick="openModal('modal-description')">Show more ↓</span>
+
+    <hr class="divider" />
+
+    <!-- Amenities -->
+    <div class="section-title">What's included</div>
+    <div class="amenities-grid">
+      <div class="amenity"><span class="amenity-icon">🏊</span> Pool</div>
+      <div class="amenity"><span class="amenity-icon">🏖️</span> Private beach</div>
+      <div class="amenity"><span class="amenity-icon">🍽️</span> Restaurant</div>
+      <div class="amenity"><span class="amenity-icon">🍸</span> Bar</div>
+      <div class="amenity"><span class="amenity-icon">💪</span> Gym</div>
+      <div class="amenity"><span class="amenity-icon">💆</span> Spa</div>
+      <div class="amenity"><span class="amenity-icon">📶</span> Free WiFi</div>
+      <div class="amenity"><span class="amenity-icon">🅿️</span> Free parking</div>
+      <div class="amenity"><span class="amenity-icon">🛎️</span> Concierge</div>
+    </div>
+    <span class="show-more" style="margin-top:12px" onclick="openModal('modal-amenities')">Show all 24 amenities ↓</span>
+
+    <hr class="divider" />
+
+    <!-- Reviews -->
+    <div class="section-title">Guest reviews</div>
+    <div class="reviews-header">
+      <div>
+        <div class="score-big">77</div>
+      </div>
+      <div>
+        <div class="score-label">Good</div>
+        <div class="score-sub">Based on 7,987 verified reviews · TrustYou</div>
+      </div>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-quote">"Amazing beach front hotel with fantastic service and beautiful rooms. The location is unbeatable."</div>
+        <div class="reviewer">— Sarah M., travelled April 2025</div>
+      </div>
+      <div class="review-card">
+        <div class="review-quote">"Great for business and leisure. Close to everything, excellent food, and the pool area is stunning."</div>
+        <div class="reviewer">— James T., travelled February 2026</div>
+      </div>
+    </div>
+    <span class="show-more" style="margin-top:14px" onclick="openModal('modal-reviews')">Read all reviews ↓</span>
+
+    <hr class="divider" />
+
+    <!-- Map -->
+    <div class="section-title">Where you're going</div>
+    <div class="map-placeholder">
+      <div style="text-align:center; position:relative; z-index:1">
+        <div class="map-pin">📍</div>
+        <div>Krystal Cancun · Hotel Zone</div>
+      </div>
+    </div>
+    <div class="map-label" style="margin-top:8px">Cancún Hotel Zone, 0.2 km from the beach · 20 min from CUN airport</div>
+
+    <hr class="divider" />
+
+    <!-- Room Section -->
+    <div class="room-section">
+      <div class="room-header">
+        <div>
+          <div class="room-title">Double Standard Room</div>
+          <div class="room-meta">
+            <span>👤 2 guests</span>
+            <span>·</span>
+            <span class="room-board-badge">🍳 Bed &amp; breakfast</span>
+          </div>
+        </div>
+        <button class="upgrade-btn">Upgrade room ↑</button>
+      </div>
+
+      <!-- Room photo gallery -->
+      <div class="room-gallery">
+        <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=700&q=80" alt="Room main view" />
+        <div class="room-gallery-side">
+          <img src="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=400&q=80" alt="Room bathroom" />
+          <img src="https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=400&q=80" alt="Room view" />
+        </div>
+      </div>
+
+      <!-- Room facilities -->
+      <div class="room-facilities">
+        <div class="room-facility"><span class="room-facility-icon">🛁</span> Bathtub &amp; shower</div>
+        <div class="room-facility"><span class="room-facility-icon">🍸</span> Minibar</div>
+        <div class="room-facility"><span class="room-facility-icon">❄️</span> Air conditioning</div>
+        <div class="room-facility"><span class="room-facility-icon">📺</span> Flat-screen TV</div>
+        <div class="room-facility"><span class="room-facility-icon">📶</span> Free WiFi</div>
+        <div class="room-facility"><span class="room-facility-icon">🏥</span> Daily housekeeping</div>
+        <div class="room-facility"><span class="room-facility-icon">📞</span> Direct dial phone</div>
+        <div class="room-facility"><span class="room-facility-icon">👨‍👩‍👧</span> Children share bed</div>
+      </div>
+      <span class="show-more" style="margin-top:14px" onclick="openModal('modal-room')">Show all room facilities ↓</span>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- Flights (collapsible) -->
+    <div class="flights-section">
+      <div class="flights-toggle" onclick="toggleFlights()">
+        <div>
+          <div class="flights-toggle-label">✈️ Your flights</div>
+          <div class="flights-toggle-meta">WestJet · Toronto (YYZ) ↔ Cancún (CUN) · Direct · Economy Standard</div>
+        </div>
+        <span class="toggle-icon" id="toggle-icon">▾</span>
+      </div>
+      <div class="flights-content" id="flights-content">
+        <!-- Outbound -->
+        <div class="flight-card">
+          <div class="flight-card-header">
+            <div class="airline-info">
+              <div class="airline-dot">WJ</div>
+              WestJet
+            </div>
+            <div class="cabin-badge">Economy Standard</div>
+          </div>
+          <div class="flight-route">
+            <div>
+              <div class="flight-time">15:30</div>
+              <div class="flight-airport">Toronto YYZ</div>
+            </div>
+            <div class="flight-duration">
+              <div class="flight-duration-text">4h 15m</div>
+              <div class="flight-duration-line"></div>
+              <div class="flight-direct">Direct</div>
+            </div>
+            <div style="text-align:right">
+              <div class="flight-time">18:45</div>
+              <div class="flight-airport">Cancún CUN</div>
+            </div>
+          </div>
+          <div class="flight-baggage">🧳 No checked baggage included · <a class="change-link" href="#">Add baggage or change flight</a></div>
+        </div>
+        <!-- Return -->
+        <div class="flight-card">
+          <div class="flight-card-header">
+            <div class="airline-info">
+              <div class="airline-dot">WJ</div>
+              WestJet
+            </div>
+            <div class="cabin-badge">Economy Standard</div>
+          </div>
+          <div class="flight-route">
+            <div>
+              <div class="flight-time">19:40</div>
+              <div class="flight-airport">Cancún CUN</div>
+            </div>
+            <div class="flight-duration">
+              <div class="flight-duration-text">4h 4m</div>
+              <div class="flight-duration-line"></div>
+              <div class="flight-direct">Direct</div>
+            </div>
+            <div style="text-align:right">
+              <div class="flight-time">00:44<span style="font-size:11px;color:#f59e0b"> +1</span></div>
+              <div class="flight-airport">Toronto YYZ</div>
+            </div>
+          </div>
+          <div class="flight-baggage">🧳 No checked baggage included · <a class="change-link" href="#">Add baggage or change flight</a></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /left-col -->
+
+  <!-- RIGHT COLUMN — STICKY BOOKING WIDGET -->
+  <div class="right-col">
+    <div class="booking-widget">
+
+      <!-- Price -->
+      <div class="widget-price">
+        <div class="price-main" id="widget-price">$1,211 <span style="font-size:16px;font-weight:500;color:#555">/pp</span></div>
+        <div class="price-sub">Flight + hotel package · 7 nights</div>
+        <div class="price-total">Total for 2 adults: <strong id="widget-total">CAD $2,421</strong></div>
+      </div>
+
+      <!-- Price Trend Chart -->
+      <div class="trend-section">
+        <div class="trend-label">Price trend — April 2026</div>
+        <div class="trend-chart" id="trend-chart"></div>
+        <div class="trend-months">
+          <span>Apr 1</span>
+          <span>Apr 15</span>
+          <span>Apr 30</span>
+        </div>
+      </div>
+
+      <!-- Rate Calendar -->
+      <div>
+        <div class="cal-header">
+          <button class="cal-nav" onclick="prevMonth()">‹</button>
+          <div class="cal-month" id="cal-month-label">April 2026</div>
+          <button class="cal-nav" onclick="nextMonth()">›</button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="cal-legend">
+          <div><span class="cal-legend-dot" style="background:#16a34a"></span>Best price</div>
+          <div><span class="cal-legend-dot" style="background:#c8102e"></span>Selected</div>
+          <div><span class="cal-legend-dot" style="background:#f0f0f0"></span>Unavailable</div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <button class="cta-btn">Personalise Your Holiday →</button>
+      <div class="cta-includes">
+        <strong>Includes:</strong> Return flights · 7 nights hotel · Breakfast<br>
+        Free to customise in the next step
+      </div>
+
+    </div>
+  </div><!-- /right-col -->
+
+</div><!-- /page-body -->
+
+<!-- ══════════════════════════════════════════
+     MODALS
+     ══════════════════════════════════════════ -->
+
+<!-- PHOTOS MODAL -->
+<div class="modal-overlay" id="modal-photos" onclick="closeModalOnOverlay(event, 'modal-photos')">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <div class="modal-title">Krystal Cancun — All photos</div>
+      <button class="modal-close" onclick="closeModal('modal-photos')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-photo-grid">
+        <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&q=80" alt="Hotel exterior" />
+        <img src="https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=600&q=80" alt="Pool" />
+        <img src="https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=600&q=80" alt="Beach" />
+        <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80" alt="Room" />
+        <img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?w=600&q=80" alt="Restaurant" />
+        <img src="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=600&q=80" alt="Bathroom" />
+        <img src="https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=600&q=80" alt="View" />
+        <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&q=80" alt="Lobby" />
+        <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&q=80" alt="Terrace" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DESCRIPTION MODAL -->
+<div class="modal-overlay" id="modal-description" onclick="closeModalOnOverlay(event, 'modal-description')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">About Krystal Cancun</div>
+      <button class="modal-close" onclick="closeModal('modal-description')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-description">
+        <p>Krystal Cancun is a beachfront resort located at the heart of the Hotel Zone, steps from Cancún's famous turquoise waters. The property features a stunning outdoor pool complex, multiple restaurants serving Mexican and international cuisine, and direct access to a white-sand beach.</p>
+        <p>Rooms are spacious and contemporary with floor-to-ceiling windows offering views of the Caribbean Sea or the lagoon. The hotel is well-positioned for both relaxation and exploring — Cancún's nightlife strip, La Isla Shopping Village, and the famous Mayan ruins of Chichén Itzá are all within reach.</p>
+        <p>The resort caters to couples, families, and solo travellers alike. A full-service spa, gym, multiple bars, and a dedicated kids' area make it versatile for any type of trip. Concierge services can arrange tours, water sports, and airport transfers.</p>
+        <p>The Hotel Zone location puts guests within walking distance of dozens of restaurants, nightclubs, and shops, while the beach and pool provide a serene retreat from the buzz of the city.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AMENITIES MODAL -->
+<div class="modal-overlay" id="modal-amenities" onclick="closeModalOnOverlay(event, 'modal-amenities')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">What's included — All amenities</div>
+      <button class="modal-close" onclick="closeModal('modal-amenities')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section-label">Pool & Beach</div>
+      <div class="modal-amenities-grid">
+        <div class="modal-amenity"><span class="modal-amenity-icon">🏊</span> Outdoor pool</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">🏖️</span> Private beach access</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">🪂</span> Water sports</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">🛶</span> Non-motorised watersports</div>
+      </div>
+      <div class="modal-section-label">Food & Drink</div>
+      <div class="modal-amenities-grid">
+        <div class="modal-amenity"><span class="modal-amenity-icon">🍽️</span> On-site restaurant</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">🍸</span> Bar</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">☕</span> Café</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">🍹</span> Poolside bar</div>
+      </div>
+      <div class="modal-section-label">Wellness</div>
+      <div class="modal-amenities-grid">
+        <div class="modal-amenity"><span class="modal-amenity-icon">💆</span> Full-service spa</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">💪</span> Fitness centre</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">🧖</span> Sauna</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">🧘</span> Yoga classes</div>
+      </div>
+      <div class="modal-section-label">Services</div>
+      <div class="modal-amenities-grid">
+        <div class="modal-amenity"><span class="modal-amenity-icon">📶</span> Free WiFi throughout</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">🅿️</span> Free parking</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">🛎️</span> 24-hr concierge</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">🚌</span> Airport shuttle (fee)</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">👶</span> Kids' club</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">🎭</span> Evening entertainment</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">🏪</span> Gift shop</div>
+        <div class="modal-amenity"><span class="modal-amenity-icon">👔</span> Business centre</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEWS MODAL -->
+<div class="modal-overlay" id="modal-reviews" onclick="closeModalOnOverlay(event, 'modal-reviews')">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <div class="modal-title">Guest reviews</div>
+      <button class="modal-close" onclick="closeModal('modal-reviews')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-score-header">
+        <div class="modal-score-number">77</div>
+        <div>
+          <div class="modal-score-label">Good</div>
+          <div class="modal-score-sub">Based on 7,987 verified reviews · Powered by TrustYou</div>
+        </div>
+      </div>
+      <div class="modal-reviews-list">
+        <div class="modal-review"><p class="modal-review-text">"Amazing beach front hotel with fantastic service and beautiful rooms. The location is unbeatable."</p><div class="modal-reviewer">Sarah M. · April 2025</div></div>
+        <div class="modal-review"><p class="modal-review-text">"Great for business and leisure. Close to everything, excellent food, and the pool area is stunning."</p><div class="modal-reviewer">James T. · February 2026</div></div>
+        <div class="modal-review"><p class="modal-review-text">"The beach access is wonderful and the staff are incredibly friendly. Would absolutely return."</p><div class="modal-reviewer">Maria L. · January 2026</div></div>
+        <div class="modal-review"><p class="modal-review-text">"Perfect location in the hotel zone. The room was clean and modern, breakfast was excellent."</p><div class="modal-reviewer">Tom K. · December 2025</div></div>
+        <div class="modal-review"><p class="modal-review-text">"Good for families. The kids' club kept our children entertained all day while we relaxed by the pool."</p><div class="modal-reviewer">Anna & Peter S. · March 2025</div></div>
+        <div class="modal-review"><p class="modal-review-text">"Solid 4-star hotel. Nothing extraordinary but everything you need is there. Great value."</p><div class="modal-reviewer">David R. · November 2025</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ROOM FACILITIES MODAL -->
+<div class="modal-overlay" id="modal-room" onclick="closeModalOnOverlay(event, 'modal-room')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Double Standard Room — All facilities</div>
+      <button class="modal-close" onclick="closeModal('modal-room')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section-label">Bathroom</div>
+      <div class="modal-facilities-grid">
+        <div class="modal-facility"><span class="modal-facility-icon">🛁</span> Bathtub</div>
+        <div class="modal-facility"><span class="modal-facility-icon">🚿</span> Separate shower</div>
+        <div class="modal-facility"><span class="modal-facility-icon">💈</span> Hairdryer</div>
+        <div class="modal-facility"><span class="modal-facility-icon">🧴</span> Toiletries provided</div>
+      </div>
+      <div class="modal-section-label">Bedroom</div>
+      <div class="modal-facilities-grid">
+        <div class="modal-facility"><span class="modal-facility-icon">🛏️</span> Double bed</div>
+        <div class="modal-facility"><span class="modal-facility-icon">❄️</span> Air conditioning</div>
+        <div class="modal-facility"><span class="modal-facility-icon">📺</span> Flat-screen TV</div>
+        <div class="modal-facility"><span class="modal-facility-icon">🪟</span> Ocean or lagoon view</div>
+        <div class="modal-facility"><span class="modal-facility-icon">👨‍👩‍👧</span> Children share bed</div>
+        <div class="modal-facility"><span class="modal-facility-icon">🧹</span> Daily housekeeping</div>
+      </div>
+      <div class="modal-section-label">In-room</div>
+      <div class="modal-facilities-grid">
+        <div class="modal-facility"><span class="modal-facility-icon">🍸</span> Minibar</div>
+        <div class="modal-facility"><span class="modal-facility-icon">☕</span> Coffee machine</div>
+        <div class="modal-facility"><span class="modal-facility-icon">📶</span> Free WiFi</div>
+        <div class="modal-facility"><span class="modal-facility-icon">📞</span> Direct dial phone</div>
+        <div class="modal-facility"><span class="modal-facility-icon">🔒</span> In-room safe</div>
+        <div class="modal-facility"><span class="modal-facility-icon">🪑</span> Seating area</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE STICKY FOOTER -->
+<div class="mobile-footer">
+  <div>
+    <div class="mobile-footer-price">$1,211<span style="font-size:13px;font-weight:400;color:#777">/pp</span></div>
+    <div class="mobile-footer-sub">Total: CAD $2,421 · 7 nights</div>
+  </div>
+  <button class="mobile-footer-btn">Personalise Your Holiday →</button>
+</div>
+
+<script>
+  // ── PRICE DATA ──
+  const prices = {
+    '2026-04': {
+      1:1516,2:1500,3:1499,4:1477,5:1455,
+      6:1309,7:1287,8:1318,9:1296,10:1297,11:1331,12:1361,
+      13:1361,14:1257,15:1271,16:1250,17:1271,18:1375,19:1375,
+      20:1375,21:1278,22:1278,23:1308,24:1278,25:1336,26:1372,
+      27:1445,28:1211,29:1293,30:1373
+    },
+    '2026-05': {
+      1:1180,2:1155,3:1190,4:1210,5:1170,
+      6:1145,7:1130,8:1160,9:1175,10:1140,11:1200,12:1220,
+      13:1230,14:1185,15:1195,16:1170,17:1190,18:1240,19:1260,
+      20:1250,21:1215,22:1220,23:1235,24:1210,25:1280,26:1295,
+      27:1310,28:1270,29:1285,30:1300,31:1320
+    }
+  };
+
+  let currentMonth = '2026-04';
+  let selectedDate = '2026-04-28';
+
+  const monthNames = { '2026-04': 'April 2026', '2026-05': 'May 2026' };
+  const monthOrder = ['2026-04', '2026-05'];
+
+  function getMonthData() { return prices[currentMonth] || {}; }
+
+  function cheapestDay() {
+    const data = getMonthData();
+    const vals = Object.entries(data);
+    if (!vals.length) return null;
+    return vals.reduce((a, b) => a[1] < b[1] ? a : b)[0];
+  }
+
+  function renderTrend() {
+    const data = getMonthData();
+    const chart = document.getElementById('trend-chart');
+    const vals = Object.values(data);
+    const min = Math.min(...vals), max = Math.max(...vals);
+    const range = max - min || 1;
+    const cheapest = cheapestDay();
+    const selDay = selectedDate.startsWith(currentMonth) ? parseInt(selectedDate.split('-')[2]) : null;
+
+    chart.innerHTML = '';
+    for (const [day, price] of Object.entries(data)) {
+      const heightPct = 20 + ((price - min) / range) * 80;
+      const bar = document.createElement('div');
+      bar.className = 'trend-bar';
+      bar.style.height = heightPct + '%';
+
+      if (selDay && parseInt(day) === selDay) {
+        bar.classList.add('selected');
+      } else if (parseInt(day) === parseInt(cheapest)) {
+        bar.classList.add('cheapest');
+        bar.style.background = '#16a34a';
+      } else {
+        bar.style.background = '#e0e0e0';
+      }
+      bar.title = `Apr ${day}: $${price}/pp`;
+      bar.onclick = () => selectDate(currentMonth + '-' + day.padStart(2,'0'));
+      chart.appendChild(bar);
+    }
+  }
+
+  function renderCalendar() {
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+    document.getElementById('cal-month-label').textContent = monthNames[currentMonth];
+
+    const days = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+    days.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'cal-day-name';
+      el.textContent = d;
+      grid.appendChild(el);
+    });
+
+    const [yr, mo] = currentMonth.split('-').map(Number);
+    const firstDay = new Date(yr, mo - 1, 1).getDay();
+    const offset = (firstDay + 6) % 7;
+    const data = getMonthData();
+    const cheapest = cheapestDay();
+    const totalDays = new Date(yr, mo, 0).getDate();
+
+    for (let i = 0; i < offset; i++) {
+      const el = document.createElement('div');
+      el.className = 'cal-day empty';
+      grid.appendChild(el);
+    }
+
+    for (let d = 1; d <= totalDays; d++) {
+      const el = document.createElement('div');
+      const dateStr = `${currentMonth}-${String(d).padStart(2,'0')}`;
+      const price = data[d];
+
+      if (!price) {
+        el.className = 'cal-day disabled';
+        el.innerHTML = `<span class="cal-day-num">${d}</span>`;
+      } else {
+        el.className = 'cal-day';
+        if (dateStr === selectedDate) el.classList.add('selected');
+        if (parseInt(cheapest) === d) el.classList.add('cheapest-day');
+        el.innerHTML = `<span class="cal-day-num">${d}</span><span class="cal-price">$${price}</span>`;
+        el.onclick = () => selectDate(dateStr);
+      }
+      grid.appendChild(el);
+    }
+
+    renderTrend();
+  }
+
+  function selectDate(dateStr) {
+    selectedDate = dateStr;
+    const [yr, mo, day] = dateStr.split('-');
+    const monthKey = `${yr}-${mo}`;
+    const price = prices[monthKey]?.[parseInt(day)];
+    if (price) {
+      document.getElementById('widget-price').innerHTML = `$${price.toLocaleString()} <span style="font-size:16px;font-weight:500;color:#555">/pp</span>`;
+      document.getElementById('widget-total').textContent = `CAD $${(price * 2).toLocaleString()}`;
+    }
+    renderCalendar();
+  }
+
+  function prevMonth() {
+    const idx = monthOrder.indexOf(currentMonth);
+    if (idx > 0) { currentMonth = monthOrder[idx - 1]; renderCalendar(); }
+  }
+
+  function nextMonth() {
+    const idx = monthOrder.indexOf(currentMonth);
+    if (idx < monthOrder.length - 1) { currentMonth = monthOrder[idx + 1]; renderCalendar(); }
+  }
+
+  let flightsOpen = true;
+  function toggleFlights() {
+    flightsOpen = !flightsOpen;
+    document.getElementById('flights-content').style.display = flightsOpen ? 'flex' : 'none';
+    document.getElementById('toggle-icon').textContent = flightsOpen ? '▾' : '▸';
+  }
+
+  renderCalendar();
+
+  // ── MODAL ──
+  function openModal(id) {
+    const el = document.getElementById(id);
+    el.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOnOverlay(e, id) {
+    if (e.target === e.currentTarget) closeModal(id);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.open').forEach(m => {
+        m.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    }
+  });
+</script>
+</body>
+</html>

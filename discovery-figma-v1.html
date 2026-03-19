@@ -1,0 +1,3052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Discovery — TripBuilder (from Figma)</title>
+
+  <!--
+    Built directly from Figma MCP data — Node: "New Hero - Tours" (5828:8728)
+    File: New Discovery (v2sKEB7o8XZSxPzbbOzUfR)
+    Generated: 2026-02-26
+
+    All text, colours, structure, and spacing are taken from the actual Figma file —
+    not guessed from a screenshot.
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Lucide icons — same icon set as the real TripBuilder frontend -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    /* ─────────────────────────────────────────────────────
+       DESIGN TOKENS — extracted from Figma MCP fill tokens
+    ───────────────────────────────────────────────────── */
+    :root {
+      /* Colours — direct from Figma fill tokens */
+      --primary:       #2681FF;   /* fill_K8K5VT — active tab, primary buttons */
+      --primary-hover: #1a6cd4;
+      --text-dark:     #333743;   /* fill_MV0XLU — all main text */
+      --white:         #FFFFFF;   /* fill_E1X3BC — cards, inputs */
+      --bg-page:       #F3F5F6;   /* fill_1CY1T3 — page background */
+      --bg-muted:      #F0F0F0;   /* fill_EV2Z0W — inactive states */
+      --border:        #E0E2E8;   /* stroke_IGTHZ1 / stroke_37K17J — exact Figma value */
+
+      /* Border radii — from Figma borderRadius values */
+      --radius-search: 24px;          /* "Create itinerary search" card */
+      --radius-input:  12px;          /* Search input field */
+      --radius-card:   16px;          /* Tour cards */
+      --radius-tab:    12px 12px 0 0; /* Tab top corners */
+      --radius-btn:    8px;           /* Buttons */
+
+      /* Shadows */
+      --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.10);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Mulish', sans-serif;
+      background: var(--bg-page);
+      color: var(--text-dark);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TYPOGRAPHY — mapped from Figma text styles ──────── */
+    /* Heading Bold/H2 */
+    .text-h2 { font-size: 32px; font-weight: 700; line-height: 1.2; }
+    /* Heading Bold/H3 — price */
+    .text-h3 { font-size: 22px; font-weight: 700; line-height: 1.3; }
+    /* Heading Black/H4 — active tab label */
+    .text-h4-black { font-size: 18px; font-weight: 900; }
+    /* Heading Bold/H4 — inactive tab label */
+    .text-h4-bold  { font-size: 18px; font-weight: 700; }
+    /* Heading/H5 — primary button */
+    .text-h5 { font-size: 15px; font-weight: 700; }
+    /* Paragraph Regular/Large — section subtitle */
+    .text-para-lg { font-size: 18px; font-weight: 400; line-height: 1.6; }
+    /* Paragraph Regular/Default — card description */
+    .text-para { font-size: 15px; font-weight: 400; line-height: 1.5; }
+    /* Paragraph Bold/Default Bold — card title, filter tabs */
+    .text-para-bold { font-size: 15px; font-weight: 700; line-height: 1.5; }
+    /* Paragraph Regular/Small — country, duration, "per person" */
+    .text-para-sm { font-size: 13px; font-weight: 400; line-height: 1.4; }
+
+    /* ── LAYOUT ────────────────────────────────────────── */
+    .page-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 48px;
+    }
+
+
+    /* ═══════════════════════════════════════
+       HERO SECTION
+       Figma: "Hero search" (5828:8730)
+    ═══════════════════════════════════════ */
+    .hero {
+      /* Hero background image — using picsum since Figma image refs require auth */
+      background: url('assets/hero-background-45ee0a.png') center/cover no-repeat;
+      /* layout_522H3S: padding 128px 0px (symmetrical top and bottom) */
+      padding: 128px 0;
+      position: relative;
+    }
+
+    /* Subtle dark overlay so the white card reads clearly */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.28), rgba(0,0,0,0.12));
+    }
+
+    /* Push child content above the overlay */
+    .hero > .page-container { position: relative; }
+
+
+    /* ── SEARCH CARD ──────────────────────────────────────
+       Figma: "Create itinerary search" (5828:8731)
+       borderRadius: 24px, fills: fill_E1X3BC (#FFFFFF)
+    ────────────────────────────────────────────────────── */
+    .search-card {
+      background: var(--white);
+      border-radius: var(--radius-search);
+      overflow: hidden;
+      /* layout_WY7KJY: width 1104px, padding 24px all sides, gap 24px between sections */
+      max-width: 1104px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 24px;
+    }
+
+
+    /* ── SEARCH TABS ──────────────────────────────────────
+       Figma: "Tabs" (5828:8732), "Options" (5828:8734)
+       strokes: stroke_OJ113W — bottom border on the bar
+    ────────────────────────────────────────────────────── */
+    .tabs-bar {
+      /* stroke_IGTHZ1: 1px bottom border, #E0E2E8 */
+      border-bottom: 1px solid var(--border);
+      /* layout_SPD989: justifyContent center — the tab group is horizontally centred */
+      display: flex;
+      justify-content: center;
+    }
+
+    .tabs-options {
+      display: flex;
+      /* layout_78ID7H: gap 16px between tab buttons (was 2px) */
+      gap: 16px;
+      /* Needed so the sliding indicator can be positioned relative to this container */
+      position: relative;
+    }
+
+    /* Individual tab button — layout_UAHEUQ */
+    .tab {
+      display: flex;
+      /* Column layout: icon sits ABOVE the label (not beside it) */
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      /* gap 4px between icon and text; padding 0 top, 16px sides, 8px bottom */
+      gap: 4px;
+      padding: 0 16px 8px;
+      /* borderRadius: 12px 12px 0px 0px from Figma */
+      border-radius: var(--radius-tab);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: 'Mulish', sans-serif;
+      color: var(--text-dark);
+      white-space: nowrap;
+      /* Heading Bold/H4: fontSize 18px, fontWeight 700 */
+      font-size: 18px;
+      font-weight: 700;
+      /* Positioning context so the ::after underline sits relative to this tab */
+      position: relative;
+    }
+
+
+    /* Active tab — color only; the sliding .tab-indicator below handles the underline */
+    .tab.active {
+      color: var(--primary);
+    }
+
+    /* Active tab uses Heading Black/H4 (weight 900) instead of Bold */
+    .tab.active .tab-label { font-weight: 900; }
+
+    .tab-icon {
+      /* layout_G97MV3: 32×32px — exact Figma icon dimensions */
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+      /* Inactive tabs: fill_D18TW8 (#333743) */
+      color: var(--text-dark);
+    }
+
+    /* Active tab icon uses fill_K8K5VT (#2681FF) */
+    .tab.active .tab-icon { color: var(--primary); }
+
+    /* ── TAB TRANSITIONS ──────────────────────────────────
+       1. Icon pop — springy scale+rotate when a tab is clicked.
+          The .popping class is added via JS and removed on animationend.
+       2. Panel fade-in — search inputs fade up when revealed.
+          CSS automatically re-runs @keyframes when an element leaves
+          display:none, so no extra JS is needed here.
+       3. Section fade-in — same trick for the large content sections.
+    ──────────────────────────────────────────────────────── */
+
+    /* Smooth colour + background shift on the tab button itself */
+    .tab { transition: color 0.2s ease, background 0.15s ease; }
+
+    /* ── SLIDING TAB INDICATOR ────────────────────────────
+       A single absolutely-positioned bar that slides left/right
+       to follow whichever tab is active. JS sets `left` and `width`
+       on every click. The CSS transition does all the movement.
+       bottom: -1px so it sits right on top of the tabs-bar border.
+    ──────────────────────────────────────────────────────── */
+    .tab-indicator {
+      position: absolute;
+      bottom: -1px;
+      height: 2px;
+      background: var(--primary);
+      /* This is the transition that makes it slide — left and width animate together */
+      transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                  width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none; /* don't block clicks on the tabs */
+      border-radius: 2px;
+    }
+
+    /* The icon smoothly shifts colour with the tab */
+    .tab-icon { transition: color 0.18s ease; }
+
+    /* Gentle lift — scales up slightly and floats a few pixels upward, then settles */
+    @keyframes tabIconPop {
+      0%   { transform: translateY(0)    scale(1);    }
+      40%  { transform: translateY(-4px) scale(1.18); }
+      100% { transform: translateY(0)    scale(1);    }
+    }
+
+    /* Applied by JS on click; removed automatically when animation ends */
+    .tab-icon.popping {
+      animation: tabIconPop 0.5s ease-out;
+    }
+
+    /* Search panel fades up when it becomes visible */
+    @keyframes panelFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0);   }
+    }
+
+    /* Animate each direct child of the panel separately so they stagger in.
+       `both` fill-mode means children start invisible even before their delay fires. */
+    .search-panel:not([hidden]) > * {
+      animation: panelFadeIn 0.25s ease-out both;
+    }
+    /* The second child (e.g. the "OR / Create own trip" row) comes in 80ms later */
+    .search-panel:not([hidden]) > *:nth-child(2) {
+      animation-delay: 0.08s;
+    }
+
+    /* Large content sections fade up when switched to */
+    @keyframes sectionFadeIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    #section-tours:not([hidden]),
+    #section-hotels:not([hidden]),
+    #section-flights:not([hidden]),
+    #section-holidays:not([hidden]) {
+      animation: sectionFadeIn 0.35s ease-out;
+    }
+
+
+    /* ── SEARCH INPUT ROW ─────────────────────────────────
+       Figma: "Search" frame (5828:8811)
+       Contains the input field + primary CTA button
+    ────────────────────────────────────────────────────── */
+    .search-area {
+      display: flex;
+      /* layout_E0ZE37: row, gap 24px between input and button */
+      gap: 24px;
+      /* stretch so the button fills the same height as the input */
+      align-items: stretch;
+      /* No padding here — the card's 24px padding already provides the side margins */
+      padding: 0;
+    }
+
+    /* Search input field — "Search" (5828:8812)
+       borderRadius: 12px, fills: white, strokes: stroke_BW1UAD */
+    .search-input-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-input);
+      /* layout_Z3PMJN: padding 16px top/bottom, 24px left/right; height 56px */
+      padding: 16px 24px;
+      min-height: 56px;
+      cursor: text;
+      transition: border-color 0.15s;
+    }
+
+    .search-input-wrap:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(38, 129, 255, 0.12);
+    }
+
+    .search-input-wrap input {
+      border: none;
+      outline: none;
+      font-family: 'Mulish', sans-serif;
+      /* Paragraph Regular/Default: fontSize 16, fontWeight 400 */
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--text-dark);
+      width: 100%;
+      background: transparent;
+    }
+
+    /* Placeholder text: "What are you looking for?" from Figma (5828:8813)
+       fills: fill_MV0XLU but at lower opacity for placeholder */
+    .search-input-wrap input::placeholder { color: #94a3b8; }
+
+    /* Primary button — "Button" (5828:8815)
+       Type=Primary, Size=Large, fills: fill_K8K5VT (#2681FF), borderRadius: 8px */
+    .btn-primary {
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-btn);
+      /* Heading/H5: fontSize 15, fontWeight 700 */
+      font-family: 'Mulish', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      /* layout_WBOPBC: width 128px fixed, padding 4px 16px, vertical fill */
+      width: 128px;
+      flex-shrink: 0;
+      padding: 4px 16px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover { background: var(--primary-hover); }
+
+
+    /* ── SECONDARY ACTION ROW ─────────────────────────────
+       Figma: "Flight Options" (5828:8816)
+       "OR" text (Paragraph Bold) + "Create own trip" text button
+    ────────────────────────────────────────────────────── */
+    .search-secondary {
+      display: flex;
+      /* layout_ES7716: row, justifyContent center, alignItems center, gap 8px */
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      /* No padding needed — the card's 24px + gap 24px already handles spacing */
+      padding: 0;
+    }
+
+    /* "OR" — Paragraph Bold/Default Bold: fontSize 16, fontWeight 700 */
+    .or-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    /* "Create own trip" — Type=Text button, fill_K8K5VT (#2681FF) */
+    .btn-text {
+      background: transparent;
+      border: none;
+      font-family: 'Mulish', sans-serif;
+      /* Paragraph Bold/Default Bold: fontSize 16, fontWeight 700 */
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .btn-text:hover { text-decoration: underline; }
+
+
+    /* ═══════════════════════════════════════
+       SECTION BASE STYLES
+    ═══════════════════════════════════════ */
+    .section { padding: 64px 0; }
+
+    .section-header { margin-bottom: 32px; }
+
+    /* Title row: icon + H2 heading side by side */
+    .section-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .section-icon {
+      width: 28px;
+      height: 28px;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    /* Divider between sections */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+
+    /* ── FILTER TABS ──────────────────────────────────────
+       Figma: "Tabs" (5828:8830) — travel style filter tabs
+       Same tab pattern as hero, but smaller and horizontal scroll
+    ────────────────────────────────────────────────────── */
+    .filter-tabs-wrap {
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
+      /* Positioning context for the sliding .filter-tab-indicator */
+      position: relative;
+    }
+
+    .filter-tabs {
+      display: flex;
+      overflow-x: auto;
+      /* Hide scrollbar but keep scroll */
+      scrollbar-width: none;
+    }
+
+    .filter-tabs::-webkit-scrollbar { display: none; }
+
+    /* Individual filter tab — Paragraph Bold/Default Bold */
+    .filter-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 20px;
+      /* borderRadius: 12px 12px 0px 0px from Figma (5828:8832) */
+      border-radius: var(--radius-tab);
+      border: none;
+      background: transparent;
+      font-family: 'Mulish', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-dark);   /* fill_MV0XLU */
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* Active filter tab — colour only; indicator handles the underline */
+    .filter-tab.active { color: var(--primary); }
+
+    /* ── SLIDING FILTER TAB INDICATOR ─────────────────────────
+       Same concept as .tab-indicator in the hero tabs.
+       Sits inside .filter-tabs-wrap (outside the scroll container)
+       so it won't be clipped by overflow-x: auto on .filter-tabs.
+       bottom: -1px overlaps the wrap's 1px border, just like the
+       original per-tab border trick did. JS sets left + width.
+    ──────────────────────────────────────────────────────────── */
+    .filter-tab-indicator {
+      position: absolute;
+      bottom: -1px;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 2px;
+      transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                  width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    /* "Other styles" has a dropdown arrow (5828:8842) */
+    .filter-tab-more { color: var(--primary); }
+
+
+    /* ── TOUR CARDS GRID ──────────────────────────────────
+       Figma: "Tours" frame (5828:8845) — 3-column grid
+       Each card: borderRadius: 16px, fills: white, effects: shadow
+    ────────────────────────────────────────────────────── */
+    .tour-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    /* Tour card — "Tour card" (e.g. 5828:8846)
+       fills: fill_E1X3BC, effects: effect_8WAQYJ (shadow), borderRadius: 16px */
+    .tour-card {
+      background: var(--white);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tour-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+    }
+
+    /* Tour image — the FRAME with image fill (e.g. 5828:8847) */
+    .tour-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Tour info section — "Tour info" frame (e.g. 5828:8848) */
+    .tour-info {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Country row — "Country" (e.g. 5828:8849): flag icon + country name
+       Paragraph Regular/Small, fill_MV0XLU */
+    .tour-country {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-dark);
+    }
+
+    /* Country flag — using flagcdn.com for real country flags */
+    .tour-country img {
+      width: 20px;
+      height: 14px;
+      border-radius: 2px;
+      object-fit: cover;
+    }
+
+    /* Tour title — "Title of the tour" (e.g. 5828:8852)
+       Paragraph Bold/Default Bold, fill_MV0XLU */
+    .tour-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1.3;
+    }
+
+    /* Tour description — "Key sentence" (e.g. 5828:8854)
+       Paragraph Regular/Default, fill_MV0XLU
+       Clamped to 2 lines like in Figma */
+    .tour-desc {
+      font-size: 14px;
+      font-weight: 400;
+      color: #667080;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Duration + price row — "Duration and price" (e.g. 5828:8856) */
+    .tour-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 4px;
+    }
+
+    /* Duration — "Duration" (e.g. 5828:8857): clock icon + "8 days"
+       Paragraph Regular/Small, fill_MV0XLU */
+    .tour-duration {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-dark);
+    }
+
+    /* Price group — "Price" (e.g. 5828:8860) */
+    .tour-price-group { text-align: right; }
+
+    /* "Per person" label — Paragraph Regular/Small */
+    .tour-per-person {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-dark);
+    }
+
+    /* Price value — "from $1650" — Heading Bold/H3, fill_MV0XLU */
+    .tour-price {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+
+    /* ── SECONDARY BUTTON ─────────────────────────────────
+       Figma: "Button" (5828:8948)
+       Type=Secondary, strokes: stroke_FEE34F (#2681FF border)
+       borderRadius: 8px
+    ────────────────────────────────────────────────────── */
+    .btn-secondary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      /* stroke_FEE34F — 1px border in primary blue */
+      border: 1px solid var(--primary);
+      border-radius: var(--radius-btn);
+      /* layout_60OKMC: padding 8px 16px */
+      padding: 10px 20px;
+      font-family: 'Mulish', sans-serif;
+      /* Paragraph Bold/Default Bold, fill_K8K5VT (#2681FF) */
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-secondary:hover { background: #eff6ff; }
+
+
+    /* ── RESPONSIVE ───────────────────────────────────────
+       4 breakpoints covering the full device range.
+       · 1024px — large tablet / small laptop
+       · 768px  — tablet portrait
+       · 480px  — phone
+       · 360px  — small phone safety net
+    ────────────────────────────────────────────────────── */
+
+    @media (max-width: 1024px) {
+      .page-container { padding: 0 32px; }
+      .hero { padding: 96px 0; }
+      .section { padding: 56px 0; }
+      .text-h2 { font-size: 28px; }
+      .tour-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .page-container { padding: 0 24px; }
+      .hero { padding: 72px 0; }
+      .section { padding: 48px 0; }
+      .text-h2 { font-size: 24px; }
+      .text-para-lg { font-size: 16px; }
+      .search-card { padding: 20px; gap: 20px; border-radius: 16px; }
+      /* Hero tabs scroll horizontally; right-edge fade hints at more tabs */
+      .tabs-bar { justify-content: flex-start; }
+      .tabs-options {
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+        mask-image: linear-gradient(to right, black 80%, transparent 100%);
+        padding-right: 24px;
+      }
+      .tabs-options::-webkit-scrollbar { display: none; }
+      .tab { padding: 0 12px 8px; font-size: 16px; }
+      .tab-icon { width: 26px; height: 26px; }
+
+      /* ── Hotel search inputs: stack vertically at tablet ──
+         The three fields (Destination / Dates / Travelers) are too
+         cramped side-by-side at 768px — stack them like a list instead.
+         We also need to fix the borders: the horizontal layout removes
+         left borders to avoid double lines, so we restore them and then
+         remove top/bottom borders where fields meet vertically instead. */
+      .search-area { flex-direction: column; gap: 12px; }
+      .btn-primary { width: 100%; }
+      .search-inputs-group { flex-direction: column; }
+      /* Restore full border on every field (overrides the adjacent-sibling rule
+         that removes left borders in the horizontal layout) */
+      .search-field { border-left: 1px solid var(--primary) !important; border-radius: 0 !important; }
+      /* Top field: round only the top two corners; no bottom border (avoids double line) */
+      .search-field:first-child { border-radius: 8px 8px 0 0 !important; border-bottom: none; }
+      /* Bottom field: round only the bottom two corners; no top border (avoids double line) */
+      .search-field:last-child { border-radius: 0 0 8px 8px !important; border-top: none; }
+    }
+
+    @media (max-width: 480px) {
+      .page-container { padding: 0 16px; }
+      .hero { padding: 48px 0; }
+      .section { padding: 36px 0; }
+      .section-header { margin-bottom: 20px; }
+      .text-h2 { font-size: 20px; }
+      .text-para-lg { font-size: 15px; }
+      .search-card { padding: 16px; gap: 14px; border-radius: 16px; }
+      .tab { padding: 0 10px 8px; font-size: 13px; gap: 3px; }
+      .tab-icon { width: 22px; height: 22px; }
+      .tabs-options { -webkit-mask-image: none; mask-image: none; padding-right: 8px; }
+      /* Stack search input + button so each gets full width on phone */
+      .search-area { flex-direction: column; gap: 12px; }
+      .search-input-wrap { min-height: 48px; padding: 12px 16px; }
+      .btn-primary { width: 100%; min-height: 48px; }
+      .tour-grid { grid-template-columns: 1fr; gap: 16px; }
+      .filter-tab { padding: 10px 14px; font-size: 14px; }
+      .btn-secondary { width: 100%; justify-content: center; }
+    }
+
+    @media (max-width: 360px) {
+      .page-container { padding: 0 12px; }
+      .text-h2 { font-size: 18px; }
+      .tab { padding: 0 8px 8px; font-size: 12px; }
+      .tab-icon { width: 20px; height: 20px; }
+    }
+
+
+    /* ═══════════════════════════════════════
+       TAB CONTENT PANELS
+       Each tab in the search card has its own
+       "panel" — only one is visible at a time.
+       The [hidden] attribute hides inactive panels.
+       !important ensures it wins over any other
+       display value set below.
+    ═══════════════════════════════════════ */
+    [hidden] { display: none !important; }
+
+    /* The panel wrapper participates in the search
+       card's flex column. It is itself a flex column
+       with the same 24px gap so the search inputs
+       and the "OR" row stay evenly spaced. */
+    .search-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+
+    /* ── HOTELS TAB: GROUPED SEARCH INPUTS ────────────
+       Figma: three inputs that sit edge-to-edge as one
+       compound control.
+       Left  → rounded left corners
+       Middle → no left border (avoids a double line)
+       Right  → rounded right corners, no left border
+    ─────────────────────────────────────────────────── */
+    .search-inputs-group {
+      display: flex;
+      align-items: stretch;
+      flex: 1; /* fill the row alongside the Search button */
+    }
+
+    /* Each input cell in the group */
+    .search-field {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      padding: 10px 16px;
+      min-height: 56px;
+      background: var(--white);
+      /* Blue border = active / selected state from Figma */
+      border: 1px solid var(--primary);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .search-field:hover { background: #f5f9ff; }
+
+    /* Left field: rounded left corners only */
+    .search-field:first-child { border-radius: 8px 0 0 8px; }
+
+    /* Every field after the first: remove left border to
+       avoid a double line where two fields meet */
+    .search-field + .search-field { border-left: none; }
+
+    /* Right field: rounded right corners only */
+    .search-field:last-child { border-radius: 0 8px 8px 0; }
+
+    /* Small label above the value — e.g. "Destination" */
+    .search-field-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #667080;
+      line-height: 1;
+    }
+
+    /* The actual value — e.g. "Bali, Indonesia" */
+    .search-field-value {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--text-dark);
+    }
+
+
+    /* ── HOTELS SECTION: HORIZONTAL SCROLL CARDS ──────
+       Figma: "Our favourite picks" — cards in a row
+       that scroll sideways (not a grid like tours).
+       Each card is 389px wide with 32px between them.
+    ─────────────────────────────────────────────────── */
+    .hotel-scroll-container {
+      display: flex;
+      gap: 32px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory; /* cards snap into place */
+      padding-bottom: 16px;
+      scrollbar-width: none;
+    }
+
+    .hotel-scroll-container::-webkit-scrollbar { display: none; }
+
+    /* Individual hotel card — fixed 389px, never shrinks */
+    .hotel-card {
+      flex-shrink: 0;
+      width: 389px;
+      background: var(--white);
+      border-radius: var(--radius-card); /* 16px */
+      overflow: hidden;
+      /* Two-layer shadow from Figma */
+      box-shadow:
+        0 4px 6px -4px rgba(0, 0, 0, 0.10),
+        0 10px 15px -3px rgba(0, 0, 0, 0.10);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      scroll-snap-align: start;
+    }
+
+    .hotel-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+    }
+
+    /* Hero image — 252px tall (taller than tour card images) */
+    .hotel-image {
+      width: 100%;
+      height: 252px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Padded content below the image */
+    .hotel-info {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Row: hotel name on the left, rating on the right */
+    .hotel-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    /* Hotel name — Heading Bold/H4, 18px (same as tab labels) */
+    .hotel-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0A0A0A;
+      line-height: 1.3;
+    }
+
+    /* Official hotel star classification — e.g. ★★★★☆
+       Separate from the green user-review score badge.
+       Gold colour from Figma token fill_NJXM3P (#FFB700). */
+    .hotel-stars {
+      font-size: 13px;
+      color: #FFB700;
+      letter-spacing: 1px;
+      margin-top: 3px;
+      line-height: 1;
+    }
+
+    /* Wrapper that groups name + stars so the rating badge
+       stays pinned to the right edge of the title row */
+    .hotel-name-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Rating: green score pill + "Excellent" + review count */
+    .hotel-rating-block {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    /* Green score pill — e.g. "4.3" */
+    .hotel-score {
+      background: #16a34a; /* success green */
+      color: var(--white);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 8px;
+      line-height: 1;
+    }
+
+    .hotel-rating-meta { display: flex; flex-direction: column; }
+
+    /* "Excellent", "Outstanding", etc. */
+    .hotel-rating-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    /* "367 reviews" */
+    .hotel-reviews {
+      font-size: 12px;
+      font-weight: 400;
+      color: #667080;
+    }
+
+    /* Location — map pin + "City, Country" */
+    .hotel-location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-dark);
+    }
+
+    /* Row of amenity pills */
+    .hotel-amenities { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* Single amenity pill — light blue with icon + label */
+    .amenity-tag {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      /* Primary blue at 10% opacity = subtle tint */
+      background: rgba(38, 129, 255, 0.10);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 400;
+      color: #0A0A0A;
+    }
+
+    /* Price section — thin rule separates it from amenities.
+       text-align: right pushes both the label and the price
+       to the right edge, matching the tour card pattern. */
+    .hotel-price-section {
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      text-align: right;
+    }
+
+    .hotel-price-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-dark);
+      margin-bottom: 2px;
+    }
+
+    /* "from $125" — Heading Bold/H3, 24px */
+    .hotel-price {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    /* Hotel-specific responsive overrides — aligned to the shared breakpoints above */
+    @media (max-width: 768px) {
+      /* Hotel cards are a horizontal scroll carousel, so they keep a fixed width.
+         At tablet size we reduce them slightly to hint that more cards exist off-screen. */
+      .hotel-card { width: 340px; }
+    }
+
+    @media (max-width: 480px) {
+      /* On phone the card is narrower — still wider than the screen so scrolling is clear */
+      .hotel-card { width: 300px; }
+      /* Grouped search inputs (Hotels tab) stack vertically on phone */
+      .search-inputs-group { flex-direction: column; }
+      /* Reset the horizontal border trick and use vertical stack borders instead */
+      .search-field { border-left: 1px solid var(--primary) !important; border-radius: 0 !important; }
+      .search-field:first-child { border-radius: 8px 8px 0 0 !important; border-bottom: none; }
+      .search-field:last-child { border-radius: 0 0 8px 8px !important; border-top: none; }
+    }
+
+
+    /* ═══════════════════════════════════════
+       FLIGHTS TAB STYLES
+    ═══════════════════════════════════════ */
+
+    /* ── TRIP TYPE TOGGLE ─────────────────────────────────
+       Three small pill-style buttons that sit above the main
+       search inputs: "Round trip", "One way", "Multi-city".
+       These are smaller and lighter than the main tab buttons.
+    ────────────────────────────────────────────────────── */
+    .flight-trip-type {
+      display: flex;
+      gap: 4px;
+    }
+
+    /* Each individual trip type button */
+    .flight-trip-btn {
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Mulish', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      /* Default (inactive) colour — muted grey */
+      color: #667080;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .flight-trip-btn:hover { background: #f0f4f8; color: var(--text-dark); }
+
+    /* Active state — soft blue tint, primary blue text */
+    .flight-trip-btn.active {
+      background: rgba(38, 129, 255, 0.10);
+      color: var(--primary);
+    }
+
+
+    /* ── FLIGHT RESULT CARDS ──────────────────────────────
+       Used in the "Popular flight routes" content section.
+       The card structure mirrors tour cards closely:
+       image on top, info below with route, details, price.
+    ────────────────────────────────────────────────────── */
+    .flight-card {
+      background: var(--white);
+      border-radius: var(--radius-card); /* 16px */
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .flight-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+    }
+
+    /* Wrapper around the image so we can overlay the badge */
+    .flight-image-wrap { position: relative; }
+
+    /* Destination thumbnail — slightly shorter than tour images */
+    .flight-image {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* "Direct", "Best value" badge — overlaid on the image */
+    .flight-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--primary);   /* default blue */
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Green variant for "Best value" / "Cheapest" badges */
+    .flight-badge.value { background: #16a34a; }
+
+    /* Orange variant for "Direct" / "Fastest" badges */
+    .flight-badge.direct { background: #ea580c; }
+
+    /* Card content area below the image */
+    .flight-info {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Route row: flag + city → flag + city
+       Uses flag images from flagcdn.com (same as tour cards) */
+    .flight-route {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    /* Tiny flag thumbnails — same size as tour card flags */
+    .flight-route img {
+      width: 18px;
+      height: 13px;
+      border-radius: 2px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    /* The "→" arrow between origin and destination */
+    .flight-route-arrow { color: #94a3b8; font-size: 14px; }
+
+    /* Details row: stops · duration · airline name */
+    .flight-details {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* An individual detail item (e.g. "1 stop", "16h 30m") */
+    .flight-detail-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 400;
+      color: #667080;
+    }
+
+    /* Small round dot that separates details (like a bullet · ) */
+    .flight-detail-sep {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #c0c8d0;
+      flex-shrink: 0;
+    }
+
+    /* Airline name tag — a subtle grey pill */
+    .flight-airline-tag {
+      display: inline-flex;
+      align-items: center;
+      background: #f3f5f6;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    /* Footer: departure/return dates on the left, price on the right.
+       Separated from details by a thin border — same as hotel cards. */
+    .flight-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      margin-top: 2px;
+    }
+
+    /* "Jul 05 · Jul 19" date range with calendar icon */
+    .flight-dates {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: #667080;
+    }
+
+    /* Price group — mirrors tour-price-group pattern */
+    .flight-price-group { text-align: right; }
+
+    .flight-per-person {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-dark);
+    }
+
+    /* "from $720" — same size as tour price (Heading Bold/H3) */
+    .flight-price {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+
+    /* ══════════════════════════════════════════════════════
+       HOLIDAY PACKAGE CARDS
+       Mirror the tour-card structure almost exactly.
+       Key addition: an amber "Hotel + Flight" badge on the image.
+    ══════════════════════════════════════════════════════ */
+
+    /* Same 3-column grid as tour-grid */
+    .holiday-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 24px;
+    }
+    @media (max-width: 1024px) { .holiday-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px)  { .holiday-grid { grid-template-columns: 1fr; } }
+
+    /* Card shell — same rounded corners and white background as tour-card */
+    .holiday-card {
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .holiday-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /*
+      "Hotel + Flight" chip — sits inside the card body, not on the image.
+      Styled as a small blue pill to match the design language of the filter
+      tabs used in Tours and Flights: same font family, same primary colour.
+    */
+
+    /* Card body — same padding as tour-info */
+    .holiday-info {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    /* Country row: flag thumbnail + country name — same as .tour-country */
+    .holiday-country {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 400;
+      color: #667080;
+    }
+    .holiday-country img {
+      width: 18px;
+      height: 12px;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+
+    /* Hotel name used as the card title, with star rating inline */
+    .holiday-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+    .holiday-stars {
+      font-size: 11px;
+      font-weight: 400;
+      color: #f59e0b;
+      letter-spacing: -1px;
+    }
+
+    /* One-line description — same as .tour-desc */
+    .holiday-desc {
+      font-size: 13px;
+      font-weight: 400;
+      color: #667080;
+      line-height: 1.5;
+    }
+
+    /* Footer row: duration on the left, price on the right — same as .tour-footer */
+    .holiday-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: auto;
+      padding-top: 12px;
+    }
+
+    /* Stacked "Return flights" + "X nights" on the left of the footer */
+    .holiday-includes {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .holiday-includes-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: #667080;
+    }
+
+    .holiday-price-group {
+      text-align: right;
+    }
+    .holiday-per-person {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-dark);
+    }
+    .holiday-price {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════════
+       HERO SECTION
+       Figma: "New Hero - Tours" (5828:8728) > "Hero search" (5828:8730)
+  ════════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="page-container">
+
+      <!--
+        Search Card — "Create itinerary search" (5828:8731)
+        fills: fill_E1X3BC (#FFFFFF), borderRadius: 24px
+      -->
+      <div class="search-card">
+
+        <!--
+          Tabs bar — "Tabs" (5828:8732)
+          strokes: stroke_OJ113W (bottom border)
+        -->
+        <div class="tabs-bar">
+          <div class="tabs-options">
+
+            <!-- Tours tab — ACTIVE (5828:8735)
+                 icon: map (5828:8744), text: "Tours" (5828:8745)
+                 textStyle: Heading Black/H4, fills: fill_K8K5VT (#2681FF)
+                 strokes: stroke_650H3B (blue bottom indicator) -->
+            <button class="tab active" data-tab="tours">
+              <i data-lucide="map" class="tab-icon"></i>
+              <span class="tab-label">Tours</span>
+            </button>
+
+            <!-- Hotels tab (5828:8746)
+                 icon: hotel (5828:8758), text: "Hotels" (5828:8759)
+                 textStyle: Heading Bold/H4, fills: fill_MV0XLU -->
+            <button class="tab" data-tab="hotels">
+              <i data-lucide="hotel" class="tab-icon"></i>
+              <span class="tab-label">Hotels</span>
+            </button>
+
+            <!-- Flights tab (5828:8760)
+                 icon: plane (5828:8771), text: "Flights" (5828:8772) -->
+            <button class="tab" data-tab="flights">
+              <i data-lucide="plane" class="tab-icon"></i>
+              <span class="tab-label">Flights</span>
+            </button>
+
+            <!-- Holidays tab (5828:8773) — hotel+flight packaged holidays -->
+            <button class="tab" data-tab="holidays">
+              <i data-lucide="sun" class="tab-icon"></i>
+              <span class="tab-label">Holidays</span>
+            </button>
+
+            <!-- AI Planner tab (5828:8798)
+                 icon: sparkles (5828:8805), text: "AI Planner" (5828:8806) -->
+            <button class="tab" data-tab="ai-planner">
+              <i data-lucide="sparkles" class="tab-icon"></i>
+              <span class="tab-label">AI Planner</span>
+            </button>
+
+            <!-- Sliding active indicator — JS moves this bar to sit under the active tab -->
+            <span class="tab-indicator" aria-hidden="true"></span>
+
+          </div>
+        </div><!-- /tabs-bar -->
+
+        <!--
+          ══════════════════════════════════════════════
+          TOURS SEARCH PANEL — visible when Tours tab is active
+          Contains the text search input + "OR / Create own trip"
+          ══════════════════════════════════════════════
+        -->
+        <div class="search-panel" data-panel="tours">
+
+          <!--
+            Search input + primary CTA — "Search" (5828:8811)
+          -->
+          <div class="search-area">
+
+            <!-- Input field — (5828:8812)
+                 fills: fill_E1X3BC, strokes: stroke_BW1UAD, borderRadius: 12px
+                 Placeholder text from Figma (5828:8813): "What are you looking for?" -->
+            <div class="search-input-wrap">
+              <i data-lucide="search" style="width:18px;height:18px;color:#94a3b8;flex-shrink:0"></i>
+              <input type="text" placeholder="What are you looking for?" />
+            </div>
+
+            <!-- Primary button (5828:8815)
+                 Type=Primary, Size=Large, fills: fill_K8K5VT (#2681FF), borderRadius: 8px
+                 Button label: "Search" (I5828:8815;1506:54767), textStyle: Heading/H5 -->
+            <button class="btn-primary">Search</button>
+
+          </div><!-- /search-area -->
+
+          <!--
+            Secondary action row — "Flight Options" (5828:8816)
+            "OR" text + "Create own trip" text button
+          -->
+          <div class="search-secondary">
+            <!-- "OR" — Paragraph Bold/Default Bold, fill_MV0XLU (5828:8817) -->
+            <span class="or-text">OR</span>
+
+            <!-- "Create own trip" — Type=Text button, fill_K8K5VT
+                 text from (I5828:8821;599:2808) -->
+            <button class="btn-text">Create own trip</button>
+          </div>
+
+        </div><!-- /search-panel tours -->
+
+
+        <!--
+          ══════════════════════════════════════════════
+          HOTELS SEARCH PANEL — visible when Hotels tab is active
+          Figma: (4177:1434) — three connected input fields
+            1. Destination (left, rounded left corners)
+            2. Date range (middle, no left border to avoid double line)
+            3. Travelers / Rooms (right, rounded right corners)
+          Followed by the Search button.
+          ══════════════════════════════════════════════
+        -->
+        <div class="search-panel" data-panel="hotels" hidden>
+
+          <div class="search-area">
+
+            <!-- The three inputs share one blue border and sit edge-to-edge -->
+            <div class="search-inputs-group">
+
+              <!-- 1. Destination — rounded left corners -->
+              <div class="search-field">
+                <span class="search-field-label">Destination</span>
+                <div class="search-field-value">
+                  <i data-lucide="map-pin" style="width:14px;height:14px;color:#94a3b8;flex-shrink:0"></i>
+                  Bali, Indonesia
+                </div>
+              </div>
+
+              <!-- 2. Date range — flat left and right edges (connects to neighbors) -->
+              <div class="search-field" style="flex:1.5">
+                <span class="search-field-label">Check-in — Check-out</span>
+                <div class="search-field-value">
+                  <i data-lucide="calendar" style="width:14px;height:14px;color:#94a3b8;flex-shrink:0"></i>
+                  Jul 05 2026 &nbsp;→&nbsp; Jul 12 2026
+                </div>
+              </div>
+
+              <!-- 3. Travelers / Rooms — rounded right corners -->
+              <div class="search-field">
+                <span class="search-field-label">Travelers / Rooms</span>
+                <div class="search-field-value">
+                  <i data-lucide="users" style="width:14px;height:14px;color:#94a3b8;flex-shrink:0"></i>
+                  2 adults · 1 room
+                </div>
+              </div>
+
+            </div><!-- /search-inputs-group -->
+
+            <!-- Same Search button as the Tours panel -->
+            <button class="btn-primary">Search</button>
+
+          </div><!-- /search-area -->
+
+        </div><!-- /search-panel hotels -->
+
+
+        <!--
+          ══════════════════════════════════════════════
+          FLIGHTS SEARCH PANEL — visible when Flights tab is active
+
+          Two parts:
+            1. A trip-type toggle row (Round trip / One way / Multi-city)
+               These are small pill buttons that sit above the inputs.
+            2. A grouped input row with 4 connected fields, matching
+               the Hotels panel pattern (same blue border, edge-to-edge).
+               Fields: From | To | Depart—Return | Passengers & class
+          ══════════════════════════════════════════════
+        -->
+        <div class="search-panel" data-panel="flights" hidden>
+
+          <!-- Trip type toggle — only shown for Flights -->
+          <div class="flight-trip-type">
+            <!-- "Round trip" is active by default -->
+            <button class="flight-trip-btn active">Round trip</button>
+            <button class="flight-trip-btn">One way</button>
+            <button class="flight-trip-btn">Multi-city</button>
+          </div>
+
+          <div class="search-area">
+
+            <!-- Four connected search fields — same .search-inputs-group pattern as Hotels -->
+            <div class="search-inputs-group">
+
+              <!-- 1. From — origin airport / city — rounded left corners -->
+              <div class="search-field">
+                <span class="search-field-label">From</span>
+                <div class="search-field-value">
+                  <!-- plane-takeoff icon — signals departure -->
+                  <i data-lucide="plane-takeoff" style="width:14px;height:14px;color:#94a3b8;flex-shrink:0"></i>
+                  London, LHR
+                </div>
+              </div>
+
+              <!-- 2. To — destination airport / city -->
+              <div class="search-field">
+                <span class="search-field-label">To</span>
+                <div class="search-field-value">
+                  <!-- plane-landing icon — signals arrival -->
+                  <i data-lucide="plane-landing" style="width:14px;height:14px;color:#94a3b8;flex-shrink:0"></i>
+                  Bali, DPS
+                </div>
+              </div>
+
+              <!-- 3. Travel dates — wider than adjacent fields (flex:1.5) -->
+              <div class="search-field" style="flex:1.5">
+                <span class="search-field-label">Depart — Return</span>
+                <div class="search-field-value">
+                  <i data-lucide="calendar" style="width:14px;height:14px;color:#94a3b8;flex-shrink:0"></i>
+                  Jul 05 2026 &nbsp;→&nbsp; Jul 19 2026
+                </div>
+              </div>
+
+              <!-- 4. Passengers & cabin class — rounded right corners -->
+              <div class="search-field">
+                <span class="search-field-label">Passengers &amp; class</span>
+                <div class="search-field-value">
+                  <i data-lucide="users" style="width:14px;height:14px;color:#94a3b8;flex-shrink:0"></i>
+                  2 adults · Economy
+                </div>
+              </div>
+
+            </div><!-- /search-inputs-group -->
+
+            <!-- Same Search button as Tours and Hotels panels -->
+            <button class="btn-primary">Search</button>
+
+          </div><!-- /search-area -->
+
+        </div><!-- /search-panel flights -->
+
+
+        <!--
+          ══════════════════════════════════════════════
+          HOLIDAYS SEARCH PANEL — visible when Holidays tab is active
+
+          Holiday packages = hotel + flight bundled, so the search
+          combines both hotel and flight fields into 4 connected inputs:
+            1. From — departure city (like Flights)
+            2. To — destination (like Hotels)
+            3. Depart — Return — date range (wider, like Flights)
+            4. Travelers & Nights — single field combining both
+               (e.g. "2 adults · 7 nights") to keep the bar compact
+          ══════════════════════════════════════════════
+        -->
+        <div class="search-panel" data-panel="holidays" hidden>
+
+          <div class="search-area">
+
+            <!-- Four connected fields — same .search-inputs-group pattern as Hotels and Flights -->
+            <div class="search-inputs-group">
+
+              <!-- 1. From — departure city — rounded left corners -->
+              <div class="search-field">
+                <span class="search-field-label">From</span>
+                <div class="search-field-value">
+                  <i data-lucide="plane-takeoff" style="width:14px;height:14px;color:#94a3b8;flex-shrink:0"></i>
+                  London, LHR
+                </div>
+              </div>
+
+              <!-- 2. To — destination (city or resort) -->
+              <div class="search-field">
+                <span class="search-field-label">To</span>
+                <div class="search-field-value">
+                  <i data-lucide="map-pin" style="width:14px;height:14px;color:#94a3b8;flex-shrink:0"></i>
+                  Cancun, Mexico
+                </div>
+              </div>
+
+              <!-- 3. Travel dates — slightly wider (flex:1.5) as on other panels -->
+              <div class="search-field" style="flex:1.5">
+                <span class="search-field-label">Depart — Return</span>
+                <div class="search-field-value">
+                  <i data-lucide="calendar" style="width:14px;height:14px;color:#94a3b8;flex-shrink:0"></i>
+                  Jul 05 2026 &nbsp;→&nbsp; Jul 12 2026
+                </div>
+              </div>
+
+              <!-- 4. Travelers & Nights — rounded right corners.
+                   Combining travelers + duration in one field keeps the bar
+                   the same width as the flights panel (4 fields total). -->
+              <div class="search-field">
+                <span class="search-field-label">Travelers &amp; Nights</span>
+                <div class="search-field-value">
+                  <i data-lucide="users" style="width:14px;height:14px;color:#94a3b8;flex-shrink:0"></i>
+                  2 adults · 7 nights
+                </div>
+              </div>
+
+            </div><!-- /search-inputs-group -->
+
+            <!-- Same blue Search button as all other panels -->
+            <button class="btn-primary">Search</button>
+
+          </div><!-- /search-area -->
+
+        </div><!-- /search-panel holidays -->
+
+
+      </div><!-- /search-card -->
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════════════════
+       TOURS CONTENT — visible when Tours tab is active
+       Hidden by JS when another tab is selected
+  ════════════════════════════════════════════════════ -->
+  <div id="section-tours">
+
+  <!-- ════════════════════════════════════════════════════
+       SECTION 1: TOURS BY TRAVEL STYLE
+       Figma: "Tour per travel style" (5828:8823)
+  ════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="page-container">
+
+      <!--
+        Section header — "Title and description" (5828:8824)
+      -->
+      <div class="section-header">
+        <div class="section-title-row">
+          <!-- tree-palm icon (5828:8826), componentId: '5136:855' -->
+          <i data-lucide="tree-palm" class="section-icon"></i>
+          <!-- "Tours for every travel style" (5828:8827), Heading Bold/H2, fill_MV0XLU -->
+          <h2 class="text-h2">Tours for every travel style</h2>
+        </div>
+        <!-- Subtitle (5828:8828), Paragraph Regular/Large, fill_MV0XLU -->
+        <p class="text-para-lg" style="color:#667080">Average prices based on current calendar month</p>
+      </div>
+
+      <!--
+        Filter tabs — "Tabs" (5828:8830)
+        strokes: stroke_OJ113W (bottom border on container)
+      -->
+      <div class="filter-tabs-wrap">
+        <div class="filter-tabs">
+
+          <!-- Culture & history — ACTIVE (5828:8832)
+               text: "Culture & history" (5828:8833), Paragraph Bold/Default Bold
+               fills: fill_K8K5VT (#2681FF), strokes: stroke_650H3B -->
+          <button class="filter-tab active">Culture &amp; history</button>
+
+          <!-- Sun & beach (5828:8834), text: "Sun & beach" (5828:8835) -->
+          <button class="filter-tab">Sun &amp; beach</button>
+
+          <!-- Safari (5828:8836), text: "Safari" (5828:8837) -->
+          <button class="filter-tab">Safari</button>
+
+          <!-- Sustainable travel (5828:8838), text: "Sustainable travel" (5828:8839) -->
+          <button class="filter-tab">Sustainable travel</button>
+
+          <!-- Spa & wellness (5828:8840), text: "Spa & wellness" (5828:8841) -->
+          <button class="filter-tab">Spa &amp; wellness</button>
+
+          <!-- "Other styles" dropdown button (5828:8842)
+               fills: fill_K8K5VT (#2681FF), with arrow-down icon (5828:8844) -->
+          <button class="filter-tab filter-tab-more">
+            Other styles
+            <i data-lucide="chevron-down" style="width:16px;height:16px"></i>
+          </button>
+
+        </div>
+        <!-- Sliding active indicator — JS moves this to sit under the active filter tab -->
+        <span class="filter-tab-indicator" aria-hidden="true"></span>
+      </div><!-- /filter-tabs-wrap -->
+
+      <!--
+        Tour cards — "Tours" frame (5828:8845)
+        6 cards in a 3-column grid
+      -->
+      <div class="tour-grid">
+
+        <!-- Card 1: Classic Thailand Explorer (5828:8846) -->
+        <div class="tour-card">
+          <!-- Image frame (5828:8847) — fill_OSOVXF, tour-card-1-4c2e30.png -->
+          <img
+            class="tour-image"
+            src="assets/tour-card-1-4c2e30.png"
+            alt="Classic Thailand Explorer"
+          />
+          <div class="tour-info">
+            <!-- Country (5828:8849): thailand flag icon + "Thailand" text (5828:8851) -->
+            <div class="tour-country">
+              <img src="https://flagcdn.com/w40/th.png" alt="Thailand" />
+              Thailand
+            </div>
+            <!-- Tour title (5828:8853): Paragraph Bold/Default Bold -->
+            <div class="tour-title">Classic Thailand Explorer</div>
+            <!-- Description (5828:8855): Paragraph Regular/Default -->
+            <div class="tour-desc">
+              Perfect introduction to Thailand with Bangkok temples, cultural experiences, and island
+            </div>
+            <div class="tour-footer">
+              <!-- Duration (5828:8857): clock icon + "8 days" (5828:8859) -->
+              <div class="tour-duration">
+                <i data-lucide="clock" style="width:14px;height:14px"></i>
+                8 days
+              </div>
+              <!-- Price (5828:8860): "Per person" + "from $1650" (5828:8862) Heading Bold/H3 -->
+              <div class="tour-price-group">
+                <div class="tour-per-person">Per person</div>
+                <div class="tour-price">from $1,650</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Cultural Bali Discovery (5828:8863) -->
+        <div class="tour-card">
+          <!-- fill_FOTPHI, tour-card-2-462e55.png -->
+          <img
+            class="tour-image"
+            src="assets/tour-card-2-462e55.png"
+            alt="Cultural Bali Discovery"
+          />
+          <div class="tour-info">
+            <!-- indonesia flag + "Indonesia" (5828:8867, 5828:8868) -->
+            <div class="tour-country">
+              <img src="https://flagcdn.com/w40/id.png" alt="Indonesia" />
+              Indonesia
+            </div>
+            <!-- "Cultural Bali Discovery" (5828:8870) -->
+            <div class="tour-title">Cultural Bali Discovery</div>
+            <!-- (5828:8872) -->
+            <div class="tour-desc">
+              Immerse yourself in Balinese culture with traditional villages, temples, and artisan
+            </div>
+            <div class="tour-footer">
+              <div class="tour-duration">
+                <i data-lucide="clock" style="width:14px;height:14px"></i>
+                8 days
+              </div>
+              <!-- "from $1980" (5828:8879) -->
+              <div class="tour-price-group">
+                <div class="tour-per-person">Per person</div>
+                <div class="tour-price">from $1,980</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Classic Peru Adventure (5828:8880) -->
+        <div class="tour-card">
+          <!-- fill_C0MAF9, tour-card-3-716657.png -->
+          <img
+            class="tour-image"
+            src="assets/tour-card-3-716657.png"
+            alt="Classic Peru Adventure"
+          />
+          <div class="tour-info">
+            <!-- peru flag + "Peru" (5828:8883, 5828:8885) -->
+            <div class="tour-country">
+              <img src="https://flagcdn.com/w40/pe.png" alt="Peru" />
+              Peru
+            </div>
+            <!-- "Classic Peru Adventure" (5828:8887) -->
+            <div class="tour-title">Classic Peru Adventure</div>
+            <!-- (5828:8889) -->
+            <div class="tour-desc">
+              The ultimate Peru experience with Machu Picchu, Sacred Valley, and Lima exploration.
+            </div>
+            <div class="tour-footer">
+              <div class="tour-duration">
+                <i data-lucide="clock" style="width:14px;height:14px"></i>
+                8 days
+              </div>
+              <!-- "from $1980" (5828:8896) -->
+              <div class="tour-price-group">
+                <div class="tour-per-person">Per person</div>
+                <div class="tour-price">from $1,980</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Island Paradise (5828:8897) -->
+        <div class="tour-card">
+          <!-- fill_2THXQA, tour-card-4-5e611c.png -->
+          <img
+            class="tour-image"
+            src="assets/tour-card-4-5e611c.png"
+            alt="Island Paradise"
+          />
+          <div class="tour-info">
+            <!-- thailand flag + "Thailand" (5828:8901, 5828:8902) -->
+            <div class="tour-country">
+              <img src="https://flagcdn.com/w40/th.png" alt="Thailand" />
+              Thailand
+            </div>
+            <!-- "Island Paradise" (5828:8904) -->
+            <div class="tour-title">Island Paradise</div>
+            <!-- (5828:8906) -->
+            <div class="tour-desc">
+              Focus on Thailand's stunning islands with beach time, snorkeling, and tropical
+            </div>
+            <div class="tour-footer">
+              <div class="tour-duration">
+                <i data-lucide="clock" style="width:14px;height:14px"></i>
+                8 days
+              </div>
+              <!-- "from $3910" (5828:8913) -->
+              <div class="tour-price-group">
+                <div class="tour-per-person">Per person</div>
+                <div class="tour-price">from $3,910</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5: Inca Trail Adventure (5828:8914) -->
+        <div class="tour-card">
+          <!-- fill_RPK2H9, tour-card-5-5e611c.png -->
+          <img
+            class="tour-image"
+            src="assets/tour-card-5-5e611c.png"
+            alt="Inca Trail Adventure"
+          />
+          <div class="tour-info">
+            <!-- peru flag + "Peru" (5828:8918, 5828:8919) -->
+            <div class="tour-country">
+              <img src="https://flagcdn.com/w40/pe.png" alt="Peru" />
+              Peru
+            </div>
+            <!-- "Inca Trail Adventure" (5828:8921) -->
+            <div class="tour-title">Inca Trail Adventure</div>
+            <!-- (5828:8923) -->
+            <div class="tour-desc">
+              For the adventurous traveler: trek the classic Inca Trail to Machu Picchu.
+            </div>
+            <div class="tour-footer">
+              <div class="tour-duration">
+                <i data-lucide="clock" style="width:14px;height:14px"></i>
+                8 days
+              </div>
+              <!-- "from $1980" (5828:8930) -->
+              <div class="tour-price-group">
+                <div class="tour-per-person">Per person</div>
+                <div class="tour-price">from $1,980</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6: Amazon & Andes (5828:8931) -->
+        <div class="tour-card">
+          <!-- fill_1LV1BV, tour-card-6-397980.png -->
+          <img
+            class="tour-image"
+            src="assets/tour-card-6-397980.png"
+            alt="Amazon & Andes"
+          />
+          <div class="tour-info">
+            <!-- peru flag + "Peru" (5828:8935, 5828:8936) -->
+            <div class="tour-country">
+              <img src="https://flagcdn.com/w40/pe.png" alt="Peru" />
+              Peru
+            </div>
+            <!-- "Amazon & Andes" (5828:8938) -->
+            <div class="tour-title">Amazon &amp; Andes</div>
+            <!-- (5828:8940) -->
+            <div class="tour-desc">
+              Experience Peru's diverse landscapes from Amazon rainforest to high-altitude lakes.
+            </div>
+            <div class="tour-footer">
+              <div class="tour-duration">
+                <i data-lucide="clock" style="width:14px;height:14px"></i>
+                8 days
+              </div>
+              <!-- "from $1980" (5828:8947) -->
+              <div class="tour-price-group">
+                <div class="tour-per-person">Per person</div>
+                <div class="tour-price">from $1,980</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tour-grid -->
+
+      <!--
+        "View all" CTA — secondary button (5828:8948)
+        Type=Secondary, strokes: stroke_FEE34F (#2681FF border)
+        Text: "View all Culture & history tours (35)" (I5828:8948;1576:581)
+      -->
+      <div style="display:flex; justify-content:center;">
+        <button class="btn-secondary">
+          View all Culture &amp; history tours (35)
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+
+  <hr class="section-divider" />
+
+
+  <!-- ════════════════════════════════════════════════════
+       SECTION 2: YOUR NEXT DREAM DESTINATION
+       Figma: "Tour per travel style" (5828:8949) — by countries
+  ════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="page-container">
+
+      <!--
+        Section header — "Title of the section - by countries" (5828:8951)
+      -->
+      <div class="section-header">
+        <div class="section-title-row">
+          <!-- flag icon (5828:8952), componentId: '5136:858' -->
+          <i data-lucide="flag" class="section-icon"></i>
+          <!-- "Your next dream destination" (5828:8953), Heading Bold/H2 -->
+          <h2 class="text-h2">Your next dream destination</h2>
+        </div>
+        <!-- Subtitle (5828:8954), Paragraph Regular/Large -->
+        <p class="text-para-lg" style="color:#667080">Average prices based on current calendar month</p>
+      </div>
+
+      <!--
+        Country filter tabs — "Tabs" (5828:8956)
+        Same tab pattern, but filtering by country instead of travel style
+      -->
+      <div class="filter-tabs-wrap">
+        <div class="filter-tabs">
+          <button class="filter-tab active">Thailand</button>
+          <button class="filter-tab">Indonesia</button>
+          <button class="filter-tab">Peru</button>
+          <button class="filter-tab">Japan</button>
+          <button class="filter-tab">Morocco</button>
+          <button class="filter-tab filter-tab-more">
+            More destinations
+            <i data-lucide="chevron-down" style="width:16px;height:16px"></i>
+          </button>
+        </div>
+        <!-- Sliding active indicator — JS moves this to sit under the active filter tab -->
+        <span class="filter-tab-indicator" aria-hidden="true"></span>
+      </div>
+
+      <!-- Tour cards for Thailand (3 sample cards — same component pattern) -->
+      <div class="tour-grid">
+
+        <div class="tour-card">
+          <!-- fill_C0MAF9 (same image ref as card 3), tour-card-3-716657.png -->
+          <img class="tour-image" src="assets/tour-card-3-716657.png" alt="Bangkok & Beyond" />
+          <div class="tour-info">
+            <div class="tour-country">
+              <img src="https://flagcdn.com/w40/th.png" alt="Thailand" />
+              Thailand
+            </div>
+            <div class="tour-title">Bangkok &amp; Beyond</div>
+            <div class="tour-desc">Discover the energy of Bangkok alongside peaceful temples and floating markets.</div>
+            <div class="tour-footer">
+              <div class="tour-duration">
+                <i data-lucide="clock" style="width:14px;height:14px"></i>
+                10 days
+              </div>
+              <div class="tour-price-group">
+                <div class="tour-per-person">Per person</div>
+                <div class="tour-price">from $2,100</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tour-card">
+          <!-- fill_RPK2H9 (same image ref as card 5), tour-card-5-5e611c.png -->
+          <img class="tour-image" src="assets/tour-card-5-5e611c.png" alt="Northern Thailand Highlights" />
+          <div class="tour-info">
+            <div class="tour-country">
+              <img src="https://flagcdn.com/w40/th.png" alt="Thailand" />
+              Thailand
+            </div>
+            <div class="tour-title">Northern Thailand Highlights</div>
+            <div class="tour-desc">Chiang Mai hill tribes, elephant sanctuaries, and lush mountain scenery.</div>
+            <div class="tour-footer">
+              <div class="tour-duration">
+                <i data-lucide="clock" style="width:14px;height:14px"></i>
+                7 days
+              </div>
+              <div class="tour-price-group">
+                <div class="tour-per-person">Per person</div>
+                <div class="tour-price">from $1,450</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tour-card">
+          <!-- fill_1LV1BV (same image ref as card 6), tour-card-6-397980.png -->
+          <img class="tour-image" src="assets/tour-card-6-397980.png" alt="Phuket & the Islands" />
+          <div class="tour-info">
+            <div class="tour-country">
+              <img src="https://flagcdn.com/w40/th.png" alt="Thailand" />
+              Thailand
+            </div>
+            <div class="tour-title">Phuket &amp; the Islands</div>
+            <div class="tour-desc">Sun, sea, and stunning scenery across Thailand's most beautiful southern islands.</div>
+            <div class="tour-footer">
+              <div class="tour-duration">
+                <i data-lucide="clock" style="width:14px;height:14px"></i>
+                9 days
+              </div>
+              <div class="tour-price-group">
+                <div class="tour-per-person">Per person</div>
+                <div class="tour-price">from $2,780</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tour-grid -->
+
+      <div style="display:flex; justify-content:center;">
+        <button class="btn-secondary">
+          View all Thailand tours (22)
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  </div><!-- /section-tours -->
+
+
+  <!-- ════════════════════════════════════════════════════
+       HOTELS CONTENT — visible when Hotels tab is active
+       Figma: (4177:1434) "Our favourite picks" section
+       Cards scroll horizontally, 389px each, 32px gap
+  ════════════════════════════════════════════════════ -->
+  <div id="section-hotels" hidden>
+    <section class="section">
+      <div class="page-container">
+
+        <!-- Section heading — heart icon + title + subtitle -->
+        <div class="section-header">
+          <div class="section-title-row">
+            <!-- heart icon — Figma uses a heart/favourites motif here -->
+            <i data-lucide="heart" class="section-icon"></i>
+            <!-- "Our favourite picks" — Heading Bold/H2, fill_MV0XLU -->
+            <h2 class="text-h2">Our favourite picks</h2>
+          </div>
+          <p class="text-para-lg" style="color:#667080">Average prices based on current calendar month</p>
+        </div>
+
+        <!--
+          Hotel cards — horizontal scroll row.
+          Unlike the tour grid (which uses CSS grid), these
+          sit in a flex row and scroll sideways like a carousel.
+          Scroll snap makes each card click into place.
+        -->
+        <div class="hotel-scroll-container">
+
+
+          <!-- ── HOTEL CARD 1: Green Paradise Resort ── -->
+          <div class="hotel-card">
+            <!-- Hero image — 252px tall from Figma -->
+            <img
+              class="hotel-image"
+              src="https://picsum.photos/seed/bali-resort/800/600"
+              alt="Green Paradise Resort"
+            />
+            <div class="hotel-info">
+
+              <!-- Name + rating row -->
+              <div class="hotel-title-row">
+                <!-- Name + official star rating (left) -->
+                <div class="hotel-name-group">
+                  <div class="hotel-name">Green Paradise Resort</div>
+                  <div class="hotel-stars">★★★★☆</div>
+                </div>
+                <!-- Rating block: green score pill + label + review count -->
+                <div class="hotel-rating-block">
+                  <!-- Green pill — score out of 5 -->
+                  <span class="hotel-score">4.3</span>
+                  <div class="hotel-rating-meta">
+                    <span class="hotel-rating-label">Excellent</span>
+                    <span class="hotel-reviews">367 reviews</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Location — map pin + city, country -->
+              <div class="hotel-location">
+                <i data-lucide="map-pin" style="width:13px;height:13px;flex-shrink:0"></i>
+                Bali, Indonesia
+              </div>
+
+              <!-- Amenity tags — light blue pills with icons -->
+              <div class="hotel-amenities">
+                <span class="amenity-tag">
+                  <i data-lucide="paw-print" style="width:12px;height:12px"></i>
+                  Pet friendly
+                </span>
+                <span class="amenity-tag">
+                  <i data-lucide="wifi" style="width:12px;height:12px"></i>
+                  Free Wifi
+                </span>
+                <span class="amenity-tag">
+                  <i data-lucide="waves" style="width:12px;height:12px"></i>
+                  Indoor pool
+                </span>
+              </div>
+
+              <!-- Price — separated by a thin rule -->
+              <div class="hotel-price-section">
+                <div class="hotel-price-label">Per person, per night</div>
+                <div class="hotel-price">from $125</div>
+              </div>
+
+            </div>
+          </div><!-- /hotel-card 1 -->
+
+
+          <!-- ── HOTEL CARD 2: Santorini Blue Palace ── -->
+          <div class="hotel-card">
+            <img
+              class="hotel-image"
+              src="https://picsum.photos/seed/santorini-hotel/800/600"
+              alt="Santorini Blue Palace"
+            />
+            <div class="hotel-info">
+
+              <div class="hotel-title-row">
+                <div class="hotel-name-group">
+                  <div class="hotel-name">Santorini Blue Palace</div>
+                  <div class="hotel-stars">★★★★★</div>
+                </div>
+                <div class="hotel-rating-block">
+                  <span class="hotel-score">4.8</span>
+                  <div class="hotel-rating-meta">
+                    <span class="hotel-rating-label">Outstanding</span>
+                    <span class="hotel-reviews">892 reviews</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hotel-location">
+                <i data-lucide="map-pin" style="width:13px;height:13px;flex-shrink:0"></i>
+                Santorini, Greece
+              </div>
+
+              <div class="hotel-amenities">
+                <span class="amenity-tag">
+                  <i data-lucide="waves" style="width:12px;height:12px"></i>
+                  Infinity pool
+                </span>
+                <span class="amenity-tag">
+                  <i data-lucide="eye" style="width:12px;height:12px"></i>
+                  Sea view
+                </span>
+                <span class="amenity-tag">
+                  <i data-lucide="coffee" style="width:12px;height:12px"></i>
+                  Breakfast
+                </span>
+              </div>
+
+              <div class="hotel-price-section">
+                <div class="hotel-price-label">Per person, per night</div>
+                <div class="hotel-price">from $285</div>
+              </div>
+
+            </div>
+          </div><!-- /hotel-card 2 -->
+
+
+          <!-- ── HOTEL CARD 3: Bangkok Riverside Hotel ── -->
+          <div class="hotel-card">
+            <img
+              class="hotel-image"
+              src="https://picsum.photos/seed/bangkok-hotel/800/600"
+              alt="Bangkok Riverside Hotel"
+            />
+            <div class="hotel-info">
+
+              <div class="hotel-title-row">
+                <div class="hotel-name-group">
+                  <div class="hotel-name">Bangkok Riverside Hotel</div>
+                  <div class="hotel-stars">★★★★☆</div>
+                </div>
+                <div class="hotel-rating-block">
+                  <span class="hotel-score">4.1</span>
+                  <div class="hotel-rating-meta">
+                    <span class="hotel-rating-label">Very Good</span>
+                    <span class="hotel-reviews">1,204 reviews</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hotel-location">
+                <i data-lucide="map-pin" style="width:13px;height:13px;flex-shrink:0"></i>
+                Bangkok, Thailand
+              </div>
+
+              <div class="hotel-amenities">
+                <span class="amenity-tag">
+                  <i data-lucide="dumbbell" style="width:12px;height:12px"></i>
+                  Gym
+                </span>
+                <span class="amenity-tag">
+                  <i data-lucide="wifi" style="width:12px;height:12px"></i>
+                  Free Wifi
+                </span>
+                <span class="amenity-tag">
+                  <i data-lucide="building" style="width:12px;height:12px"></i>
+                  City view
+                </span>
+              </div>
+
+              <div class="hotel-price-section">
+                <div class="hotel-price-label">Per person, per night</div>
+                <div class="hotel-price">from $95</div>
+              </div>
+
+            </div>
+          </div><!-- /hotel-card 3 -->
+
+
+          <!-- ── HOTEL CARD 4: Marrakech Medina Riad ── -->
+          <div class="hotel-card">
+            <img
+              class="hotel-image"
+              src="https://picsum.photos/seed/marrakech-riad/800/600"
+              alt="Marrakech Medina Riad"
+            />
+            <div class="hotel-info">
+
+              <div class="hotel-title-row">
+                <div class="hotel-name-group">
+                  <div class="hotel-name">Marrakech Medina Riad</div>
+                  <div class="hotel-stars">★★★★☆</div>
+                </div>
+                <div class="hotel-rating-block">
+                  <span class="hotel-score">4.6</span>
+                  <div class="hotel-rating-meta">
+                    <span class="hotel-rating-label">Excellent</span>
+                    <span class="hotel-reviews">543 reviews</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hotel-location">
+                <i data-lucide="map-pin" style="width:13px;height:13px;flex-shrink:0"></i>
+                Marrakech, Morocco
+              </div>
+
+              <div class="hotel-amenities">
+                <span class="amenity-tag">
+                  <i data-lucide="sparkles" style="width:12px;height:12px"></i>
+                  Hammam
+                </span>
+                <span class="amenity-tag">
+                  <i data-lucide="building-2" style="width:12px;height:12px"></i>
+                  Rooftop terrace
+                </span>
+                <span class="amenity-tag">
+                  <i data-lucide="coffee" style="width:12px;height:12px"></i>
+                  Breakfast
+                </span>
+              </div>
+
+              <div class="hotel-price-section">
+                <div class="hotel-price-label">Per person, per night</div>
+                <div class="hotel-price">from $180</div>
+              </div>
+
+            </div>
+          </div><!-- /hotel-card 4 -->
+
+
+        </div><!-- /hotel-scroll-container -->
+
+        <!-- "View all" CTA — same secondary button style as tour sections -->
+        <div style="display:flex; justify-content:center; margin-top:32px;">
+          <button class="btn-secondary">
+            View all hotels (148)
+          </button>
+        </div>
+
+      </div>
+    </section>
+  </div><!-- /section-hotels -->
+
+
+  <!-- ════════════════════════════════════════════════════
+       FLIGHTS CONTENT — visible when Flights tab is active.
+       Shows a "Popular flight routes" section with 6 cards
+       in the same 3-column grid as the Tours section.
+       Each card has: destination image, a deal badge, route
+       with flag icons, flight details, and price.
+  ════════════════════════════════════════════════════ -->
+  <div id="section-flights" hidden>
+    <section class="section">
+      <div class="page-container">
+
+        <!-- Section heading — plane icon + title, same structure as Tours / Hotels -->
+        <div class="section-header">
+          <div class="section-title-row">
+            <i data-lucide="plane" class="section-icon"></i>
+            <h2 class="text-h2">Popular flight routes</h2>
+          </div>
+          <p class="text-para-lg" style="color:#667080">Average prices based on current calendar month</p>
+        </div>
+
+        <!--
+          Flight cards — reusing the .tour-grid class for the same
+          3-column responsive grid. Each card uses the new .flight-card
+          classes defined in the styles above.
+        -->
+        <div class="tour-grid">
+
+
+          <!-- ── CARD 1: London → Bali ── -->
+          <div class="flight-card">
+            <div class="flight-image-wrap">
+              <!-- picsum seed "bali-flight" gives a consistent tropical image -->
+              <img
+                class="flight-image"
+                src="https://picsum.photos/seed/bali-flight/800/600"
+                alt="London to Bali"
+              />
+              <!-- "Best value" badge — green, sits over the top-left of the image -->
+              <span class="flight-badge value">Best value</span>
+            </div>
+            <div class="flight-info">
+              <!-- Route: UK flag + city → Indonesia flag + city -->
+              <div class="flight-route">
+                <img src="https://flagcdn.com/w40/gb.png" alt="United Kingdom" />
+                London
+                <span class="flight-route-arrow">→</span>
+                <img src="https://flagcdn.com/w40/id.png" alt="Indonesia" />
+                Bali
+              </div>
+              <!-- Details: stops · total duration · airline tag -->
+              <div class="flight-details">
+                <span class="flight-detail-item">
+                  <i data-lucide="git-branch" style="width:12px;height:12px"></i>
+                  1 stop
+                </span>
+                <span class="flight-detail-sep"></span>
+                <span class="flight-detail-item">
+                  <i data-lucide="clock" style="width:12px;height:12px"></i>
+                  16h 30m
+                </span>
+                <span class="flight-detail-sep"></span>
+                <span class="flight-airline-tag">KLM</span>
+              </div>
+              <!-- Footer: date range + price -->
+              <div class="flight-footer">
+                <div class="flight-dates">
+                  <i data-lucide="calendar" style="width:13px;height:13px"></i>
+                  Jul 05 · Jul 19 2026
+                </div>
+                <div class="flight-price-group">
+                  <div class="flight-per-person">Per person</div>
+                  <div class="flight-price">from $720</div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /card 1 -->
+
+
+          <!-- ── CARD 2: London → Bangkok ── -->
+          <div class="flight-card">
+            <div class="flight-image-wrap">
+              <img
+                class="flight-image"
+                src="https://picsum.photos/seed/bangkok-flight/800/600"
+                alt="London to Bangkok"
+              />
+              <!-- "Direct" badge — orange to stand out as a desirable option -->
+              <span class="flight-badge direct">Direct</span>
+            </div>
+            <div class="flight-info">
+              <div class="flight-route">
+                <img src="https://flagcdn.com/w40/gb.png" alt="United Kingdom" />
+                London
+                <span class="flight-route-arrow">→</span>
+                <img src="https://flagcdn.com/w40/th.png" alt="Thailand" />
+                Bangkok
+              </div>
+              <div class="flight-details">
+                <!-- "Direct" = no stops -->
+                <span class="flight-detail-item">
+                  <i data-lucide="minus" style="width:12px;height:12px"></i>
+                  Direct
+                </span>
+                <span class="flight-detail-sep"></span>
+                <span class="flight-detail-item">
+                  <i data-lucide="clock" style="width:12px;height:12px"></i>
+                  11h 20m
+                </span>
+                <span class="flight-detail-sep"></span>
+                <span class="flight-airline-tag">Thai Airways</span>
+              </div>
+              <div class="flight-footer">
+                <div class="flight-dates">
+                  <i data-lucide="calendar" style="width:13px;height:13px"></i>
+                  Jul 10 · Jul 24 2026
+                </div>
+                <div class="flight-price-group">
+                  <div class="flight-per-person">Per person</div>
+                  <div class="flight-price">from $490</div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /card 2 -->
+
+
+          <!-- ── CARD 3: Amsterdam → Tokyo ── -->
+          <div class="flight-card">
+            <div class="flight-image-wrap">
+              <img
+                class="flight-image"
+                src="https://picsum.photos/seed/tokyo-flight/800/600"
+                alt="Amsterdam to Tokyo"
+              />
+              <!-- No badge — just a standard listing -->
+            </div>
+            <div class="flight-info">
+              <div class="flight-route">
+                <img src="https://flagcdn.com/w40/nl.png" alt="Netherlands" />
+                Amsterdam
+                <span class="flight-route-arrow">→</span>
+                <img src="https://flagcdn.com/w40/jp.png" alt="Japan" />
+                Tokyo
+              </div>
+              <div class="flight-details">
+                <span class="flight-detail-item">
+                  <i data-lucide="git-branch" style="width:12px;height:12px"></i>
+                  1 stop
+                </span>
+                <span class="flight-detail-sep"></span>
+                <span class="flight-detail-item">
+                  <i data-lucide="clock" style="width:12px;height:12px"></i>
+                  13h 45m
+                </span>
+                <span class="flight-detail-sep"></span>
+                <span class="flight-airline-tag">KLM</span>
+              </div>
+              <div class="flight-footer">
+                <div class="flight-dates">
+                  <i data-lucide="calendar" style="width:13px;height:13px"></i>
+                  Aug 02 · Aug 16 2026
+                </div>
+                <div class="flight-price-group">
+                  <div class="flight-per-person">Per person</div>
+                  <div class="flight-price">from $650</div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /card 3 -->
+
+
+          <!-- ── CARD 4: London → Marrakech ── -->
+          <div class="flight-card">
+            <div class="flight-image-wrap">
+              <img
+                class="flight-image"
+                src="https://picsum.photos/seed/marrakech-flight/800/600"
+                alt="London to Marrakech"
+              />
+              <span class="flight-badge value">Best value</span>
+            </div>
+            <div class="flight-info">
+              <div class="flight-route">
+                <img src="https://flagcdn.com/w40/gb.png" alt="United Kingdom" />
+                London
+                <span class="flight-route-arrow">→</span>
+                <img src="https://flagcdn.com/w40/ma.png" alt="Morocco" />
+                Marrakech
+              </div>
+              <div class="flight-details">
+                <span class="flight-detail-item">
+                  <i data-lucide="minus" style="width:12px;height:12px"></i>
+                  Direct
+                </span>
+                <span class="flight-detail-sep"></span>
+                <span class="flight-detail-item">
+                  <i data-lucide="clock" style="width:12px;height:12px"></i>
+                  3h 30m
+                </span>
+                <span class="flight-detail-sep"></span>
+                <span class="flight-airline-tag">easyJet</span>
+              </div>
+              <div class="flight-footer">
+                <div class="flight-dates">
+                  <i data-lucide="calendar" style="width:13px;height:13px"></i>
+                  Sep 12 · Sep 19 2026
+                </div>
+                <div class="flight-price-group">
+                  <div class="flight-per-person">Per person</div>
+                  <div class="flight-price">from $89</div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /card 4 -->
+
+
+          <!-- ── CARD 5: Paris → Bali ── -->
+          <div class="flight-card">
+            <div class="flight-image-wrap">
+              <img
+                class="flight-image"
+                src="https://picsum.photos/seed/paris-bali/800/600"
+                alt="Paris to Bali"
+              />
+            </div>
+            <div class="flight-info">
+              <div class="flight-route">
+                <img src="https://flagcdn.com/w40/fr.png" alt="France" />
+                Paris
+                <span class="flight-route-arrow">→</span>
+                <img src="https://flagcdn.com/w40/id.png" alt="Indonesia" />
+                Bali
+              </div>
+              <div class="flight-details">
+                <span class="flight-detail-item">
+                  <i data-lucide="git-branch" style="width:12px;height:12px"></i>
+                  1 stop
+                </span>
+                <span class="flight-detail-sep"></span>
+                <span class="flight-detail-item">
+                  <i data-lucide="clock" style="width:12px;height:12px"></i>
+                  17h 00m
+                </span>
+                <span class="flight-detail-sep"></span>
+                <span class="flight-airline-tag">Air France</span>
+              </div>
+              <div class="flight-footer">
+                <div class="flight-dates">
+                  <i data-lucide="calendar" style="width:13px;height:13px"></i>
+                  Jul 15 · Jul 29 2026
+                </div>
+                <div class="flight-price-group">
+                  <div class="flight-per-person">Per person</div>
+                  <div class="flight-price">from $780</div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /card 5 -->
+
+
+          <!-- ── CARD 6: London → Lima ── -->
+          <div class="flight-card">
+            <div class="flight-image-wrap">
+              <img
+                class="flight-image"
+                src="https://picsum.photos/seed/lima-flight/800/600"
+                alt="London to Lima"
+              />
+            </div>
+            <div class="flight-info">
+              <div class="flight-route">
+                <img src="https://flagcdn.com/w40/gb.png" alt="United Kingdom" />
+                London
+                <span class="flight-route-arrow">→</span>
+                <img src="https://flagcdn.com/w40/pe.png" alt="Peru" />
+                Lima
+              </div>
+              <div class="flight-details">
+                <span class="flight-detail-item">
+                  <i data-lucide="git-branch" style="width:12px;height:12px"></i>
+                  1 stop
+                </span>
+                <span class="flight-detail-sep"></span>
+                <span class="flight-detail-item">
+                  <i data-lucide="clock" style="width:12px;height:12px"></i>
+                  14h 30m
+                </span>
+                <span class="flight-detail-sep"></span>
+                <span class="flight-airline-tag">Iberia</span>
+              </div>
+              <div class="flight-footer">
+                <div class="flight-dates">
+                  <i data-lucide="calendar" style="width:13px;height:13px"></i>
+                  Aug 20 · Sep 03 2026
+                </div>
+                <div class="flight-price-group">
+                  <div class="flight-per-person">Per person</div>
+                  <div class="flight-price">from $690</div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /card 6 -->
+
+
+        </div><!-- /tour-grid -->
+
+        <!-- "View all" CTA — same secondary button as Tour and Hotel sections -->
+        <div style="display:flex; justify-content:center; margin-top:32px;">
+          <button class="btn-secondary">
+            <i data-lucide="plane" style="width:16px;height:16px"></i>
+            View all flight routes
+          </button>
+        </div>
+
+      </div>
+    </section>
+  </div><!-- /section-flights -->
+
+
+  <!-- ════════════════════════════════════════════════════
+       HOLIDAYS CONTENT — visible when Holidays tab is active
+       Two subsections:
+         A. Package grid — 6 hotel+flight bundle cards
+         B. Value props — "Why book a holiday package?"
+  ════════════════════════════════════════════════════ -->
+  <div id="section-holidays" hidden>
+
+    <section class="section">
+      <div class="page-container">
+
+        <div class="section-header">
+          <div class="section-title-row">
+            <i data-lucide="sun" class="section-icon"></i>
+            <h2 class="text-h2">Holiday packages</h2>
+          </div>
+          <p class="text-para-lg" style="color:#667080">Hotel + flights from one price · average prices based on current calendar month</p>
+        </div>
+
+        <!-- 8 destination cards — 3-column grid, same layout as Tours -->
+        <div class="holiday-grid">
+
+          <!-- ── CARD 1: Cancun ── -->
+          <div class="holiday-card">
+            <img class="holiday-image" src="https://picsum.photos/seed/cancun-resort/800/600" alt="Cancun, Mexico" />
+            <div class="holiday-info">
+              <div class="holiday-country">
+                <img src="https://flagcdn.com/w40/mx.png" alt="Mexico" />
+                Mexico
+              </div>
+              <div class="holiday-title">Riu Palace Las Americas <span class="holiday-stars">★★★★★</span></div>
+              <div class="holiday-desc">
+                All-inclusive beachfront resort with direct Caribbean Sea access and nightly entertainment.
+              </div>
+              <div class="holiday-footer">
+                <div class="holiday-includes">
+                  <div class="holiday-includes-item">
+                    <i data-lucide="plane" style="width:13px;height:13px"></i>
+                    Return flights
+                  </div>
+                  <div class="holiday-includes-item">
+                    <i data-lucide="moon" style="width:13px;height:13px"></i>
+                    7 nights
+                  </div>
+                </div>
+                <div class="holiday-price-group">
+                  <div class="holiday-per-person">Per person</div>
+                  <div class="holiday-price">from $1,290</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CARD 2: Riviera Maya ── -->
+          <div class="holiday-card">
+            <img class="holiday-image" src="https://picsum.photos/seed/riviera-maya/800/600" alt="Riviera Maya, Mexico" />
+            <div class="holiday-info">
+              <div class="holiday-country">
+                <img src="https://flagcdn.com/w40/mx.png" alt="Mexico" />
+                Mexico
+              </div>
+              <div class="holiday-title">Grand Bahia Principe Tulum <span class="holiday-stars">★★★★☆</span></div>
+              <div class="holiday-desc">
+                Eco-certified resort in lush jungle with cenote access and Mayan ruins nearby.
+              </div>
+              <div class="holiday-footer">
+                <div class="holiday-includes">
+                  <div class="holiday-includes-item">
+                    <i data-lucide="plane" style="width:13px;height:13px"></i>
+                    Return flights
+                  </div>
+                  <div class="holiday-includes-item">
+                    <i data-lucide="moon" style="width:13px;height:13px"></i>
+                    7 nights
+                  </div>
+                </div>
+                <div class="holiday-price-group">
+                  <div class="holiday-per-person">Per person</div>
+                  <div class="holiday-price">from $1,190</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CARD 3: Maldives ── -->
+          <div class="holiday-card">
+            <img class="holiday-image" src="https://picsum.photos/seed/maldives-overwater/800/600" alt="Maldives" />
+            <div class="holiday-info">
+              <div class="holiday-country">
+                <img src="https://flagcdn.com/w40/mv.png" alt="Maldives" />
+                Maldives
+              </div>
+              <div class="holiday-title">Soneva Jani <span class="holiday-stars">★★★★★</span></div>
+              <div class="holiday-desc">
+                Overwater villas with private pools, house reef snorkelling, and barefoot luxury.
+              </div>
+              <div class="holiday-footer">
+                <div class="holiday-includes">
+                  <div class="holiday-includes-item">
+                    <i data-lucide="plane" style="width:13px;height:13px"></i>
+                    Return flights
+                  </div>
+                  <div class="holiday-includes-item">
+                    <i data-lucide="moon" style="width:13px;height:13px"></i>
+                    7 nights
+                  </div>
+                </div>
+                <div class="holiday-price-group">
+                  <div class="holiday-per-person">Per person</div>
+                  <div class="holiday-price">from $3,450</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CARD 4: Tenerife ── -->
+          <div class="holiday-card">
+            <img class="holiday-image" src="https://picsum.photos/seed/tenerife-beach/800/600" alt="Tenerife, Spain" />
+            <div class="holiday-info">
+              <div class="holiday-country">
+                <img src="https://flagcdn.com/w40/es.png" alt="Spain" />
+                Spain
+              </div>
+              <div class="holiday-title">Hard Rock Hotel Tenerife <span class="holiday-stars">★★★☆☆</span></div>
+              <div class="holiday-desc">
+                Sun-soaked resort with volcanic beaches, on-site waterpark, and vibrant nightlife.
+              </div>
+              <div class="holiday-footer">
+                <div class="holiday-includes">
+                  <div class="holiday-includes-item">
+                    <i data-lucide="plane" style="width:13px;height:13px"></i>
+                    Return flights
+                  </div>
+                  <div class="holiday-includes-item">
+                    <i data-lucide="moon" style="width:13px;height:13px"></i>
+                    7 nights
+                  </div>
+                </div>
+                <div class="holiday-price-group">
+                  <div class="holiday-per-person">Per person</div>
+                  <div class="holiday-price">from $890</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CARD 5: Dubai ── -->
+          <div class="holiday-card">
+            <img class="holiday-image" src="https://picsum.photos/seed/dubai-atlantis/800/600" alt="Dubai, UAE" />
+            <div class="holiday-info">
+              <div class="holiday-country">
+                <img src="https://flagcdn.com/w40/ae.png" alt="UAE" />
+                UAE
+              </div>
+              <div class="holiday-title">Atlantis The Palm <span class="holiday-stars">★★★★☆</span></div>
+              <div class="holiday-desc">
+                Iconic Palm resort with waterpark, private beach, and world-class dining and entertainment.
+              </div>
+              <div class="holiday-footer">
+                <div class="holiday-includes">
+                  <div class="holiday-includes-item">
+                    <i data-lucide="plane" style="width:13px;height:13px"></i>
+                    Return flights
+                  </div>
+                  <div class="holiday-includes-item">
+                    <i data-lucide="moon" style="width:13px;height:13px"></i>
+                    5 nights
+                  </div>
+                </div>
+                <div class="holiday-price-group">
+                  <div class="holiday-per-person">Per person</div>
+                  <div class="holiday-price">from $1,680</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CARD 6: Bali ── -->
+          <div class="holiday-card">
+            <img class="holiday-image" src="https://picsum.photos/seed/bali-four-seasons/800/600" alt="Bali, Indonesia" />
+            <div class="holiday-info">
+              <div class="holiday-country">
+                <img src="https://flagcdn.com/w40/id.png" alt="Indonesia" />
+                Indonesia
+              </div>
+              <div class="holiday-title">Four Seasons Resort Sayan <span class="holiday-stars">★★★★★</span></div>
+              <div class="holiday-desc">
+                Jungle retreat above the Ayung River with rice-terrace views, spa, and infinity pool.
+              </div>
+              <div class="holiday-footer">
+                <div class="holiday-includes">
+                  <div class="holiday-includes-item">
+                    <i data-lucide="plane" style="width:13px;height:13px"></i>
+                    Return flights
+                  </div>
+                  <div class="holiday-includes-item">
+                    <i data-lucide="moon" style="width:13px;height:13px"></i>
+                    10 nights
+                  </div>
+                </div>
+                <div class="holiday-price-group">
+                  <div class="holiday-per-person">Per person</div>
+                  <div class="holiday-price">from $2,100</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CARD 7: Santorini ── -->
+          <div class="holiday-card">
+            <img class="holiday-image" src="https://picsum.photos/seed/santorini-caldera/800/600" alt="Santorini, Greece" />
+            <div class="holiday-info">
+              <div class="holiday-country">
+                <img src="https://flagcdn.com/w40/gr.png" alt="Greece" />
+                Greece
+              </div>
+              <div class="holiday-title">Grace Hotel Santorini <span class="holiday-stars">★★★★☆</span></div>
+              <div class="holiday-desc">
+                Clifftop suites with caldera views, infinity pool, and sunset dining above the Aegean.
+              </div>
+              <div class="holiday-footer">
+                <div class="holiday-includes">
+                  <div class="holiday-includes-item">
+                    <i data-lucide="plane" style="width:13px;height:13px"></i>
+                    Return flights
+                  </div>
+                  <div class="holiday-includes-item">
+                    <i data-lucide="moon" style="width:13px;height:13px"></i>
+                    7 nights
+                  </div>
+                </div>
+                <div class="holiday-price-group">
+                  <div class="holiday-per-person">Per person</div>
+                  <div class="holiday-price">from $2,200</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CARD 8: Phuket ── -->
+          <div class="holiday-card">
+            <img class="holiday-image" src="https://picsum.photos/seed/phuket-beach/800/600" alt="Phuket, Thailand" />
+            <div class="holiday-info">
+              <div class="holiday-country">
+                <img src="https://flagcdn.com/w40/th.png" alt="Thailand" />
+                Thailand
+              </div>
+              <div class="holiday-title">Anantara Layan Phuket Resort <span class="holiday-stars">★★★☆☆</span></div>
+              <div class="holiday-desc">
+                Secluded bay resort with private beach, Thai cooking classes, and spa pavilions.
+              </div>
+              <div class="holiday-footer">
+                <div class="holiday-includes">
+                  <div class="holiday-includes-item">
+                    <i data-lucide="plane" style="width:13px;height:13px"></i>
+                    Return flights
+                  </div>
+                  <div class="holiday-includes-item">
+                    <i data-lucide="moon" style="width:13px;height:13px"></i>
+                    7 nights
+                  </div>
+                </div>
+                <div class="holiday-price-group">
+                  <div class="holiday-per-person">Per person</div>
+                  <div class="holiday-price">from $1,450</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /holiday-grid -->
+
+        <div style="display:flex; justify-content:center; margin-top:32px;">
+          <button class="btn-secondary">
+            <i data-lucide="sun" style="width:16px;height:16px"></i>
+            View all holiday packages
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /section-holidays -->
+
+
+  <script>
+    // Initialise Lucide icons — converts <i data-lucide="..."> to inline SVGs
+    lucide.createIcons();
+
+    // ── Sliding tab indicator ─────────────────────────────────
+    // Moves the .tab-indicator bar so it sits under `activeTab`.
+    // We pass `animate: false` on first load so there's no slide-in from 0,0.
+    function moveIndicator(activeTab, animate = true) {
+      const indicator = document.querySelector('.tab-indicator');
+      const optionsEl  = activeTab.closest('.tabs-options');
+      const optionsRect = optionsEl.getBoundingClientRect();
+      const tabRect     = activeTab.getBoundingClientRect();
+
+      if (!animate) {
+        // Suppress the CSS transition just for this one frame
+        indicator.style.transition = 'none';
+      }
+
+      indicator.style.left  = (tabRect.left - optionsRect.left) + 'px';
+      indicator.style.width = tabRect.width + 'px';
+
+      if (!animate) {
+        // Restore transition after the browser has painted the initial position
+        requestAnimationFrame(() => { indicator.style.transition = ''; });
+      }
+    }
+
+    // Position the indicator immediately on page load (no sliding animation)
+    const initialTab = document.querySelector('.tabs-options .tab.active');
+    if (initialTab) moveIndicator(initialTab, false);
+
+    // ── Search widget tab switching ──────────────────────────
+    // Each tab button carries a data-tab="tours" / "hotels" / etc.
+    // When clicked we:
+    //   1. Update the active tab indicator (blue underline + bold)
+    //   2. Slide the .tab-indicator bar to the new tab
+    //   3. Swap the search panel inside the card (tours vs hotels inputs)
+    //   4. Swap the page content below the hero (tours sections vs hotel cards)
+    const tabsOptions = document.querySelector('.tabs-options');
+
+    document.querySelectorAll('.tabs-options .tab').forEach(tab => {
+      // Hover: slide the indicator to the hovered tab
+      tab.addEventListener('mouseenter', () => moveIndicator(tab));
+
+      // Mouse-leave: slide back to whichever tab is currently active
+      tab.addEventListener('mouseleave', () => {
+        const active = tabsOptions.querySelector('.tab.active');
+        if (active) moveIndicator(active);
+      });
+
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab; // e.g. "tours" or "hotels"
+
+        // 1. Switch active tab styling
+        document.querySelectorAll('.tabs-options .tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // 2. Slide the indicator to the clicked tab
+        moveIndicator(tab);
+
+        // 1b. Animate the icon on the tab that was just clicked.
+        //     We remove the class first (in case the user clicks rapidly)
+        //     then force a reflow so the browser sees it as a fresh start,
+        //     then add it back. The class removes itself when the animation ends.
+        const icon = tab.querySelector('.tab-icon');
+        if (icon) {
+          icon.classList.remove('popping');
+          void icon.offsetWidth; // reflow — resets the animation
+          icon.classList.add('popping');
+          icon.addEventListener('animationend', () => icon.classList.remove('popping'), { once: true });
+        }
+
+        // 2. Switch search panel — hide all, then reveal the matching one.
+        //    If a tab has no matching panel (e.g. Flights), all panels hide.
+        document.querySelectorAll('.search-panel').forEach(p => p.setAttribute('hidden', ''));
+        const activePanel = document.querySelector(`.search-panel[data-panel="${tabName}"]`);
+        if (activePanel) activePanel.removeAttribute('hidden');
+
+        // 3. Switch page content sections.
+        //    Each section is hidden unless its tabName matches.
+        const toursSec    = document.getElementById('section-tours');
+        const hotelsSec   = document.getElementById('section-hotels');
+        const flightsSec  = document.getElementById('section-flights');
+        const holidaysSec = document.getElementById('section-holidays'); // ← new
+        if (toursSec)    toursSec.hidden    = (tabName !== 'tours');
+        if (hotelsSec)   hotelsSec.hidden   = (tabName !== 'hotels');
+        if (flightsSec)  flightsSec.hidden  = (tabName !== 'flights');
+        if (holidaysSec) holidaysSec.hidden = (tabName !== 'holidays'); // ← new
+      });
+    });
+
+    // ── Flights: trip type toggle (Round trip / One way / Multi-city) ──
+    // When the user clicks one of the small trip-type pill buttons,
+    // we remove .active from all buttons in that group and add it to
+    // the one they clicked — the same pattern as the filter tabs below.
+    document.querySelectorAll('.flight-trip-type').forEach(group => {
+      group.querySelectorAll('.flight-trip-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          group.querySelectorAll('.flight-trip-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+    });
+
+    // ── Filter tab indicator ──────────────────────────────────
+    // Same idea as moveIndicator() above, but for the filter tab groups.
+    // `wrap` is the .filter-tabs-wrap element — the indicator lives there so
+    // it isn't clipped by the .filter-tabs overflow-x: auto scroll container.
+    // We measure tab position with getBoundingClientRect() (viewport-relative)
+    // and subtract the wrap's left edge to get the correct absolute left value.
+    function moveFilterIndicator(wrap, activeTab, animate = true) {
+      const indicator = wrap.querySelector('.filter-tab-indicator');
+      if (!indicator) return;
+
+      const wrapRect = wrap.getBoundingClientRect();
+      const tabRect  = activeTab.getBoundingClientRect();
+
+      if (!animate) indicator.style.transition = 'none';
+
+      indicator.style.left  = (tabRect.left - wrapRect.left) + 'px';
+      indicator.style.width = tabRect.width + 'px';
+
+      if (!animate) requestAnimationFrame(() => { indicator.style.transition = ''; });
+    }
+
+    // ── Filter tab switching ─────────────────────────────────
+    // Each .filter-tabs-wrap manages its own active state and indicator independently
+    document.querySelectorAll('.filter-tabs-wrap').forEach(wrap => {
+      const group = wrap.querySelector('.filter-tabs');
+
+      // Set the indicator to the initially active tab (no slide animation on load)
+      const initialActive = group.querySelector('.filter-tab.active');
+      if (initialActive) moveFilterIndicator(wrap, initialActive, false);
+
+      group.querySelectorAll('.filter-tab:not(.filter-tab-more)').forEach(tab => {
+        // Hover: slide the indicator to the hovered tab
+        tab.addEventListener('mouseenter', () => {
+          moveFilterIndicator(wrap, tab);
+        });
+
+        // Mouse-leave: slide the indicator back to whichever tab is active
+        tab.addEventListener('mouseleave', () => {
+          const active = group.querySelector('.filter-tab.active');
+          if (active) moveFilterIndicator(wrap, active);
+        });
+
+        tab.addEventListener('click', () => {
+          group.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          moveFilterIndicator(wrap, tab);
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
