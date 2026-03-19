@@ -12,7 +12,7 @@
  *   - Non-cached destinations get a standard DayPicker only.
  */
 
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   Plane,
   MapPin,
@@ -138,8 +138,14 @@ export default function PackageSearchForm({
   // to DayPicker's `modifiers` prop and apply the amber cell background.
   const bestDealDates = useMemo(() => {
     if (!isCached) return [] as Date[];
+    // todayStr lets us exclude past dates — past best-deal days would otherwise
+    // get the #EFF6FF background even though they're greyed out and unselectable.
+    const todayStr = format(new Date(), "yyyy-MM-dd");
     return Array.from(departurePriceMap.entries())
-      .filter(([dateStr, price]) => price === bestPricePerMonth.get(dateStr.substring(0, 7)))
+      .filter(([dateStr, price]) =>
+        dateStr >= todayStr &&
+        price === bestPricePerMonth.get(dateStr.substring(0, 7))
+      )
       // Using noon prevents off-by-one issues when the browser's local timezone
       // shifts a midnight UTC date into the previous day.
       .map(([dateStr]) => new Date(dateStr + "T12:00:00"));
@@ -531,9 +537,22 @@ export default function PackageSearchForm({
             {dateMode === "specific" && (
               <div className="p-4">
                 <style>{`
-                  .rdp { --rdp-accent-color: #2681ff; --rdp-background-color: rgba(38,129,255,0.10); margin: 0; }
-                  .rdp-day_selected:not([disabled]) { font-weight: bold; }
-                  ${isCached ? `.rdp { --rdp-cell-size: 60px; }` : ""}
+                  /* v9: root class is .rdp-root, not .rdp */
+                  .rdp-root {
+                    --rdp-accent-color: #2681FF;
+                    --rdp-accent-background-color: rgba(38,129,255,0.10);
+                    --rdp-day_button-border-radius: 8px;
+                    margin: 0;
+                  }
+                  ${isCached ? `
+                    /* Wider cells for the price-per-day view */
+                    .rdp-root {
+                      --rdp-day-width: 60px;
+                      --rdp-day-height: 60px;
+                      --rdp-day_button-width: 58px;
+                      --rdp-day_button-height: 58px;
+                    }
+                  ` : ""}
                 `}</style>
                 <DayPicker
                   mode="single"
@@ -567,52 +586,51 @@ export default function PackageSearchForm({
                       : bestDealDates,
                   } : {}}
                   modifiersStyles={isCached ? {
-                    stay:       { backgroundColor: "#f0f4f8" },
-                    tripReturn: { backgroundColor: "#dbeafe", outline: "1px solid #93c5fd", outlineOffset: "-1px" },
-                    // Light primary-blue tint — consistent with the design system and
-                    // readable even before the day is selected.
-                    bestDeal:   { backgroundColor: "#EFF6FF" },
+                    // borderRadius must match --rdp-day_button-border-radius (8px).
+                    // modifiersStyles targets the .rdp-day wrapper (the td), not the
+                    // button inside — so we must set borderRadius here explicitly,
+                    // otherwise the background is a square behind the rounded button.
+                    stay:       { backgroundColor: "#f0f4f8", borderRadius: "8px" },
+                    tripReturn: { backgroundColor: "#dbeafe", outline: "1px solid #93c5fd", outlineOffset: "-1px", borderRadius: "8px" },
+                    bestDeal:   { backgroundColor: "#EFF6FF", borderRadius: "8px" },
                   } : {}}
-                  // ── DayContent: inject day-number + price inside each cell ───
-                  // DayContent only controls the HTML *inside* each button —
-                  // hover, disabled, and selection states are still handled by DayPicker.
+                  // ── DayButton: inject day-number + price inside each cell ───
+                  // react-day-picker v9 replaced DayContent with DayButton.
+                  // DayButton replaces the whole button — we spread {...buttonProps}
+                  // to preserve click, disabled, aria, and DayPicker's own class names,
+                  // then add our custom content (day number + price) inside.
+                  //
+                  // day.isoDate is already "yyyy-MM-dd" (built into v9 CalendarDay).
+                  // modifiers.selected / modifiers.disabled come from DayPicker.
                   components={isCached ? {
-                    DayContent: ({ date }) => {
-                      const dateStr = format(date, "yyyy-MM-dd");
+                    DayButton: ({ day, modifiers, ...buttonProps }) => {
+                      const dateStr = day.isoDate;  // "yyyy-MM-dd", no format() needed
                       const price = departurePriceMap.get(dateStr);
                       const monthKey = dateStr.substring(0, 7);
                       // Is this the cheapest departure in its month?
                       const isBestDeal = price !== undefined && price === bestPricePerMonth.get(monthKey);
-                      // Is this the currently selected departure? (flip colours to white)
-                      const isSelected = dateRange?.from
-                        ? format(dateRange.from, "yyyy-MM-dd") === dateStr
-                        : false;
-                      // Hide price for past dates — comparing at midnight avoids timezone issues
-                      const isPast = date < new Date(new Date().toDateString());
+                      // modifiers.disabled → past date or otherwise unavailable
+                      const isDisabled = modifiers.disabled ?? false;
                       return (
-                        <span className="flex flex-col items-center justify-center gap-0 leading-none">
-                          {/* ★ badge — only on the cheapest day of each month.
-                              Turns white when the cell is selected (blue background)
-                              so it stays readable in both states. */}
-                          {isBestDeal && !isPast && (
-                            <span className={`text-[9px] font-black leading-none mb-0.5 ${
-                              isSelected ? "text-white/90" : "text-[#2681FF]"
-                            }`}>
-                              ★
-                            </span>
-                          )}
-                          <span className="text-[13px]">{date.getDate()}</span>
-                          {price !== undefined && !isPast && (
-                            // 11px is readable inside a 60px cell
-                            <span className={`text-[11px] font-bold leading-tight mt-0.5 ${
-                              isSelected ? "text-white/90" : "text-[#2681FF]"
-                            }`}>
-                              {price >= 1000
-                                ? `£${(price / 1000).toFixed(1)}k`
-                                : `£${price}`}
-                            </span>
-                          )}
-                        </span>
+                        <button {...buttonProps}>
+                          <span className="flex flex-col items-center justify-center gap-0 leading-none">
+                            {/* ★ badge — always blue, always visible on cheapest day */}
+                            {isBestDeal && !isDisabled && (
+                              <span className="text-[9px] font-black leading-none mb-0.5 text-[#2681FF]">
+                                ★
+                              </span>
+                            )}
+                            <span className="text-[13px]">{day.date.getDate()}</span>
+                            {price !== undefined && !isDisabled && (
+                              // 11px is readable inside a 60px cell
+                              <span className="text-[11px] font-bold leading-tight mt-0.5 text-[#2681FF]">
+                                {price >= 1000
+                                  ? `£${(price / 1000).toFixed(1)}k`
+                                  : `£${price}`}
+                              </span>
+                            )}
+                          </span>
+                        </button>
                       );
                     }
                   } : undefined}

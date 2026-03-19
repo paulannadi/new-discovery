@@ -89,31 +89,6 @@ export type SelectedFlightLeg = {
   option: FlightOption;
 };
 
-// Represents one holiday package — a bundled flight + hotel deal.
-// Shared between HolidayListPage (card) and HolidayDetailPage (full detail).
-export type HolidayPackage = {
-  id: number;
-  destination: string;
-  country: string;
-  flag: string;
-  image: string;
-  hotelName: string;
-  hotelStars: number;
-  rating: number;
-  reviewLabel: string;
-  reviewCount: number;
-  flightFrom: string;
-  flightFromCode: string;
-  flightToCode: string;
-  flightAirline: string;
-  flightStops: string;
-  flightDuration: string;
-  nights: number;
-  boardType: string;
-  price: string;
-  priceNum: number; // used for sorting
-  badge?: string;
-};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // App
@@ -379,31 +354,6 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
-  // ── HolidayDetailPage: click "Book this holiday" → SmartPlanner ──────────
-  // Builds the holiday StartingContext from the chosen package and room.
-  const handleHolidayBook = (pkg: HolidayPackage) => {
-    setStartingContext({
-      type: "holiday",
-      pkg: {
-        destination: pkg.destination,
-        hotelName: pkg.hotelName,
-        hotelStars: pkg.hotelStars,
-        flightFrom: pkg.flightFrom,
-        flightAirline: pkg.flightAirline,
-        flightDuration: pkg.flightDuration,
-        // Pass the actual nights from the package card so SmartPlanner
-        // shows the right duration (e.g. 10 nights, not a hardcoded 7).
-        nights: pkg.nights,
-        // Pass the travel date from the Holidays search form if one was entered.
-        checkIn: holidaySearchCriteria.dateRange?.from
-          ? format(holidaySearchCriteria.dateRange.from, "yyyy-MM-dd")
-          : undefined,
-      },
-    });
-    setCurrentPage("smart-planner");
-    window.scrollTo(0, 0);
-  };
-
   // ── AI PLANNER tab: submit prompt → SmartPlanner ─────────────────────────
   // Passes the raw prompt into SmartPlanner, which uses keyword matching
   // to pick the destination and renders a pre-generated 3-day itinerary.
@@ -517,28 +467,15 @@ export default function App() {
         />
       )}
 
-      {/* Screen 7: Holiday detail — reached from HolidayListPage */}
-      {currentPage === "holiday-detail" && selectedHolidayPackage && (
-        <HolidayDetailPage
-          pkg={selectedHolidayPackage}
-          searchCriteria={holidaySearchCriteria}
-          onBook={handleHolidayBook}
-          onBack={() => {
-            setCurrentPage("holiday-list");
-            window.scrollTo(0, 0);
-          }}
-        />
-      )}
-
       {/* Screen 6: Smart Planner — the itinerary view, reached from any tab */}
       {currentPage === "smart-planner" && startingContext && (
         <SmartPlannerPage
           startingContext={startingContext}
           onBack={() => {
-            // If we came from a holiday package, go back to the detail page.
+            // If we came from a holiday package, go back to the package detail page.
             // For all other entry points, go back to Discovery.
-            if (startingContext.type === "holiday" && selectedHolidayPackage) {
-              setCurrentPage("holiday-detail");
+            if (startingContext.type === "holiday" && selectedUnifiedPackage) {
+              setCurrentPage("package-detail");
             } else {
               handleBack();
             }
