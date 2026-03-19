@@ -23,7 +23,6 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import {
-  ArrowLeft,
   MapPin,
   Plane,
   Star,
@@ -36,9 +35,11 @@ import {
   CalendarDays,
   Pencil,
   Check,
+  Building2,
 } from "lucide-react";
 import { UnifiedPackage } from "../../../types";
 import type { HolidaySearchCriteria } from "../../../App";
+import { BackButton } from "../../../shared/components/BackButton";
 import { RateCalendarPanel } from "../components/RateCalendarPanel";
 import {
   Dialog,
@@ -673,14 +674,8 @@ export default function PackageDetailPage({
         <div className="max-w-[1280px] mx-auto">
 
           {/* Back button — sits above the hero inside the white card */}
-          <div className="px-6 md:px-10 pt-5 pb-2">
-            <button
-              onClick={onBack}
-              className="flex items-center gap-1.5 text-[#333743] text-[14px] font-semibold hover:text-[#2681FF] transition-colors"
-            >
-              <ArrowLeft size={16} />
-              Back to all holidays
-            </button>
+          <div className="px-4 sm:px-6 md:px-10 pt-5 pb-2">
+            <BackButton label="Back to all holidays" onClick={onBack} />
           </div>
 
           {/* ── HERO PHOTO GALLERY ────────────────────────────────────────────
@@ -688,7 +683,7 @@ export default function PackageDetailPage({
               Left: large main hero image. Right: 2×2 thumbnail grid.
               "See all photos" secondary button floats bottom-right.
           ──────────────────────────────────────────────────────────────────── */}
-          <div className="relative">
+          <div className="relative rounded-[16px] overflow-hidden mx-4 sm:mx-6 md:mx-10 mb-2">
             {/* Photo grid — h-[402px] on desktop matches Figma exactly */}
             <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[280px] md:h-[402px] gap-[4px] overflow-hidden">
 
@@ -736,7 +731,7 @@ export default function PackageDetailPage({
               and the price/CTA block on the RIGHT.
               This matches the Figma "Frame 1000002102" structure exactly.
           ──────────────────────────────────────────────────────────────────── */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 lg:gap-12 px-6 md:px-10 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 lg:gap-12 px-4 sm:px-6 md:px-10 py-5 md:py-8">
 
             {/* ── LEFT: Hotel identity + Package details ──────────────────── */}
             <div className="flex flex-col gap-4">
@@ -766,15 +761,12 @@ export default function PackageDetailPage({
                   </button>
                 </div>
 
-                {/* Hotel name — Heading Black/H1, fill_3CZMCP (#333743)
-                    Figma: "Hotel Krystal Grand Cancún" in large black weight */}
-                <h1 className="text-[32px] md:text-[40px] font-black text-[#333743] leading-[1.1] tracking-tight">
-                  {pkg.hotel.name}
-                </h1>
-
-                {/* Star rating row — "★★★★★" fill_J3CGBV (yellow) */}
-                <div className="flex items-center gap-1">
-                  <span className="text-[#FFB700] text-[16px] tracking-tight leading-none">
+                {/* Hotel name + star rating on the same line, stars 8px to the right */}
+                <div className="flex items-baseline gap-2">
+                  <h1 className="text-[24px] sm:text-[32px] md:text-[40px] font-black text-[#333743] leading-[1.1] tracking-tight">
+                    {pkg.hotel.name}
+                  </h1>
+                  <span className="text-[#FFB700] text-[16px] tracking-tight leading-none shrink-0">
                     {"★".repeat(pkg.hotel.category)}
                     {"☆".repeat(Math.max(0, 5 - pkg.hotel.category))}
                   </span>
@@ -800,27 +792,19 @@ export default function PackageDetailPage({
                   Items: plane icon + "Return flights from London"
                          building icon + "Superior Ocean View Room"
                          utensils icon + "All Inclusive" */}
-              <div className="bg-[#F8F9FA] rounded-[12px] p-4">
-                <div className="text-[13px] font-bold text-[#333743] mb-3 uppercase tracking-[0.4px]">
-                  Package details
+              {/* Package details — horizontal row, no background, Lucide icons */}
+              <div className="flex flex-row flex-wrap gap-x-6 gap-y-2">
+                <div className="flex items-center gap-2 text-[14px] text-[#333743]">
+                  <Plane size={15} className="text-[#333743] shrink-0" />
+                  <span>Return flights from {pkg.flights.outbound.departureAirport}</span>
                 </div>
-                <div className="flex flex-col gap-2.5">
-                  <div className="flex items-center gap-2.5 text-[14px] text-[#333743]">
-                    <Plane size={15} className="text-[#333743] shrink-0" />
-                    <span>
-                      Return flights from {pkg.flights.outbound.departureAirport}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-[14px] text-[#333743]">
-                    {/* building-2 icon — Figma uses this for room type */}
-                    <span className="text-[15px] shrink-0">🏨</span>
-                    <span>{pkg.room.roomType}</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-[14px] text-[#333743]">
-                    {/* utensils icon — Figma uses this for board type */}
-                    <Utensils size={15} className="text-[#333743] shrink-0" />
-                    <span>{pkg.room.boardType}</span>
-                  </div>
+                <div className="flex items-center gap-2 text-[14px] text-[#333743]">
+                  <Building2 size={15} className="text-[#333743] shrink-0" />
+                  <span>{pkg.room.roomType}</span>
+                </div>
+                <div className="flex items-center gap-2 text-[14px] text-[#333743]">
+                  <Utensils size={15} className="text-[#333743] shrink-0" />
+                  <span>{pkg.room.boardType}</span>
                 </div>
               </div>
             </div>
@@ -864,15 +848,11 @@ export default function PackageDetailPage({
                   Figma: "Personalise Your Holiday →" in white text */}
               <button
                 onClick={() => onBook(pkg, selectedDate)}
-                className="w-full lg:min-w-[280px] bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[16px] py-[16px] px-6 rounded-[10px] transition-colors whitespace-nowrap text-center"
+                className="w-full lg:min-w-[280px] bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[15px] md:text-[16px] py-3 md:py-[16px] px-4 md:px-6 rounded-[10px] transition-colors text-center"
               >
                 Personalise Your Holiday →
               </button>
 
-              {/* "You won't be charged yet" — Airbnb-style reassurance text */}
-              <div className="text-center text-[12px] text-[#717171]">
-                You won't be charged yet
-              </div>
             </div>
           </div>
         </div>
@@ -884,7 +864,7 @@ export default function PackageDetailPage({
           Right column: sticky rate calendar sidebar
           Both columns sit on the grey #F3F5F6 page background.
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-8">
+      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8">
 
         {/* ── "Hotel and flight information" H2 heading ─────────────────────
             Figma node 6117:1247: textStyle "Heading Black/H2", fill_3CZMCP
@@ -898,7 +878,7 @@ export default function PackageDetailPage({
           {/* ╔═══════════════════════════════════════════════════════════════
               LEFT COLUMN — all the content sections
           ═══════════════════════════════════════════════════════════════╗ */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 min-w-0">
 
             {/* ── SELECTED ROOM ──────────────────────────────────────────────
                 Figma: "Selected room" heading (Heading Bold/H3) + "Change room"
@@ -1115,101 +1095,74 @@ export default function PackageDetailPage({
             </div>
 
             {/* ── REVIEWS ───────────────────────────────────────────────────
-                Figma: "Reviews" heading H3. White card, rounded-[16px], Elevation S.
-                Rating summary: "4.3/5" (H3), "Exceptional", "472 verified reviews"
-                Review cards: each with "8/10 Good" score, text, "See details" link,
-                date, "Verified review" label. 2-column layout.
-                "See all 472 reviews" text button at the bottom of the card.
+                Figma node 6117:2032: row layout, white card, rounded-[16px], Elevation S.
+                Left: score summary column. Right: horizontally scrollable review cards.
             ──────────────────────────────────────────────────────────────── */}
-            <div>
-              <h3 className="text-[20px] font-bold text-[#333743] mb-4">
-                Reviews
-              </h3>
+            <div className="bg-white rounded-[16px] shadow-[0_0_4px_0_rgba(125,130,147,0.4)] flex flex-col md:flex-row gap-5 md:gap-10 p-4 md:py-6 md:pl-6 md:pr-0">
 
-              {/* Reviews card — bg-white, rounded-[16px], Elevation S shadow */}
-              <div className="bg-white rounded-[16px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] overflow-hidden">
-
-                {/* Top: rating summary row */}
-                {/* Figma: "4.3/5" in Heading Black/H3, "Exceptional" bold,
-                    "472 verified reviews" as a link — all on one row */}
-                <div className="p-5 border-b border-[#F0F0F0]">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    {/* "4.3/5" — Heading Black/H3, fill_A7J20N (using dark text) */}
-                    <span className="text-[24px] font-black text-[#333743] leading-none">
-                      {ratingEU}/5
-                    </span>
-                    {/* "Exceptional" — Paragraph Bold/Default Bold */}
-                    <span className="text-[15px] font-bold text-[#333743]">
-                      {ratingLabel(pkg.hotel.trustYou.rating)}
-                    </span>
-                    {/* Divider */}
-                    <span className="text-[#DDDDDD] hidden sm:block">·</span>
-                    {/* "472 verified reviews" — Paragraph Regular/Small, link */}
-                    <button
-                      onClick={() => setReviewsOpen(true)}
-                      className="text-[14px] text-[#333743] underline hover:no-underline"
-                    >
-                      {pkg.hotel.trustYou.reviewCount.toLocaleString()} verified
-                      reviews
-                    </button>
-                  </div>
-                </div>
-
-                {/* Review cards — 2-column grid inside the white card */}
-                <div className="p-5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-                    {MOCK_REVIEWS.map((review, i) => (
-                      // Each review card: border only, rounded-[16px] — Figma: strokes: stroke_AX4XKK
-                      <div
-                        key={i}
-                        className="border border-[#E8E8E8] rounded-[16px] p-4 flex flex-col gap-3 hover:border-[#AAAAAA] transition-colors"
-                      >
-                        {/* Score row: "8/10 Good" — Paragraph Bold/Default Bold */}
-                        <div className="flex items-center gap-2">
-                          {/* Score badge — NOT using a colored background here; it's just bold text
-                              Figma shows "8/10 Good" as a plain text with Paragraph Bold style */}
-                          <span className="text-[14px] font-bold text-[#333743]">
-                            {review.score} {review.label}
-                          </span>
-                        </div>
-
-                        {/* Review text — Paragraph Regular/Default, fill_LR9Q77 */}
-                        <p className="text-[14px] text-[#333743] leading-[1.6] flex-1">
-                          {review.text}
-                        </p>
-
-                        {/* Footer: "See details" link + date + "Verified review" */}
-                        <div className="flex flex-col gap-1.5">
-                          {/* "See details →" — text button, fill_CTT1AZ (#2681FF) */}
-                          <button className="text-[13px] font-bold text-[#2681FF] flex items-center gap-1 hover:underline self-start">
-                            See details
-                            <span className="text-[10px]">›</span>
-                          </button>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            {/* Date — Paragraph Regular/Default, fill_LR9Q77 */}
-                            <span className="text-[13px] text-[#333743]">
-                              {review.date}
-                            </span>
-                            {/* "Verified review" — Paragraph Regular/Small, fill_LIGD59 (grey) */}
-                            <span className="text-[12px] text-[#717171]">
-                              Verified review
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* "See all 472 reviews" — text button, fill_CTT1AZ (#2681FF)
-                      Figma: Type=Text, Size=Normal, Icon=None, Paragraph Bold/Default Bold */}
-                  <button
-                    onClick={() => setReviewsOpen(true)}
-                    className="text-[15px] font-bold text-[#2681FF] hover:underline"
-                  >
-                    See all {pkg.hotel.trustYou.reviewCount.toLocaleString()} reviews
-                  </button>
-                </div>
+              {/* Left column — score summary. Full width on mobile, fixed on desktop. */}
+              <div className="flex flex-row md:flex-col items-center md:items-start gap-3 md:gap-1 md:shrink-0 md:w-[100px]">
+                {/* "4.3/5" — Heading Black/H3 (Mulish 900, 24px), green #227950 */}
+                <span className="text-[24px] font-black text-[#227950] leading-tight">
+                  {ratingEU}/5
+                </span>
+                {/* "Exceptional" — Paragraph Bold/Default Bold (700, 16px) */}
+                <span className="text-[16px] font-bold text-[#191E3B]">
+                  {ratingLabel(pkg.hotel.trustYou.rating)}
+                </span>
+                {/* "472 verified reviews" — small text link */}
+                <button
+                  onClick={() => setReviewsOpen(true)}
+                  className="text-[12px] text-[#333743] underline hover:no-underline text-left mt-1"
+                >
+                  {pkg.hotel.trustYou.reviewCount.toLocaleString()} verified reviews
+                </button>
               </div>
+
+              {/* Right column — horizontally scrollable cards + "See all" below */}
+              <div className="flex flex-col gap-6 flex-1 min-w-0 overflow-hidden">
+
+                {/* Scrollable card row — cards are ~295px wide, gap 16px, pr-6 for breathing room */}
+                <div className="flex flex-row gap-4 overflow-x-auto pb-1 pr-6" style={{ scrollbarWidth: "none" }}>
+                  {MOCK_REVIEWS.map((review, i) => (
+                    // Each card: fixed 295×230px, border #E0E2E8, rounded-[16px], p-4
+                    <div
+                      key={i}
+                      className="flex flex-col border border-[#E0E2E8] rounded-[16px] p-4 shrink-0 w-[78vw] sm:w-[280px] md:w-[295px] h-[210px] sm:h-[230px]"
+                    >
+                      {/* "8/10 Good" — Paragraph Bold/Default Bold (700, 16px) */}
+                      <div className="text-[16px] font-bold text-[#191E3B] mb-2">
+                        {review.score} {review.label}
+                      </div>
+
+                      {/* Review text — fills remaining space */}
+                      <p className="text-[16px] text-[#191E3B] leading-[1.5] flex-1 overflow-hidden">
+                        {review.text}
+                      </p>
+
+                      {/* "See details" — text button, #2681FF, Paragraph Bold/Small Bold */}
+                      <button className="text-[12px] font-bold text-[#2681FF] hover:underline text-left mt-2 mb-1">
+                        See details
+                      </button>
+
+                      {/* Date */}
+                      <div className="text-[16px] text-[#191E3B]">{review.date}</div>
+
+                      {/* "Verified review" — Paragraph Regular/Small, #9598A4 */}
+                      <div className="text-[12px] text-[#9598A4]">Verified review</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* "See all 472 reviews" — Paragraph Bold/Default Bold, #2681FF */}
+                <button
+                  onClick={() => setReviewsOpen(true)}
+                  className="text-[16px] font-bold text-[#2681FF] hover:underline text-left"
+                >
+                  See all {pkg.hotel.trustYou.reviewCount.toLocaleString()} reviews
+                </button>
+              </div>
+
             </div>
 
             {/* ── MOBILE: EXPLORE DATES (cached packages only) ──────────────
@@ -1256,11 +1209,6 @@ export default function PackageDetailPage({
                   {mobileDatesExpanded && (
                     <div className="px-5 pb-5 border-t border-[#F0F0F0]">
                       <div className="pt-5">
-                        <PriceTrendChart
-                          rateCalendar={pkg.rateCalendar}
-                          selectedDate={selectedDate}
-                          onSelectDate={setSelectedDate}
-                        />
                         <RateCalendarPanel
                           rateCalendar={pkg.rateCalendar}
                           selectedDate={selectedDate}
@@ -1293,7 +1241,7 @@ export default function PackageDetailPage({
             <div className="bg-white border border-[#E8E8E8] rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.10)] overflow-hidden">
 
               {/* ── Price summary block ──────────────────────────────────── */}
-              <div className="p-5 border-b border-[#F0F0F0]">
+              <div className="p-5">
                 {/* £828 / per person */}
                 <div className="flex items-baseline gap-1.5 mb-1">
                   <span className="text-[28px] font-black text-[#333743] leading-none">
@@ -1323,18 +1271,9 @@ export default function PackageDetailPage({
                   showing "Explore travel dates" + month navigation + calendar.
                   For cached packages we show the rate calendar; for live
                   packages we show a date picker. */}
-              <div className="bg-[#F8F9FA] p-5">
-                <div className="text-[14px] font-bold text-[#333743] mb-4">
-                  Explore travel dates
-                </div>
-
+              <div className="bg-white p-5">
                 {pkg.sourceMode === "cache" && pkg.rateCalendar ? (
                   <div>
-                    <PriceTrendChart
-                      rateCalendar={pkg.rateCalendar}
-                      selectedDate={selectedDate}
-                      onSelectDate={setSelectedDate}
-                    />
                     <RateCalendarPanel
                       rateCalendar={pkg.rateCalendar}
                       selectedDate={selectedDate}
@@ -1410,40 +1349,14 @@ export default function PackageDetailPage({
                 )}
               </div>
 
-              {/* ── CTA button + trust signals ─────────────────────────────
-                  CTA is at the bottom of the sidebar card (inside the grey bg area). */}
-              <div className="px-5 pb-5 bg-[#F8F9FA]">
+              {/* ── CTA button ───────────────────────────────────────────── */}
+              <div className="px-5 pb-5 bg-white">
                 <button
                   onClick={() => onBook(pkg, selectedDate)}
                   className="w-full bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[16px] py-[16px] rounded-[10px] transition-colors"
                 >
                   Personalise Your Holiday →
                 </button>
-
-                <div className="text-center text-[12px] text-[#717171] mt-2 mb-4">
-                  You won't be charged yet
-                </div>
-
-                {/* What's included checklist */}
-                <div className="border-t border-[#E8E8E8] pt-4 flex flex-col gap-2">
-                  {[
-                    `Return direct flights from ${pkg.flights.outbound.departureAirport}`,
-                    `${nights} nights at ${pkg.hotel.name}`,
-                    pkg.room.boardType,
-                    "Free cancellation until 14 days before",
-                  ].map((item) => (
-                    <div
-                      key={item}
-                      className="flex items-start gap-2.5 text-[12px] text-[#333743]"
-                    >
-                      <Check
-                        size={13}
-                        className="text-[#16a34a] mt-0.5 shrink-0"
-                      />
-                      {item}
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           </div>
@@ -1451,6 +1364,9 @@ export default function PackageDetailPage({
 
         </div>
       </div>
+
+      {/* Spacer so the sticky footer doesn't overlap the last content section on mobile */}
+      <div className="lg:hidden h-20" />
 
       {/* ══════════════════════════════════════════════════════════════════════
           MOBILE STICKY FOOTER

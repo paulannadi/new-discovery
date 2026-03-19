@@ -211,37 +211,6 @@ export function RateCalendarPanel({
         })}
       </div>
 
-      {/* Selected date summary — departure + return dates below the grid */}
-      {selectedDate && (
-        <div className="mt-3 pt-3 border-t border-[#e0e2e8] flex flex-col gap-0.5">
-          {/* Departure row */}
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-[11px] text-[#9598a4] uppercase tracking-wide">Departure</div>
-              <div className="text-[12px] font-bold text-[#2681FF]">
-                {format(new Date(selectedDate), "EEE, d MMM yyyy")}
-              </div>
-            </div>
-            {entryMap.get(selectedDate) && (
-              <div className="text-[13px] font-black text-[#333743]">
-                {currSym}{entryMap.get(selectedDate)!.pricePerPerson.toLocaleString()}
-                <span className="text-[10px] font-semibold text-[#9598a4]">/pp</span>
-              </div>
-            )}
-          </div>
-          {/* Return row — less prominent */}
-          {returnDateStr && (
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-[11px] text-[#9598a4] uppercase tracking-wide">Return</div>
-                <div className="text-[12px] font-semibold text-[#667080]">
-                  {format(new Date(returnDateStr), "EEE, d MMM yyyy")} · {nights} nights
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
