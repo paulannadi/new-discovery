@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { BackButton } from "../../../shared/components/BackButton";
 import {
-  ArrowLeft,
   Plane,
   Moon,
   Star,
@@ -21,7 +20,32 @@ import {
   Sparkles,
   CalendarDays,
 } from "lucide-react";
-import type { HolidayPackage, HolidaySearchCriteria } from "../../../App";
+import type { HolidaySearchCriteria } from "../../../App";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HolidayPackage — the shape of a holiday result card passed into this page.
+// Defined here because it is not (yet) exported from App.tsx.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type HolidayPackage = {
+  destination: string;
+  country: string;
+  flag: string;           // ISO 3166-1 alpha-2 country code, e.g. "es"
+  hotelName: string;
+  hotelStars: number;
+  rating: number;
+  reviewLabel: string;    // e.g. "Excellent"
+  reviewCount: number;
+  nights: number;
+  priceNum: number;       // base price per person in £
+  boardType: string;      // e.g. "All Inclusive", "Bed & Breakfast"
+  flightFrom: string;     // departure city name, e.g. "London"
+  flightFromCode: string; // IATA code, e.g. "LHR"
+  flightToCode: string;   // IATA code, e.g. "PMI"
+  flightStops: string;    // e.g. "Direct" or "1 stop"
+  flightDuration: string; // e.g. "2h 30m"
+  flightAirline: string;  // e.g. "easyJet"
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
