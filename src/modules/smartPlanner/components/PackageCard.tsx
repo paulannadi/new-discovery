@@ -12,7 +12,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from "react";
-import { MapPin, BedDouble, Utensils, Calendar as CalendarIcon, ArrowRight, Wifi, Waves, Dumbbell, Wine, Wind, Dog, Accessibility, Droplets, Umbrella, Sparkles, Flag, Fish, Anchor, Eye, Music2 } from "lucide-react";
+import { MapPin, BedDouble, Utensils, Calendar as CalendarIcon, ArrowRight, Wifi, Waves, Dumbbell, Wine, Wind, Dog, Accessibility, Droplets, Umbrella, Sparkles, Flag, Fish, Anchor, Eye, Music2, Plane, Users, User, RotateCcw, Zap } from "lucide-react";
 import { format } from "date-fns";
 import { UnifiedPackage } from "../../../types";
 
@@ -60,6 +60,21 @@ function formatDateRange(outboundISO: string, returnISO: string): string {
     return outboundISO;
   }
 }
+
+// ── Trip type badge helper ──────────────────────────────────────────────────
+// Maps a tripType string to an icon, label, and Tailwind colour classes.
+// Shown as a pill overlay on the card image so agents can instantly see
+// what kind of holiday they're looking at.
+
+type TripType = NonNullable<UnifiedPackage["tripType"]>;
+
+const TRIP_TYPE_CONFIG: Record<TripType, { icon: React.ReactNode; label: string; bg: string; text: string }> = {
+  "hotel-flight":    { icon: <Plane size={11} />,     label: "Hotel + Flight",    bg: "bg-blue-100",   text: "text-blue-700" },
+  "group-tour":      { icon: <Users size={11} />,     label: "Group Tour",        bg: "bg-purple-100", text: "text-purple-700" },
+  "individual-tour": { icon: <User size={11} />,      label: "Individual Tour",   bg: "bg-green-100",  text: "text-green-700" },
+  "round-trip":      { icon: <RotateCcw size={11} />, label: "Round Trip",        bg: "bg-amber-100",  text: "text-amber-700" },
+  "last-minute":     { icon: <Zap size={11} />,       label: "Last Minute",       bg: "bg-red-100",    text: "text-red-700" },
+};
 
 // ── Props ──────────────────────────────────────────────────────────────────
 
@@ -113,6 +128,17 @@ export function PackageCard({ pkg, onSelect, onHover, isHovered, isPricePending 
           alt={pkg.hotel.name}
           className="w-full h-[160px] lg:h-full object-cover"
         />
+        {/* Trip type badge — shown top-left on the image when tripType is set.
+            Tells agents at a glance what kind of holiday this is. */}
+        {pkg.tripType && (() => {
+          const cfg = TRIP_TYPE_CONFIG[pkg.tripType];
+          return (
+            <span className={`absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${cfg.bg} ${cfg.text}`}>
+              {cfg.icon}
+              {cfg.label}
+            </span>
+          );
+        })()}
       </div>
 
       {/* ── Right: hotel + package details ──────────────────────────────── */}

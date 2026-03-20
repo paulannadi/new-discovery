@@ -137,6 +137,7 @@ export const CACHED_PACKAGES: UnifiedPackage[] = [
       return:   ba_return("2026-05-05"),
     },
     price: { perPerson: 849, total: 1698, currency: "GBP" },
+    tripType: "hotel-flight",
     rateCalendar: makeRateCalendar(849),
   },
 
@@ -160,6 +161,7 @@ export const CACHED_PACKAGES: UnifiedPackage[] = [
       return:   ba_return("2026-05-12"),
     },
     price: { perPerson: 1199, total: 2398, currency: "GBP" },
+    tripType: "individual-tour",
     rateCalendar: makeRateCalendar(1199),
   },
 
@@ -183,6 +185,7 @@ export const CACHED_PACKAGES: UnifiedPackage[] = [
       return:   vs_return("2026-04-28"),
     },
     price: { perPerson: 1099, total: 2198, currency: "GBP" },
+    tripType: "round-trip",
     rateCalendar: makeRateCalendar(1099),
   },
 
@@ -206,6 +209,7 @@ export const CACHED_PACKAGES: UnifiedPackage[] = [
       return:   vs_return("2026-05-19"),
     },
     price: { perPerson: 1349, total: 2698, currency: "GBP" },
+    tripType: "group-tour",
     rateCalendar: makeRateCalendar(1349),
   },
 
@@ -229,6 +233,7 @@ export const CACHED_PACKAGES: UnifiedPackage[] = [
       return:   ba_return("2026-06-16"),
     },
     price: { perPerson: 1499, total: 2998, currency: "GBP" },
+    tripType: "last-minute",
     rateCalendar: makeRateCalendar(1499),
   },
 
@@ -252,6 +257,7 @@ export const CACHED_PACKAGES: UnifiedPackage[] = [
       return:   ba_return("2026-04-21"),
     },
     price: { perPerson: 1249, total: 2498, currency: "GBP" },
+    tripType: "hotel-flight",
     rateCalendar: makeRateCalendar(1249),
   },
 ];

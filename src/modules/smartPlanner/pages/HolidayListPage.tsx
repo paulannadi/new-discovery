@@ -33,7 +33,37 @@ type HolidayListPageProps = {
 };
 
 // Which filter pill dropdown is currently open
-type FilterDropdown = "sort" | "duration" | "stars" | "board" | "stops" | "price" | null;
+type FilterDropdown = "sort" | "duration" | "stars" | "board" | "stops" | "price" | "triptype" | "style" | "country" | null;
+
+// Travel style options — matches the discovery page section
+const TRAVEL_STYLE_OPTIONS = [
+  "Culture & history",
+  "Sun & beach",
+  "Safari",
+  "Sustainable travel",
+  "Spa & wellness",
+  "Adventure",
+  "Luxury",
+] as const;
+
+// Country options derived from the mock destinations
+const COUNTRY_OPTIONS = [
+  "Mexico",
+  "Thailand",
+  "Indonesia",
+  "Peru",
+  "Japan",
+  "Morocco",
+] as const;
+
+// The trip type values — kept in sync with UnifiedPackage["tripType"] in types/index.ts
+const TRIP_TYPE_OPTIONS = [
+  { id: "hotel-flight",    label: "Hotel + Flight" },
+  { id: "group-tour",      label: "Group Tour" },
+  { id: "individual-tour", label: "Individual Tour" },
+  { id: "round-trip",      label: "Round Trip" },
+  { id: "last-minute",     label: "Last Minute" },
+] as const;
 
 const SORT_OPTIONS = [
   { id: "recommended", label: "Recommended" },
@@ -215,6 +245,10 @@ export default function HolidayListPage({
   const [priceMax, setPriceMax] = useState(5000);
   const [filterStars, setFilterStars] = useState<Set<number>>(new Set());
   const [filterBoard, setFilterBoard] = useState<Set<string>>(new Set());
+  // Trip type filter — empty Set means "show all types"
+  const [filterTripTypes, setFilterTripTypes] = useState<Set<string>>(new Set());
+  const [filterStyles, setFilterStyles] = useState<Set<string>>(new Set());
+  const [filterCountries, setFilterCountries] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<SortId>("recommended");
 
   // ── Filter pill dropdown state ─────────────────────────────────────────────
@@ -244,6 +278,9 @@ export default function HolidayListPage({
     setPriceMin(500); setPriceMax(5000);
     setFilterStars(new Set());
     setFilterBoard(new Set());
+    setFilterTripTypes(new Set());
+    setFilterStyles(new Set());
+    setFilterCountries(new Set());
     setSortBy("recommended");
   };
 
@@ -255,6 +292,16 @@ export default function HolidayListPage({
       if (pkg.price.perPerson < priceMin || pkg.price.perPerson > priceMax) return false;
       if (filterStars.size > 0 && !filterStars.has(pkg.hotel.category)) return false;
       if (filterBoard.size > 0 && !filterBoard.has(pkg.room.boardType)) return false;
+      // Only apply trip type filter when at least one type is selected.
+      // Packages without a tripType are included when no filter is active.
+      if (filterTripTypes.size > 0 && !filterTripTypes.has(pkg.tripType ?? "")) return false;
+      // Country: match against the destination in the search criteria or hotel location
+      if (filterCountries.size > 0) {
+        const loc = pkg.hotel.location.toLowerCase();
+        const matchesCountry = [...filterCountries].some((c) => loc.includes(c.toLowerCase()));
+        if (!matchesCountry) return false;
+      }
+      // Travel style: no style field on packages yet — filter is UI-only for now
       return true;
     });
     switch (sortBy) {
@@ -264,7 +311,7 @@ export default function HolidayListPage({
       default: break;
     }
     return results;
-  }, [packages, priceMin, priceMax, filterStars, filterBoard, sortBy]);
+  }, [packages, priceMin, priceMax, filterStars, filterBoard, filterTripTypes, filterCountries, sortBy]);
 
   // ── Human-readable search summary labels ──────────────────────────────────
 
@@ -284,6 +331,9 @@ export default function HolidayListPage({
     priceMin > 500 || priceMax < 5000,
     filterStars.size > 0,
     filterBoard.size > 0,
+    filterTripTypes.size > 0,
+    filterStyles.size > 0,
+    filterCountries.size > 0,
   ].filter(Boolean).length;
 
   // ── Desktop filter dropdown renderer ──────────────────────────────────────
@@ -340,6 +390,50 @@ export default function HolidayListPage({
           <div className="flex flex-col gap-1">
             {["All Inclusive", "Half Board", "Breakfast Included", "Room Only"].map((b) => (
               <CheckboxRow key={b} label={b} checked={filterBoard.has(b)} onChange={() => setFilterBoard(toggleSet(filterBoard, b))} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (openFilter === "triptype") {
+      return (
+        <div style={style} className="w-[220px] bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-200">
+          <h4 className="font-bold text-sm mb-3 text-[#333743]">Trip type</h4>
+          <div className="flex flex-col gap-1">
+            {TRIP_TYPE_OPTIONS.map((opt) => (
+              <CheckboxRow
+                key={opt.id}
+                label={opt.label}
+                checked={filterTripTypes.has(opt.id)}
+                onChange={() => setFilterTripTypes(toggleSet(filterTripTypes, opt.id))}
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (openFilter === "style") {
+      return (
+        <div style={style} className="w-[220px] bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-200">
+          <h4 className="font-bold text-sm mb-3 text-[#333743]">Travel style</h4>
+          <div className="flex flex-col gap-1">
+            {TRAVEL_STYLE_OPTIONS.map((s) => (
+              <CheckboxRow key={s} label={s} checked={filterStyles.has(s)} onChange={() => setFilterStyles(toggleSet(filterStyles, s))} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (openFilter === "country") {
+      return (
+        <div style={style} className="w-[200px] bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-200">
+          <h4 className="font-bold text-sm mb-3 text-[#333743]">Country</h4>
+          <div className="flex flex-col gap-1">
+            {COUNTRY_OPTIONS.map((c) => (
+              <CheckboxRow key={c} label={c} checked={filterCountries.has(c)} onChange={() => setFilterCountries(toggleSet(filterCountries, c))} />
             ))}
           </div>
         </div>
@@ -457,6 +551,29 @@ export default function HolidayListPage({
             hasSelection={sortBy !== "recommended"}
             onClick={(e) => handleFilterToggle("sort", e)}
             icon={<ArrowUpDown size={14} />}
+          />
+
+          <FilterButton
+            label={filterTripTypes.size > 0
+              ? `Trip type (${filterTripTypes.size})`
+              : "Trip type"}
+            active={openFilter === "triptype"}
+            hasSelection={filterTripTypes.size > 0}
+            onClick={(e) => handleFilterToggle("triptype", e)}
+          />
+
+          <FilterButton
+            label={filterStyles.size > 0 ? `Travel style (${filterStyles.size})` : "Travel style"}
+            active={openFilter === "style"}
+            hasSelection={filterStyles.size > 0}
+            onClick={(e) => handleFilterToggle("style", e)}
+          />
+
+          <FilterButton
+            label={filterCountries.size > 0 ? `Country (${filterCountries.size})` : "Country"}
+            active={openFilter === "country"}
+            hasSelection={filterCountries.size > 0}
+            onClick={(e) => handleFilterToggle("country", e)}
           />
 
           <FilterButton
@@ -698,6 +815,35 @@ export default function HolidayListPage({
               <h3 className="font-bold text-[#333743]">Board type</h3>
               {["All Inclusive", "Half Board", "Breakfast Included", "Room Only"].map((b) => (
                 <CheckboxRow key={b} label={b} checked={filterBoard.has(b)} onChange={() => setFilterBoard(toggleSet(filterBoard, b))} />
+              ))}
+            </div>
+            <div className="h-[1px] bg-[#e0e2e8]" />
+
+            <div className="flex flex-col gap-3">
+              <h3 className="font-bold text-[#333743]">Trip type</h3>
+              {TRIP_TYPE_OPTIONS.map((opt) => (
+                <CheckboxRow
+                  key={opt.id}
+                  label={opt.label}
+                  checked={filterTripTypes.has(opt.id)}
+                  onChange={() => setFilterTripTypes(toggleSet(filterTripTypes, opt.id))}
+                />
+              ))}
+            </div>
+            <div className="h-[1px] bg-[#e0e2e8]" />
+
+            <div className="flex flex-col gap-3">
+              <h3 className="font-bold text-[#333743]">Travel style</h3>
+              {TRAVEL_STYLE_OPTIONS.map((s) => (
+                <CheckboxRow key={s} label={s} checked={filterStyles.has(s)} onChange={() => setFilterStyles(toggleSet(filterStyles, s))} />
+              ))}
+            </div>
+            <div className="h-[1px] bg-[#e0e2e8]" />
+
+            <div className="flex flex-col gap-3">
+              <h3 className="font-bold text-[#333743]">Country</h3>
+              {COUNTRY_OPTIONS.map((c) => (
+                <CheckboxRow key={c} label={c} checked={filterCountries.has(c)} onChange={() => setFilterCountries(toggleSet(filterCountries, c))} />
               ))}
             </div>
 
