@@ -266,7 +266,7 @@ export default function PackageSearchForm({
     `${h} ${r} border px-4 flex items-center gap-3 transition-colors ${
       active
         ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-        : "border-[#e0e2e8] bg-[#f9fafb] hover:border-[#2681FF]"
+        : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
     }`;
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -320,7 +320,7 @@ export default function PackageSearchForm({
           className={`${h} ${r} border px-4 flex items-center gap-3 transition-colors ${
             openPanel === "to"
               ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-              : "border-[#e0e2e8] bg-[#f9fafb] focus-within:border-[#2681FF]"
+              : "border-[#e0e2e8] bg-white focus-within:border-[#2681FF]"
           }`}
         >
           <MapPin size={iconSize} className="text-[#2681FF] shrink-0" />

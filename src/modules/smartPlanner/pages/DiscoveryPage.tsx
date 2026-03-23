@@ -1518,7 +1518,22 @@ export default function DiscoveryPage({
             </div>
 
             <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
-              <button className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors">
+              <button
+                onClick={() => onHolidaySearch({
+                  from: "London (LHR)",
+                  to: "Anywhere",
+                  isCachedDestination: false,
+                  dateMode: "flexible",
+                  dateRange: undefined,
+                  selectedMonths: [],
+                  nights: 7,
+                  adults: 2,
+                  children: 0,
+                  // Pre-select the travel style filter so the list opens already filtered
+                  initialFilters: { style: activeTourStyle },
+                })}
+                className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors"
+              >
                 View all {activeTourStyle} tours (35)
               </button>
             </div>
@@ -1576,7 +1591,22 @@ export default function DiscoveryPage({
             </div>
 
             <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
-              <button className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors">
+              <button
+                onClick={() => onHolidaySearch({
+                  from: "London (LHR)",
+                  to: activeCountry,
+                  isCachedDestination: false,
+                  dateMode: "flexible",
+                  dateRange: undefined,
+                  selectedMonths: [],
+                  nights: 7,
+                  adults: 2,
+                  children: 0,
+                  // Pre-select the country filter so the list opens already filtered
+                  initialFilters: { country: activeCountry },
+                })}
+                className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors"
+              >
                 View all {activeCountry} tours (22)
               </button>
             </div>
@@ -1706,6 +1736,8 @@ export default function DiscoveryPage({
                   nights: 7,
                   adults: 2,
                   children: 0,
+                  // Pre-select the trip type filter so the list opens already filtered
+                  initialFilters: { tripType: activeTripType },
                 })}
                 className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors"
               >
