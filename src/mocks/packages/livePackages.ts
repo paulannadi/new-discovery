@@ -65,6 +65,7 @@ export const LIVE_PACKAGES: UnifiedPackage[] = [
     },
     // Live price is £30 cheaper — watch the card update when this arrives
     price: { perPerson: 819, total: 1638, currency: "GBP" },
+    tripType: "hotel-flight",
     // No rateCalendar — live packages always use the Package Details panel
   },
 
@@ -104,6 +105,7 @@ export const LIVE_PACKAGES: UnifiedPackage[] = [
       },
     },
     price: { perPerson: 1049, total: 2098, currency: "GBP" },
+    tripType: "round-trip",
   },
 
   // pkg_l003 — NEW hotel (not in cache), appended to list
@@ -142,6 +144,7 @@ export const LIVE_PACKAGES: UnifiedPackage[] = [
       },
     },
     price: { perPerson: 799, total: 1598, currency: "GBP" },
+    tripType: "group-tour",
   },
 
   // ── Batch 2 (arrives at t=5s): remaining packages ────────────────────────
@@ -182,6 +185,7 @@ export const LIVE_PACKAGES: UnifiedPackage[] = [
       },
     },
     price: { perPerson: 1149, total: 2298, currency: "GBP" },
+    tripType: "individual-tour",
   },
 
   // pkg_l005 — NEW hotel, second batch (budget option)
@@ -220,6 +224,7 @@ export const LIVE_PACKAGES: UnifiedPackage[] = [
       },
     },
     price: { perPerson: 749, total: 1498, currency: "GBP" },
+    tripType: "last-minute",
   },
 ];
 
@@ -263,6 +268,7 @@ export const NON_CACHED_PACKAGES: UnifiedPackage[] = [
       },
     },
     price: { perPerson: 1349, total: 2698, currency: "GBP" },
+    tripType: "individual-tour",
   },
   {
     packageId: "pkg_nc002",
@@ -299,6 +305,7 @@ export const NON_CACHED_PACKAGES: UnifiedPackage[] = [
       },
     },
     price: { perPerson: 1899, total: 3798, currency: "GBP" },
+    tripType: "group-tour",
   },
   {
     packageId: "pkg_nc003",
@@ -335,5 +342,6 @@ export const NON_CACHED_PACKAGES: UnifiedPackage[] = [
       },
     },
     price: { perPerson: 1099, total: 2198, currency: "GBP" },
+    tripType: "round-trip",
   },
 ];

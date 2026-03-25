@@ -46,6 +46,13 @@ export type HolidaySearchCriteria = {
   nights: number;
   adults: number;
   children: number;
+  // Optional pre-selected filters — set when navigating from a "View all X" button
+  // on the Discovery page so the list opens with the right filter already applied.
+  initialFilters?: {
+    tripType?: string;   // e.g. "group-tour"
+    style?: string;      // e.g. "Culture & history"
+    country?: string;    // e.g. "Thailand"
+  };
 };
 
 // ── FLIGHT SEARCH TYPES ──────────────────────────────────────────────────────

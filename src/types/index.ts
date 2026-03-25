@@ -73,4 +73,9 @@ export interface UnifiedPackage {
   // Rate calendar — only present for cache-sourced packages.
   // Shows which departure dates are bookable and at what price.
   rateCalendar?: RateCalendarEntry[];
+
+  // The category of holiday this package represents.
+  // Used to show a badge on PackageCard and to filter the holiday list.
+  // Optional so existing packages without a tag still work fine.
+  tripType?: "hotel-flight" | "group-tour" | "individual-tour" | "round-trip" | "last-minute";
 }

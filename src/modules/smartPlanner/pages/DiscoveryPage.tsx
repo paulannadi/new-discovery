@@ -9,7 +9,6 @@ import tourCard4 from "../../../../assets/tour-card-4-5e611c.png";
 import tourCard5 from "../../../../assets/tour-card-5-5e611c.png";
 import tourCard6 from "../../../../assets/tour-card-6-397980.png";
 import {
-  Map,
   Building2,
   Plane,
   Sun,
@@ -37,6 +36,8 @@ import {
   GitBranch,
   Moon,
   RotateCcw,
+  Zap,
+  User,
   Paperclip,
   Send,
 } from "lucide-react";
@@ -48,7 +49,7 @@ import type { FlightSearchCriteria, FlightLeg, HolidaySearchCriteria } from "../
 
 // --- Types ---
 
-type TabId = "tours" | "hotels" | "flights" | "holidays";
+type TabId = "hotels" | "flights" | "holidays" | "ai";
 
 type RoomConfig = {
   id: number;
@@ -84,10 +85,11 @@ type DiscoveryPageProps = {
 // --- Tab Definitions ---
 // Only 'hotels' is connected to a real search flow; the others are visual for now.
 const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
-  { id: "tours", label: "Tours", icon: <Map size={32} /> },
+  // Holidays is now first — Tours and Holidays have merged into one experience
+  { id: "holidays", label: "Holidays", icon: <Sun size={32} /> },
   { id: "hotels", label: "Hotels", icon: <Building2 size={32} /> },
   { id: "flights", label: "Flights", icon: <Plane size={32} /> },
-  { id: "holidays", label: "Holidays", icon: <Sun size={32} /> },
+  { id: "ai", label: "AI Planner", icon: <Sparkles size={32} /> },
 ];
 
 // --- Section data ---
@@ -268,6 +270,47 @@ const HOLIDAY_DESTINATIONS = [
   },
 ];
 
+// Trip type showcase cards — displayed in the "Browse by trip type" section
+// on the Holidays tab. Each type has 3 example cards using existing images.
+type TripTypeId = "hotel-flight" | "group-tour" | "individual-tour" | "round-trip" | "last-minute";
+
+const TRIP_TYPES: { id: TripTypeId; label: string; icon: React.ReactNode }[] = [
+  { id: "hotel-flight",    label: "Hotel + Flight",  icon: <Plane size={15} /> },
+  { id: "group-tour",      label: "Group Tours",     icon: <Users size={15} /> },
+  { id: "individual-tour", label: "Individual Tours",icon: <User size={15} /> },
+  { id: "round-trip",      label: "Round Trips",     icon: <RotateCcw size={15} /> },
+  { id: "last-minute",     label: "Last Minute",     icon: <Zap size={15} /> },
+];
+
+// Reuses the same tour card images already imported — no extra assets needed.
+const TRIP_TYPE_CARDS: Record<TripTypeId, { id: number; title: string; destination: string; image: string; duration: string; price: string }[]> = {
+  "hotel-flight": [
+    { id: 1, title: "Cancún All-Inclusive Escape",     destination: "Cancún, Mexico",   image: tourCard1, duration: "7 nights", price: "from £849" },
+    { id: 2, title: "Maldives Overwater Villa",         destination: "Maldives",         image: tourCard2, duration: "7 nights", price: "from £1,899" },
+    { id: 3, title: "Dubai Luxury Getaway",             destination: "Dubai, UAE",       image: tourCard3, duration: "7 nights", price: "from £999" },
+  ],
+  "group-tour": [
+    { id: 4, title: "Classic Peru Group Adventure",    destination: "Peru",             image: tourCard3, duration: "8 days",   price: "from £1,980" },
+    { id: 5, title: "Japan Group Highlights Tour",     destination: "Japan",            image: tourCard4, duration: "11 days",  price: "from £2,890" },
+    { id: 6, title: "Morocco Imperial Cities Group",   destination: "Morocco",          image: tourCard5, duration: "9 days",   price: "from £1,540" },
+  ],
+  "individual-tour": [
+    { id: 7, title: "Bali Cultural Discovery",         destination: "Bali, Indonesia",  image: tourCard2, duration: "8 days",   price: "from £1,980" },
+    { id: 8, title: "Kyoto Self-Guided Journey",       destination: "Japan",            image: tourCard6, duration: "8 days",   price: "from £2,200" },
+    { id: 9, title: "Thai Island Hopping",             destination: "Thailand",         image: tourCard1, duration: "10 days",  price: "from £1,650" },
+  ],
+  "round-trip": [
+    { id: 10, title: "Japan Rail Circle Route",        destination: "Japan",            image: tourCard4, duration: "14 days",  price: "from £3,400" },
+    { id: 11, title: "Moroccan Imperial Loop",         destination: "Morocco",          image: tourCard5, duration: "9 days",   price: "from £1,540" },
+    { id: 12, title: "Peru Amazon & Andes Circuit",    destination: "Peru",             image: tourCard6, duration: "12 days",  price: "from £2,400" },
+  ],
+  "last-minute": [
+    { id: 13, title: "Santorini Getaway",              destination: "Greece",           image: tourCard2, duration: "7 nights", price: "from £749" },
+    { id: 14, title: "Bangkok Long Weekend",           destination: "Thailand",         image: tourCard3, duration: "5 nights", price: "from £599" },
+    { id: 15, title: "Cancún Quick Escape",            destination: "Mexico",           image: tourCard1, duration: "7 nights", price: "from £819" },
+  ],
+};
+
 // --- Main Component ---
 
 export default function DiscoveryPage({
@@ -278,7 +321,7 @@ export default function DiscoveryPage({
   onHolidaySearch,
   onAIPlan,
 }: DiscoveryPageProps) {
-  const [activeTab, setActiveTab] = useState<TabId>("tours");
+  const [activeTab, setActiveTab] = useState<TabId>("holidays");
   // Controls whether the hero shows the normal search card or the AI Experience mode
   const [aiExperienceMode, setAiExperienceMode] = useState(false);
 
@@ -298,6 +341,8 @@ export default function DiscoveryPage({
   }, [aiExperienceMode]);
   const [activeTourStyle, setActiveTourStyle] = useState("Culture & history");
   const [activeCountry, setActiveCountry] = useState("Thailand");
+  // Trip type tab for the "Browse by trip type" showcase on the Holidays landing
+  const [activeTripType, setActiveTripType] = useState<TripTypeId>("hotel-flight");
 
   // Tab indicator: each button ref is measured to position the sliding blue underline.
   // hoveredTab wins over activeTab so the indicator follows the cursor.
@@ -339,6 +384,19 @@ export default function DiscoveryPage({
     const bar = countryTabBarRef.current;
     if (el && bar) setCountryIndicator({ left: el.offsetLeft, width: el.offsetWidth });
   }, [activeCountry, hoveredCountry]);
+
+  // Same sliding indicator for the trip type section
+  const tripTypeTabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+  const tripTypeTabBarRef = useRef<HTMLDivElement>(null);
+  const [tripTypeIndicator, setTripTypeIndicator] = useState({ left: 0, width: 0 });
+  const [hoveredTripType, setHoveredTripType] = useState<TripTypeId | null>(null);
+
+  useEffect(() => {
+    const target = hoveredTripType ?? activeTripType;
+    const el = tripTypeTabRefs.current[target];
+    const bar = tripTypeTabBarRef.current;
+    if (el && bar) setTripTypeIndicator({ left: el.offsetLeft, width: el.offsetWidth });
+  }, [activeTripType, hoveredTripType]);
 
   // Hotels panel state
   type HotelPanel = "destination" | "dates" | "guests" | null;
@@ -435,8 +493,6 @@ export default function DiscoveryPage({
 
   const flightPassengersLabel = `${flightPassengers.adults} Adult${flightPassengers.adults !== 1 ? "s" : ""}${flightPassengers.children > 0 ? `, ${flightPassengers.children} Child${flightPassengers.children !== 1 ? "ren" : ""}` : ""}`;
   const [flightCabinClassOpen, setFlightCabinClassOpen] = useState(false);
-
-  const [tourSearch, setTourSearch] = useState("");
 
   // Holidays panel — state now lives inside PackageSearchForm
 
@@ -976,30 +1032,6 @@ export default function DiscoveryPage({
                     >
                       <Search size={20} />
                       Search Hotels
-                    </button>
-                  </div>
-                )}
-
-                {/* TOURS PANEL */}
-                {activeTab === "tours" && (
-                  // flex-col on mobile (stacked), sm:flex-row on wider screens (side by side)
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex-1">
-                      <div className="w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-[#f9fafb] focus-within:border-[#2681FF] focus-within:ring-2 focus-within:ring-[#2681FF]/20 transition-all">
-                        <Search size={18} className="text-[#9598a4] shrink-0" />
-                        <input
-                          type="text"
-                          placeholder="What kind of tour are you looking for?"
-                          className="flex-1 bg-transparent text-[14px] text-[#333743] outline-none placeholder:text-[#9598a4]"
-                          value={tourSearch}
-                          onChange={(e) => setTourSearch(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    {/* w-full on mobile, sm:w-auto on wider screens */}
-                    <button className="w-full sm:w-auto bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black text-[16px] h-[52px] px-6 rounded-[12px] transition-colors flex items-center justify-center gap-2">
-                      <Search size={20} />
-                      Search Tours
                     </button>
                   </div>
                 )}
@@ -1553,7 +1585,7 @@ export default function DiscoveryPage({
 
       {/* ── HOTELS ── */}
       {activeTab === "hotels" && (
-        <section className="py-16 px-4 md:px-12">
+        <section className="py-16 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1200px] mx-auto">
 
             <div className="mb-8">
@@ -1674,7 +1706,7 @@ export default function DiscoveryPage({
 
       {/* ── FLIGHTS ── */}
       {activeTab === "flights" && (
-        <section className="py-16 px-4 md:px-12">
+        <section className="py-16 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1200px] mx-auto">
 
             <div className="mb-8">
@@ -1779,59 +1811,319 @@ export default function DiscoveryPage({
       )}
 
       {/* ── HOLIDAYS ── */}
+      {/* This tab now combines the old Holidays + Tours into one rich experience. */}
       {activeTab === "holidays" && (
-        <section className="py-16 px-4 md:px-12">
-          <div className="max-w-[1200px] mx-auto">
+        <>
 
-            <div className="mb-8">
+          {/* ── Section 1: Tours by travel style ────────────────────────── */}
+          {/* Section has no horizontal padding. The max-w-[1200px] wrapper aligns
+              headings + tab bars with the hero card. Scroll rows use dynamic
+              pl-[max(pad, (100vw-1200px)/2)] so the first card starts at exactly
+              the same left edge on all screen sizes, including wide viewports. */}
+          <section className="py-16">
+
+            {/* Constrained content — aligns with hero card left edge */}
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-8">
               <div className="flex items-center gap-2.5 mb-2">
-                <Sun size={28} className="text-[#2681FF]" />
+                <TreePalm size={28} className="text-[#2681FF]" />
                 <h2 className="text-[#333743] font-bold text-[32px] leading-tight">
-                  Popular holiday destinations
+                  Tours for every travel style
                 </h2>
               </div>
               <p className="text-[#667080] text-[18px]">
-                Flights + hotel bundled together — best value guaranteed
+                Average prices based on current calendar month
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {HOLIDAY_DESTINATIONS.map((dest) => (
-                <HolidayCard
-                  key={dest.id}
-                  dest={dest}
-                  onSelect={() => onHolidaySearch({
-                    from: "London (LHR)",
-                    to: dest.destination,
-                    isCachedDestination: false,
-                    dateMode: "specific",
-                    dateRange: undefined,
-                    selectedMonths: [],
-                    nights: dest.nights,
-                    adults: 2,
-                    children: 0,
-                  })}
-                />
+            <div ref={styleTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] sm:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-[#E0E2E8] mb-8 flex gap-0 overflow-x-auto">
+              {TOUR_STYLE_FILTERS.map((style) => (
+                <button
+                  key={style}
+                  ref={(el) => { styleTabRefs.current[style] = el; }}
+                  onClick={() => setActiveTourStyle(style)}
+                  onMouseEnter={() => setHoveredStyle(style)}
+                  onMouseLeave={() => setHoveredStyle(null)}
+                  className={`shrink-0 px-5 py-3 text-[15px] font-bold whitespace-nowrap ${
+                    activeTourStyle === style ? "text-[#2681FF]" : "text-[#333743]"
+                  }`}
+                >
+                  {style}
+                </button>
               ))}
+              <button className="shrink-0 ml-auto px-5 py-3 text-[15px] font-bold text-[#2681FF] flex items-center gap-1.5">
+                Other styles
+                <ChevronDown size={16} />
+              </button>
+              <div
+                className="absolute bottom-0 h-[2.5px] bg-[#2681FF] rounded-full transition-all duration-300 ease-out"
+                style={{ left: styleIndicator.left, width: styleIndicator.width }}
+              />
             </div>
 
-            <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
-              {[
-                { icon: <Sun size={22} className="text-[#2681FF]" />, title: "Buy together & save", desc: "Bundle your flights and hotel for the best combined price." },
-                { icon: <Heart size={22} className="text-[#2681FF]" />, title: "Tailor your holiday", desc: "Mix and match hotels, room types, and board options." },
-                { icon: <Plane size={22} className="text-[#2681FF]" />, title: "Flexible dates", desc: "See prices across different dates to find the best deal." },
-                { icon: <Users size={22} className="text-[#2681FF]" />, title: "24 / 7 support", desc: "Our travel experts are here before, during, and after your trip." },
-              ].map(({ icon, title, desc }) => (
-                <div key={title} className="flex flex-col gap-2">
-                  <div className="w-10 h-10 bg-[#EFF6FF] rounded-[10px] flex items-center justify-center">{icon}</div>
-                  <div className="text-[14px] font-bold text-[#333743]">{title}</div>
-                  <div className="text-[13px] text-[#667080] leading-relaxed">{desc}</div>
+            {/* Scroll row: starts at the same left edge as the hero card.
+                pl-[max(pad,(100vw-75rem)/2)] dynamically tracks the mx-auto centering
+                so cards align correctly on both narrow and wide screens. */}
+            <div className="pl-[max(1rem,calc((100vw-75rem)/2))] sm:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] sm:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+              {TOUR_CARDS.map((tour) => (
+                <div key={tour.id} className="shrink-0 w-[320px] snap-start">
+                  <TourCard tour={tour} onSelect={() => onTourSelect(tour)} />
                 </div>
               ))}
             </div>
 
-          </div>
-        </section>
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
+              <button
+                onClick={() => onHolidaySearch({
+                  from: "London (LHR)",
+                  to: "Anywhere",
+                  isCachedDestination: false,
+                  dateMode: "flexible",
+                  dateRange: undefined,
+                  selectedMonths: [],
+                  nights: 7,
+                  adults: 2,
+                  children: 0,
+                  // Pre-select the travel style filter so the list opens already filtered
+                  initialFilters: { style: activeTourStyle },
+                })}
+                className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors"
+              >
+                View all {activeTourStyle} tours (35)
+              </button>
+            </div>
+
+          </section>
+
+          <hr className="border-[#E0E2E8] mx-4 sm:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
+
+          {/* ── Section 2: Tours by destination ──────────────────────────── */}
+          <section className="py-16">
+
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-8">
+              <div className="flex items-center gap-2.5 mb-2">
+                <Flag size={28} className="text-[#2681FF]" />
+                <h2 className="text-[#333743] font-bold text-[32px] leading-tight">
+                  Your next dream destination
+                </h2>
+              </div>
+              <p className="text-[#667080] text-[18px]">
+                Average prices based on current calendar month
+              </p>
+            </div>
+
+            <div ref={countryTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] sm:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-[#E0E2E8] mb-8 flex gap-0 overflow-x-auto">
+              {DESTINATION_FILTERS.map((country) => (
+                <button
+                  key={country}
+                  ref={(el) => { countryTabRefs.current[country] = el; }}
+                  onClick={() => setActiveCountry(country)}
+                  onMouseEnter={() => setHoveredCountry(country)}
+                  onMouseLeave={() => setHoveredCountry(null)}
+                  className={`shrink-0 px-5 py-3 text-[15px] font-bold whitespace-nowrap ${
+                    activeCountry === country ? "text-[#2681FF]" : "text-[#333743]"
+                  }`}
+                >
+                  {country}
+                </button>
+              ))}
+              <button className="shrink-0 ml-auto px-5 py-3 text-[15px] font-bold text-[#2681FF] flex items-center gap-1.5">
+                More destinations
+                <ChevronDown size={16} />
+              </button>
+              <div
+                className="absolute bottom-0 h-[2.5px] bg-[#2681FF] rounded-full transition-all duration-300 ease-out"
+                style={{ left: countryIndicator.left, width: countryIndicator.width }}
+              />
+            </div>
+
+            <div className="pl-[max(1rem,calc((100vw-75rem)/2))] sm:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] sm:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+              {(TOURS_BY_COUNTRY[activeCountry] ?? []).map((tour) => (
+                <div key={tour.id} className="shrink-0 w-[320px] snap-start">
+                  <TourCard tour={tour} onSelect={() => onTourSelect(tour)} />
+                </div>
+              ))}
+            </div>
+
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
+              <button
+                onClick={() => onHolidaySearch({
+                  from: "London (LHR)",
+                  to: activeCountry,
+                  isCachedDestination: false,
+                  dateMode: "flexible",
+                  dateRange: undefined,
+                  selectedMonths: [],
+                  nights: 7,
+                  adults: 2,
+                  children: 0,
+                  // Pre-select the country filter so the list opens already filtered
+                  initialFilters: { country: activeCountry },
+                })}
+                className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors"
+              >
+                View all {activeCountry} tours (22)
+              </button>
+            </div>
+
+          </section>
+
+          <hr className="border-[#E0E2E8] mx-4 sm:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
+
+          {/* ── Section 3: Travel the way you like ───────────────────────── */}
+          <section className="py-16">
+
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-8">
+              <div className="flex items-center gap-2.5 mb-2">
+                <GitBranch size={28} className="text-[#2681FF]" />
+                <h2 className="text-[#333743] font-bold text-[32px] leading-tight">
+                  Travel the way you like
+                </h2>
+              </div>
+              <p className="text-[#667080] text-[18px]">
+                Find the right style of holiday for you
+              </p>
+            </div>
+
+            <div ref={tripTypeTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] sm:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-[#E0E2E8] mb-8 flex gap-0 overflow-x-auto">
+              {TRIP_TYPES.map((tt) => (
+                <button
+                  key={tt.id}
+                  ref={(el) => { tripTypeTabRefs.current[tt.id] = el; }}
+                  onClick={() => setActiveTripType(tt.id)}
+                  onMouseEnter={() => setHoveredTripType(tt.id)}
+                  onMouseLeave={() => setHoveredTripType(null)}
+                  className={`shrink-0 px-5 py-3 text-[15px] font-bold whitespace-nowrap ${
+                    activeTripType === tt.id ? "text-[#2681FF]" : "text-[#333743]"
+                  }`}
+                >
+                  {tt.label}
+                </button>
+              ))}
+              <div
+                className="absolute bottom-0 h-[2.5px] bg-[#2681FF] rounded-full transition-all duration-300 ease-out"
+                style={{ left: tripTypeIndicator.left, width: tripTypeIndicator.width }}
+              />
+            </div>
+
+            {activeTripType === "hotel-flight" && (
+              <div className="pl-[max(1rem,calc((100vw-75rem)/2))] sm:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] sm:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+                {HOLIDAY_DESTINATIONS.map((dest) => (
+                  <div key={dest.id} className="shrink-0 w-[320px] snap-start">
+                    <HolidayCard
+                      dest={dest}
+                      onSelect={() => onHolidaySearch({
+                        from: "London (LHR)",
+                        to: dest.destination,
+                        isCachedDestination: false,
+                        dateMode: "specific",
+                        dateRange: undefined,
+                        selectedMonths: [],
+                        nights: dest.nights,
+                        adults: 2,
+                        children: 0,
+                      })}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTripType !== "hotel-flight" && (
+              <div className="pl-[max(1rem,calc((100vw-75rem)/2))] sm:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] sm:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+                {(TRIP_TYPE_CARDS[activeTripType] ?? []).map((card) => (
+                  <div key={card.id} className="shrink-0 w-[300px] snap-start">
+                    <div
+                      className="bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
+                      onClick={() => onHolidaySearch({
+                        from: "London (LHR)",
+                        to: card.destination,
+                        isCachedDestination: false,
+                        dateMode: "specific",
+                        dateRange: undefined,
+                        selectedMonths: [],
+                        nights: 7,
+                        adults: 2,
+                        children: 0,
+                      })}
+                    >
+                      <div className="relative">
+                        <img src={card.image} alt={card.title} className="w-full h-[180px] object-cover" />
+                        <span className={`absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                          activeTripType === "group-tour"      ? "bg-purple-100 text-purple-700" :
+                          activeTripType === "individual-tour" ? "bg-green-100 text-green-700" :
+                          activeTripType === "round-trip"      ? "bg-amber-100 text-amber-700" :
+                                                                 "bg-red-100 text-red-700"
+                        }`}>
+                          {TRIP_TYPES.find((t) => t.id === activeTripType)?.icon}
+                          {TRIP_TYPES.find((t) => t.id === activeTripType)?.label}
+                        </span>
+                      </div>
+                      <div className="p-4 flex flex-col gap-2">
+                        <div className="text-[13px] text-[#667080]">{card.destination}</div>
+                        <div className="text-[15px] font-bold text-[#333743] leading-snug">{card.title}</div>
+                        <div className="flex items-end justify-between mt-1">
+                          <div className="flex items-center gap-1.5 text-[13px] text-[#333743]">
+                            <Clock size={14} />
+                            {card.duration}
+                          </div>
+                          <div className="text-right">
+                            <div className="text-[12px] text-[#667080]">Per person</div>
+                            <div className="text-[20px] font-bold text-[#333743]">{card.price}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
+              <button
+                onClick={() => onHolidaySearch({
+                  from: "London (LHR)",
+                  to: "Anywhere",
+                  isCachedDestination: false,
+                  dateMode: "flexible",
+                  dateRange: undefined,
+                  selectedMonths: [],
+                  nights: 7,
+                  adults: 2,
+                  children: 0,
+                  // Pre-select the trip type filter so the list opens already filtered
+                  initialFilters: { tripType: activeTripType },
+                })}
+                className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors"
+              >
+                View all {TRIP_TYPES.find((t) => t.id === activeTripType)?.label} holidays
+              </button>
+            </div>
+
+          </section>
+
+          <hr className="border-[#E0E2E8] mx-4 sm:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
+
+          {/* ── Section 5: Why book with us ───────────────────────────────── */}
+          <section className="py-16">
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))]">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {[
+                  { icon: <Sun size={22} className="text-[#2681FF]" />, title: "Buy together & save", desc: "Bundle your flights and hotel for the best combined price." },
+                  { icon: <Heart size={22} className="text-[#2681FF]" />, title: "Tailor your holiday", desc: "Mix and match hotels, room types, and board options." },
+                  { icon: <Plane size={22} className="text-[#2681FF]" />, title: "Flexible dates", desc: "See prices across different dates to find the best deal." },
+                  { icon: <Users size={22} className="text-[#2681FF]" />, title: "24 / 7 support", desc: "Our travel experts are here before, during, and after your trip." },
+                ].map(({ icon, title, desc }) => (
+                  <div key={title} className="flex flex-col gap-2">
+                    <div className="w-10 h-10 bg-[#EFF6FF] rounded-[10px] flex items-center justify-center">{icon}</div>
+                    <div className="text-[14px] font-bold text-[#333743]">{title}</div>
+                    <div className="text-[13px] text-[#667080] leading-relaxed">{desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+        </>
       )}
 
       {/* Footer */}
