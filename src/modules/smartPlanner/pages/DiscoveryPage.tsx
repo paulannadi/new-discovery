@@ -49,7 +49,7 @@ import type { FlightSearchCriteria, FlightLeg, HolidaySearchCriteria } from "../
 
 // --- Types ---
 
-type TabId = "hotels" | "flights" | "holidays" | "ai";
+type TabId = "hotels" | "flights" | "holidays";
 
 type RoomConfig = {
   id: number;
@@ -78,8 +78,6 @@ type DiscoveryPageProps = {
   onFlightSearch: (criteria: FlightSearchCriteria) => void;
   // Called when the user submits the Holidays search form → leads to HolidayListPage
   onHolidaySearch: (criteria: HolidaySearchCriteria) => void;
-  // Called when the user submits the AI Planner prompt
-  onAIPlan: (prompt: string) => void;
 };
 
 // --- Tab Definitions ---
@@ -89,7 +87,6 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "holidays", label: "Holidays", icon: <Sun size={32} /> },
   { id: "hotels", label: "Hotels", icon: <Building2 size={32} /> },
   { id: "flights", label: "Flights", icon: <Plane size={32} /> },
-  { id: "ai", label: "AI Planner", icon: <Sparkles size={32} /> },
 ];
 
 // --- Section data ---
@@ -319,7 +316,6 @@ export default function DiscoveryPage({
   onTourSelect,
   onFlightSearch,
   onHolidaySearch,
-  onAIPlan,
 }: DiscoveryPageProps) {
   const [activeTab, setActiveTab] = useState<TabId>("holidays");
   // Controls whether the hero shows the normal search card or the AI Experience mode
@@ -512,10 +508,8 @@ export default function DiscoveryPage({
     const el = searchCardRef.current;
     if (!el) return;
 
-    // Capture immediately on mount / when returning from AI mode
     setLockedCardHeight(el.offsetHeight);
 
-    // Keep updating as tabs switch or dropdowns open (the card grows/shrinks)
     const observer = new ResizeObserver(() => {
       setLockedCardHeight(el.offsetHeight);
     });
@@ -649,7 +643,7 @@ export default function DiscoveryPage({
             {/* Toggle pill — pulses when mode changes */}
             <motion.div animate={toggleControls}>
               <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm px-5 py-2.5 rounded-full border border-white/30">
-                <span className="text-white font-bold text-[15px] whitespace-nowrap">Try AI Experience</span>
+                <span className="text-white font-bold text-[15px] whitespace-nowrap">AI Experience</span>
                 <Switch
                   checked={aiExperienceMode}
                   onCheckedChange={setAiExperienceMode}
@@ -1378,11 +1372,7 @@ export default function DiscoveryPage({
             </div>
             </div>
 
-            {/*
-              AI content wrapper — contains BOTH the search card AND the suggestion
-              prompts so they fade as one unit. When hidden, absolute inset-0 keeps
-              everything scoped inside the relative wrapper (no flash at top).
-            */}
+            {/* AI content wrapper — fades in when the "Try AI Experience" switch is on */}
             <div
               className={`transition-opacity duration-500 ${
                 aiExperienceMode
@@ -1396,7 +1386,6 @@ export default function DiscoveryPage({
                   className="bg-white sm:rounded-[24px] sm:shadow-2xl w-full sm:max-w-[860px] flex flex-col"
                   style={{ height: lockedCardHeight ?? undefined }}
                 >
-                  {/* Textarea */}
                   <div className="flex-1 p-4 sm:p-6">
                     <textarea
                       placeholder="Describe your ideal trip — destination, dates, budget, travel style…"
@@ -1405,17 +1394,12 @@ export default function DiscoveryPage({
                       onChange={(e) => setAiPrompt(e.target.value)}
                     />
                   </div>
-
-                  {/* Action row */}
                   <div className="flex items-center justify-between px-4 sm:px-6 pb-4 sm:pb-6 border-t border-[#e0e2e8] pt-4 shrink-0">
                     <button className="flex items-center gap-2 text-[#9598a4] text-[14px] font-bold hover:text-[#667080] transition-colors">
                       <Paperclip size={16} />
                       Attach files
                     </button>
-                    <button
-                      className="flex items-center gap-2 bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black text-[16px] h-[52px] px-6 rounded-[12px] transition-colors shadow-md"
-                      onClick={() => onAIPlan(aiPrompt)}
-                    >
+                    <button className="flex items-center gap-2 bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black text-[16px] h-[52px] px-6 rounded-[12px] transition-colors shadow-md">
                       <Send size={18} />
                       Plan my trip
                     </button>
@@ -1423,7 +1407,7 @@ export default function DiscoveryPage({
                 </div>
               </div>
 
-              {/* Suggestion prompts — shown below the card in AI mode */}
+              {/* Suggestion prompts */}
               <div className="flex flex-col items-center gap-3 px-4 pb-16 lg:pb-[128px]">
                 <span className="text-white/70 text-[14px]">Try asking:</span>
                 <div className="flex flex-wrap gap-3 justify-center max-w-[860px]">
@@ -1444,6 +1428,7 @@ export default function DiscoveryPage({
                 </div>
               </div>
             </div>
+
           </div>{/* end relative search-area wrapper */}
         </div>
       </div>
@@ -1460,128 +1445,6 @@ export default function DiscoveryPage({
         }}
       >
 
-      {/* ── TOURS ── */}
-      {activeTab === "tours" && (
-        <>
-          <section className="py-16 px-4 md:px-12">
-            <div className="max-w-[1200px] mx-auto">
-
-              <div className="mb-8">
-                <div className="flex items-center gap-2.5 mb-2">
-                  <TreePalm size={28} className="text-[#2681FF]" />
-                  <h2 className="text-[#333743] font-bold text-[32px] leading-tight">
-                    Tours for every travel style
-                  </h2>
-                </div>
-                <p className="text-[#667080] text-[18px]">
-                  Average prices based on current calendar month
-                </p>
-              </div>
-
-              {/* Style filter tabs */}
-              <div ref={styleTabBarRef} className="relative border-b border-[#E0E2E8] mb-8 flex gap-0 overflow-x-auto">
-                {TOUR_STYLE_FILTERS.map((style) => (
-                  <button
-                    key={style}
-                    ref={(el) => { styleTabRefs.current[style] = el; }}
-                    onClick={() => setActiveTourStyle(style)}
-                    onMouseEnter={() => setHoveredStyle(style)}
-                    onMouseLeave={() => setHoveredStyle(null)}
-                    className={`shrink-0 px-5 py-3 text-[15px] font-bold whitespace-nowrap ${
-                      activeTourStyle === style ? "text-[#2681FF]" : "text-[#333743]"
-                    }`}
-                  >
-                    {style}
-                  </button>
-                ))}
-                <button className="shrink-0 ml-auto px-5 py-3 text-[15px] font-bold text-[#2681FF] flex items-center gap-1.5">
-                  Other styles
-                  <ChevronDown size={16} />
-                </button>
-                <div
-                  className="absolute bottom-0 h-[2.5px] bg-[#2681FF] rounded-full transition-all duration-300 ease-out"
-                  style={{ left: styleIndicator.left, width: styleIndicator.width }}
-                />
-              </div>
-
-              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
-                {TOUR_CARDS.map((tour) => (
-                  <div key={tour.id} className="shrink-0 w-[320px] snap-start">
-                    <TourCard tour={tour} onSelect={() => onTourSelect(tour)} />
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex justify-end">
-                <button className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors">
-                  View all {activeTourStyle} tours (35)
-                </button>
-              </div>
-
-            </div>
-          </section>
-
-          <hr className="border-[#E0E2E8] mx-4 md:mx-12" />
-
-          <section className="py-16 px-4 md:px-12">
-            <div className="max-w-[1200px] mx-auto">
-
-              <div className="mb-8">
-                <div className="flex items-center gap-2.5 mb-2">
-                  <Flag size={28} className="text-[#2681FF]" />
-                  <h2 className="text-[#333743] font-bold text-[32px] leading-tight">
-                    Your next dream destination
-                  </h2>
-                </div>
-                <p className="text-[#667080] text-[18px]">
-                  Average prices based on current calendar month
-                </p>
-              </div>
-
-              {/* Country filter tabs */}
-              <div ref={countryTabBarRef} className="relative border-b border-[#E0E2E8] mb-8 flex gap-0 overflow-x-auto">
-                {DESTINATION_FILTERS.map((country) => (
-                  <button
-                    key={country}
-                    ref={(el) => { countryTabRefs.current[country] = el; }}
-                    onClick={() => setActiveCountry(country)}
-                    onMouseEnter={() => setHoveredCountry(country)}
-                    onMouseLeave={() => setHoveredCountry(null)}
-                    className={`shrink-0 px-5 py-3 text-[15px] font-bold whitespace-nowrap ${
-                      activeCountry === country ? "text-[#2681FF]" : "text-[#333743]"
-                    }`}
-                  >
-                    {country}
-                  </button>
-                ))}
-                <button className="shrink-0 ml-auto px-5 py-3 text-[15px] font-bold text-[#2681FF] flex items-center gap-1.5">
-                  More destinations
-                  <ChevronDown size={16} />
-                </button>
-                <div
-                  className="absolute bottom-0 h-[2.5px] bg-[#2681FF] rounded-full transition-all duration-300 ease-out"
-                  style={{ left: countryIndicator.left, width: countryIndicator.width }}
-                />
-              </div>
-
-              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
-                {(TOURS_BY_COUNTRY[activeCountry] ?? []).map((tour) => (
-                  <div key={tour.id} className="shrink-0 w-[320px] snap-start">
-                    <TourCard tour={tour} onSelect={() => onTourSelect(tour)} />
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex justify-end">
-                <button className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors">
-                  View all {activeCountry} tours (22)
-                </button>
-              </div>
-
-            </div>
-          </section>
-        </>
-      )}
 
       {/* ── HOTELS ── */}
       {activeTab === "hotels" && (

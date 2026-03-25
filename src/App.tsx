@@ -361,18 +361,6 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
-  // ── AI PLANNER tab: submit prompt → SmartPlanner ─────────────────────────
-  // Passes the raw prompt into SmartPlanner, which uses keyword matching
-  // to pick the destination and renders a pre-generated 3-day itinerary.
-  const handleAIPlan = (prompt: string) => {
-    setStartingContext({
-      type: "ai",
-      prompt: prompt || "A relaxing 7-day trip",
-    });
-    setCurrentPage("smart-planner");
-    window.scrollTo(0, 0);
-  };
-
   // ── Back → Discovery ─────────────────────────────────────────────────────
   // Called from the SmartPlanner "Back" button and the HotelList "← New Search".
   const handleBack = () => {
@@ -397,7 +385,6 @@ export default function App() {
           onTourSelect={handleTourSelect}
           onFlightSearch={handleFlightSearch}
           onHolidaySearch={handleHolidaySearch}
-          onAIPlan={handleAIPlan}
         />
       )}
 
