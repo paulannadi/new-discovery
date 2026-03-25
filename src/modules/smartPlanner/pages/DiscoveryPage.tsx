@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { motion, useAnimation } from "framer-motion";
 import PackageSearchForm from "../components/PackageSearchForm";
 import heroBg from "../../../../assets/hero-background-45ee0a.png";
 import tourCard1 from "../../../../assets/tour-card-1-4c2e30.png";
@@ -37,7 +38,10 @@ import {
   RotateCcw,
   Zap,
   User,
+  Paperclip,
+  Send,
 } from "lucide-react";
+import { Switch } from "../../../shared/components/ui/switch";
 import { DayPicker, DateRange } from "react-day-picker";
 import { format, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
@@ -318,6 +322,23 @@ export default function DiscoveryPage({
   onAIPlan,
 }: DiscoveryPageProps) {
   const [activeTab, setActiveTab] = useState<TabId>("holidays");
+  // Controls whether the hero shows the normal search card or the AI Experience mode
+  const [aiExperienceMode, setAiExperienceMode] = useState(false);
+
+  // Pill pulse — fires only when the toggle actually changes, not on first mount
+  const toggleControls = useAnimation();
+  const isMounted = useRef(false);
+
+  useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return;
+    }
+    toggleControls.start({
+      scale: [1, 1.1, 1],
+      transition: { duration: 0.4, ease: "easeOut" },
+    });
+  }, [aiExperienceMode]);
   const [activeTourStyle, setActiveTourStyle] = useState("Culture & history");
   const [activeCountry, setActiveCountry] = useState("Thailand");
   // Trip type tab for the "Browse by trip type" showcase on the Holidays landing
@@ -477,8 +498,30 @@ export default function DiscoveryPage({
 
   const [aiPrompt, setAiPrompt] = useState("");
 
+  // Tracks the height of the white search card while AI mode is OFF.
+  // Frozen when AI mode turns on — used to size the AI white card to match.
+  const [lockedCardHeight, setLockedCardHeight] = useState<number | null>(null);
+
   // Close hotel dropdowns when clicking outside the search card
   const searchCardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Stop updating while AI mode is on — we keep the last measured value
+    if (aiExperienceMode) return;
+
+    const el = searchCardRef.current;
+    if (!el) return;
+
+    // Capture immediately on mount / when returning from AI mode
+    setLockedCardHeight(el.offsetHeight);
+
+    // Keep updating as tabs switch or dropdowns open (the card grows/shrinks)
+    const observer = new ResizeObserver(() => {
+      setLockedCardHeight(el.offsetHeight);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [aiExperienceMode]);
   useEffect(() => {
     const handleOutside = (e: MouseEvent) => {
       if (
@@ -504,19 +547,151 @@ export default function DiscoveryPage({
     <div className="min-h-screen bg-[#F3F5F6]">
       {/* HERO — full-width background image with search card */}
       {/* On mobile: white background, no image. On sm+: image shows behind floating card */}
-      <div className="relative flex flex-col bg-white sm:bg-transparent">
-        <div className="hidden sm:block absolute inset-0">
+      {/* When aiExperienceMode is on, the background swaps to a melted gradient instead */}
+      {/* overflow-hidden clips the hero image when it scales up during the melt-out */}
+      <div className={`relative flex flex-col bg-white sm:bg-transparent overflow-hidden transition-all duration-500 ${aiExperienceMode ? "min-h-screen" : ""}`}>
+
+        {/*
+          Blob background — always in the DOM but starts invisible (opacity 0).
+          Uses Framer Motion `animate` so it transitions in the exact same frame
+          as the hero image transition below — no cross-fade timing gap or flash.
+        */}
+        <motion.div
+          className="hidden sm:block absolute inset-0 overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: aiExperienceMode ? 1 : 0 }}
+          transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
+          style={{ pointerEvents: aiExperienceMode ? "auto" : "none" }}
+        >
+              {/* Base — cool grey from the design theme */}
+              <div className="absolute inset-0 bg-[#dde0ea]" />
+
+              {/* Sky zone — wide flat oval, cool grey-blue at the top (matches sky) */}
+              <motion.div
+                className="absolute"
+                style={{
+                  width: 1600, height: 500,
+                  borderRadius: "50%",
+                  background: "radial-gradient(ellipse, #c8cfe0 0%, transparent 70%)",
+                  filter: "blur(80px)",
+                  top: -180, left: -150,
+                }}
+                animate={{ x: [0, 140, -90, 0], y: [0, 70, -50, 0] }}
+                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+              />
+
+              {/* Ocean zone — tall wide oval, brand blue, middle band (matches water) */}
+              <motion.div
+                className="absolute"
+                style={{
+                  width: 1300, height: 480,
+                  borderRadius: "50%",
+                  background: "radial-gradient(ellipse, #5ba8ff 0%, transparent 65%)",
+                  filter: "blur(75px)",
+                  top: "28%", left: -80,
+                }}
+                animate={{ x: [0, 120, -80, 0], y: [0, 60, -40, 0] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              />
+
+              {/* Cool grey zone — wide oval at the bottom (replaces sand) */}
+              <motion.div
+                className="absolute"
+                style={{
+                  width: 1500, height: 550,
+                  borderRadius: "50%",
+                  background: "radial-gradient(ellipse, #e4e7f2 0%, transparent 65%)",
+                  filter: "blur(85px)",
+                  bottom: -180, left: -80,
+                }}
+                animate={{ x: [0, 100, -120, 0], y: [0, -60, 40, 0] }}
+                transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+              />
+
+              {/* Transition zone — soft teal oval bridging ocean into base, center */}
+              <motion.div
+                className="absolute"
+                style={{
+                  width: 900, height: 380,
+                  borderRadius: "50%",
+                  background: "radial-gradient(ellipse, #7dcfcc 0%, transparent 65%)",
+                  filter: "blur(65px)",
+                  top: "48%", left: "18%",
+                }}
+                animate={{ x: [0, 160, -100, 0], y: [0, 70, -50, 0] }}
+                transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+              />
+        </motion.div>
+
+        {/*
+          Hero photo — sits on top of the blobs and melts away when AI mode activates.
+          Using Framer Motion (same engine as the blob fade above) guarantees both
+          animations start in the same frame — no flash or timing gap.
+        */}
+        <motion.div
+          className="hidden sm:block absolute inset-0"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: aiExperienceMode ? 0 : 1 }}
+          transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
+        >
           <img
             src={heroBg}
             alt="Discover the world"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/25 to-black/10" />
-        </div>
+        </motion.div>
 
         <div className="relative z-10 flex flex-col">
-          {/* On mobile: no padding so the card is truly flush edge-to-edge */}
-          <div className="sm:px-6 lg:px-12 sm:py-16 lg:py-[128px] flex justify-center">
+
+          {/* ── Toggle + tagline — always rendered, text swaps on mode change ── */}
+          <div className="hidden sm:flex flex-col items-center px-6 lg:px-12 pt-32 pb-6 gap-5">
+            {/* Toggle pill — pulses when mode changes */}
+            <motion.div animate={toggleControls}>
+              <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm px-5 py-2.5 rounded-full border border-white/30">
+                <span className="text-white font-bold text-[15px] whitespace-nowrap">Try AI Experience</span>
+                <Switch
+                  checked={aiExperienceMode}
+                  onCheckedChange={setAiExperienceMode}
+                />
+              </div>
+            </motion.div>
+            {/* Tagline — crossfades between the two strings */}
+            <div className="relative flex items-center justify-center min-h-[56px] lg:min-h-[68px] w-full">
+              {/* Default tagline — fades out when AI mode turns on */}
+              <h1
+                className={`absolute text-white font-black text-[36px] lg:text-[48px] text-center drop-shadow-md leading-tight transition-all duration-500 ${
+                  aiExperienceMode ? "opacity-0 -translate-y-2 pointer-events-none" : "opacity-100 translate-y-0"
+                }`}
+              >
+                Explore the world's hidden gems
+              </h1>
+              {/* AI tagline — fades in when AI mode turns on */}
+              <h1
+                className={`absolute text-white font-black text-[36px] lg:text-[48px] text-center drop-shadow-md leading-tight transition-all duration-500 ${
+                  aiExperienceMode ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"
+                }`}
+              >
+                Your AI Travel Assistant
+              </h1>
+            </div>
+          </div>
+
+          {/* ── Search area ── */}
+          {/*
+            Both cards sit inside this relative wrapper.
+            Whichever card is "hidden" gets absolute inset-0 — scoped to THIS
+            wrapper, so it can never jump up over the toggle/tagline above.
+          */}
+          <div className="relative">
+
+            {/* Normal search card — fades out when AI mode turns on */}
+            <div
+              className={`transition-all duration-500 ${
+                aiExperienceMode ? "opacity-0 pointer-events-none absolute inset-0" : "opacity-100"
+              }`}
+            >
+            <div className="sm:px-6 lg:px-12 sm:pb-16 lg:pb-[128px] flex justify-center">
             <div
               ref={searchCardRef}
               className="bg-white sm:rounded-[24px] sm:shadow-2xl w-full sm:max-w-[1200px]"
@@ -1198,36 +1373,215 @@ export default function DiscoveryPage({
                   <PackageSearchForm variant="hero" onSearch={onHolidaySearch} />
                 )}
 
-                {/* AI PLANNER PANEL */}
-                {activeTab === "ai" && (
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-start gap-3 p-4 rounded-[12px] border border-[#e0e2e8] bg-[#f9fafb] focus-within:border-[#2681FF] focus-within:ring-2 focus-within:ring-[#2681FF]/20 transition-all min-h-[88px]">
-                      <Sparkles
-                        size={18}
-                        className="text-[#2681FF] mt-0.5 shrink-0"
-                      />
-                      <textarea
-                        placeholder="Describe your dream trip… e.g. 'A relaxing 7-day beach holiday for 2 in Europe in July, budget around €3,000'"
-                        className="flex-1 bg-transparent text-[14px] text-[#333743] outline-none placeholder:text-[#9598a4] resize-none leading-relaxed"
-                        rows={3}
-                        value={aiPrompt}
-                        onChange={(e) => setAiPrompt(e.target.value)}
-                      />
-                    </div>
-                    <button
-                      className="w-full bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black text-[16px] h-[52px] rounded-[12px] transition-colors flex items-center justify-center gap-2"
-                      onClick={() => onAIPlan(aiPrompt)}
-                    >
-                      <Sparkles size={20} />
-                      Plan my trip with AI
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
-          </div>
+            </div>
+            </div>
+
+            {/*
+              AI content wrapper — contains BOTH the search card AND the suggestion
+              prompts so they fade as one unit. When hidden, absolute inset-0 keeps
+              everything scoped inside the relative wrapper (no flash at top).
+            */}
+            <div
+              className={`transition-opacity duration-500 ${
+                aiExperienceMode
+                  ? "opacity-100"
+                  : "opacity-0 pointer-events-none absolute inset-0 overflow-hidden"
+              }`}
+            >
+              {/* AI search card */}
+              <div className="sm:px-6 lg:px-12 sm:pb-16 lg:pb-[128px] flex justify-center">
+                <div
+                  className="bg-white sm:rounded-[24px] sm:shadow-2xl w-full sm:max-w-[860px] flex flex-col"
+                  style={{ height: lockedCardHeight ?? undefined }}
+                >
+                  {/* Textarea */}
+                  <div className="flex-1 p-4 sm:p-6">
+                    <textarea
+                      placeholder="Describe your ideal trip — destination, dates, budget, travel style…"
+                      className="w-full h-full bg-transparent text-[16px] text-[#333743] outline-none placeholder:text-[#9598a4] resize-none leading-relaxed"
+                      value={aiPrompt}
+                      onChange={(e) => setAiPrompt(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Action row */}
+                  <div className="flex items-center justify-between px-4 sm:px-6 pb-4 sm:pb-6 border-t border-[#e0e2e8] pt-4 shrink-0">
+                    <button className="flex items-center gap-2 text-[#9598a4] text-[14px] font-bold hover:text-[#667080] transition-colors">
+                      <Paperclip size={16} />
+                      Attach files
+                    </button>
+                    <button
+                      className="flex items-center gap-2 bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black text-[16px] h-[52px] px-6 rounded-[12px] transition-colors shadow-md"
+                      onClick={() => onAIPlan(aiPrompt)}
+                    >
+                      <Send size={18} />
+                      Plan my trip
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Suggestion prompts — shown below the card in AI mode */}
+              <div className="flex flex-col items-center gap-3 px-4 pb-16 lg:pb-[128px]">
+                <span className="text-white/70 text-[14px]">Try asking:</span>
+                <div className="flex flex-wrap gap-3 justify-center max-w-[860px]">
+                  {[
+                    "Find me a beach resort in Bali for next month",
+                    "Plan a 5-day family trip to Paris",
+                    "Weekend getaway in the Alps under €500",
+                    "Luxury honeymoon in the Maldives",
+                  ].map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      className="bg-white/15 backdrop-blur-sm hover:bg-white/25 text-white text-[14px] px-4 py-2 rounded-full border border-white/30 transition-colors"
+                      onClick={() => setAiPrompt(suggestion)}
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>{/* end relative search-area wrapper */}
         </div>
       </div>
+
+      {/* ── BELOW-HERO CONTENT — collapses to zero height in AI mode so it takes no space ── */}
+      <motion.div
+        initial={{ opacity: 1 }}
+        animate={{ opacity: aiExperienceMode ? 0 : 1 }}
+        transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+        style={{
+          pointerEvents: aiExperienceMode ? "none" : "auto",
+          overflow: "hidden",
+          height: aiExperienceMode ? 0 : "auto",
+        }}
+      >
+
+      {/* ── TOURS ── */}
+      {activeTab === "tours" && (
+        <>
+          <section className="py-16 px-4 md:px-12">
+            <div className="max-w-[1200px] mx-auto">
+
+              <div className="mb-8">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <TreePalm size={28} className="text-[#2681FF]" />
+                  <h2 className="text-[#333743] font-bold text-[32px] leading-tight">
+                    Tours for every travel style
+                  </h2>
+                </div>
+                <p className="text-[#667080] text-[18px]">
+                  Average prices based on current calendar month
+                </p>
+              </div>
+
+              {/* Style filter tabs */}
+              <div ref={styleTabBarRef} className="relative border-b border-[#E0E2E8] mb-8 flex gap-0 overflow-x-auto">
+                {TOUR_STYLE_FILTERS.map((style) => (
+                  <button
+                    key={style}
+                    ref={(el) => { styleTabRefs.current[style] = el; }}
+                    onClick={() => setActiveTourStyle(style)}
+                    onMouseEnter={() => setHoveredStyle(style)}
+                    onMouseLeave={() => setHoveredStyle(null)}
+                    className={`shrink-0 px-5 py-3 text-[15px] font-bold whitespace-nowrap ${
+                      activeTourStyle === style ? "text-[#2681FF]" : "text-[#333743]"
+                    }`}
+                  >
+                    {style}
+                  </button>
+                ))}
+                <button className="shrink-0 ml-auto px-5 py-3 text-[15px] font-bold text-[#2681FF] flex items-center gap-1.5">
+                  Other styles
+                  <ChevronDown size={16} />
+                </button>
+                <div
+                  className="absolute bottom-0 h-[2.5px] bg-[#2681FF] rounded-full transition-all duration-300 ease-out"
+                  style={{ left: styleIndicator.left, width: styleIndicator.width }}
+                />
+              </div>
+
+              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+                {TOUR_CARDS.map((tour) => (
+                  <div key={tour.id} className="shrink-0 w-[320px] snap-start">
+                    <TourCard tour={tour} onSelect={() => onTourSelect(tour)} />
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-end">
+                <button className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors">
+                  View all {activeTourStyle} tours (35)
+                </button>
+              </div>
+
+            </div>
+          </section>
+
+          <hr className="border-[#E0E2E8] mx-4 md:mx-12" />
+
+          <section className="py-16 px-4 md:px-12">
+            <div className="max-w-[1200px] mx-auto">
+
+              <div className="mb-8">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <Flag size={28} className="text-[#2681FF]" />
+                  <h2 className="text-[#333743] font-bold text-[32px] leading-tight">
+                    Your next dream destination
+                  </h2>
+                </div>
+                <p className="text-[#667080] text-[18px]">
+                  Average prices based on current calendar month
+                </p>
+              </div>
+
+              {/* Country filter tabs */}
+              <div ref={countryTabBarRef} className="relative border-b border-[#E0E2E8] mb-8 flex gap-0 overflow-x-auto">
+                {DESTINATION_FILTERS.map((country) => (
+                  <button
+                    key={country}
+                    ref={(el) => { countryTabRefs.current[country] = el; }}
+                    onClick={() => setActiveCountry(country)}
+                    onMouseEnter={() => setHoveredCountry(country)}
+                    onMouseLeave={() => setHoveredCountry(null)}
+                    className={`shrink-0 px-5 py-3 text-[15px] font-bold whitespace-nowrap ${
+                      activeCountry === country ? "text-[#2681FF]" : "text-[#333743]"
+                    }`}
+                  >
+                    {country}
+                  </button>
+                ))}
+                <button className="shrink-0 ml-auto px-5 py-3 text-[15px] font-bold text-[#2681FF] flex items-center gap-1.5">
+                  More destinations
+                  <ChevronDown size={16} />
+                </button>
+                <div
+                  className="absolute bottom-0 h-[2.5px] bg-[#2681FF] rounded-full transition-all duration-300 ease-out"
+                  style={{ left: countryIndicator.left, width: countryIndicator.width }}
+                />
+              </div>
+
+              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+                {(TOURS_BY_COUNTRY[activeCountry] ?? []).map((tour) => (
+                  <div key={tour.id} className="shrink-0 w-[320px] snap-start">
+                    <TourCard tour={tour} onSelect={() => onTourSelect(tour)} />
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-end">
+                <button className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors">
+                  View all {activeCountry} tours (22)
+                </button>
+              </div>
+
+            </div>
+          </section>
+        </>
+      )}
 
       {/* ── HOTELS ── */}
       {activeTab === "hotels" && (
@@ -1778,6 +2132,7 @@ export default function DiscoveryPage({
           © 2026 Nezasa · TripBuilder · Over 500,000 hotels worldwide
         </p>
       </div>
+      </motion.div>{/* end below-hero content */}
     </div>
   );
 }
@@ -1933,7 +2288,6 @@ function HolidayCard({
             <div className="text-[22px] font-bold text-[#333743]">{dest.price}</div>
           </div>
         </div>
-
       </div>
     </div>
   );

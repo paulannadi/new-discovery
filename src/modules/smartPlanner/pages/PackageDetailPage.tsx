@@ -36,6 +36,13 @@ import {
   Pencil,
   Check,
   Building2,
+  Luggage,
+  BedDouble,
+  AirVent,
+  Eye,
+  UtensilsCrossed,
+  Users,
+  Info,
 } from "lucide-react";
 import { UnifiedPackage } from "../../../types";
 import type { HolidaySearchCriteria } from "../../../App";
@@ -395,7 +402,7 @@ function FlightCard({
           extras →" text button on the right (fills: fill_CTT1AZ = #2681FF). */}
       <div className="mt-4 pt-3 border-t border-[#F0F0F0] flex items-center justify-between gap-3">
         <div className="flex items-center gap-1.5 text-[12px] text-[#717171]">
-          <span>🧳</span>
+          <Luggage size={13} className="shrink-0" />
           <span>Hand luggage included</span>
         </div>
         {/* "Add baggage and extras →" — text button, fill_CTT1AZ (#2681FF) */}
@@ -918,29 +925,32 @@ export default function PackageDetailPage({
                         {pkg.room.roomType}
                       </div>
                       <div className="flex flex-wrap items-center gap-2 mb-4">
-                        <span className="border border-[#E8E8E8] rounded-full px-3 py-1 text-[13px] text-[#333743]">
-                          🍳 {pkg.room.boardType}
+                        <span className="flex items-center gap-1.5 border border-[#E8E8E8] rounded-full px-3 py-1 text-[13px] text-[#333743]">
+                          <UtensilsCrossed size={12} className="shrink-0 text-[#667080]" />
+                          {pkg.room.boardType}
                         </span>
-                        <span className="border border-[#E8E8E8] rounded-full px-3 py-1 text-[13px] text-[#333743]">
-                          👤 {adults} guests
+                        <span className="flex items-center gap-1.5 border border-[#E8E8E8] rounded-full px-3 py-1 text-[13px] text-[#333743]">
+                          <Users size={12} className="shrink-0 text-[#667080]" />
+                          {adults} guests
                         </span>
                       </div>
                       <div className="flex flex-col gap-2">
                         {[
-                          "🛏️ Double bed",
-                          "🪟 Ocean or garden view",
-                          "❄️ Air conditioning",
-                          "📶 Free WiFi",
-                        ].map((fact) => (
+                          { icon: <BedDouble size={13} className="text-[#667080] shrink-0" />, label: "Double bed" },
+                          { icon: <Eye size={13} className="text-[#667080] shrink-0" />, label: "Ocean or garden view" },
+                          { icon: <AirVent size={13} className="text-[#667080] shrink-0" />, label: "Air conditioning" },
+                          { icon: <Wifi size={13} className="text-[#667080] shrink-0" />, label: "Free WiFi" },
+                        ].map(({ icon, label }) => (
                           <div
-                            key={fact}
+                            key={label}
                             className="flex items-center gap-2 text-[13px] text-[#333743]"
                           >
                             <Check
                               size={13}
                               className="text-[#16a34a] shrink-0"
                             />
-                            {fact}
+                            {icon}
+                            {label}
                           </div>
                         ))}
                       </div>
@@ -978,24 +988,24 @@ export default function PackageDetailPage({
               </div>
             </div>
 
-            {/* ── HOTEL DESCRIPTION ─────────────────────────────────────────
-                Figma: "Hotel description" heading (Heading Bold/H3).
-                White card, rounded-[16px], Elevation S shadow.
-                "Read more about the hotel →" link inside the card.
+            {/* ── HOTEL DESCRIPTION + HIGHLIGHTS + GETTING AROUND ──────────
+                All hotel-level content merged into one card so it reads as
+                one cohesive topic rather than three separate sections.
             ──────────────────────────────────────────────────────────────── */}
-            <div>
-              <h3 className="text-[20px] font-bold text-[#333743] mb-4">
-                Hotel description
-              </h3>
-              {/* bg-white, rounded-[16px], Elevation S — Figma node 6117:2025 */}
-              <div className="bg-white rounded-[16px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+            <div className="bg-white rounded-[16px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] overflow-hidden">
+
+              {/* Description */}
+              <div className="p-5 pb-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Info size={15} className="text-[#2681FF] shrink-0" />
+                  <h3 className="text-[17px] font-bold text-[#333743]">About the hotel</h3>
+                </div>
                 <p className="text-[15px] text-[#333743] leading-[1.75] mb-2">
                   {desc.short}
                 </p>
                 <p className="text-[15px] text-[#333743] leading-[1.75]">
                   {desc.long}
                 </p>
-                {/* "Read more about the hotel →" — text button, fill_CTT1AZ */}
                 <button
                   onClick={() => setDescriptionOpen(true)}
                   className="mt-4 text-[14px] font-semibold text-[#2681FF] flex items-center gap-1 hover:underline"
@@ -1004,100 +1014,86 @@ export default function PackageDetailPage({
                   <span className="text-[10px]">›</span>
                 </button>
               </div>
-            </div>
 
-            {/* ── HOTEL HIGHLIGHTS ──────────────────────────────────────────
-                Figma: pill badges with full border-radius (borderRadius: 16777200px
-                = fully rounded/pill shape). White background + border stroke.
-                Icons + label text. Inline wrapping layout.
-            ──────────────────────────────────────────────────────────────── */}
-            <div>
-              <h3 className="text-[20px] font-bold text-[#333743] mb-4">
-                Hotel highlights
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {(pkg.hotel.amenities.length > 0
-                  ? pkg.hotel.amenities.slice(0, 5)
-                  : [
-                      "Beachfront",
-                      "Outdoor pool",
-                      "Spa",
-                      "All-day dining",
-                      "Kids club",
-                    ]
-                ).map((amenity) => (
-                  <div
-                    key={amenity}
-                    // borderRadius: 16777200px in Figma = fully rounded pill
-                    className="flex items-center gap-2 bg-white border border-[#E8E8E8] rounded-full px-4 py-2.5 hover:border-[#AAAAAA] transition-colors"
-                  >
-                    <AmenityIcon name={amenity} size={15} />
-                    {/* Highlight text — style_YW7KOA, fill_3CZMCP (#333743) */}
-                    <span className="text-[14px] text-[#333743] font-medium">
-                      {amenity}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+              {/* Divider */}
+              <div className="border-t border-[#f3f5f6] mx-5" />
 
-            {/* ── LOCATION ──────────────────────────────────────────────────
-                Map image with a blurred address chip overlay.
-                "Getting around" label + nearby POI pill badges.
-            ──────────────────────────────────────────────────────────────── */}
-            <div>
-              <h3 className="text-[20px] font-bold text-[#333743] mb-4">
-                Location
-              </h3>
-
-              {/* Map-style image — rounded-[16px], 260px tall */}
-              <div className="rounded-[16px] overflow-hidden h-[260px] relative mb-4 cursor-pointer group">
-                <img
-                  src={hotelImages.area}
-                  alt="Hotel area map"
-                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
-                {/* Map pin overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-white rounded-full p-2.5 shadow-xl">
-                    <MapPin size={22} className="text-[#2681FF]" />
-                  </div>
-                </div>
-                {/* Address chip — Figma: blurred bg, rounded-[8px], "Hotel Zone, Cancún" */}
-                <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm rounded-[8px] px-3 py-1.5 text-[13px] font-semibold text-[#222222] flex items-center gap-1.5 shadow-sm">
-                  <MapPin size={12} className="text-[#2681FF] shrink-0" />
-                  {pkg.hotel.location}
+              {/* Highlights — amenity pills */}
+              <div className="p-5 pb-4">
+                <h3 className="text-[14px] font-bold text-[#333743] mb-3">Highlights</h3>
+                <div className="flex flex-wrap gap-2">
+                  {(pkg.hotel.amenities.length > 0
+                    ? pkg.hotel.amenities.slice(0, 5)
+                    : [
+                        "Beachfront",
+                        "Outdoor pool",
+                        "Spa",
+                        "All-day dining",
+                        "Kids club",
+                      ]
+                  ).map((amenity) => (
+                    <div
+                      key={amenity}
+                      className="flex items-center gap-1.5 bg-white border border-[#E8E8E8] rounded-full px-3.5 py-2"
+                    >
+                      <AmenityIcon name={amenity} size={15} />
+                      <span className="text-[14px] text-[#333743] font-medium">
+                        {amenity}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* "Getting around" — Figma: style_25RSEL label, then POI badges */}
-              <div className="text-[13px] font-bold text-[#717171] mb-3 uppercase tracking-[0.5px]">
-                Getting around
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {nearbyPOIs(pkg.hotel.location).map((poi) => (
-                  // Each POI: border pill with emoji pin, name, distance
-                  // Figma: borderRadius: 16777200px (full pill), border stroke
-                  <span
-                    key={poi.label}
-                    className="flex items-center gap-1.5 bg-white border border-[#E8E8E8] rounded-full px-3.5 py-2 text-[13px]"
-                  >
-                    <span>📍</span>
-                    <span className="font-medium text-[#333743]">
-                      {poi.label}
+              {/* Divider */}
+              <div className="border-t border-[#f3f5f6] mx-5" />
+
+              {/* Location map */}
+              <div className="p-5 pb-4">
+                <h3 className="text-[14px] font-bold text-[#333743] mb-3">Location</h3>
+                <div className="rounded-[16px] overflow-hidden h-[220px] relative mb-4 cursor-pointer group">
+                  <img
+                    src={hotelImages.area}
+                    alt="Hotel area map"
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white rounded-full p-2.5 shadow-xl">
+                      <MapPin size={22} className="text-[#2681FF]" />
+                    </div>
+                  </div>
+                  <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm rounded-[8px] px-3 py-1.5 text-[13px] font-semibold text-[#222222] flex items-center gap-1.5 shadow-sm">
+                    <MapPin size={12} className="text-[#2681FF] shrink-0" />
+                    {pkg.hotel.location}
+                  </div>
+                </div>
+
+                {/* Getting around — POI pills with MapPin instead of emoji */}
+                <h3 className="text-[14px] font-bold text-[#333743] mb-3">Getting around</h3>
+                <div className="flex flex-wrap gap-2">
+                  {nearbyPOIs(pkg.hotel.location).map((poi) => (
+                    <span
+                      key={poi.label}
+                      className="flex items-center gap-1.5 bg-white border border-[#E8E8E8] rounded-full px-3.5 py-2 text-[13px]"
+                    >
+                      <MapPin size={12} className="text-[#2681FF] shrink-0" />
+                      <span className="font-medium text-[#333743]">
+                        {poi.label}
+                      </span>
+                      <span className="text-[#717171]">· {poi.distance}</span>
                     </span>
-                    {/* Distance in grey — style_6C8QNI, fill_LIGD59 */}
-                    <span className="text-[#717171]">· {poi.distance}</span>
-                  </span>
-                ))}
+                  ))}
+                </div>
               </div>
+
             </div>
 
             {/* ── REVIEWS ───────────────────────────────────────────────────
                 Figma node 6117:2032: row layout, white card, rounded-[16px], Elevation S.
                 Left: score summary column. Right: horizontally scrollable review cards.
             ──────────────────────────────────────────────────────────────── */}
+            <h3 className="text-[20px] font-bold text-[#333743]">Guest reviews</h3>
             <div className="bg-white rounded-[16px] shadow-[0_0_4px_0_rgba(125,130,147,0.4)] flex flex-col md:flex-row gap-5 md:gap-10 p-4 md:py-6 md:pl-6 md:pr-0">
 
               {/* Left column — score summary. Full width on mobile, fixed on desktop. */}
