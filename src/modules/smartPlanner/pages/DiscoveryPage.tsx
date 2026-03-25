@@ -542,8 +542,9 @@ export default function DiscoveryPage({
       {/* HERO — full-width background image with search card */}
       {/* On mobile: white background, no image. On sm+: image shows behind floating card */}
       {/* When aiExperienceMode is on, the background swaps to a melted gradient instead */}
-      {/* overflow-hidden clips the hero image when it scales up during the melt-out */}
-      <div className={`relative flex flex-col bg-white sm:bg-transparent overflow-hidden transition-all duration-500 ${aiExperienceMode ? "min-h-screen" : ""}`}>
+      {/* Note: overflow-hidden was removed from here — it was clipping dropdown menus.
+          The blob background layer already has its own overflow-hidden to contain the hero image animation. */}
+      <div className={`relative flex flex-col bg-white sm:bg-transparent transition-all duration-500 ${aiExperienceMode ? "min-h-screen" : ""}`}>
 
         {/*
           Blob background — always in the DOM but starts invisible (opacity 0).

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { ChevronProps } from "react-day-picker";
 import { DayPicker } from "react-day-picker";
 
 import { cn } from "./utils";
@@ -60,12 +61,14 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ className, ...props }) => (
-          <ChevronLeft className={cn("size-4", className)} {...props} />
-        ),
-        IconRight: ({ className, ...props }) => (
-          <ChevronRight className={cn("size-4", className)} {...props} />
-        ),
+        // react-day-picker v9 uses a single Chevron component instead of IconLeft/IconRight
+        // The `orientation` prop tells us which direction to point the arrow
+        Chevron: ({ orientation, className, ...props }: ChevronProps) =>
+          orientation === "left" ? (
+            <ChevronLeft className={cn("size-4", className)} {...props} />
+          ) : (
+            <ChevronRight className={cn("size-4", className)} {...props} />
+          ),
       }}
       {...props}
     />

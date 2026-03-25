@@ -111,6 +111,15 @@ const CANCELLATION_OPTIONS: PricingOption[] = [
   { id: "free_cancellation", label: "Free cancellation", priceDelta: 25 }
 ];
 
+// Converts a 0–10 rating score to a label (matching the style in PackageDetailPage)
+function ratingLabel(score: number): string {
+  if (score >= 9) return "Exceptional";
+  if (score >= 8.5) return "Outstanding";
+  if (score >= 8) return "Excellent";
+  if (score >= 7) return "Very Good";
+  return "Good";
+}
+
 // Simple pseudo-random number generator seeded by string
 const seededRandom = (seed: string) => {
   let hash = 0;
@@ -559,27 +568,34 @@ export default function HotelDetailPage({
         <div className="flex flex-col gap-4 pb-8">
           {/* On mobile this stacks vertically; on sm+ it's side-by-side */}
           <div className="flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-0">
-            <div className="flex flex-wrap gap-3 md:gap-8 lg:gap-14 items-center">
-              <h1 className="text-[#333743] font-black text-[32px] leading-[46px]">{hotel.name}</h1>
-
-              {/* Stars come right after the hotel name */}
-              <div className="flex gap-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    size={18}
-                    className={`${i < hotel.stars ? 'fill-[#FFB700] text-[#FFB700]' : 'fill-[#e0e2e8] text-[#e0e2e8]'}`}
-                  />
-                ))}
+            <div className="flex flex-col gap-1.5">
+              {/* Rating badge row — matches PackageDetailPage style */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <div className="bg-[#19A974] text-white text-[12px] font-bold px-2 py-0.5 rounded-[8px] leading-tight">
+                    {hotel.rating}
+                  </div>
+                  <span className="text-[13px] font-bold text-[#333743]">
+                    {ratingLabel(hotel.rating)}
+                  </span>
+                </div>
+                <span className="text-[13px] text-[#333743] underline">
+                  {hotel.reviewCount.toLocaleString()} reviews
+                </span>
               </div>
 
-              {/* Review score follows the stars */}
-              <div className="flex flex-col items-end">
-                <div className="flex items-center gap-1">
-                  <div className="bg-[#19a974] text-white px-2 py-0.5 rounded-[8px] text-[12px] font-bold">{hotel.rating}</div>
-                  <span className="font-bold text-[#333743] text-[12px]">Excellent</span>
+              {/* Hotel name + stars */}
+              <div className="flex items-baseline gap-3 flex-wrap">
+                <h1 className="text-[#333743] font-black text-[32px] leading-[46px]">{hotel.name}</h1>
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      size={18}
+                      className={`${i < hotel.stars ? 'fill-[#FFB700] text-[#FFB700]' : 'fill-[#e0e2e8] text-[#e0e2e8]'}`}
+                    />
+                  ))}
                 </div>
-                <span className="text-[#333743] text-[12px]">{hotel.reviewCount} reviews</span>
               </div>
             </div>
 

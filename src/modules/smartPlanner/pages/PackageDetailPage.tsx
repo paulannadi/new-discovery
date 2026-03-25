@@ -677,11 +677,11 @@ export default function PackageDetailPage({
           that wraps both the hero gallery AND the hotel info + price row.
           It sits on the grey page background like an elevated card.
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="bg-white shadow-[0_4px_24px_rgba(0,0,0,0.08),_0_1px_4px_rgba(0,0,0,0.06)]">
+      <div className="bg-white">
         <div className="max-w-[1280px] mx-auto">
 
           {/* Back button — sits above the hero inside the white card */}
-          <div className="px-4 sm:px-6 md:px-10 pt-5 pb-2">
+          <div className="px-4 sm:px-6 md:px-10 pt-5 pb-5">
             <BackButton label="Back to all holidays" onClick={onBack} />
           </div>
 
@@ -690,12 +690,12 @@ export default function PackageDetailPage({
               Left: large main hero image. Right: 2×2 thumbnail grid.
               "See all photos" secondary button floats bottom-right.
           ──────────────────────────────────────────────────────────────────── */}
-          <div className="relative rounded-[16px] overflow-hidden mx-4 sm:mx-6 md:mx-10 mb-2">
+          <div className="relative mx-4 sm:mx-6 md:mx-10 mb-2">
             {/* Photo grid — h-[402px] on desktop matches Figma exactly */}
-            <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[280px] md:h-[402px] gap-[4px] overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[280px] md:h-[402px] gap-2">
 
-              {/* Main hero image */}
-              <div className="relative overflow-hidden group">
+              {/* Main hero image — rounded corners on all sides */}
+              <div className="relative overflow-hidden rounded-[16px] group">
                 <img
                   src={pkg.hotel.mainImage}
                   alt={pkg.hotel.name}
@@ -706,11 +706,11 @@ export default function PackageDetailPage({
               </div>
 
               {/* 2×2 thumbnail grid — desktop only */}
-              <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-[4px]">
+              <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-2">
                 {hotelImages.gallery.map((url, i) => (
                   <div
                     key={url}
-                    className="overflow-hidden cursor-pointer group"
+                    className="overflow-hidden rounded-[16px] cursor-pointer group"
                     onClick={() => setPhotosOpen(true)}
                   >
                     <img
@@ -782,7 +782,7 @@ export default function PackageDetailPage({
 
               {/* Location + Duration row — with divider between them */}
               {/* Figma: 📍 location | ─── | 📅 7 days */}
-              <div className="flex items-center gap-4 text-[15px] text-[#333743] flex-wrap">
+              <div className="flex items-center gap-4 text-[16px] text-[#333743] flex-wrap">
                 <div className="flex items-center gap-1.5">
                   <MapPin size={15} className="text-[#333743] shrink-0" />
                   <span>{pkg.hotel.location}</span>
@@ -800,16 +800,17 @@ export default function PackageDetailPage({
                          building icon + "Superior Ocean View Room"
                          utensils icon + "All Inclusive" */}
               {/* Package details — horizontal row, no background, Lucide icons */}
+              <h3 className="text-[18px] font-bold text-[#333743]">Package details</h3>
               <div className="flex flex-row flex-wrap gap-x-6 gap-y-2">
-                <div className="flex items-center gap-2 text-[14px] text-[#333743]">
+                <div className="flex items-center gap-2 text-[16px] text-[#333743]">
                   <Plane size={15} className="text-[#333743] shrink-0" />
                   <span>Return flights from {pkg.flights.outbound.departureAirport}</span>
                 </div>
-                <div className="flex items-center gap-2 text-[14px] text-[#333743]">
+                <div className="flex items-center gap-2 text-[16px] text-[#333743]">
                   <Building2 size={15} className="text-[#333743] shrink-0" />
                   <span>{pkg.room.roomType}</span>
                 </div>
-                <div className="flex items-center gap-2 text-[14px] text-[#333743]">
+                <div className="flex items-center gap-2 text-[16px] text-[#333743]">
                   <Utensils size={15} className="text-[#333743] shrink-0" />
                   <span>{pkg.room.boardType}</span>
                 </div>
@@ -1403,7 +1404,7 @@ export default function PackageDetailPage({
               <img
                 src={pkg.hotel.mainImage}
                 alt={pkg.hotel.name}
-                className="w-full aspect-[16/7] object-cover rounded-[8px]"
+                className="w-full aspect-[16/7] object-cover rounded-[16px]"
               />
             </div>
             {hotelImages.modal.map((url, i) => (
@@ -1411,7 +1412,7 @@ export default function PackageDetailPage({
                 key={url}
                 src={url}
                 alt={`Hotel photo ${i + 2}`}
-                className="w-full aspect-[4/3] object-cover rounded-[8px]"
+                className="w-full aspect-[4/3] object-cover rounded-[16px]"
               />
             ))}
           </div>

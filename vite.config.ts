@@ -4,6 +4,9 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // base tells Vite that the app will be served from /new-discovery/ on GitHub Pages
+  // Without this, all asset links (JS, CSS, images) would use "/" and break
+  base: '/new-discovery/',
   plugins: [
     react(),
     tailwindcss(),
