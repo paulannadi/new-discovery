@@ -4,6 +4,9 @@ import HotelListPage from "./modules/smartPlanner/pages/HotelListPage";
 import HotelDetailPage from "./modules/smartPlanner/pages/HotelDetailPage";
 import HolidayListPage from "./modules/smartPlanner/pages/HolidayListPage";
 import PackageDetailPage from "./modules/smartPlanner/pages/PackageDetailPage";
+import TourDetailPage from "./modules/smartPlanner/pages/TourDetailPage";
+import { SWISS_WINTER_TOUR, DISCOVERY_TOUR_MAP } from "./mocks/tours";
+import type { Tour } from "./types";
 import FlightListPage from "./modules/smartPlanner/pages/FlightListPage";
 import SmartPlannerPage, {
   type StartingContext,
@@ -115,7 +118,7 @@ export type SelectedFlightLeg = {
 export default function App() {
   // Which screen is currently visible?
   const [currentPage, setCurrentPage] = useState<
-    "discovery" | "hotel-list" | "hotel-detail" | "holiday-list" | "package-detail" | "flight-results" | "smart-planner"
+    "discovery" | "hotel-list" | "hotel-detail" | "holiday-list" | "package-detail" | "tour-detail" | "flight-results" | "smart-planner"
   >("discovery");
 
   // The "how did you get here" context passed into SmartPlanner.
@@ -156,6 +159,12 @@ export default function App() {
   // The unified package (hotel + flights bundle) the user selected on HolidayListPage —
   // carried into the new PackageDetailPage full-page experience.
   const [selectedUnifiedPackage, setSelectedUnifiedPackage] = useState<UnifiedPackage | null>(null);
+
+  // The tour the user selected — carried into TourDetailPage.
+  const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
+
+  // Where the back button on TourDetailPage should return to.
+  const [tourDetailBackPage, setTourDetailBackPage] = useState<"discovery" | "holiday-list">("holiday-list");
 
   // ── FLIGHT search state ───────────────────────────────────────────────────
   // What the user searched for — passed to FlightListPage as read-only criteria.
@@ -243,22 +252,14 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
-  // ── TOURS tab: click a tour card → SmartPlanner ──────────────────────────
-  // Called when the user clicks any tour card in the Discovery tours sections.
+  // ── TOURS tab: click a tour card → TourDetailPage ───────────────────────
+  // Look up the full Tour object from the discovery card's id.
+  // If there's no match (shouldn't happen), fall back to the Swiss tour.
   const handleTourSelect = (tour: any) => {
-    setStartingContext({
-      type: "tour",
-      tour: {
-        country: tour.country,
-        flag: tour.flag,
-        title: tour.title,
-        desc: tour.desc,
-        duration: tour.duration,
-        price: tour.price,
-        image: tour.image,
-      },
-    });
-    setCurrentPage("smart-planner");
+    const fullTour = DISCOVERY_TOUR_MAP[tour.id as number] ?? SWISS_WINTER_TOUR;
+    setSelectedTour(fullTour);
+    setTourDetailBackPage("discovery");
+    setCurrentPage("tour-detail");
     window.scrollTo(0, 0);
   };
 
@@ -338,6 +339,14 @@ export default function App() {
   const handleUnifiedPackageSelect = (pkg: UnifiedPackage) => {
     setSelectedUnifiedPackage(pkg);
     setCurrentPage("package-detail");
+    window.scrollTo(0, 0);
+  };
+
+  // ── HolidayListPage: click a TourCard → TourDetailPage ────────────────────
+  const handleTourCardSelect = (tour: Tour) => {
+    setSelectedTour(tour);
+    setTourDetailBackPage("holiday-list");
+    setCurrentPage("tour-detail");
     window.scrollTo(0, 0);
   };
 
@@ -441,8 +450,37 @@ export default function App() {
         <HolidayListPage
           searchCriteria={holidaySearchCriteria}
           onViewDetail={handleUnifiedPackageSelect}
+          onViewTour={handleTourCardSelect}
           onBack={handleBack}
           onRefineSearch={handleRefineHolidaySearch}
+        />
+      )}
+
+      {/* Screen: Tour detail — reached from either Discovery or HolidayListPage. */}
+      {currentPage === "tour-detail" && (
+        <TourDetailPage
+          tour={selectedTour ?? SWISS_WINTER_TOUR}
+          backLabel={tourDetailBackPage === "discovery" ? "Back to tours" : "Back to all tours"}
+          onBack={() => {
+            setCurrentPage(tourDetailBackPage);
+            window.scrollTo(0, 0);
+          }}
+          onBook={(tour, _travelDate, _adults, _hotelPreference) => {
+            setStartingContext({
+              type: "tour",
+              tour: {
+                country: tour.stops[0]?.destinationName ?? "",
+                flag: "🇨🇭",
+                title: tour.title,
+                desc: tour.subtitle,
+                duration: `${tour.duration} days`,
+                price: `${tour.price.currency} ${tour.price.perPerson.toLocaleString()}`,
+                image: tour.mainImage,
+              },
+            });
+            setCurrentPage("smart-planner");
+            window.scrollTo(0, 0);
+          }}
         />
       )}
 

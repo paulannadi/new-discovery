@@ -679,7 +679,7 @@ export default function HotelDetailPage({
               {/* DayPicker popup — same pattern as PackageSearchForm's dates panel */}
               {openSearchPanel === "checkIn" && (
                 <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-150">
-                  <style>{`.rdp { --rdp-accent-color: #2681ff; --rdp-background-color: rgba(38,129,255,0.10); margin: 0; }`}</style>
+                  <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
                   <DayPicker
                     mode="single"
                     selected={searchDates.checkIn ? parseISO(searchDates.checkIn) : undefined}
@@ -718,7 +718,7 @@ export default function HotelDetailPage({
 
               {openSearchPanel === "checkOut" && (
                 <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-150">
-                  <style>{`.rdp { --rdp-accent-color: #2681ff; --rdp-background-color: rgba(38,129,255,0.10); margin: 0; }`}</style>
+                  <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
                   <DayPicker
                     mode="single"
                     selected={searchDates.checkOut ? parseISO(searchDates.checkOut) : undefined}

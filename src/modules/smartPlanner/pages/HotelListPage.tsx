@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import { DayPicker, DateRange } from "react-day-picker";
 import { format, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
+import LeafletMap, { type MapMarkerData } from "../../../shared/components/LeafletMap";
 
 // --- Types ---
 
@@ -49,7 +50,8 @@ type Hotel = {
   amenities: string[];
   boardTypes: string[];
   cancellationPolicy: "Free cancellation" | "Non-refundable";
-  coordinates: { x: number; y: number }; // Percentages for map placement
+  // Real lat/lng so Leaflet can place the pin on an actual map
+  coordinates: { lat: number; lng: number };
 };
 
 type SortOption = "recommended" | "price_low" | "price_high" | "rating" | "stars";
@@ -73,7 +75,7 @@ const HOTELS: Hotel[] = [
     amenities: ["Pet friendly", "Free Wifi", "Indoor pool", "Gym", "Bar", "Restaurant"],
     boardTypes: ["Room only", "Breakfast", "Half board", "Full board"],
     cancellationPolicy: "Free cancellation",
-    coordinates: { x: 45, y: 30 }
+    coordinates: { lat: 39.2238, lng: 9.1217 } // Old Town, Cagliari
   },
   {
     id: "h2",
@@ -87,7 +89,7 @@ const HOTELS: Hotel[] = [
     amenities: ["Pet friendly", "Free Wifi", "Indoor pool", "Air conditioning"],
     boardTypes: ["Room only", "Breakfast"],
     cancellationPolicy: "Free cancellation",
-    coordinates: { x: 55, y: 40 }
+    coordinates: { lat: 39.2285, lng: 9.1068 } // Cagliari north
   },
   {
     id: "h3",
@@ -101,7 +103,7 @@ const HOTELS: Hotel[] = [
     amenities: ["Free Wifi", "Outdoor pool", "Bar"],
     boardTypes: ["Room only", "Breakfast", "Half board"],
     cancellationPolicy: "Non-refundable",
-    coordinates: { x: 30, y: 60 }
+    coordinates: { lat: 39.2254, lng: 9.1136 } // Via Roma waterfront area
   },
   {
     id: "h4",
@@ -115,7 +117,7 @@ const HOTELS: Hotel[] = [
     amenities: ["Pet friendly", "Free Wifi", "Indoor pool", "Kids facilities", "Outdoor parking"],
     boardTypes: ["Room only", "Breakfast", "Full board"],
     cancellationPolicy: "Free cancellation",
-    coordinates: { x: 70, y: 20 }
+    coordinates: { lat: 38.9986, lng: 9.0671 } // Pula, south Sardinia
   },
   {
     id: "h5",
@@ -129,7 +131,7 @@ const HOTELS: Hotel[] = [
     amenities: ["Free Wifi", "Air conditioning", "Wheelchair accessible"],
     boardTypes: ["Breakfast"],
     cancellationPolicy: "Free cancellation",
-    coordinates: { x: 20, y: 45 }
+    coordinates: { lat: 39.2194, lng: 9.1321 } // Castello district
   },
   {
     id: "h6",
@@ -143,7 +145,7 @@ const HOTELS: Hotel[] = [
     amenities: ["Pet friendly", "Free Wifi"],
     boardTypes: ["Room only"],
     cancellationPolicy: "Non-refundable",
-    coordinates: { x: 65, y: 75 }
+    coordinates: { lat: 39.2310, lng: 9.1180 } // Villanova quarter
   },
   {
     id: "h7",
@@ -157,7 +159,7 @@ const HOTELS: Hotel[] = [
     amenities: ["Pet friendly", "Free Wifi", "Indoor parking"],
     boardTypes: ["Room only", "Breakfast"],
     cancellationPolicy: "Free cancellation",
-    coordinates: { x: 80, y: 60 }
+    coordinates: { lat: 39.2160, lng: 9.0990 } // Quartucciu suburb west
   },
   {
     id: "h8",
@@ -171,7 +173,7 @@ const HOTELS: Hotel[] = [
     amenities: ["Pet friendly", "Free Wifi", "Air conditioning"],
     boardTypes: ["Room only"],
     cancellationPolicy: "Non-refundable",
-    coordinates: { x: 40, y: 80 }
+    coordinates: { lat: 39.2330, lng: 9.1250 } // Poetto beach area
   }
 ];
 
@@ -293,27 +295,7 @@ const HotelCard = ({ hotel, displayPrice, onSelect, onHover, isHovered }: { hote
   );
 };
 
-const MapMarker = ({ hotel, price, isHovered }: { hotel: Hotel, price: number, isHovered: boolean }) => (
-  <div 
-    className={`absolute -translate-x-1/2 -translate-y-full cursor-pointer transition-all duration-300 z-10
-      ${isHovered ? 'scale-110 z-20' : 'scale-100'}
-    `}
-    style={{ left: `${hotel.coordinates.x}%`, top: `${hotel.coordinates.y}%` }}
-  >
-    <div 
-      className={`px-3 py-1.5 rounded-[8px] font-bold text-sm shadow-md flex items-center justify-center relative
-        ${isHovered ? 'bg-[#2681ff] text-white' : 'bg-white text-[#333743]'}
-      `}
-    >
-      ${price}
-      <div 
-        className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 
-          ${isHovered ? 'bg-[#2681ff]' : 'bg-white'}
-        `} 
-      />
-    </div>
-  </div>
-);
+// MapMarker removed — replaced by LeafletMap which handles its own markers
 
 // Props type for HotelListPage.
 // The "initial*" props are optional — they come from the search page when the user
@@ -1154,34 +1136,24 @@ export default function HotelListPage({
           </div>
         </div>
 
-        {/* Map */}
-        <div className={`w-full md:w-[35%] min-w-0 h-[calc(100vh-130px)] sticky top-0 bg-[#e0e2e8] relative overflow-hidden ${mobileView === 'list' ? 'hidden md:block' : 'block'}`}>
-          <img 
-            src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.1.0&auto=format&fit=crop&w=1500&q=80" 
-            alt="Map"
-            className="w-full h-full object-cover opacity-80"
+        {/* Map — real interactive Leaflet map replacing the old static photo */}
+        <div className={`w-full md:w-[35%] min-w-0 h-[calc(100vh-130px)] sticky top-0 ${mobileView === 'list' ? 'hidden md:block' : 'block'}`}>
+          <LeafletMap
+            // Centre the map on Cagliari (where all our hotels are)
+            center={[39.2238, 9.1217]}
+            zoom={13}
+            // Build marker data from whichever hotels are currently visible after filtering
+            markers={filteredAndSortedHotels.map((hotel): MapMarkerData => ({
+              id: hotel.id,
+              lat: hotel.coordinates.lat,
+              lng: hotel.coordinates.lng,
+              label: hotel.name,
+              price: `$${calculateDisplayPrice(hotel.price, hotel)}`,
+              isHighlighted: hoveredHotelId === hotel.id,
+            }))}
+            // When hovering a map marker, highlight the matching card in the list
+            onMarkerHover={(id) => setHoveredHotelId(id)}
           />
-          <div className="absolute inset-0 bg-black/5" />
-          
-          {/* Map Markers */}
-          {filteredAndSortedHotels.map(hotel => (
-             <div 
-                key={hotel.id}
-                onMouseEnter={() => setHoveredHotelId(hotel.id)}
-                onMouseLeave={() => setHoveredHotelId(null)}
-             >
-               <MapMarker 
-                 hotel={hotel} 
-                 price={calculateDisplayPrice(hotel.price, hotel)} 
-                 isHovered={hoveredHotelId === hotel.id}
-               />
-             </div>
-          ))}
-
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm font-bold text-[#333743]">
-             <MapIcon size={16} />
-             Search this area
-          </div>
         </div>
 
       </div>

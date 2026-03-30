@@ -24,6 +24,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import {
   MapPin,
+  MapPinned,
   Plane,
   Star,
   Wifi,
@@ -61,6 +62,7 @@ import {
   PopoverTrigger,
 } from "../../../shared/components/ui/popover";
 import { Button } from "../../../shared/components/ui/button";
+import LeafletMap from "../../../shared/components/LeafletMap";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -521,6 +523,28 @@ function nearbyPOIs(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// locationCoords — maps a hotel location string to approximate lat/lng
+// Used to centre the LeafletMap in the "Show on map" modal.
+// ─────────────────────────────────────────────────────────────────────────────
+function locationCoords(location: string): [number, number] {
+  const loc = location.toLowerCase();
+  if (loc.includes("cancún") || loc.includes("cancun") || loc.includes("mexico"))
+    return [21.1619, -86.8515];
+  if (loc.includes("bali") || loc.includes("seminyak") || loc.includes("indonesia"))
+    return [-8.6905, 115.1709];
+  if (loc.includes("maldives") || loc.includes("malé"))
+    return [4.1755, 73.5093];
+  if (loc.includes("santorini") || loc.includes("greece"))
+    return [36.3932, 25.4615];
+  if (loc.includes("dubai") || loc.includes("palm"))
+    return [25.2048, 55.2708];
+  if (loc.includes("phuket") || loc.includes("thailand"))
+    return [7.8804, 98.3923];
+  // Default fallback — centre of Europe
+  return [48.8566, 2.3522];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Static mock data
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -630,6 +654,9 @@ export default function PackageDetailPage({
   const [amenitiesOpen, setAmenitiesOpen] = useState(false);
   const [reviewsOpen, setReviewsOpen] = useState(false);
   const [roomFacilitiesOpen, setRoomFacilitiesOpen] = useState(false);
+
+  // "Show on map" modal
+  const [showMapModal, setShowMapModal] = useState(false);
 
   // Mobile "Explore dates" accordion
   const [mobileDatesExpanded, setMobileDatesExpanded] = useState(false);
@@ -780,18 +807,25 @@ export default function PackageDetailPage({
                 </div>
               </div>
 
-              {/* Location + Duration row — with divider between them */}
-              {/* Figma: 📍 location | ─── | 📅 7 days */}
+              {/* Duration + Location row — duration first, then location, then map link */}
               <div className="flex items-center gap-4 text-[16px] text-[#333743] flex-wrap">
-                <div className="flex items-center gap-1.5">
-                  <MapPin size={15} className="text-[#333743] shrink-0" />
-                  <span>{pkg.hotel.location}</span>
-                </div>
-                <span className="text-[#DDDDDD] hidden sm:block">|</span>
                 <div className="flex items-center gap-1.5">
                   <CalendarDays size={15} className="text-[#333743] shrink-0" />
                   <span>{nights} days</span>
                 </div>
+                <span className="text-[#DDDDDD] hidden sm:block">|</span>
+                <div className="flex items-center gap-1.5">
+                  <MapPin size={15} className="text-[#333743] shrink-0" />
+                  <span>{pkg.hotel.location}</span>
+                </div>
+                {/* "Show on map" link — same style as TourDetailPage */}
+                <button
+                  onClick={() => setShowMapModal(true)}
+                  className="flex items-center gap-1.5 text-[14px] font-semibold text-[#2681FF] hover:underline"
+                >
+                  <MapPinned size={14} />
+                  Show on map
+                </button>
               </div>
 
               {/* Package details — Figma: small heading + 3-item list

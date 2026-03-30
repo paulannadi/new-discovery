@@ -566,7 +566,7 @@ export default function PackageSearchForm({
                   // viewport. For the price-per-day view the taller cells (60px) make
                   // one month tall enough; users navigate with the ← → arrows.
                   // Non-cached destinations use the standard two-month layout.
-                  numberOfMonths={isCached ? 1 : 2}
+                  numberOfMonths={1}
                   disabled={{ before: new Date() }}
                   // ── Modifiers add CSS backgrounds to specific day groups ──────
                   // Using modifiersStyles (inline styles) instead of Tailwind classes

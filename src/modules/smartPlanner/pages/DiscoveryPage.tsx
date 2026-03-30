@@ -744,7 +744,7 @@ export default function DiscoveryPage({
                           className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border text-left transition-all ${
                             hotelOpenPanel === "destination"
                               ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-                              : "border-[#e0e2e8] bg-[#f9fafb] hover:border-[#2681FF]"
+                              : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
                           }`}
                           onClick={() =>
                             setHotelOpenPanel(
@@ -838,7 +838,7 @@ export default function DiscoveryPage({
                           className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border text-left transition-all ${
                             hotelOpenPanel === "dates"
                               ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-                              : "border-[#e0e2e8] bg-[#f9fafb] hover:border-[#2681FF]"
+                              : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
                           }`}
                           onClick={() =>
                             setHotelOpenPanel(
@@ -868,7 +868,7 @@ export default function DiscoveryPage({
 
                         {hotelOpenPanel === "dates" && (
                           <div className="absolute top-full left-0 mt-2 bg-white rounded-[16px] shadow-xl border border-[#e0e2e8] z-50 overflow-hidden">
-                            <style>{`.rdp { --rdp-accent-color: #2681ff; --rdp-background-color: rgba(38, 129, 255, 0.1); margin: 0; } .rdp-day_selected:not([disabled]) { font-weight: bold; }`}</style>
+                            <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
                             <DayPicker
                               mode="range"
                               selected={hotelDateRange}
@@ -896,7 +896,7 @@ export default function DiscoveryPage({
                           className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border text-left transition-all ${
                             hotelOpenPanel === "guests"
                               ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-                              : "border-[#e0e2e8] bg-[#f9fafb] hover:border-[#2681FF]"
+                              : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
                           }`}
                           onClick={() =>
                             setHotelOpenPanel(
@@ -1042,7 +1042,7 @@ export default function DiscoveryPage({
                       <div className="relative w-full sm:w-auto">
                         <button
                           onClick={() => { setFlightTripTypeOpen((o) => !o); setFlightCabinClassOpen(false); setFlightPassengersOpen(false); }}
-                          className={`w-full sm:w-auto flex items-center gap-1.5 h-[52px] sm:h-8 px-4 sm:px-3 rounded-[12px] sm:rounded-[8px] border text-[14px] sm:text-[13px] font-semibold transition-all ${flightTripTypeOpen ? "border-[#2681FF] bg-white text-[#2681FF]" : "border-[#e0e2e8] bg-[#f9fafb] text-[#333743] hover:border-[#2681FF]"}`}
+                          className={`w-full sm:w-auto flex items-center gap-1.5 h-[52px] sm:h-8 px-4 sm:px-3 rounded-[12px] sm:rounded-[8px] border text-[14px] sm:text-[13px] font-semibold transition-all ${flightTripTypeOpen ? "border-[#2681FF] bg-white text-[#2681FF]" : "border-[#e0e2e8] bg-white text-[#333743] hover:border-[#2681FF]"}`}
                         >
                           {flightTripType === "roundtrip" ? "Round trip" : "Multi-city"}
                           <ChevronDown size={13} className={`shrink-0 transition-transform ${flightTripTypeOpen ? "rotate-180" : ""}`} />
@@ -1070,7 +1070,7 @@ export default function DiscoveryPage({
                       <div className="relative w-full sm:w-auto">
                         <button
                           onClick={() => { setFlightCabinClassOpen((o) => !o); setFlightTripTypeOpen(false); setFlightPassengersOpen(false); }}
-                          className={`w-full sm:w-auto flex items-center gap-1.5 h-[52px] sm:h-8 px-4 sm:px-3 rounded-[12px] sm:rounded-[8px] border text-[14px] sm:text-[13px] font-semibold transition-all ${flightCabinClassOpen ? "border-[#2681FF] bg-white text-[#2681FF]" : "border-[#e0e2e8] bg-[#f9fafb] text-[#333743] hover:border-[#2681FF]"}`}
+                          className={`w-full sm:w-auto flex items-center gap-1.5 h-[52px] sm:h-8 px-4 sm:px-3 rounded-[12px] sm:rounded-[8px] border text-[14px] sm:text-[13px] font-semibold transition-all ${flightCabinClassOpen ? "border-[#2681FF] bg-white text-[#2681FF]" : "border-[#e0e2e8] bg-white text-[#333743] hover:border-[#2681FF]"}`}
                         >
                           {CABIN_CLASS_LABELS[flightCabinClass]}
                           <ChevronDown size={13} className={`shrink-0 transition-transform ${flightCabinClassOpen ? "rotate-180" : ""}`} />
@@ -1094,7 +1094,7 @@ export default function DiscoveryPage({
                       <div className="relative w-full sm:w-auto">
                         <button
                           onClick={() => { setFlightPassengersOpen((o) => !o); setFlightTripTypeOpen(false); setFlightCabinClassOpen(false); }}
-                          className={`w-full sm:w-auto flex items-center gap-1.5 h-[52px] sm:h-8 px-4 sm:px-3 rounded-[12px] sm:rounded-[8px] border text-[14px] sm:text-[13px] font-semibold transition-all ${flightPassengersOpen ? "border-[#2681FF] bg-white text-[#2681FF]" : "border-[#e0e2e8] bg-[#f9fafb] text-[#333743] hover:border-[#2681FF]"}`}
+                          className={`w-full sm:w-auto flex items-center gap-1.5 h-[52px] sm:h-8 px-4 sm:px-3 rounded-[12px] sm:rounded-[8px] border text-[14px] sm:text-[13px] font-semibold transition-all ${flightPassengersOpen ? "border-[#2681FF] bg-white text-[#2681FF]" : "border-[#e0e2e8] bg-white text-[#333743] hover:border-[#2681FF]"}`}
                         >
                           {flightPassengersLabel}
                           <ChevronDown size={13} className={`shrink-0 transition-transform ${flightPassengersOpen ? "rotate-180" : ""}`} />
@@ -1145,7 +1145,7 @@ export default function DiscoveryPage({
 
                         {/* From */}
                         <div className="flex-1">
-                          <div className="w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-[#f9fafb] focus-within:border-[#2681FF] transition-all">
+                          <div className="w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-white focus-within:border-[#2681FF] transition-all">
                             <Plane size={18} className="text-[#2681FF] shrink-0" />
                             <div className="flex flex-col flex-1 min-w-0">
                               <span className="text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5">From</span>
@@ -1166,7 +1166,7 @@ export default function DiscoveryPage({
 
                         {/* To */}
                         <div className="flex-1">
-                          <div className="w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-[#f9fafb] focus-within:border-[#2681FF] transition-all">
+                          <div className="w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-white focus-within:border-[#2681FF] transition-all">
                             <Plane size={18} className="text-[#2681FF] shrink-0 rotate-90" />
                             <div className="flex flex-col flex-1 min-w-0">
                               <span className="text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5">To</span>
@@ -1189,7 +1189,7 @@ export default function DiscoveryPage({
                         <div className="flex-1">
                           <div className="relative w-full">
                             <button
-                              className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border bg-[#f9fafb] transition-all ${flightDatesOpen ? "border-[#2681FF]" : "border-[#e0e2e8] hover:border-[#2681FF]"}`}
+                              className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border bg-white transition-all ${flightDatesOpen ? "border-[#2681FF]" : "border-[#e0e2e8] hover:border-[#2681FF]"}`}
                               onClick={() => setFlightDatesOpen(!flightDatesOpen)}
                             >
                               <CalendarIcon size={18} className="text-[#2681FF] shrink-0" />
@@ -1202,7 +1202,7 @@ export default function DiscoveryPage({
                             </button>
                             {flightDatesOpen && (
                               <div className="absolute top-[60px] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4">
-                                <style>{`.rdp { --rdp-accent-color: #2681ff; --rdp-background-color: rgba(38, 129, 255, 0.1); margin: 0; } .rdp-day_selected:not([disabled]) { font-weight: bold; }`}</style>
+                                <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
                                 <DayPicker
                                   mode="range"
                                   selected={flightDateRange}
@@ -1256,7 +1256,7 @@ export default function DiscoveryPage({
                             </span>
 
                             {/* From input */}
-                            <div className="flex-1 flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-[#f9fafb] focus-within:border-[#2681FF] transition-all">
+                            <div className="flex-1 flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-white focus-within:border-[#2681FF] transition-all">
                               <Plane size={16} className="text-[#2681FF] shrink-0" />
                               <input
                                 type="text"
@@ -1271,7 +1271,7 @@ export default function DiscoveryPage({
                             <ArrowRight size={14} className="text-[#9598a4] shrink-0 hidden sm:block" />
 
                             {/* To input */}
-                            <div className="flex-1 flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-[#f9fafb] focus-within:border-[#2681FF] transition-all">
+                            <div className="flex-1 flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-white focus-within:border-[#2681FF] transition-all">
                               <Plane size={16} className="text-[#2681FF] shrink-0 rotate-90" />
                               <input
                                 type="text"
@@ -1285,7 +1285,7 @@ export default function DiscoveryPage({
                             {/* Date picker for this leg (single date) */}
                             <div className="relative sm:w-[160px]">
                               <button
-                                className={`w-full flex items-center gap-2 h-[52px] px-3 rounded-[12px] border bg-[#f9fafb] transition-all ${openLegDateId === leg.id ? "border-[#2681FF]" : "border-[#e0e2e8] hover:border-[#2681FF]"}`}
+                                className={`w-full flex items-center gap-2 h-[52px] px-3 rounded-[12px] border bg-white transition-all ${openLegDateId === leg.id ? "border-[#2681FF]" : "border-[#e0e2e8] hover:border-[#2681FF]"}`}
                                 onClick={() => setOpenLegDateId(openLegDateId === leg.id ? null : leg.id)}
                               >
                                 <CalendarIcon size={15} className="text-[#2681FF] shrink-0" />
@@ -1295,7 +1295,7 @@ export default function DiscoveryPage({
                               </button>
                               {openLegDateId === leg.id && (
                                 <div className="absolute top-[60px] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4">
-                                  <style>{`.rdp { --rdp-accent-color: #2681ff; --rdp-background-color: rgba(38, 129, 255, 0.1); margin: 0; } .rdp-day_selected:not([disabled]) { font-weight: bold; }`}</style>
+                                  <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
                                   <DayPicker
                                     mode="single"
                                     selected={leg.date}

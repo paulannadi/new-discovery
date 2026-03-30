@@ -16,8 +16,13 @@ import type { HolidaySearchCriteria } from "../../../App";
 import type { UnifiedPackage } from "../../../types";
 import PackageSearchForm from "../components/PackageSearchForm";
 import { PackageCard } from "../components/PackageCard";
+import { TourCard } from "../components/TourCard";
 import { LiveSearchProgressBanner } from "../components/LiveSearchProgressBanner";
+import { SWISS_WINTER_TOUR } from "../../../mocks/tours";
+import type { Tour } from "../../../types";
 import { useUnifiedSearch } from "../hooks/useUnifiedSearch";
+import LeafletMap, { type MapMarkerData } from "../../../shared/components/LeafletMap";
+import { DESTINATIONS } from "../../../mocks/destinations";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -26,6 +31,8 @@ import { useUnifiedSearch } from "../hooks/useUnifiedSearch";
 type HolidayListPageProps = {
   searchCriteria: HolidaySearchCriteria;
   onViewDetail: (pkg: UnifiedPackage) => void;
+  // Called when the user clicks a TourCard — routes to TourDetailPage
+  onViewTour?: (tour: Tour) => void;
   onBack: () => void;
   onRefineSearch?: (criteria: HolidaySearchCriteria) => void;
 };
@@ -170,6 +177,7 @@ export default function HolidayListPage({
   onBack,
   onRefineSearch,
   onViewDetail,
+  onViewTour,
 }: HolidayListPageProps) {
 
   // ── Live search state ──────────────────────────────────────────────────────
@@ -717,6 +725,14 @@ export default function HolidayListPage({
           {/* Package card list */}
           {filteredAndSorted.length > 0 && (
             <div className="flex flex-col gap-4 pb-4">
+              {/* ── Tour card — always shown at the top of the list.
+                  In the real product, tours would come from the same search results.
+                  For this prototype we inject the Swiss tour as a featured result. */}
+              <TourCard
+                tour={SWISS_WINTER_TOUR}
+                onSelect={(t) => onViewTour?.(t)}
+              />
+
               {filteredAndSorted.map((pkg) => (
                 <PackageCard
                   key={pkg.packageId}
@@ -744,18 +760,52 @@ export default function HolidayListPage({
 
         </div>
 
-        {/* RIGHT: world map */}
-        <div className={`w-full md:w-[35%] min-w-0 h-[calc(100vh-160px)] sticky top-0 bg-[#dce8f0] relative overflow-hidden ${mobileView === "list" ? "hidden md:block" : "block"}`}>
-          <img
-            src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.1.0&auto=format&fit=crop&w=1500&q=80"
-            alt="World map"
-            className="w-full h-full object-cover opacity-80"
-          />
-          <div className="absolute inset-0 bg-black/5" />
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm font-bold text-[#333743]">
-            <MapIcon size={16} />
-            {searchCriteria.to || "World destinations"}
-          </div>
+        {/* RIGHT: real Leaflet world map with destination pins */}
+        <div className={`w-full md:w-[35%] min-w-0 h-[calc(100vh-160px)] sticky top-0 ${mobileView === "list" ? "hidden md:block" : "block"}`}>
+          {(() => {
+            // Look up the selected destination's coordinates so we can centre the map on it.
+            // If no destination is selected yet (searchCriteria.to is empty), default to
+            // a world overview centred on Europe/Atlantic.
+            const selectedDest = DESTINATIONS.find((d) => d.code === searchCriteria.to);
+            const mapCenter: [number, number] = selectedDest?.lat && selectedDest?.lng
+              ? [selectedDest.lat, selectedDest.lng]
+              : [20, 10]; // world overview fallback
+            // Zoom in closer for a specific destination, pull back for the overview
+            const mapZoom = selectedDest ? 9 : 2;
+
+            // Build marker pins — one per destination in our list.
+            // The selected destination marker is highlighted in blue.
+            // We also show the lowest package price at that destination if available.
+            const lowestPriceByDest = filteredAndSorted.reduce<Record<string, number>>((acc, pkg) => {
+              const code = searchCriteria.to; // all packages in a HolidayList search share the same destination
+              if (!acc[code] || pkg.price.perPerson < acc[code]) {
+                acc[code] = pkg.price.perPerson;
+              }
+              return acc;
+            }, {});
+
+            const markers: MapMarkerData[] = DESTINATIONS
+              .filter((d) => d.lat && d.lng)
+              .map((d) => ({
+                id: d.code,
+                lat: d.lat!,
+                lng: d.lng!,
+                label: d.label,
+                // Show a price badge only on the destination being searched
+                price: d.code === searchCriteria.to && lowestPriceByDest[d.code]
+                  ? `£${lowestPriceByDest[d.code].toLocaleString()}`
+                  : undefined,
+                isHighlighted: d.code === searchCriteria.to,
+              }));
+
+            return (
+              <LeafletMap
+                center={mapCenter}
+                zoom={mapZoom}
+                markers={markers}
+              />
+            );
+          })()}
         </div>
 
       </div>

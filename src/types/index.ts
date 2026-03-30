@@ -79,3 +79,110 @@ export interface UnifiedPackage {
   // Optional so existing packages without a tag still work fine.
   tripType?: "hotel-flight" | "group-tour" | "individual-tour" | "round-trip" | "last-minute";
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tour Types
+//
+// A Tour is a multi-stop, guided journey (group or individual).
+// Unlike a UnifiedPackage (one hotel + flights), a tour has multiple
+// destination stops connected by transfers, with accommodation and
+// activities at each stop.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// A single activity at a destination stop (e.g. "Excursion to Zermatt")
+export interface TourActivity {
+  date: string;          // Display date, e.g. "Fri, Apr 04"
+  name: string;          // e.g. "Excursion to Zermatt Incl."
+  description: string;   // Short description shown below the name
+  image?: string;        // Optional photo
+}
+
+// The hotel staying at a given stop
+export interface TourAccommodation {
+  hotelName: string;
+  stars: number;
+  image?: string;
+  checkIn: string;       // Display string, e.g. "Apr 03"
+  checkOut: string;      // Display string, e.g. "Apr 05"
+  checkInISO: string;    // ISO date "YYYY-MM-DD" for machine use
+  checkOutISO: string;
+  roomType: string;      // e.g. "Double Room"
+  boardType: string;     // e.g. "Buffet breakfast"
+}
+
+// One destination stop in the tour itinerary
+export interface TourStop {
+  destinationName: string;   // e.g. "Lucerne"
+  dateRange: string;         // Display string, e.g. "Mar 31 – Apr 01"
+  nights: number;
+  description: string;       // 1–2 sentence destination blurb
+  accommodation: TourAccommodation;
+  activities: TourActivity[];
+  // Coordinates so we can place this stop on the LeafletMap
+  lat?: number;
+  lng?: number;
+}
+
+// A transfer segment between two stops (e.g. a scenic train journey)
+export interface TourTransfer {
+  from: string;          // e.g. "Lucerne"
+  to: string;            // e.g. "Interlaken"
+  date: string;          // Display string, e.g. "Apr 01, Tour & Transfer"
+  mode: string;          // e.g. "Tour & Transfer"
+  description?: string;  // e.g. "2h Panoramic journey on the Luzern-Interlaken Express"
+  image?: string;
+}
+
+// One day entry in the day-by-day itinerary shown on TourDetailPage.
+export interface TourDayItem {
+  type: "highlight" | "hotel" | "transport";
+  label: string;        // Bold title, e.g. "Scenic train to Interlaken"
+  description?: string; // Optional detail line shown in grey
+}
+
+export interface TourDay {
+  dayNumber: number;
+  title: string;        // e.g. "Arrival in Lucerne"
+  items: TourDayItem[];
+  image?: string;       // Optional day photo
+}
+
+// Quick-fact attribute chip shown below the hero.
+// iconKey maps to a Lucide icon in the component.
+export interface TourAttribute {
+  label: string;
+  iconKey: "users" | "languages" | "activity" | "calendar-check";
+}
+
+// The top-level Tour object — used for both TourCard (list) and TourDetailPage
+export interface Tour {
+  tourId: string;
+  title: string;
+  subtitle: string;
+  tripType: "group-tour" | "individual-tour";
+  duration: number;
+  highlights: string[];    // Used on TourCard chips + Highlights info tab
+  mainImage: string;
+  price: {
+    perPerson: number;
+    total: number;
+    currency: string;
+    paidBefore: number;
+    paidAtDestination: number;
+  };
+  startDate: string;       // Display string, e.g. "Mar 31, 2026"
+  endDate: string;
+  adults: number;
+
+  // ── Detail page fields ─────────────────────────────────────────────────
+  locationsLabel: string;  // e.g. "Lucerne · Interlaken · Brig · Chur"
+  gallery: string[];       // Photos for the gallery section
+  attributes: TourAttribute[];  // Quick facts (group tour, language, level, age)
+  days: TourDay[];         // Full day-by-day itinerary
+  included: string[];      // "Included" tab content
+  excluded: string[];      // "Excluded" tab content
+
+  // ── TourCard fields ────────────────────────────────────────────────────
+  stops: TourStop[];       // Drives the route breadcrumb on TourCard
+  transfers: TourTransfer[];
+}
