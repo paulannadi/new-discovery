@@ -156,7 +156,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
           {/* ── Photo grid — 402px, 3fr / 2fr, same as PackageDetailPage ── */}
           <div className="relative mx-4 sm:mx-6 md:mx-10 mb-2">
-            <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[280px] md:h-[402px] gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[200px] sm:h-[240px] md:h-[402px] gap-2">
 
               {/* Main image with play button overlay */}
               <div className="relative overflow-hidden rounded-[16px] group cursor-pointer">
