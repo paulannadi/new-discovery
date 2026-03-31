@@ -13,7 +13,7 @@
  *   highlight the corresponding card.
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 // react-leaflet gives us React components that wrap the Leaflet JS library
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 // Leaflet's own CSS — required for the map to display correctly
@@ -54,8 +54,14 @@ export type MapMarkerData = {
 
 type LeafletMapProps = {
   markers: MapMarkerData[];
-  center: [number, number]; // [latitude, longitude]
-  zoom: number;
+  center: [number, number]; // [latitude, longitude] — fallback when no markers exist
+  zoom: number;             // fallback zoom — only used when there are no markers
+  /**
+   * A string that identifies the current "view context" (e.g. the destination
+   * code). The map re-fits to the marker bounds exactly once per unique key.
+   * After that, the user can freely pan and zoom without the map resetting.
+   */
+  centerKey?: string;
   /** Called when hovering a marker — passes the marker id, or null on leave */
   onMarkerHover?: (id: string | null) => void;
   className?: string;
@@ -64,17 +70,48 @@ type LeafletMapProps = {
 // ─────────────────────────────────────────────────────────────────────────────
 // MapCentreUpdater — internal helper component
 //
-// react-leaflet's MapContainer doesn't re-render when `center` or `zoom` props
-// change (it only reads them once on mount). This internal component uses the
-// `useMap()` hook to access the live map instance and imperatively move it
-// when the `center` prop changes — for example, when the user switches from
-// one destination to another.
+// Fires fitBounds (or flyTo) exactly ONCE per centerKey. After the initial
+// fit the user can freely pan and zoom — nothing will snap the map back.
+//
+// How it works:
+//   - lastKeyRef tracks which centerKey we already positioned for.
+//   - When centerKey changes (new destination) we re-fit to the new markers.
+//   - If markers aren't loaded yet when the key changes we fall back to the
+//     destination's own lat/lng so the map at least moves to the right region.
+//   - Subsequent marker updates for the *same* key (e.g. live results arriving)
+//     are intentionally ignored — we don't want to jerk the map around.
 // ─────────────────────────────────────────────────────────────────────────────
-const MapCentreUpdater = ({ center, zoom }: { center: [number, number]; zoom: number }) => {
+const MapCentreUpdater = ({
+  markers,
+  center,
+  zoom,
+  centerKey,
+}: {
+  markers: MapMarkerData[];
+  center: [number, number];
+  zoom: number;
+  centerKey?: string;
+}) => {
   const map = useMap();
+  const lastKeyRef = useRef<string | undefined>(undefined);
+
   useEffect(() => {
-    map.setView(center, zoom);
-  }, [center, zoom, map]);
+    // Only act when the destination (centerKey) actually changes.
+    if (centerKey === lastKeyRef.current) return;
+    lastKeyRef.current = centerKey;
+
+    if (markers.length > 0) {
+      // Fit the map tightly around all hotel pins for this destination.
+      // padding keeps the outermost pins away from the map edge.
+      // maxZoom prevents zooming in so far that only one hotel fills the screen.
+      const bounds = L.latLngBounds(markers.map(m => [m.lat, m.lng] as [number, number]));
+      map.fitBounds(bounds, { padding: [60, 60], maxZoom: 13 });
+    } else {
+      // No markers yet — at least move to the destination's region.
+      map.setView(center, zoom);
+    }
+  }, [centerKey, markers, center, zoom, map]);
+
   return null;
 };
 
@@ -89,6 +126,10 @@ const MapCentreUpdater = ({ center, zoom }: { center: [number, number]; zoom: nu
 // ─────────────────────────────────────────────────────────────────────────────
 const createPriceIcon = (price: string, isHighlighted: boolean) => {
   const bg = isHighlighted ? "#2681FF" : "#333743";
+  // Estimate the rendered width so we can centre the badge on its lat/lng point.
+  // Each character in the 12px bold font is ~7.5px wide; add 16px for left+right padding.
+  const estimatedWidth = Math.round(price.length * 7.5 + 16);
+  const height = 26;
   const html = `
     <div style="
       background: ${bg};
@@ -101,6 +142,7 @@ const createPriceIcon = (price: string, isHighlighted: boolean) => {
       box-shadow: 0 2px 6px rgba(0,0,0,0.25);
       transition: background 0.2s;
       font-family: system-ui, sans-serif;
+      display: inline-block;
     ">
       ${price}
     </div>
@@ -108,7 +150,9 @@ const createPriceIcon = (price: string, isHighlighted: boolean) => {
   return L.divIcon({
     html,
     className: "", // remove Leaflet's default white background class
-    iconAnchor: [30, 16], // centre the badge horizontally, anchor at bottom
+    // Centre the badge horizontally and anchor its bottom edge at the marker point
+    iconSize: [estimatedWidth, height],
+    iconAnchor: [estimatedWidth / 2, height],
   });
 };
 
@@ -140,6 +184,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
   markers,
   center,
   zoom,
+  centerKey,
   onMarkerHover,
   className = "",
 }) => {
@@ -163,8 +208,9 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
 
-      {/* This invisible component keeps the map centred when props change */}
-      <MapCentreUpdater center={center} zoom={zoom} />
+      {/* This invisible component fits the map to hotel bounds once per destination.
+          After that it stays out of the way so the user can freely pan and zoom. */}
+      <MapCentreUpdater markers={markers} center={center} zoom={zoom} centerKey={centerKey} />
 
       {/* Render a marker for each location */}
       {markers.map((marker) => {

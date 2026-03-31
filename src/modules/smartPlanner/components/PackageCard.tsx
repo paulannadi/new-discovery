@@ -114,13 +114,15 @@ export function PackageCard({ pkg, onSelect, onHover, isHovered, isPricePending 
       onMouseLeave={() => onHover?.(false)}
     >
       {/* ── Image ───────────────────────────────────────────────────────── */}
-      {/* Below 680px: full width on top (flex-col context, no width set).
-          At 680px+: fixed 260px on the left, image fills the full card height. */}
-      <div className="relative shrink-0 @[680px]:w-[260px]">
+      {/* Below 680px: full-width strip, fixed 200px tall.
+          At 680px+: fixed 260px wide, stretches to the card height.
+          The image uses absolute inset-0 on desktop so its natural dimensions
+          (e.g. portrait photos) never push the card taller than the content. */}
+      <div className="relative shrink-0 h-[200px] @[680px]:h-auto @[680px]:w-[260px] @[680px]:self-stretch overflow-hidden">
         <img
           src={pkg.hotel.mainImage}
           alt={pkg.hotel.name}
-          className="w-full h-[200px] @[680px]:h-full object-cover"
+          className="w-full h-full @[680px]:absolute @[680px]:inset-0 object-cover"
         />
         <span className="absolute top-2 left-2 flex items-center gap-1 px-[10px] py-[4px] rounded-full text-[12px] font-normal bg-white text-[#333743]">
           <Plane size={11} />

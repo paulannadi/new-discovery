@@ -40,6 +40,10 @@ export interface UnifiedPackage {
   // Format: `${giataId}_${outboundFlight}_${returnFlight}_${departureDate}`
   deduplicationKey: string;
 
+  // Which destination this package belongs to — matches a code in DESTINATIONS.
+  // Used by useUnifiedSearch to filter results to the searched destination.
+  destinationCode?: string;
+
   hotel: {
     giataId: string;
     name: string;
@@ -52,6 +56,10 @@ export interface UnifiedPackage {
     };
     amenities: string[];
     location: string;       // e.g. "Hotel Zone, Cancún"
+    // Coordinates for placing this specific hotel as a pin on the map.
+    // Should be set to the hotel's real-world location within the destination.
+    lat?: number;
+    lng?: number;
   };
 
   room: {
@@ -185,4 +193,9 @@ export interface Tour {
   // ── TourCard fields ────────────────────────────────────────────────────
   stops: TourStop[];       // Drives the route breadcrumb on TourCard
   transfers: TourTransfer[];
+
+  // Which destination codes this tour is relevant for.
+  // Used to filter tours in HolidayListPage when the user searches a specific destination.
+  // If empty or undefined, the tour is shown for all destinations.
+  destinationCodes?: string[];
 }

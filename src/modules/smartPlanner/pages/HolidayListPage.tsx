@@ -331,6 +331,14 @@ export default function HolidayListPage({
     return results;
   }, [packages, priceMin, priceMax, filterStars, filterBoard, filterTripTypes, filterCountries, sortBy]);
 
+  // ── Tours filtered to the searched destination ────────────────────────────
+  // searchCriteria.to is the display label ("Cancún, Mexico"), so we look up
+  // the code ("CANCUN") to match against tour.destinationCodes.
+  const toursForDest = (() => {
+    const destCode = DESTINATIONS.find(d => d.label === searchCriteria.to)?.code ?? searchCriteria.to;
+    return ALL_TOURS.filter(t => !t.destinationCodes || t.destinationCodes.length === 0 || t.destinationCodes.includes(destCode));
+  })();
+
   // ── Human-readable search summary labels ──────────────────────────────────
 
   const searchDateLabel = searchCriteria.dateMode === "flexible"
@@ -725,10 +733,10 @@ export default function HolidayListPage({
           {/* Package card list */}
           {filteredAndSorted.length > 0 && (
             <div className="flex flex-col gap-4 pb-4">
-              {/* ── Tour cards — injected at the top of the list.
-                  In the real product, tours would come from the same search results.
-                  For this prototype we show all mock tours as featured results. */}
-              {ALL_TOURS.map((tour) => (
+              {/* ── Tour cards — filtered to the searched destination.
+                  Only tours with a matching destinationCode (or no destinationCodes
+                  set) are shown, so Bali shows Bali tours, Dubai shows Dubai tours, etc. */}
+              {toursForDest.map((tour) => (
                 <TourCard
                   key={tour.tourId}
                   tour={tour}
@@ -769,42 +777,53 @@ export default function HolidayListPage({
             // Look up the selected destination's coordinates so we can centre the map on it.
             // If no destination is selected yet (searchCriteria.to is empty), default to
             // a world overview centred on Europe/Atlantic.
-            const selectedDest = DESTINATIONS.find((d) => d.code === searchCriteria.to);
+            // searchCriteria.to is the display label ("Cancún, Mexico") — match by label
+            const selectedDest = DESTINATIONS.find((d) => d.label === searchCriteria.to);
             const mapCenter: [number, number] = selectedDest?.lat && selectedDest?.lng
               ? [selectedDest.lat, selectedDest.lng]
               : [20, 10]; // world overview fallback
-            // Zoom in closer for a specific destination, pull back for the overview
-            const mapZoom = selectedDest ? 9 : 2;
+            // Zoom 12 = city-level view, close enough to see individual hotel pins.
+            // Zoom 2 = world overview when no destination is selected yet.
+            const mapZoom = selectedDest ? 12 : 2;
 
-            // Build marker pins — one per destination in our list.
-            // The selected destination marker is highlighted in blue.
-            // We also show the lowest package price at that destination if available.
-            const lowestPriceByDest = filteredAndSorted.reduce<Record<string, number>>((acc, pkg) => {
-              const code = searchCriteria.to; // all packages in a HolidayList search share the same destination
-              if (!acc[code] || pkg.price.perPerson < acc[code]) {
-                acc[code] = pkg.price.perPerson;
-              }
-              return acc;
-            }, {});
-
-            const markers: MapMarkerData[] = DESTINATIONS
-              .filter((d) => d.lat && d.lng)
-              .map((d) => ({
-                id: d.code,
-                lat: d.lat!,
-                lng: d.lng!,
-                label: d.label,
-                // Show a price badge only on the destination being searched
-                price: d.code === searchCriteria.to && lowestPriceByDest[d.code]
-                  ? `£${lowestPriceByDest[d.code].toLocaleString()}`
-                  : undefined,
-                isHighlighted: d.code === searchCriteria.to,
+            // Build marker pins — one per hotel in the current search results.
+            // Each hotel now has its own lat/lng so pins appear at the actual hotel
+            // location within the destination, not just a single destination pin.
+            // Falls back to destination-level pins if no hotel coordinates are set.
+            const hotelMarkers: MapMarkerData[] = filteredAndSorted
+              .filter((pkg) => pkg.hotel.lat && pkg.hotel.lng)
+              .map((pkg) => ({
+                id: pkg.packageId,
+                lat: pkg.hotel.lat!,
+                lng: pkg.hotel.lng!,
+                label: pkg.hotel.name,
+                price: `£${pkg.price.perPerson.toLocaleString('en-GB')}`,
+                isHighlighted: false, // future: sync with hovered card
               }));
+
+            // If no hotel-level coordinates are available (shouldn't happen with
+            // the new mock data, but keep as a safe fallback), fall back to showing
+            // the destination pin as before.
+            const markers: MapMarkerData[] = hotelMarkers.length > 0
+              ? hotelMarkers
+              : DESTINATIONS
+                  .filter((d) => d.lat && d.lng)
+                  .map((d) => ({
+                    id: d.code,
+                    lat: d.lat!,
+                    lng: d.lng!,
+                    label: d.label,
+                    isHighlighted: d.code === searchCriteria.to,
+                  }));
 
             return (
               <LeafletMap
                 center={mapCenter}
                 zoom={mapZoom}
+                // centerKey changes whenever the destination changes.
+                // The map fits to hotel bounds once per unique key, then
+                // leaves the user's pan/zoom alone.
+                centerKey={searchCriteria.to}
                 markers={markers}
               />
             );

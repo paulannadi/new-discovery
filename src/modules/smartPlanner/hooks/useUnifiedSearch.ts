@@ -25,7 +25,8 @@ import { UnifiedPackage } from '../../../types';
 import { HolidaySearchCriteria } from '../../../App';
 import { mergeDeduplicated } from '../utils/mergeDeduplicated';
 import { CACHED_PACKAGES } from '../../../mocks/packages/cachedPackages';
-import { LIVE_PACKAGES, NON_CACHED_PACKAGES } from '../../../mocks/packages/livePackages';
+import { LIVE_PACKAGES, NON_CACHED_PACKAGES_BY_DESTINATION } from '../../../mocks/packages/livePackages';
+import { DESTINATIONS } from '../../../mocks/destinations';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // updateFlightDates
@@ -199,6 +200,15 @@ export function useUnifiedSearch(criteria: HolidaySearchCriteria): UnifiedSearch
     // This gives the user visual feedback that a new search has started.
     setState({ packages: [], isLiveLoading: false, liveProgress: null, error: null, isNonCachedLoading: false, pricesReady: false });
 
+    // ── Filter packages to the searched destination ──────────────────────────
+    // criteria.to holds the destination *label* (e.g. "Cancún, Mexico") because
+    // that's what PackageSearchForm stores. We need to look up the *code* (e.g.
+    // "CANCUN") to match against the destinationCode field on each package.
+    const destCode = DESTINATIONS.find(d => d.label === criteria.to)?.code ?? criteria.to;
+    const cachedForDest = CACHED_PACKAGES.filter(p => p.destinationCode === destCode);
+    const liveForDest   = LIVE_PACKAGES.filter(p => p.destinationCode === destCode);
+    const nonCachedForDest = NON_CACHED_PACKAGES_BY_DESTINATION[destCode] ?? [];
+
     // ── Step 1 — Cached results (t=200ms) ───────────────────────────────────
     // For cached destinations: show cached packages immediately, then start
     // live loading. For non-cached: show live-only results and stop there.
@@ -207,7 +217,7 @@ export function useUnifiedSearch(criteria: HolidaySearchCriteria): UnifiedSearch
         // Cached destination path: show cache first, then live suppliers kick in
         setState(prev => ({
           ...prev,
-          packages: applyDateToPackages(CACHED_PACKAGES, criteria),
+          packages: applyDateToPackages(cachedForDest, criteria),
           isLiveLoading: true,
           liveProgress: { completed: 0, total: 3 },
         }));
@@ -231,7 +241,7 @@ export function useUnifiedSearch(criteria: HolidaySearchCriteria): UnifiedSearch
       const tNc2 = setTimeout(() => {
         setState(prev => ({
           ...prev,
-          packages: applyDateToPackages(NON_CACHED_PACKAGES, criteria),
+          packages: applyDateToPackages(nonCachedForDest, criteria),
           isNonCachedLoading: true,
           pricesReady: false,
         }));
@@ -263,10 +273,10 @@ export function useUnifiedSearch(criteria: HolidaySearchCriteria): UnifiedSearch
     }, 2000);
 
     // ── Step 3 — Supplier 2 returns first batch (t=3.5s) ───────────────────
-    // First 3 live packages arrive. mergeDeduplicated handles replacements:
-    // pkg_l001 replaces pkg_c001, pkg_l002 replaces pkg_c003, pkg_l003 is new.
+    // First half of live packages for this destination arrive.
+    // mergeDeduplicated handles replacements (same dedup key = update in place).
     const t3 = setTimeout(() => {
-      const firstBatch = LIVE_PACKAGES.slice(0, 3);
+      const firstBatch = liveForDest.slice(0, Math.ceil(liveForDest.length / 2));
       setState(prev => ({
         ...prev,
         packages: applyDateToPackages(mergeDeduplicated(prev.packages, firstBatch), criteria),
@@ -275,9 +285,9 @@ export function useUnifiedSearch(criteria: HolidaySearchCriteria): UnifiedSearch
     }, 3500);
 
     // ── Step 4 — Supplier 3 returns remaining results (t=5s) ────────────────
-    // Final 2 live packages arrive. Loading is now complete.
+    // Remaining live packages arrive. Loading is now complete.
     const t4 = setTimeout(() => {
-      const secondBatch = LIVE_PACKAGES.slice(3);
+      const secondBatch = liveForDest.slice(Math.ceil(liveForDest.length / 2));
       setState(prev => ({
         ...prev,
         packages: applyDateToPackages(mergeDeduplicated(prev.packages, secondBatch), criteria),

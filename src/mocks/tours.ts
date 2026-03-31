@@ -31,6 +31,7 @@ export const SWISS_WINTER_TOUR: Tour = {
   startDate: "Mar 31, 2026",
   endDate: "Apr 07, 2026",
   adults: 2,
+  destinationCodes: ["SWITZERLAND"],
 
   // ── Quick-fact attribute chips ────────────────────────────────────────────
   attributes: [
@@ -314,6 +315,8 @@ export const SWISS_WINTER_TOUR: Tour = {
       description: "4h Glacier Express — the world's most scenic train journey",
     },
   ],
+  // No specific destination in our list — shown on Discovery but not in Holiday List destination searches
+  destinationCodes: [],
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -507,6 +510,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
     { from: "Bangkok", to: "Chiang Mai", date: "Oct 07, flight", mode: "Domestic flight", description: "1h 15m included domestic flight" },
     { from: "Chiang Mai", to: "Koh Samui", date: "Oct 10, flight", mode: "Domestic flight", description: "Approx. 2h domestic flight" },
   ],
+  destinationCodes: ["PHUKET"],
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -682,6 +686,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
   transfers: [
     { from: "Ubud", to: "Seminyak", date: "Sep 18, transfer", mode: "Private car", description: "Approx. 45 min private transfer" },
   ],
+  destinationCodes: ["BALI"],
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -893,6 +898,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
     { from: "Cusco", to: "Sacred Valley", date: "Jul 10, private transfer", mode: "Private coach", description: "Approx. 1h via Pisac" },
     { from: "Sacred Valley", to: "Machu Picchu", date: "Jul 11, Peru Rail", mode: "Scenic train", description: "1h 40m scenic valley train from Ollantaytambo" },
   ],
+  destinationCodes: ["COSTARICA"],
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1137,6 +1143,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
     { from: "Hakone", to: "Kyoto", date: "Apr 06, Shinkansen", mode: "Bullet train", description: "Approx. 2h 20m via Odawara" },
     { from: "Kyoto", to: "Osaka", date: "Apr 10, Shinkansen", mode: "Bullet train", description: "15 min · JR Pass covered" },
   ],
+  destinationCodes: ["HOCHIMINH"],
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1358,6 +1365,593 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
     { from: "Fes", to: "Merzouga", date: "Nov 12, coach", mode: "Private coach", description: "Full-day drive over the Atlas — approx. 9h with stops" },
     { from: "Merzouga", to: "Marrakech (via Ouarzazate)", date: "Nov 14–15, coach", mode: "Private coach", description: "Via Aït Benhaddou and Tizi n'Tichka mountain pass" },
   ],
+  destinationCodes: ["MARRAKECH"],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Dubai — "Dubai Highlights City Tour"
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const DUBAI_HIGHLIGHTS_TOUR: Tour = {
+  tourId: "dubai-highlights",
+  title: "Dubai Highlights City Tour",
+  subtitle: "From the golden deserts to the world's tallest tower — experience ultra-modern Dubai with expert local guides.",
+  tripType: "individual-tour",
+  duration: 7,
+  locationsLabel: "Dubai · Palm Jumeirah · Desert",
+  highlights: [
+    "Burj Khalifa observation deck",
+    "Desert safari & camel riding",
+    "Souks & Spice market",
+    "Palm Jumeirah cruise",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80",
+  price: { perPerson: 1599, total: 3198, currency: "GBP", paidBefore: 799, paidAtDestination: 800 },
+  startDate: "Apr 14, 2026",
+  endDate: "Apr 21, 2026",
+  adults: 2,
+  attributes: [
+    { iconKey: "users",           label: "Individual tour" },
+    { iconKey: "languages",       label: "Guided in English" },
+    { iconKey: "activity",        label: "All levels" },
+    { iconKey: "calendar-check",  label: "Age 12+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80",
+    "https://images.unsplash.com/photo-1545579133-99bb5ad189be?w=800&q=80",
+    "https://images.unsplash.com/photo-1590073844006-33379778ae09?w=800&q=80",
+    "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrival in Dubai",
+      items: [
+        { type: "highlight", label: "Arrive at Dubai International Airport", description: "Transfer to your hotel in Downtown Dubai. Evening at leisure — stroll along the Dubai Fountain." },
+        { type: "hotel", label: "Address Downtown or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1545579133-99bb5ad189be?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Burj Khalifa & Downtown",
+      items: [
+        { type: "highlight", label: "Burj Khalifa — At the Top", description: "Access to level 124 observation deck with 360° views across the city and desert." },
+        { type: "highlight", label: "Dubai Mall & Dubai Fountain show", description: "World's largest shopping mall. Evening Dubai Fountain water performance." },
+        { type: "hotel", label: "Address Downtown or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1545579133-99bb5ad189be?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Old Dubai & Souks",
+      items: [
+        { type: "highlight", label: "Spice Souk & Gold Souk", description: "Explore the vibrant traditional markets of Deira. Take an abra (water taxi) across the Creek." },
+        { type: "highlight", label: "Al Fahidi Historic District", description: "Wind-tower architecture and the Dubai Museum — the city's fascinating transformation." },
+        { type: "hotel", label: "Address Downtown or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1590073844006-33379778ae09?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Desert Safari",
+      items: [
+        { type: "highlight", label: "Dune bashing & camel riding", description: "Afternoon 4x4 desert safari over the red dunes, sandboarding, and camel riding." },
+        { type: "highlight", label: "Bedouin camp dinner under the stars", description: "Traditional Arabian dinner with belly dancing and stargazing in the desert." },
+        { type: "hotel", label: "Address Downtown or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Palm Jumeirah & Marina",
+      items: [
+        { type: "highlight", label: "Palm Jumeirah cruise", description: "Scenic cruise around the iconic palm-shaped island with views of Atlantis and the Burj Al Arab." },
+        { type: "highlight", label: "Dubai Marina Walk", description: "Afternoon stroll along the glittering marina waterfront." },
+        { type: "hotel", label: "Address Downtown or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Day at Leisure",
+      items: [
+        { type: "highlight", label: "Optional: Wild Wadi Waterpark or Ski Dubai", description: "Choose your own adventure — world-class waterpark or indoor ski slope in the desert." },
+        { type: "hotel", label: "Address Downtown or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1582610116397-edb72270f707?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Departure",
+      items: [
+        { type: "highlight", label: "Final morning in Dubai", description: "Check out and transfer to Dubai International Airport for your return flight." },
+      ],
+    },
+  ],
+  included: [
+    "6 nights accommodation in 5★ hotel",
+    "Daily breakfast",
+    "Return airport transfers",
+    "Desert safari with dinner",
+    "Burj Khalifa At the Top tickets",
+    "Palm Jumeirah cruise",
+    "Old Dubai walking tour with guide",
+  ],
+  excluded: [
+    "International flights",
+    "Lunches and dinners (except day 4 safari dinner)",
+    "Travel insurance",
+    "Personal shopping",
+    "Optional activities",
+  ],
+  stops: [
+    {
+      destinationName: "Dubai",
+      dateRange: "Apr 14 – 17",
+      nights: 3,
+      description: "The glittering skyline, souks, and world records of the UAE's most iconic city.",
+      accommodation: {
+        hotelName: "Address Downtown",
+        stars: 5,
+        checkIn: "Apr 14", checkOut: "Apr 17",
+        checkInISO: "2026-04-14", checkOutISO: "2026-04-17",
+        roomType: "Deluxe Room", boardType: "Breakfast included",
+      },
+      activities: [
+        { date: "Apr 15", name: "Burj Khalifa At the Top", description: "Observatory deck experience" },
+        { date: "Apr 16", name: "Old Dubai & Souks Tour", description: "Deira Spice & Gold Souks + abra crossing" },
+      ],
+      lat: 25.197, lng: 55.274,
+    },
+    {
+      destinationName: "Desert Camp",
+      dateRange: "Apr 17 – 18",
+      nights: 1,
+      description: "The vast red dunes of the Hatta desert, 90 minutes from the city.",
+      accommodation: {
+        hotelName: "Bedouin Desert Camp",
+        stars: 4,
+        checkIn: "Apr 17", checkOut: "Apr 18",
+        checkInISO: "2026-04-17", checkOutISO: "2026-04-18",
+        roomType: "Luxury Tent", boardType: "Full board",
+      },
+      activities: [
+        { date: "Apr 17", name: "Dune Bashing & Camel Riding", description: "4x4 desert safari + camel ride" },
+      ],
+      lat: 24.897, lng: 56.042,
+    },
+    {
+      destinationName: "Palm Jumeirah",
+      dateRange: "Apr 18 – 21",
+      nights: 3,
+      description: "The world-famous man-made island jutting into the Arabian Gulf.",
+      accommodation: {
+        hotelName: "Atlantis The Palm",
+        stars: 5,
+        checkIn: "Apr 18", checkOut: "Apr 21",
+        checkInISO: "2026-04-18", checkOutISO: "2026-04-21",
+        roomType: "King Room Ocean View", boardType: "Breakfast included",
+      },
+      activities: [
+        { date: "Apr 19", name: "Palm Jumeirah Cruise", description: "Scenic boat tour around the Palm" },
+        { date: "Apr 20", name: "Aquaventure Waterpark", description: "Full day at Atlantis waterpark" },
+      ],
+      lat: 25.130, lng: 55.117,
+    },
+  ],
+  transfers: [
+    { from: "Dubai Downtown", to: "Desert Camp", date: "Apr 17, 4x4 transfer", mode: "Private 4x4", description: "Approx. 1h 30m scenic drive to the dunes" },
+    { from: "Desert Camp", to: "Palm Jumeirah", date: "Apr 18, private transfer", mode: "Private car", description: "Approx. 1h 45m back to the coast" },
+  ],
+  destinationCodes: ["DUBAI"],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cancún — "Riviera Maya Explorer"
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const CANCUN_RIVIERA_TOUR: Tour = {
+  tourId: "cancun-riviera-maya",
+  title: "Riviera Maya Explorer",
+  subtitle: "Ancient Mayan ruins, cenote swims, tropical jungle and the Caribbean's most spectacular beaches.",
+  tripType: "group-tour",
+  duration: 10,
+  locationsLabel: "Cancún · Tulum · Chichen Itza",
+  highlights: [
+    "Chichen Itza sunrise visit",
+    "Cenote snorkelling",
+    "Tulum Mayan ruins",
+    "Playa del Carmen",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80",
+  price: { perPerson: 1899, total: 3798, currency: "GBP", paidBefore: 999, paidAtDestination: 900 },
+  startDate: "Apr 28, 2026",
+  endDate: "May 08, 2026",
+  adults: 2,
+  attributes: [
+    { iconKey: "users",           label: "Group tour" },
+    { iconKey: "languages",       label: "Guided in English & Spanish" },
+    { iconKey: "activity",        label: "Moderate fitness" },
+    { iconKey: "calendar-check",  label: "Age 16+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80",
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
+    "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80",
+    "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrival in Cancún",
+      items: [
+        { type: "highlight", label: "Arrive at Cancún International Airport", description: "Welcome briefing and check-in at your Hotel Zone resort." },
+        { type: "hotel", label: "Moon Palace or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Cancún Beach Day",
+      items: [
+        { type: "highlight", label: "Hotel Zone beaches", description: "Free day to explore Cancún's famous turquoise beaches and Hotel Zone." },
+        { type: "hotel", label: "Moon Palace or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Chichen Itza",
+      items: [
+        { type: "highlight", label: "Sunrise visit to Chichen Itza", description: "One of the Seven Wonders of the World — see the iconic El Castillo pyramid with expert guides." },
+        { type: "transport", label: "Coach transfer", description: "3h each way · Air-conditioned coach" },
+        { type: "hotel", label: "Moon Palace or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Transfer to Tulum",
+      items: [
+        { type: "highlight", label: "Playa del Carmen stop", description: "Stroll along 5th Avenue for shopping and lunch." },
+        { type: "hotel", label: "Azulik Tulum or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80",
+    },
+  ],
+  included: [
+    "9 nights accommodation",
+    "Daily breakfast",
+    "Chichen Itza entrance + guide",
+    "Cenote snorkelling excursion",
+    "Tulum ruins guided tour",
+    "All internal coach transfers",
+  ],
+  excluded: [
+    "International flights",
+    "Lunches and dinners",
+    "Travel insurance",
+    "Optional zip-lining excursion",
+  ],
+  stops: [
+    {
+      destinationName: "Cancún",
+      dateRange: "Apr 28 – May 02",
+      nights: 4,
+      description: "The Caribbean's most famous resort strip, with powdery white sand beaches and turquoise waters.",
+      accommodation: {
+        hotelName: "Moon Palace Golf & Spa Resort",
+        stars: 5,
+        checkIn: "Apr 28", checkOut: "May 02",
+        checkInISO: "2026-04-28", checkOutISO: "2026-05-02",
+        roomType: "Deluxe Suite Ocean View", boardType: "All Inclusive",
+      },
+      activities: [
+        { date: "Apr 30", name: "Chichen Itza Day Trip", description: "Sunrise guided visit to the Mayan pyramid" },
+        { date: "May 01", name: "Cenote Swim", description: "Snorkelling in a sacred freshwater cenote" },
+      ],
+      lat: 21.075, lng: -86.806,
+    },
+    {
+      destinationName: "Tulum",
+      dateRange: "May 02 – 08",
+      nights: 6,
+      description: "Cliffside Mayan ruins above the turquoise Caribbean — the most photographed ruin in Mexico.",
+      accommodation: {
+        hotelName: "Azulik Eco Resort",
+        stars: 5,
+        checkIn: "May 02", checkOut: "May 08",
+        checkInISO: "2026-05-02", checkOutISO: "2026-05-08",
+        roomType: "Villa Sea View", boardType: "Breakfast included",
+      },
+      activities: [
+        { date: "May 03", name: "Tulum Ruins Guided Tour", description: "Morning visit to the cliffside Mayan archaeological site" },
+        { date: "May 05", name: "Coba Bike & Swim", description: "Cycle through jungle to Coba pyramid + cenote swim" },
+      ],
+      lat: 20.211, lng: -87.465,
+    },
+  ],
+  transfers: [
+    { from: "Cancún", to: "Tulum", date: "May 02, coach", mode: "Private coach", description: "Approx. 2h with Playa del Carmen stop" },
+  ],
+  destinationCodes: ["CANCUN"],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Maldives — "Island Hopping Maldives"
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const MALDIVES_ISLAND_TOUR: Tour = {
+  tourId: "maldives-island-hopping",
+  title: "Island Hopping Maldives",
+  subtitle: "Drift between remote atolls, dive pristine reefs, and sleep in overwater bungalows above the Indian Ocean.",
+  tripType: "individual-tour",
+  duration: 10,
+  locationsLabel: "Malé · North Malé Atoll · Baa Atoll",
+  highlights: [
+    "Overwater bungalow stays",
+    "Manta ray snorkelling at Hanifaru Bay",
+    "Sunset dolphin cruise",
+    "Coral reef PADI dive",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80",
+  price: { perPerson: 4299, total: 8598, currency: "GBP", paidBefore: 2299, paidAtDestination: 2000 },
+  startDate: "Apr 18, 2026",
+  endDate: "Apr 28, 2026",
+  adults: 2,
+  attributes: [
+    { iconKey: "users",           label: "Individual tour" },
+    { iconKey: "languages",       label: "English-speaking guides" },
+    { iconKey: "activity",        label: "All levels" },
+    { iconKey: "calendar-check",  label: "Age 16+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80",
+    "https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=800&q=80",
+    "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=800&q=80",
+    "https://images.unsplash.com/photo-1540202404-8d0de77c3573?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrival in Malé",
+      items: [
+        { type: "highlight", label: "Arrive at Velana International Airport, Malé", description: "Speedboat transfer to your first island resort." },
+        { type: "hotel", label: "Gili Lankanfushi or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "North Malé Atoll Exploration",
+      items: [
+        { type: "highlight", label: "House reef snorkelling", description: "Explore the technicolour coral reef directly off your water villa." },
+        { type: "highlight", label: "Sunset dolphin cruise", description: "Spot spinner dolphins at dusk on a traditional dhoni boat." },
+        { type: "hotel", label: "Gili Lankanfushi or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Transfer to Baa Atoll",
+      items: [
+        { type: "transport", label: "Seaplane transfer to Baa Atoll", description: "Breathtaking 30-min scenic seaplane flight over the atolls" },
+        { type: "hotel", label: "Six Senses Laamu or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Hanifaru Bay — Manta Rays",
+      items: [
+        { type: "highlight", label: "Hanifaru Bay UNESCO Biosphere snorkel", description: "UNESCO World Biosphere Reserve — snorkel with hundreds of manta rays in season." },
+        { type: "hotel", label: "Six Senses Laamu or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1540202404-8d0de77c3573?w=800&q=80",
+    },
+    {
+      dayNumber: 10,
+      title: "Departure",
+      items: [
+        { type: "highlight", label: "Final morning at leisure", description: "Farewell breakfast on your overwater terrace before transfer to the airport." },
+      ],
+    },
+  ],
+  included: [
+    "9 nights overwater accommodation",
+    "All meals (full board both resorts)",
+    "Speedboat & seaplane inter-island transfers",
+    "Hanifaru Bay manta snorkel excursion",
+    "Dolphin sunset cruise",
+    "House reef snorkelling equipment",
+  ],
+  excluded: [
+    "International flights to Malé",
+    "Travel insurance",
+    "PADI dive courses (optional extra)",
+    "Spa treatments",
+  ],
+  stops: [
+    {
+      destinationName: "North Malé Atoll",
+      dateRange: "Apr 18 – 23",
+      nights: 5,
+      description: "Crystal-clear lagoons and pristine reef just 30 minutes by speedboat from Malé.",
+      accommodation: {
+        hotelName: "Gili Lankanfushi",
+        stars: 5,
+        checkIn: "Apr 18", checkOut: "Apr 23",
+        checkInISO: "2026-04-18", checkOutISO: "2026-04-23",
+        roomType: "Crusoe Residence Over Water", boardType: "All Inclusive",
+      },
+      activities: [
+        { date: "Apr 19", name: "House Reef Snorkel", description: "Guided coral reef snorkelling" },
+        { date: "Apr 20", name: "Sunset Dolphin Cruise", description: "Dhoni boat cruise with spinner dolphins" },
+      ],
+      lat: 4.203, lng: 73.514,
+    },
+    {
+      destinationName: "Baa Atoll",
+      dateRange: "Apr 23 – 28",
+      nights: 5,
+      description: "UNESCO World Biosphere Reserve, famous for manta ray and whale shark encounters.",
+      accommodation: {
+        hotelName: "Six Senses Laamu",
+        stars: 5,
+        checkIn: "Apr 23", checkOut: "Apr 28",
+        checkInISO: "2026-04-23", checkOutISO: "2026-04-28",
+        roomType: "Water Villa with Pool", boardType: "Breakfast Included",
+      },
+      activities: [
+        { date: "Apr 24", name: "Hanifaru Bay Manta Snorkel", description: "UNESCO biosphere snorkel — mantas in season" },
+        { date: "Apr 26", name: "Whale Shark Search", description: "Excursion to look for whale sharks" },
+      ],
+      lat: 5.145, lng: 72.973,
+    },
+  ],
+  transfers: [
+    { from: "North Malé Atoll", to: "Baa Atoll", date: "Apr 23, seaplane", mode: "Seaplane", description: "30 min scenic flight over the atolls" },
+  ],
+  destinationCodes: ["MALDIVES"],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tenerife — "Tenerife Volcanic & Beaches"
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const TENERIFE_TOUR: Tour = {
+  tourId: "tenerife-volcanic-beaches",
+  title: "Tenerife: Volcanoes & Atlantic Beaches",
+  subtitle: "Hike through lunar volcanic landscapes in Teide National Park, then unwind on Tenerife's golden southern beaches.",
+  tripType: "individual-tour",
+  duration: 8,
+  locationsLabel: "Santa Cruz · Teide · Costa Adeje",
+  highlights: [
+    "Mount Teide cable car",
+    "Lava fields at Teide National Park",
+    "Whale & dolphin watching cruise",
+    "Masca gorge hike",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1607604276583-eef5d176d184?w=800&q=80",
+  price: { perPerson: 1099, total: 2198, currency: "GBP", paidBefore: 549, paidAtDestination: 550 },
+  startDate: "Apr 11, 2026",
+  endDate: "Apr 19, 2026",
+  adults: 2,
+  attributes: [
+    { iconKey: "users",           label: "Individual tour" },
+    { iconKey: "languages",       label: "Guided in English" },
+    { iconKey: "activity",        label: "Moderate fitness required" },
+    { iconKey: "calendar-check",  label: "Age 12+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1607604276583-eef5d176d184?w=800&q=80",
+    "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrival in Tenerife",
+      items: [
+        { type: "highlight", label: "Arrive at Tenerife South Airport", description: "Transfer to Costa Adeje and check in to your resort." },
+        { type: "hotel", label: "Bahía del Duque or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Teide National Park",
+      items: [
+        { type: "highlight", label: "Mount Teide cable car ascent", description: "Cable car to 3,555m — stunning views across the Canary Islands on a clear day." },
+        { type: "highlight", label: "Roques de García lava field walk", description: "Guided walk through the otherworldly volcanic landscape." },
+        { type: "hotel", label: "Bahía del Duque or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1607604276583-eef5d176d184?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Masca Gorge Hike",
+      items: [
+        { type: "highlight", label: "Masca village & gorge descent", description: "Stunning 3h hike from the mountain village to the sea, with boat pick-up." },
+        { type: "hotel", label: "Bahía del Duque or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Whale & Dolphin Cruise",
+      items: [
+        { type: "highlight", label: "Whale & dolphin watching from Los Cristianos", description: "3h catamaran cruise to see resident pilot whales and bottlenose dolphins." },
+        { type: "hotel", label: "Bahía del Duque or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Departure",
+      items: [
+        { type: "highlight", label: "Morning beach time, then fly home", description: "Final morning on the beach before transfer to Tenerife South Airport." },
+      ],
+    },
+  ],
+  included: [
+    "7 nights accommodation",
+    "Daily breakfast",
+    "Return airport transfers",
+    "Teide National Park guided tour",
+    "Masca gorge hike + boat pickup",
+    "Whale & dolphin cruise",
+  ],
+  excluded: [
+    "International flights",
+    "Lunches and dinners",
+    "Travel insurance",
+    "Optional quad bike tours",
+  ],
+  stops: [
+    {
+      destinationName: "Costa Adeje",
+      dateRange: "Apr 11 – 15",
+      nights: 4,
+      description: "Tenerife's premium resort area with golden beaches, turquoise Atlantic waters, and luxury hotels.",
+      accommodation: {
+        hotelName: "Bahía del Duque",
+        stars: 5,
+        checkIn: "Apr 11", checkOut: "Apr 15",
+        checkInISO: "2026-04-11", checkOutISO: "2026-04-15",
+        roomType: "Junior Suite Garden View", boardType: "Breakfast included",
+      },
+      activities: [
+        { date: "Apr 12", name: "Teide National Park Day", description: "Cable car + volcanic landscape walk" },
+        { date: "Apr 14", name: "Masca Gorge Hike", description: "Mountain village to sea, boat pickup" },
+      ],
+      lat: 28.095, lng: -16.749,
+    },
+    {
+      destinationName: "Los Cristianos",
+      dateRange: "Apr 15 – 19",
+      nights: 4,
+      description: "Bustling harbour town and year-round whale & dolphin watching capital of the Canaries.",
+      accommodation: {
+        hotelName: "Hard Rock Hotel Tenerife",
+        stars: 5,
+        checkIn: "Apr 15", checkOut: "Apr 19",
+        checkInISO: "2026-04-15", checkOutISO: "2026-04-19",
+        roomType: "Platinum King Room Sea View", boardType: "All Inclusive",
+      },
+      activities: [
+        { date: "Apr 16", name: "Whale & Dolphin Cruise", description: "3h catamaran from Los Cristianos harbour" },
+        { date: "Apr 18", name: "Playa de las Américas beach day", description: "Free day on Tenerife's most popular beach" },
+      ],
+      lat: 28.048, lng: -16.713,
+    },
+  ],
+  transfers: [
+    { from: "Costa Adeje", to: "Los Cristianos", date: "Apr 15, taxi", mode: "Private car", description: "Approx. 10 min coastal transfer" },
+  ],
+  destinationCodes: ["TENERIFE"],
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1371,6 +1965,10 @@ export const ALL_TOURS: Tour[] = [
   PERU_ADVENTURE_TOUR,
   JAPAN_HIGHLIGHTS_TOUR,
   MOROCCO_IMPERIAL_TOUR,
+  DUBAI_HIGHLIGHTS_TOUR,
+  CANCUN_RIVIERA_TOUR,
+  MALDIVES_ISLAND_TOUR,
+  TENERIFE_TOUR,
 ];
 
 // Maps a Discovery TourCardData.id to a Tour object.
