@@ -544,7 +544,7 @@ export default function DiscoveryPage({
       {/* When aiExperienceMode is on, the background swaps to a melted gradient instead */}
       {/* Note: overflow-hidden was removed from here — it was clipping dropdown menus.
           The blob background layer already has its own overflow-hidden to contain the hero image animation. */}
-      <div className={`relative flex flex-col bg-white sm:bg-transparent transition-all duration-500 ${aiExperienceMode ? "min-h-screen" : ""}`}>
+      <div className={`relative flex flex-col bg-transparent transition-all duration-500 ${aiExperienceMode ? "h-screen overflow-hidden" : ""}`}>
 
         {/*
           Blob background — always in the DOM but starts invisible (opacity 0).
@@ -552,7 +552,7 @@ export default function DiscoveryPage({
           as the hero image transition below — no cross-fade timing gap or flash.
         */}
         <motion.div
-          className="hidden sm:block absolute inset-0 overflow-hidden"
+          className={`absolute inset-0 overflow-hidden ${aiExperienceMode ? "block" : "hidden sm:block"}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: aiExperienceMode ? 1 : 0 }}
           transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
@@ -624,7 +624,7 @@ export default function DiscoveryPage({
           animations start in the same frame — no flash or timing gap.
         */}
         <motion.div
-          className="hidden sm:block absolute inset-0"
+          className="block absolute inset-0"
           initial={{ opacity: 1 }}
           animate={{ opacity: aiExperienceMode ? 0 : 1 }}
           transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
@@ -637,10 +637,10 @@ export default function DiscoveryPage({
           <div className="absolute inset-0 bg-gradient-to-b from-black/25 to-black/10" />
         </motion.div>
 
-        <div className="relative z-10 flex flex-col">
+        <div className={`relative z-10 flex flex-col ${aiExperienceMode ? "h-full" : ""}`}>
 
           {/* ── Toggle + tagline — always rendered, text swaps on mode change ── */}
-          <div className="hidden sm:flex flex-col items-center px-6 lg:px-12 pt-32 pb-6 gap-5">
+          <div className={`flex flex-col items-center px-6 lg:px-12 pt-16 sm:pt-32 pb-6 gap-5`}>
             {/* Toggle pill — pulses when mode changes */}
             <motion.div animate={toggleControls}>
               <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm px-5 py-2.5 rounded-full border border-white/30">
@@ -667,7 +667,7 @@ export default function DiscoveryPage({
                   aiExperienceMode ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"
                 }`}
               >
-                Your AI Travel Assistant
+                You dream it. We'll plan it.
               </h1>
             </div>
           </div>
@@ -1377,17 +1377,20 @@ export default function DiscoveryPage({
             <div
               className={`transition-opacity duration-500 ${
                 aiExperienceMode
-                  ? "opacity-100"
+                  ? "opacity-100 flex flex-col justify-center"
                   : "opacity-0 pointer-events-none absolute inset-0 overflow-hidden"
               }`}
             >
               {/* AI search card */}
-              <div className="sm:px-6 lg:px-12 sm:pb-16 lg:pb-[128px] flex justify-center">
+              <div className="px-4 sm:px-6 lg:px-12 pb-6 lg:pb-[128px] flex justify-center">
                 <div
-                  className="bg-white sm:rounded-[24px] sm:shadow-2xl w-full sm:max-w-[860px] flex flex-col"
-                  style={{ height: lockedCardHeight ?? undefined }}
+                  className="bg-white rounded-[24px] shadow-2xl w-full max-w-[860px] flex flex-col"
+                  // lockedCardHeight keeps the AI card the same size as the search card it replaced.
+                  // Using minHeight (not height) so the card can grow on mobile when the stacked
+                  // (flex-col) button row needs extra space — prevents the CTA from overflowing.
+                  style={{ minHeight: lockedCardHeight ?? undefined }}
                 >
-                  <div className="flex-1 p-4 sm:p-6">
+                  <div className="flex-1 p-6">
                     <textarea
                       placeholder="Describe your ideal trip — destination, dates, budget, travel style…"
                       className="w-full h-full bg-transparent text-[16px] text-[#333743] outline-none placeholder:text-[#9598a4] resize-none leading-relaxed"
@@ -1395,12 +1398,14 @@ export default function DiscoveryPage({
                       onChange={(e) => setAiPrompt(e.target.value)}
                     />
                   </div>
-                  <div className="flex items-center justify-between px-4 sm:px-6 pb-4 sm:pb-6 border-t border-[#e0e2e8] pt-4 shrink-0">
-                    <button className="flex items-center gap-2 text-[#9598a4] text-[14px] font-bold hover:text-[#667080] transition-colors">
-                      <Paperclip size={16} />
-                      Attach files
+                  <div className="flex items-center px-6 pb-6 border-t border-[#e0e2e8] pt-4 shrink-0 gap-3 sm:justify-between">
+                    {/* Attachment — icon-only on mobile, text label on sm+ */}
+                    <button className="flex items-center justify-center gap-2 shrink-0 h-[52px] rounded-[12px] border border-[#e0e2e8] text-[#9598a4] hover:text-[#667080] hover:border-[#667080] transition-colors w-[52px] sm:w-auto sm:px-4 sm:font-bold sm:text-[14px]">
+                      <Paperclip size={18} />
+                      <span className="hidden sm:inline">Attach files</span>
                     </button>
-                    <button className="flex items-center gap-2 bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black text-[16px] h-[52px] px-6 rounded-[12px] transition-colors shadow-md">
+                    {/* CTA — fills remaining space on mobile, auto width on sm+ */}
+                    <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black text-[16px] h-[52px] px-6 rounded-[12px] transition-colors shadow-md">
                       <Send size={18} />
                       Plan my trip
                     </button>
@@ -1409,7 +1414,7 @@ export default function DiscoveryPage({
               </div>
 
               {/* Suggestion prompts */}
-              <div className="flex flex-col items-center gap-3 px-4 pb-16 lg:pb-[128px]">
+              <div className="flex flex-col items-center gap-3 px-6 pb-16 lg:pb-[128px] relative z-10">
                 <span className="text-white/70 text-[14px]">Try asking:</span>
                 <div className="flex flex-wrap gap-3 justify-center max-w-[860px]">
                   {[
@@ -1449,17 +1454,17 @@ export default function DiscoveryPage({
 
       {/* ── HOTELS ── */}
       {activeTab === "hotels" && (
-        <section className="py-16 px-4 sm:px-6 lg:px-12">
+        <section className="py-10 sm:py-16 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1200px] mx-auto">
 
-            <div className="mb-8">
+            <div className="mb-6 sm:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
-                <Heart size={28} className="text-[#2681FF]" />
-                <h2 className="text-[#333743] font-bold text-[32px] leading-tight">
+                <Heart size={24} className="text-[#2681FF] sm:size-7" />
+                <h2 className="text-[#333743] font-bold text-[22px] sm:text-[32px] leading-tight">
                   Our favourite picks
                 </h2>
               </div>
-              <p className="text-[#667080] text-[18px]">
+              <p className="text-[#667080] text-[14px] sm:text-[18px]">
                 Average prices based on current calendar month
               </p>
             </div>
@@ -1684,22 +1689,22 @@ export default function DiscoveryPage({
               headings + tab bars with the hero card. Scroll rows use dynamic
               pl-[max(pad, (100vw-1200px)/2)] so the first card starts at exactly
               the same left edge on all screen sizes, including wide viewports. */}
-          <section className="py-16">
+          <section className="py-10 sm:py-16">
 
             {/* Constrained content — aligns with hero card left edge */}
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-8">
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-5 sm:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
-                <TreePalm size={28} className="text-[#2681FF]" />
-                <h2 className="text-[#333743] font-bold text-[32px] leading-tight">
+                <TreePalm size={24} className="text-[#2681FF] sm:size-7" />
+                <h2 className="text-[#333743] font-bold text-[22px] sm:text-[32px] leading-tight">
                   Tours for every travel style
                 </h2>
               </div>
-              <p className="text-[#667080] text-[18px]">
+              <p className="text-[#667080] text-[14px] sm:text-[18px]">
                 Average prices based on current calendar month
               </p>
             </div>
 
-            <div ref={styleTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] sm:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-[#E0E2E8] mb-8 flex gap-0 overflow-x-auto">
+            <div ref={styleTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] sm:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-[#E0E2E8] mb-5 sm:mb-8 flex gap-0 overflow-x-auto">
               {TOUR_STYLE_FILTERS.map((style) => (
                 <button
                   key={style}
@@ -1761,21 +1766,21 @@ export default function DiscoveryPage({
           <hr className="border-[#E0E2E8] mx-4 sm:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
 
           {/* ── Section 2: Tours by destination ──────────────────────────── */}
-          <section className="py-16">
+          <section className="py-10 sm:py-16">
 
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-8">
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-5 sm:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
-                <Flag size={28} className="text-[#2681FF]" />
-                <h2 className="text-[#333743] font-bold text-[32px] leading-tight">
+                <Flag size={24} className="text-[#2681FF] sm:size-7" />
+                <h2 className="text-[#333743] font-bold text-[22px] sm:text-[32px] leading-tight">
                   Your next dream destination
                 </h2>
               </div>
-              <p className="text-[#667080] text-[18px]">
+              <p className="text-[#667080] text-[14px] sm:text-[18px]">
                 Average prices based on current calendar month
               </p>
             </div>
 
-            <div ref={countryTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] sm:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-[#E0E2E8] mb-8 flex gap-0 overflow-x-auto">
+            <div ref={countryTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] sm:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-[#E0E2E8] mb-5 sm:mb-8 flex gap-0 overflow-x-auto">
               {DESTINATION_FILTERS.map((country) => (
                 <button
                   key={country}
@@ -1834,21 +1839,21 @@ export default function DiscoveryPage({
           <hr className="border-[#E0E2E8] mx-4 sm:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
 
           {/* ── Section 3: Travel the way you like ───────────────────────── */}
-          <section className="py-16">
+          <section className="py-10 sm:py-16">
 
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-8">
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-5 sm:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
-                <GitBranch size={28} className="text-[#2681FF]" />
-                <h2 className="text-[#333743] font-bold text-[32px] leading-tight">
+                <GitBranch size={24} className="text-[#2681FF] sm:size-7" />
+                <h2 className="text-[#333743] font-bold text-[22px] sm:text-[32px] leading-tight">
                   Travel the way you like
                 </h2>
               </div>
-              <p className="text-[#667080] text-[18px]">
+              <p className="text-[#667080] text-[14px] sm:text-[18px]">
                 Find the right style of holiday for you
               </p>
             </div>
 
-            <div ref={tripTypeTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] sm:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-[#E0E2E8] mb-8 flex gap-0 overflow-x-auto">
+            <div ref={tripTypeTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] sm:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-[#E0E2E8] mb-5 sm:mb-8 flex gap-0 overflow-x-auto">
               {TRIP_TYPES.map((tt) => (
                 <button
                   key={tt.id}
@@ -1968,9 +1973,9 @@ export default function DiscoveryPage({
           <hr className="border-[#E0E2E8] mx-4 sm:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
 
           {/* ── Section 5: Why book with us ───────────────────────────────── */}
-          <section className="py-16">
+          <section className="py-10 sm:py-16">
             <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))]">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                 {[
                   { icon: <Sun size={22} className="text-[#2681FF]" />, title: "Buy together & save", desc: "Bundle your flights and hotel for the best combined price." },
                   { icon: <Heart size={22} className="text-[#2681FF]" />, title: "Tailor your holiday", desc: "Mix and match hotels, room types, and board options." },

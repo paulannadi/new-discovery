@@ -62,7 +62,7 @@ function AttributeIcon({ iconKey }: { iconKey: TourAttribute["iconKey"] }) {
 }
 
 function DayItemIcon({ type }: { type: TourDayItem["type"] }) {
-  if (type === "highlight") return <MapPinned size={15} className="text-[#2681FF] shrink-0 mt-0.5" />;
+  if (type === "highlight") return <MapPinned size={15} className="text-[#9598a4] shrink-0 mt-0.5" />;
   if (type === "hotel")     return <Hotel     size={15} className="text-[#9598a4] shrink-0 mt-0.5" />;
   if (type === "transport") return <Bus       size={15} className="text-[#9598a4] shrink-0 mt-0.5" />;
   return null;
@@ -254,31 +254,6 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               LEFT COLUMN — gallery, day-by-day, info tabs
           ═══════════════════════════════════════════════════════════════╗ */}
           <div className="flex flex-col gap-6 min-w-0">
-
-            {/* ── Photo gallery ───────────────────────────────────────────── */}
-            <div>
-              <h3 className="text-[20px] font-bold text-[#222222] mb-4">
-                Discover the beauty of Switzerland
-              </h3>
-              <div className="bg-white rounded-[16px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] p-5">
-                <p className="text-[16px] text-[#333743] mb-4">
-                  Explore Switzerland's iconic landscapes, historic cities, and world-famous railways on this unforgettable winter journey.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="rounded-[12px] overflow-hidden">
-                    <img src={galleryImages[1]} alt="Switzerland" className="w-full h-[200px] object-cover" />
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    <div className="rounded-[12px] overflow-hidden">
-                      <img src={galleryImages[2]} alt="Tour photo 2" className="w-full h-[95px] object-cover" />
-                    </div>
-                    <div className="rounded-[12px] overflow-hidden">
-                      <img src={galleryImages[3]} alt="Tour photo 3" className="w-full h-[95px] object-cover" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* ── Day-by-day ──────────────────────────────────────────────── */}
             <div>
@@ -656,13 +631,15 @@ function DayCard({ day, slug }: { day: TourDay; slug: string }) {
             ))}
           </div>
 
-          {/* Day photo */}
-          <div className="sm:w-[200px] shrink-0">
-            <img
-              src={dayImage}
-              alt={`Day ${day.dayNumber}: ${day.title}`}
-              className="w-full h-[140px] sm:h-full object-cover"
-            />
+          {/* Day photo — padded + rounded to sit inside the card */}
+          <div className="sm:w-[200px] shrink-0 p-4 sm:pl-0">
+            <div className="rounded-[12px] overflow-hidden h-[140px] sm:h-full">
+              <img
+                src={dayImage}
+                alt={`Day ${day.dayNumber}: ${day.title}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
         </div>
       )}
