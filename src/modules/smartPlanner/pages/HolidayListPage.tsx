@@ -18,7 +18,7 @@ import PackageSearchForm from "../components/PackageSearchForm";
 import { PackageCard } from "../components/PackageCard";
 import { TourCard } from "../components/TourCard";
 import { LiveSearchProgressBanner } from "../components/LiveSearchProgressBanner";
-import { SWISS_WINTER_TOUR } from "../../../mocks/tours";
+import { ALL_TOURS } from "../../../mocks/tours";
 import type { Tour } from "../../../types";
 import { useUnifiedSearch } from "../hooks/useUnifiedSearch";
 import LeafletMap, { type MapMarkerData } from "../../../shared/components/LeafletMap";
@@ -725,13 +725,16 @@ export default function HolidayListPage({
           {/* Package card list */}
           {filteredAndSorted.length > 0 && (
             <div className="flex flex-col gap-4 pb-4">
-              {/* ── Tour card — always shown at the top of the list.
+              {/* ── Tour cards — injected at the top of the list.
                   In the real product, tours would come from the same search results.
-                  For this prototype we inject the Swiss tour as a featured result. */}
-              <TourCard
-                tour={SWISS_WINTER_TOUR}
-                onSelect={(t) => onViewTour?.(t)}
-              />
+                  For this prototype we show all mock tours as featured results. */}
+              {ALL_TOURS.map((tour) => (
+                <TourCard
+                  key={tour.tourId}
+                  tour={tour}
+                  onSelect={(t) => onViewTour?.(t)}
+                />
+              ))}
 
               {filteredAndSorted.map((pkg) => (
                 <PackageCard

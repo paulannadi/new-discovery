@@ -10,7 +10,7 @@ import { useState, useEffect } from "react";
 import {
   MapPin,
   ArrowRight,
-  Clock,
+
   Train,
   Users,
   User,
@@ -89,10 +89,7 @@ export function TourCard({ tour, onSelect, onHover, isHovered }: TourCardProps) 
           {tripTypeBadge.label}
         </span>
 
-        <span className="absolute bottom-2 right-2 flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#333743]/60 text-white backdrop-blur-sm">
-          <Clock size={11} />
-          {tour.duration} days
-        </span>
+
       </div>
 
       {/* ── Right side ──────────────────────────────────────────────────── */}
