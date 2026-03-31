@@ -29,6 +29,12 @@ import {
 import { DayPicker, DateRange } from "react-day-picker";
 import { format, addMonths, startOfMonth, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
+// useIsMobile: returns true when viewport is < 768px (phone sizes)
+import { useIsMobile } from "../../../shared/components/ui/use-mobile";
+// Drawer: vaul-based bottom sheet — used to display the dates panel on mobile
+import {
+  Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose,
+} from "../../../shared/components/ui/drawer";
 import type { HolidaySearchCriteria } from "../../../App";
 
 // ── Destination + pricing data (imported from central mock files) ─────────────
@@ -82,6 +88,8 @@ export default function PackageSearchForm({
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  // true on screens narrower than 768px — drives all mobile-specific behaviour below
+  const isMobile = useIsMobile();
 
   // Generate 18 rolling months starting from today.
   // Prices come from MONTHLY_PRICES keyed by the selected destination code.
@@ -176,19 +184,37 @@ export default function PackageSearchForm({
   const cachedDests     = filteredDests.filter((d) => d.isCached);
   const nonCachedDests  = filteredDests.filter((d) => !d.isCached);
 
-  // Close all panels when clicking outside the form
+  // Close all panels when clicking outside the form.
+  // When the dates drawer is open on mobile, vaul handles its own dismissal
+  // (swipe down or tap the overlay). We skip our handler in that case so taps
+  // inside the drawer don't immediately fire setOpenPanel(null) before the
+  // calendar or month button click can register.
+  // Using openPanel + isMobile in the deps array ensures the handler always
+  // sees the latest values without stale-closure issues.
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
+      if (isMobile && openPanel === "dates") return;
+      const target = e.target as Element;
+      if (!containerRef.current?.contains(target)) {
         setOpenPanel(null);
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  }, [isMobile, openPanel]);
+
+  // On mobile, prevent the page from scrolling behind an open dropdown.
+  // We exclude the "dates" panel because vaul manages its own scroll lock
+  // internally — adding a second overflow:hidden on top of vaul's conflicts
+  // with touch handling inside the drawer.
+  useEffect(() => {
+    if (isMobile && openPanel !== null && openPanel !== "dates") {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isMobile, openPanel]);
 
   // ── Human-readable summary labels ────────────────────────────────────────
 
@@ -257,7 +283,11 @@ export default function PackageSearchForm({
   const h         = variant === "hero" ? "h-[52px]" : "h-[48px]";
   const r         = variant === "hero" ? "rounded-[12px]" : "rounded-[8px]";
   const labelCls  = "text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5";
-  const valueCls  = variant === "hero" ? "text-[14px] font-semibold" : "text-[13px] font-semibold";
+  // text-base (16px) on mobile: iOS Safari auto-zooms any input with font-size < 16px.
+  // md:text-[14px] / md:text-[13px] brings the tighter desktop size back at 768px+.
+  const valueCls  = variant === "hero"
+    ? "text-base md:text-[14px] font-semibold"
+    : "text-base md:text-[13px] font-semibold";
   const iconSize  = variant === "hero" ? 18 : 16;
   const fieldGap  = variant === "hero" ? "gap-3" : "gap-2";
 
@@ -270,6 +300,242 @@ export default function PackageSearchForm({
     }`;
 
   // ── Render ────────────────────────────────────────────────────────────────
+
+  // Shared inner content for the dates panel.
+  // Defined as a const here (not a separate component) so it can access all the
+  // component's state and computed values without needing extra props.
+  // It renders inside an absolute dropdown on desktop, or a bottom Drawer on mobile.
+  const datesPanelContent = (
+    <>
+      {/* Mode toggle — only visible for cached destinations */}
+      {isCached && (
+        <div className="flex border-b border-[#e0e2e8] px-2">
+          {(["specific", "flexible"] as const).map((mode) => (
+            <button
+              key={mode}
+              onClick={(e) => {
+                e.stopPropagation();
+                setDateMode(mode);
+              }}
+              className={`relative py-3 px-5 text-[13px] font-bold transition-colors ${
+                dateMode === mode
+                  ? "text-[#2681FF]"
+                  : "text-[#9598a4] hover:text-[#333743]"
+              }`}
+            >
+              {mode === "specific" ? "📅  Specific Date" : "✦  Flexible Dates"}
+              {dateMode === mode && (
+                <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#2681FF] rounded-full" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ── SPECIFIC DATE: DayPicker ── */}
+      {/* User picks a departure date only. The return date is auto-calculated
+          as departure + the selected number of nights from the Duration strip below.
+          For cached destinations (Cancún), each day cell also shows:
+            - the best available price for that departure date
+            - an amber tint on the cheapest day of each month ("best deal")
+            - a grey tint across the stay nights to visualise trip duration
+            - a blue ring on the return day */}
+      {dateMode === "specific" && (
+        <div className="p-4">
+          <style>{`
+            /* v9: root class is .rdp-root, not .rdp */
+            .rdp-root {
+              --rdp-accent-color: #2681FF;
+              --rdp-accent-background-color: rgba(38,129,255,0.10);
+              --rdp-day_button-border-radius: 8px;
+              margin: 0;
+            }
+            ${isCached && !isMobile ? `
+              /* Desktop only: 60px fixed cells for the price-per-day view */
+              .rdp-root {
+                --rdp-day-width: 60px;
+                --rdp-day-height: 60px;
+                --rdp-day_button-width: 58px;
+                --rdp-day_button-height: 58px;
+              }
+            ` : isMobile ? `
+              /* Mobile: cells fill the available drawer width dynamically.
+                 40px = 2 × 16px padding from the p-4 wrapper + a little breathing room.
+                 Dividing by 7 fills all 7 day columns perfectly on any phone width.
+                 Cached destinations get a taller cell (× 1.3) so the price text fits. */
+              .rdp-root {
+                --rdp-day-width: calc((100vw - 40px) / 7);
+                --rdp-day-height: ${isCached ? "calc((100vw - 40px) / 7 * 1.3)" : "calc((100vw - 40px) / 7)"};
+                --rdp-day_button-width: calc((100vw - 40px) / 7 - 2px);
+                --rdp-day_button-height: ${isCached ? "calc((100vw - 40px) / 7 * 1.3 - 2px)" : "calc((100vw - 40px) / 7 - 2px)"};
+              }
+            ` : ""}
+          `}</style>
+          <DayPicker
+            mode="single"
+            selected={dateRange?.from}
+            onSelect={(date) => {
+              if (!date) return;
+              // Auto-set the return date based on currently selected nights
+              setDateRange({ from: date, to: addDays(date, nights) });
+              // Close the panel immediately — date is applied, job done.
+              // (Matches the behaviour of the flexible dates "Apply" button.)
+              setOpenPanel(null);
+            }}
+            // Single month keeps the panel narrow so it never overflows the
+            // viewport. For the price-per-day view the taller cells (60px) make
+            // one month tall enough; users navigate with the ← → arrows.
+            // Non-cached destinations use the standard two-month layout.
+            numberOfMonths={1}
+            disabled={{ before: new Date() }}
+            // ── Modifiers add CSS backgrounds to specific day groups ──────
+            // Using modifiersStyles (inline styles) instead of Tailwind classes
+            // because DayPicker's own styles have higher specificity in some builds.
+            modifiers={isCached ? {
+              // Nights between departure and return
+              stay: stayDates,
+              // The return day itself
+              ...(returnDate ? { tripReturn: [returnDate] } : {}),
+              // The cheapest departure day(s) in each visible month.
+              // We exclude the currently selected date so DayPicker's own blue
+              // "selected" background is never overridden by our inline style.
+              bestDeal: dateRange?.from
+                ? bestDealDates.filter(
+                    d => format(d, "yyyy-MM-dd") !== format(dateRange.from!, "yyyy-MM-dd")
+                  )
+                : bestDealDates,
+            } : {}}
+            modifiersStyles={isCached ? {
+              // borderRadius must match --rdp-day_button-border-radius (8px).
+              // modifiersStyles targets the .rdp-day wrapper (the td), not the
+              // button inside — so we must set borderRadius here explicitly,
+              // otherwise the background is a square behind the rounded button.
+              stay:       { backgroundColor: "#f0f4f8", borderRadius: "8px" },
+              tripReturn: { backgroundColor: "#dbeafe", outline: "1px solid #93c5fd", outlineOffset: "-1px", borderRadius: "8px" },
+              bestDeal:   { backgroundColor: "#EFF6FF", borderRadius: "8px" },
+            } : {}}
+            // ── DayButton: inject day-number + price inside each cell ───
+            // react-day-picker v9 replaced DayContent with DayButton.
+            // DayButton replaces the whole button — we spread {...buttonProps}
+            // to preserve click, disabled, aria, and DayPicker's own class names,
+            // then add our custom content (day number + price) inside.
+            //
+            // day.isoDate is already "yyyy-MM-dd" (built into v9 CalendarDay).
+            // modifiers.selected / modifiers.disabled come from DayPicker.
+            components={isCached ? {
+              DayButton: ({ day, modifiers, ...buttonProps }) => {
+                const dateStr = day.isoDate;  // "yyyy-MM-dd", no format() needed
+                const price = departurePriceMap.get(dateStr);
+                const monthKey = dateStr.substring(0, 7);
+                // Is this the cheapest departure in its month?
+                const isBestDeal = price !== undefined && price === bestPricePerMonth.get(monthKey);
+                // modifiers.disabled → past date or otherwise unavailable
+                const isDisabled = modifiers.disabled ?? false;
+                return (
+                  <button {...buttonProps}>
+                    <span className="flex flex-col items-center justify-center gap-0 leading-none">
+                      {/* ★ badge — always blue, always visible on cheapest day */}
+                      {isBestDeal && !isDisabled && (
+                        <span className="text-[9px] font-black leading-none mb-0.5 text-[#2681FF]">
+                          ★
+                        </span>
+                      )}
+                      <span className="text-[13px]">{day.date.getDate()}</span>
+                      {price !== undefined && !isDisabled && (
+                        // 11px is readable inside a 60px cell
+                        <span className="text-[11px] font-bold leading-tight mt-0.5 text-[#2681FF]">
+                          {price >= 1000
+                            ? `£${(price / 1000).toFixed(1)}k`
+                            : `£${price}`}
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                );
+              }
+            } : undefined}
+          />
+        </div>
+      )}
+
+      {/* ── FLEXIBLE DATES: month grid ── */}
+      {/* w-full on mobile (stretches inside the drawer); md:w-[480px] restores the fixed width on desktop */}
+      {dateMode === "flexible" && (
+        <div className="p-4 w-full md:w-[480px]">
+          <p className="text-[12px] text-[#9598a4] mb-3">
+            Select one or more months to see the best deals
+          </p>
+          {/* 2 columns on mobile (month cards need space); 3 columns on md+ */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {months.map(({ key, label, price }) => {
+              const isSelected  = selectedMonths.includes(key);
+              const isAvailable = price !== null;
+              return (
+                <button
+                  key={key}
+                  disabled={!isAvailable}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isAvailable) toggleMonth(key);
+                  }}
+                  className={`flex items-center gap-2 px-3 py-2.5 rounded-[10px] border text-left transition-all ${
+                    isSelected
+                      ? "border-[#2681FF] bg-[#EFF6FF]"
+                      : isAvailable
+                      ? "border-[#e0e2e8] hover:border-[#2681FF] bg-white"
+                      : "border-[#f0f0f0] bg-[#fafafa] opacity-40 cursor-not-allowed"
+                  }`}
+                >
+                  {/* Checkbox */}
+                  <div
+                    className={`w-4 h-4 rounded-[4px] border flex items-center justify-center shrink-0 transition-colors ${
+                      isSelected
+                        ? "bg-[#2681FF] border-[#2681FF]"
+                        : "border-[#d0d5e0]"
+                    }`}
+                  >
+                    {isSelected && <Check size={9} className="text-white" />}
+                  </div>
+
+                  {/* Label + price */}
+                  <div className="flex flex-col min-w-0">
+                    <span
+                      className={`text-[13px] font-bold leading-tight ${
+                        isSelected
+                          ? "text-[#2681FF]"
+                          : isAvailable
+                          ? "text-[#333743]"
+                          : "text-[#9598a4]"
+                      }`}
+                    >
+                      {label}
+                    </span>
+                    {isAvailable && (
+                      <span className="text-[11px] text-[#667080] leading-tight">
+                        from £{price!.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {selectedMonths.length > 0 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenPanel(null);
+              }}
+              className="mt-4 w-full bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[14px] py-2.5 rounded-[10px] transition-colors"
+            >
+              Apply →
+            </button>
+          )}
+        </div>
+      )}
+    </>
+  );
 
   return (
     <div
@@ -360,7 +626,9 @@ export default function PackageSearchForm({
         </div>
 
         {openPanel === "to" && (
-          <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] py-2 min-w-[300px] max-h-[340px] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+          // left-0 right-0: stretches full width of the parent on mobile (avoids overflow).
+          // md:right-auto md:min-w-[300px]: restores the natural min-width on desktop.
+          <div className="absolute top-[calc(100%+8px)] left-0 right-0 z-50 bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] py-2 min-w-0 max-h-[340px] overflow-y-auto animate-in fade-in zoom-in-95 duration-150 md:right-auto md:min-w-[300px]">
             {filteredDests.length === 0 ? (
               <div className="px-4 py-3 text-[13px] text-[#9598a4]">
                 No destinations found
@@ -496,224 +764,36 @@ export default function PackageSearchForm({
           <ChevronDown size={14} className="text-[#9598a4] shrink-0" />
         </div>
 
-        {openPanel === "dates" && (
+        {/* Desktop: absolute dropdown, positioned below the field trigger */}
+        {!isMobile && openPanel === "dates" && (
           // max-h + overflow-y-auto: if the calendar is near the bottom of the
           // viewport it won't clip — the panel becomes scrollable instead.
           <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] animate-in fade-in zoom-in-95 duration-150 max-h-[calc(100vh-180px)] overflow-y-auto">
-
-            {/* Mode toggle — only visible for cached destinations */}
-            {isCached && (
-              <div className="flex border-b border-[#e0e2e8] px-2">
-                {(["specific", "flexible"] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDateMode(mode);
-                    }}
-                    className={`relative py-3 px-5 text-[13px] font-bold transition-colors ${
-                      dateMode === mode
-                        ? "text-[#2681FF]"
-                        : "text-[#9598a4] hover:text-[#333743]"
-                    }`}
-                  >
-                    {mode === "specific" ? "📅  Specific Date" : "✦  Flexible Dates"}
-                    {dateMode === mode && (
-                      <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#2681FF] rounded-full" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* ── SPECIFIC DATE: DayPicker ── */}
-            {/* User picks a departure date only. The return date is auto-calculated
-                as departure + the selected number of nights from the Duration strip below.
-                For cached destinations (Cancún), each day cell also shows:
-                  - the best available price for that departure date
-                  - an amber tint on the cheapest day of each month ("best deal")
-                  - a grey tint across the stay nights to visualise trip duration
-                  - a blue ring on the return day */}
-            {dateMode === "specific" && (
-              <div className="p-4">
-                <style>{`
-                  /* v9: root class is .rdp-root, not .rdp */
-                  .rdp-root {
-                    --rdp-accent-color: #2681FF;
-                    --rdp-accent-background-color: rgba(38,129,255,0.10);
-                    --rdp-day_button-border-radius: 8px;
-                    margin: 0;
-                  }
-                  ${isCached ? `
-                    /* Wider cells for the price-per-day view */
-                    .rdp-root {
-                      --rdp-day-width: 60px;
-                      --rdp-day-height: 60px;
-                      --rdp-day_button-width: 58px;
-                      --rdp-day_button-height: 58px;
-                    }
-                  ` : ""}
-                `}</style>
-                <DayPicker
-                  mode="single"
-                  selected={dateRange?.from}
-                  onSelect={(date) => {
-                    if (!date) return;
-                    // Auto-set the return date based on currently selected nights
-                    setDateRange({ from: date, to: addDays(date, nights) });
-                  }}
-                  // Single month keeps the panel narrow so it never overflows the
-                  // viewport. For the price-per-day view the taller cells (60px) make
-                  // one month tall enough; users navigate with the ← → arrows.
-                  // Non-cached destinations use the standard two-month layout.
-                  numberOfMonths={1}
-                  disabled={{ before: new Date() }}
-                  // ── Modifiers add CSS backgrounds to specific day groups ──────
-                  // Using modifiersStyles (inline styles) instead of Tailwind classes
-                  // because DayPicker's own styles have higher specificity in some builds.
-                  modifiers={isCached ? {
-                    // Nights between departure and return
-                    stay: stayDates,
-                    // The return day itself
-                    ...(returnDate ? { tripReturn: [returnDate] } : {}),
-                    // The cheapest departure day(s) in each visible month.
-                    // We exclude the currently selected date so DayPicker's own blue
-                    // "selected" background is never overridden by our inline style.
-                    bestDeal: dateRange?.from
-                      ? bestDealDates.filter(
-                          d => format(d, "yyyy-MM-dd") !== format(dateRange.from!, "yyyy-MM-dd")
-                        )
-                      : bestDealDates,
-                  } : {}}
-                  modifiersStyles={isCached ? {
-                    // borderRadius must match --rdp-day_button-border-radius (8px).
-                    // modifiersStyles targets the .rdp-day wrapper (the td), not the
-                    // button inside — so we must set borderRadius here explicitly,
-                    // otherwise the background is a square behind the rounded button.
-                    stay:       { backgroundColor: "#f0f4f8", borderRadius: "8px" },
-                    tripReturn: { backgroundColor: "#dbeafe", outline: "1px solid #93c5fd", outlineOffset: "-1px", borderRadius: "8px" },
-                    bestDeal:   { backgroundColor: "#EFF6FF", borderRadius: "8px" },
-                  } : {}}
-                  // ── DayButton: inject day-number + price inside each cell ───
-                  // react-day-picker v9 replaced DayContent with DayButton.
-                  // DayButton replaces the whole button — we spread {...buttonProps}
-                  // to preserve click, disabled, aria, and DayPicker's own class names,
-                  // then add our custom content (day number + price) inside.
-                  //
-                  // day.isoDate is already "yyyy-MM-dd" (built into v9 CalendarDay).
-                  // modifiers.selected / modifiers.disabled come from DayPicker.
-                  components={isCached ? {
-                    DayButton: ({ day, modifiers, ...buttonProps }) => {
-                      const dateStr = day.isoDate;  // "yyyy-MM-dd", no format() needed
-                      const price = departurePriceMap.get(dateStr);
-                      const monthKey = dateStr.substring(0, 7);
-                      // Is this the cheapest departure in its month?
-                      const isBestDeal = price !== undefined && price === bestPricePerMonth.get(monthKey);
-                      // modifiers.disabled → past date or otherwise unavailable
-                      const isDisabled = modifiers.disabled ?? false;
-                      return (
-                        <button {...buttonProps}>
-                          <span className="flex flex-col items-center justify-center gap-0 leading-none">
-                            {/* ★ badge — always blue, always visible on cheapest day */}
-                            {isBestDeal && !isDisabled && (
-                              <span className="text-[9px] font-black leading-none mb-0.5 text-[#2681FF]">
-                                ★
-                              </span>
-                            )}
-                            <span className="text-[13px]">{day.date.getDate()}</span>
-                            {price !== undefined && !isDisabled && (
-                              // 11px is readable inside a 60px cell
-                              <span className="text-[11px] font-bold leading-tight mt-0.5 text-[#2681FF]">
-                                {price >= 1000
-                                  ? `£${(price / 1000).toFixed(1)}k`
-                                  : `£${price}`}
-                              </span>
-                            )}
-                          </span>
-                        </button>
-                      );
-                    }
-                  } : undefined}
-                />
-              </div>
-            )}
-
-            {/* ── FLEXIBLE DATES: month grid ── */}
-            {dateMode === "flexible" && (
-              <div className="p-4 w-[480px]">
-                <p className="text-[12px] text-[#9598a4] mb-3">
-                  Select one or more months to see the best deals
-                </p>
-                <div className="grid grid-cols-3 gap-2">
-                  {months.map(({ key, label, price }) => {
-                    const isSelected  = selectedMonths.includes(key);
-                    const isAvailable = price !== null;
-                    return (
-                      <button
-                        key={key}
-                        disabled={!isAvailable}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (isAvailable) toggleMonth(key);
-                        }}
-                        className={`flex items-center gap-2 px-3 py-2.5 rounded-[10px] border text-left transition-all ${
-                          isSelected
-                            ? "border-[#2681FF] bg-[#EFF6FF]"
-                            : isAvailable
-                            ? "border-[#e0e2e8] hover:border-[#2681FF] bg-white"
-                            : "border-[#f0f0f0] bg-[#fafafa] opacity-40 cursor-not-allowed"
-                        }`}
-                      >
-                        {/* Checkbox */}
-                        <div
-                          className={`w-4 h-4 rounded-[4px] border flex items-center justify-center shrink-0 transition-colors ${
-                            isSelected
-                              ? "bg-[#2681FF] border-[#2681FF]"
-                              : "border-[#d0d5e0]"
-                          }`}
-                        >
-                          {isSelected && <Check size={9} className="text-white" />}
-                        </div>
-
-                        {/* Label + price */}
-                        <div className="flex flex-col min-w-0">
-                          <span
-                            className={`text-[13px] font-bold leading-tight ${
-                              isSelected
-                                ? "text-[#2681FF]"
-                                : isAvailable
-                                ? "text-[#333743]"
-                                : "text-[#9598a4]"
-                            }`}
-                          >
-                            {label}
-                          </span>
-                          {isAvailable && (
-                            <span className="text-[11px] text-[#667080] leading-tight">
-                              from £{price!.toLocaleString()}
-                            </span>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {selectedMonths.length > 0 && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenPanel(null);
-                    }}
-                    className="mt-4 w-full bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[14px] py-2.5 rounded-[10px] transition-colors"
-                  >
-                    Apply →
-                  </button>
-                )}
-              </div>
-            )}
-
+            {datesPanelContent}
           </div>
+        )}
+
+        {/* Mobile: vaul bottom Drawer — slides up from the bottom of the screen.
+            open/onOpenChange map directly to our existing openPanel state so we
+            don't need any extra state. User can also swipe down to dismiss. */}
+        {isMobile && (
+          <Drawer
+            open={openPanel === "dates"}
+            onOpenChange={(open) => { if (!open) setOpenPanel(null); }}
+          >
+            <DrawerContent>
+              <DrawerHeader className="flex flex-row items-center justify-between pb-0">
+                <DrawerTitle className="text-[15px] font-bold text-[#333743]">Select dates</DrawerTitle>
+                <DrawerClose asChild>
+                  <button className="text-[#9598a4] p-1"><X size={18} /></button>
+                </DrawerClose>
+              </DrawerHeader>
+              {/* overflow-y-auto allows the calendar to scroll if it's taller than the drawer */}
+              <div className="overflow-y-auto">
+                {datesPanelContent}
+              </div>
+            </DrawerContent>
+          </Drawer>
         )}
       </div>
 

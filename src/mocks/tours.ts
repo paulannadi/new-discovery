@@ -315,8 +315,6 @@ export const SWISS_WINTER_TOUR: Tour = {
       description: "4h Glacier Express — the world's most scenic train journey",
     },
   ],
-  // No specific destination in our list — shown on Discovery but not in Holiday List destination searches
-  destinationCodes: [],
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
