@@ -729,7 +729,7 @@ export default function PackageDetailPage({
                   className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
                 />
                 {/* Subtle gradient for the bottom edge legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#333743]/25 via-transparent to-transparent pointer-events-none" />
               </div>
 
               {/* 2×2 thumbnail grid — desktop only */}
@@ -1092,7 +1092,7 @@ export default function PackageDetailPage({
                     alt="Hotel area map"
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#333743]/25 via-transparent to-transparent pointer-events-none" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="bg-white rounded-full p-2.5 shadow-xl">
                       <MapPin size={22} className="text-[#2681FF]" />

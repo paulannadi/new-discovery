@@ -21,6 +21,7 @@ import {
   Mountain,
   Camera,
   Star,
+  Calendar,
 } from "lucide-react";
 import type { Tour } from "../../../types";
 
@@ -71,11 +72,11 @@ export function TourCard({ tour, onSelect, onHover, isHovered }: TourCardProps) 
   // Build the route string from stop names: "Lucerne → Interlaken → Brig → Chur"
   const route = tour.stops.map((s) => s.destinationName).join(" → ");
 
-  // Trip type badge config — same icon/colours as PackageCard's TRIP_TYPE_CONFIG
+  // Trip type badge config — icon and text are both black to match the card tag style
   const tripTypeBadge =
     tour.tripType === "group-tour"
-      ? { icon: <Users size={11} />, label: "Group Tour", iconColor: "text-purple-600" }
-      : { icon: <User size={11} />, label: "Individual Tour", iconColor: "text-green-600" };
+      ? { icon: <Users size={11} />, label: "Group Tour" }
+      : { icon: <User size={11} />, label: "Individual Tour" };
 
   return (
     <div
@@ -102,14 +103,14 @@ export function TourCard({ tour, onSelect, onHover, isHovered }: TourCardProps) 
         />
 
         {/* Trip type badge — top-left overlay (same white chip pattern as PackageCard) */}
-        <span className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-white text-black">
-          <span className={tripTypeBadge.iconColor}>{tripTypeBadge.icon}</span>
+        <span className="absolute top-2 left-2 flex items-center gap-1 px-[10px] py-[4px] rounded-full text-[12px] font-normal bg-white text-[#333743]">
+          {tripTypeBadge.icon}
           {tripTypeBadge.label}
         </span>
 
         {/* Duration badge — bottom-right of image.
             Shows "8 days" prominently so agents can scan quickly. */}
-        <span className="absolute bottom-2 right-2 flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/60 text-white backdrop-blur-sm">
+        <span className="absolute bottom-2 right-2 flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#333743]/60 text-white backdrop-blur-sm">
           <Clock size={11} />
           {tour.duration} days
         </span>
@@ -125,22 +126,23 @@ export function TourCard({ tour, onSelect, onHover, isHovered }: TourCardProps) 
 
         {/* Route breadcrumb — shows all destination names in sequence.
             Uses a ChevronRight icon between each stop for clarity. */}
-        <div className="flex items-center flex-wrap gap-1 text-[13px] text-[#333743]">
-          <MapPin size={13} className="text-[#2681FF] shrink-0" />
+        <div className="flex items-center flex-wrap gap-1 text-[12px] text-[#333743]">
+          <MapPin size={13} className="text-[#333743] shrink-0" />
           {tour.stops.map((stop, i) => (
             <span key={stop.destinationName} className="flex items-center gap-1">
               <span className="font-medium">{stop.destinationName}</span>
               {/* Show a chevron between stops, but not after the last one */}
               {i < tour.stops.length - 1 && (
-                <ChevronRight size={12} className="text-[#999]" />
+                <ChevronRight size={12} className="text-[#333743]" />
               )}
             </span>
           ))}
         </div>
 
         {/* Travel period — start and end dates */}
-        <p className="text-[12px] text-[#555e6d]">
-          {tour.startDate} – {tour.endDate} · {tour.adults} {tour.adults === 1 ? "adult" : "adults"}
+        <p className="flex items-center gap-1 text-[12px] text-[#333743]">
+          <Calendar size={12} className="shrink-0 text-[#333743]" />
+          {tour.startDate} – {tour.endDate}
         </p>
 
         {/* Highlight chips — same pill style as amenity chips in PackageCard.

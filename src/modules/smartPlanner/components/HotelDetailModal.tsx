@@ -168,7 +168,7 @@ export function HotelDetailModal({ pkg, open, onClose, searchCriteria }: HotelDe
   return (
     // Modal backdrop — clicking outside closes the modal
     <div
-      className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-[#333743]/60 flex items-center justify-center p-4"
       onClick={onClose}
     >
       {/* Modal content — stop clicks from bubbling to backdrop */}

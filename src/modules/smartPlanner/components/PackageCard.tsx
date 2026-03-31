@@ -133,10 +133,10 @@ export function PackageCard({ pkg, onSelect, onHover, isHovered, isPricePending 
             Tells agents at a glance what kind of holiday this is. */}
         {pkg.tripType && (() => {
           const cfg = TRIP_TYPE_CONFIG[pkg.tripType];
-          // White chip with black label — colour lives only on the icon
+          // White chip — icon and text are both black
           return (
-            <span className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-white text-black">
-              <span className={cfg.iconColor}>{cfg.icon}</span>
+            <span className="absolute top-2 left-2 flex items-center gap-1 px-[10px] py-[4px] rounded-full text-[12px] font-normal bg-white text-[#333743]">
+              {cfg.icon}
               {cfg.label}
             </span>
           );
@@ -182,13 +182,13 @@ export function PackageCard({ pkg, onSelect, onHover, isHovered, isPricePending 
 
           {/* Location + dates — col-span-2 = full card width.
               flex-col: location on its own full-width row, date on the next. */}
-          <div className="col-span-2 flex flex-col gap-y-0.5 text-[12px] text-[#333743]">
+          <div className="col-span-2 flex flex-col gap-y-2 text-[12px] text-[#333743]">
             <span className="flex items-center gap-1">
-              <MapPin size={12} className="shrink-0 text-black" />
+              <MapPin size={12} className="shrink-0 text-[#333743]" />
               {pkg.hotel.location}
             </span>
             <span className="flex items-center gap-1">
-              <CalendarIcon size={12} className="shrink-0 text-black" />
+              <CalendarIcon size={12} className="shrink-0 text-[#333743]" />
               {dateLabel}
             </span>
           </div>

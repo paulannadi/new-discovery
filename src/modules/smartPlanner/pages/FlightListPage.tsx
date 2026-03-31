@@ -174,7 +174,7 @@ function FlightCard({
   onSelect: () => void;
 }) {
   return (
-    <div className="bg-white rounded-[16px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow duration-200 overflow-hidden">
+    <div className="bg-white rounded-[16px] border border-[#e0e2e8] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 ease-out overflow-hidden">
       <div className="p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-4">
 
         {/* Left: airline info + flight bar */}

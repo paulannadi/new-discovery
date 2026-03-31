@@ -524,43 +524,43 @@ function CardsCcDinersClubSvg() {
         <g clipPath="url(#clip0_74_380)" id="cards-cc_diners_club.svg">
           <path d={svgPaths.p2ae0d140} fill="var(--fill-0, #0069AA)" id="Vector" />
           <path d={svgPaths.p21882780} fill="var(--fill-0, white)" id="Vector_2" />
-          <path d={svgPaths.p21532e00} fill="var(--fill-0, black)" id="Vector_3" />
-          <path d={svgPaths.p5a1cb00} fill="var(--fill-0, black)" id="Vector_4" />
-          <path d={svgPaths.p1282ba00} fill="var(--fill-0, black)" id="Vector_5" />
-          <path d={svgPaths.p20d00e00} fill="var(--fill-0, black)" id="Vector_6" />
-          <path d={svgPaths.p18d19b80} fill="var(--fill-0, black)" id="Vector_7" />
-          <path d={svgPaths.p23fa1d00} fill="var(--fill-0, black)" id="Vector_8" />
-          <path d={svgPaths.pbdace80} fill="var(--fill-0, black)" id="Vector_9" />
-          <path d={svgPaths.p7be1f00} fill="var(--fill-0, black)" id="Vector_10" />
-          <path d={svgPaths.p39960280} fill="var(--fill-0, black)" id="Vector_11" />
-          <path d={svgPaths.p10ec0700} fill="var(--fill-0, black)" id="Vector_12" />
-          <path d={svgPaths.p36046500} fill="var(--fill-0, black)" id="Vector_13" />
-          <path d={svgPaths.p4f6a300} fill="var(--fill-0, black)" id="Vector_14" />
-          <path d={svgPaths.p19a1ab40} fill="var(--fill-0, black)" id="Vector_15" />
-          <path d={svgPaths.p262da00} fill="var(--fill-0, black)" id="Vector_16" />
-          <path d={svgPaths.p30a08b00} fill="var(--fill-0, black)" id="Vector_17" />
-          <path d={svgPaths.p3b72580} fill="var(--fill-0, black)" id="Vector_18" />
-          <path d={svgPaths.pc98cd00} fill="var(--fill-0, black)" id="Vector_19" />
-          <path d={svgPaths.p1d859e00} fill="var(--fill-0, black)" id="Vector_20" />
-          <path d={svgPaths.p29a87300} fill="var(--fill-0, black)" id="Vector_21" />
-          <path d={svgPaths.p3ea5b900} fill="var(--fill-0, black)" id="Vector_22" />
-          <path d={svgPaths.p168552c0} fill="var(--fill-0, black)" id="Vector_23" />
-          <path d={svgPaths.p27ddd180} fill="var(--fill-0, black)" id="Vector_24" />
-          <path d={svgPaths.p36d04500} fill="var(--fill-0, black)" id="Vector_25" />
-          <path d={svgPaths.p3e0b5600} fill="var(--fill-0, black)" id="Vector_26" />
-          <path d={svgPaths.p2fa77640} fill="var(--fill-0, black)" id="Vector_27" />
-          <path d={svgPaths.p315f2a80} fill="var(--fill-0, black)" id="Vector_28" />
-          <path d={svgPaths.p3e5706a0} fill="var(--fill-0, black)" id="Vector_29" />
-          <path d={svgPaths.p1e58bec0} fill="var(--fill-0, black)" id="Vector_30" />
-          <path d={svgPaths.p2ef68100} fill="var(--fill-0, black)" id="Vector_31" />
-          <path d={svgPaths.p26957400} fill="var(--fill-0, black)" id="Vector_32" />
-          <path d={svgPaths.p1882b900} fill="var(--fill-0, black)" id="Vector_33" />
-          <path d={svgPaths.pf677e00} fill="var(--fill-0, black)" id="Vector_34" />
-          <path d={svgPaths.p2b3db480} fill="var(--fill-0, black)" id="Vector_35" />
-          <path d={svgPaths.p36c0c00} fill="var(--fill-0, black)" id="Vector_36" />
-          <path d={svgPaths.p121bb300} fill="var(--fill-0, black)" id="Vector_37" />
-          <path d={svgPaths.p342d5300} fill="var(--fill-0, black)" id="Vector_38" />
-          <path d={svgPaths.p3fba0dc0} fill="var(--fill-0, black)" id="Vector_39" />
+          <path d={svgPaths.p21532e00} fill="var(--fill-0, #333743)" id="Vector_3" />
+          <path d={svgPaths.p5a1cb00} fill="var(--fill-0, #333743)" id="Vector_4" />
+          <path d={svgPaths.p1282ba00} fill="var(--fill-0, #333743)" id="Vector_5" />
+          <path d={svgPaths.p20d00e00} fill="var(--fill-0, #333743)" id="Vector_6" />
+          <path d={svgPaths.p18d19b80} fill="var(--fill-0, #333743)" id="Vector_7" />
+          <path d={svgPaths.p23fa1d00} fill="var(--fill-0, #333743)" id="Vector_8" />
+          <path d={svgPaths.pbdace80} fill="var(--fill-0, #333743)" id="Vector_9" />
+          <path d={svgPaths.p7be1f00} fill="var(--fill-0, #333743)" id="Vector_10" />
+          <path d={svgPaths.p39960280} fill="var(--fill-0, #333743)" id="Vector_11" />
+          <path d={svgPaths.p10ec0700} fill="var(--fill-0, #333743)" id="Vector_12" />
+          <path d={svgPaths.p36046500} fill="var(--fill-0, #333743)" id="Vector_13" />
+          <path d={svgPaths.p4f6a300} fill="var(--fill-0, #333743)" id="Vector_14" />
+          <path d={svgPaths.p19a1ab40} fill="var(--fill-0, #333743)" id="Vector_15" />
+          <path d={svgPaths.p262da00} fill="var(--fill-0, #333743)" id="Vector_16" />
+          <path d={svgPaths.p30a08b00} fill="var(--fill-0, #333743)" id="Vector_17" />
+          <path d={svgPaths.p3b72580} fill="var(--fill-0, #333743)" id="Vector_18" />
+          <path d={svgPaths.pc98cd00} fill="var(--fill-0, #333743)" id="Vector_19" />
+          <path d={svgPaths.p1d859e00} fill="var(--fill-0, #333743)" id="Vector_20" />
+          <path d={svgPaths.p29a87300} fill="var(--fill-0, #333743)" id="Vector_21" />
+          <path d={svgPaths.p3ea5b900} fill="var(--fill-0, #333743)" id="Vector_22" />
+          <path d={svgPaths.p168552c0} fill="var(--fill-0, #333743)" id="Vector_23" />
+          <path d={svgPaths.p27ddd180} fill="var(--fill-0, #333743)" id="Vector_24" />
+          <path d={svgPaths.p36d04500} fill="var(--fill-0, #333743)" id="Vector_25" />
+          <path d={svgPaths.p3e0b5600} fill="var(--fill-0, #333743)" id="Vector_26" />
+          <path d={svgPaths.p2fa77640} fill="var(--fill-0, #333743)" id="Vector_27" />
+          <path d={svgPaths.p315f2a80} fill="var(--fill-0, #333743)" id="Vector_28" />
+          <path d={svgPaths.p3e5706a0} fill="var(--fill-0, #333743)" id="Vector_29" />
+          <path d={svgPaths.p1e58bec0} fill="var(--fill-0, #333743)" id="Vector_30" />
+          <path d={svgPaths.p2ef68100} fill="var(--fill-0, #333743)" id="Vector_31" />
+          <path d={svgPaths.p26957400} fill="var(--fill-0, #333743)" id="Vector_32" />
+          <path d={svgPaths.p1882b900} fill="var(--fill-0, #333743)" id="Vector_33" />
+          <path d={svgPaths.pf677e00} fill="var(--fill-0, #333743)" id="Vector_34" />
+          <path d={svgPaths.p2b3db480} fill="var(--fill-0, #333743)" id="Vector_35" />
+          <path d={svgPaths.p36c0c00} fill="var(--fill-0, #333743)" id="Vector_36" />
+          <path d={svgPaths.p121bb300} fill="var(--fill-0, #333743)" id="Vector_37" />
+          <path d={svgPaths.p342d5300} fill="var(--fill-0, #333743)" id="Vector_38" />
+          <path d={svgPaths.p3fba0dc0} fill="var(--fill-0, #333743)" id="Vector_39" />
         </g>
         <defs>
           <clipPath id="clip0_74_380">
@@ -608,7 +608,7 @@ function Group4() {
     <div className="absolute inset-[0_0.05%]" data-name="Group">
       <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 101.233 64">
         <g id="Group">
-          <path d="M101.233 0H0V64H101.233V0Z" fill="var(--fill-0, black)" id="XMLID_21_" />
+          <path d="M101.233 0H0V64H101.233V0Z" fill="var(--fill-0, #333743)" id="XMLID_21_" />
         </g>
       </svg>
     </div>

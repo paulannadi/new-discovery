@@ -634,7 +634,7 @@ export default function DiscoveryPage({
             alt="Discover the world"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/25 to-black/10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#333743]/25 to-black/10" />
         </motion.div>
 
         <div className={`relative z-10 flex flex-col ${aiExperienceMode ? "h-full" : ""}`}>

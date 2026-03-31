@@ -258,7 +258,7 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
           alt={room.name} 
           className="w-full h-full object-cover absolute inset-0"
         />
-        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute inset-0 bg-[#333743]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
         
         {/* Selected Badge */}
         {isSelected && (

@@ -211,7 +211,7 @@ const RadioRow = ({ label, checked, onChange }: { label: string, checked: boolea
 const HotelCard = ({ hotel, displayPrice, onSelect, onHover, isHovered }: { hotel: Hotel, displayPrice: number, onSelect: () => void, onHover?: (hovering: boolean) => void, isHovered?: boolean }) => {
   return (
     <div
-      className={`bg-white rounded-[16px] overflow-hidden flex flex-col lg:flex-row shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1)] hover:shadow-[0px_8px_24px_0px_rgba(0,0,0,0.12)] transition-all cursor-pointer group border ${isHovered ? 'border-[#e0e2e8]' : 'border-transparent'}`}
+      className={`bg-white rounded-[16px] overflow-hidden flex flex-col lg:flex-row shadow-sm transition-all duration-300 ease-out cursor-pointer group border ${isHovered ? 'border-[#2681FF] shadow-lg -translate-y-0.5' : 'border-[#e0e2e8] hover:shadow-lg hover:-translate-y-0.5'}`}
       onClick={onSelect}
       onMouseEnter={() => onHover?.(true)}
       onMouseLeave={() => onHover?.(false)}
@@ -1295,7 +1295,7 @@ export default function HotelListPage({
 
       {/* Mobile Sort Takeover */}
       {isMobileSortOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-black/50 flex flex-col justify-end animate-in fade-in duration-200">
+        <div className="md:hidden fixed inset-0 z-50 bg-[#333743]/50 flex flex-col justify-end animate-in fade-in duration-200">
            {/* Backdrop click to close */}
            <div className="absolute inset-0" onClick={() => setIsMobileSortOpen(false)} />
            

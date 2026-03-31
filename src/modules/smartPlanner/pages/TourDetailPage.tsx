@@ -165,7 +165,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   alt={tour.title}
                   className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#333743]/30 via-transparent to-transparent" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                     <Play size={20} className="text-[#1a1a1a] ml-1" fill="#1a1a1a" />
