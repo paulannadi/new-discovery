@@ -2,7 +2,6 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { BackButton } from "../../../shared/components/BackButton";
 import {
   MapPin,
-  Star,
   Wifi,
   Waves,
   Dumbbell,
@@ -510,139 +509,147 @@ export default function HotelDetailPage({
     <div className="bg-[#F3F5F6] min-h-screen">
       <Toaster position="bottom-right" />
       
-      {/* Top Info Section - White Background */}
-      <div className="w-full bg-white">
-        <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] py-[40px] flex flex-col gap-8">
-        
-        {/* Back to all hotels */}
-        <BackButton label="Back to all hotels" onClick={onBack} />
+      {/* ── WHITE INFO CARD — structure matches PackageDetailPage ────────── */}
+      <div className="bg-white">
+        <div className="max-w-[1280px] mx-auto">
 
-        {/* Gallery Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 h-[220px] sm:h-[300px] lg:h-[400px]">
-          {/* Left: Large Image */}
-          <div className="h-full rounded-[24px] overflow-hidden relative">
-             <img 
-               src={hotel.image}
-               className="w-full h-full object-cover"
-               alt="Exterior"
-             />
+          {/* Back button — own container with responsive horizontal padding */}
+          <div className="px-4 sm:px-6 md:px-10 pt-5 pb-5">
+            <BackButton label="Back to all hotels" onClick={onBack} />
           </div>
-          
-          {/* Right: Split Column — hidden on smaller screens, only shown on lg+ */}
-          <div className="hidden lg:grid grid-cols-2 gap-2 h-full">
-            {/* Middle Column: Stacked Images */}
-            <div className="flex flex-col gap-2 h-full">
-               <div className="flex-1 rounded-[24px] overflow-hidden relative">
-                 <img 
-                   src="https://images.unsplash.com/photo-1763207291832-819499e261dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJlc3RhdXJhbnQlMjBicmVha2Zhc3QlMjBidWZmZXR8ZW58MXx8fHwxNzY5NzgxMzM2fDA&ixlib=rb-4.1.0&q=80&w=1080"
-                   className="w-full h-full object-cover"
-                   alt="Interior"
-                 />
-               </div>
-               <div className="flex-1 rounded-[24px] overflow-hidden relative">
-                 <img 
-                   src="https://images.unsplash.com/photo-1729605411476-defbdab14c54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMGJhbGklMjBwb29sJTIwaW5maW5pdHl8ZW58MXx8fHwxNzY5NzgxMzM2fDA&ixlib=rb-4.1.0&q=80&w=1080"
-                   className="w-full h-full object-cover"
-                   alt="Pool"
-                 />
-               </div>
-            </div>
-            
-            {/* Right Column: Map */}
-            <div className="h-full rounded-[8px] overflow-hidden relative border border-[#e0e2e8]">
-              <img 
-                src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.1.0&auto=format&fit=crop&w=600&q=80"
-                className="w-full h-full object-cover"
-                alt="Map"
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                 <div className="bg-white p-2 rounded-full shadow-lg">
-                   <MapPin className="text-[#2681ff]" size={24} />
-                 </div>
+
+          {/* ── HERO GALLERY ─────────────────────────────────────────────────
+              Inset with mx-4 sm:mx-6 md:mx-10 so gallery edges align with the
+              info row padding below — matches PackageDetailPage exactly.
+              Grid switches to [3fr_2fr] at md breakpoint (same as reference).
+          ─────────────────────────────────────────────────────────────────── */}
+          <div className="relative mx-4 sm:mx-6 md:mx-10 mb-2">
+            <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[280px] md:h-[402px] gap-2">
+              {/* Left: Main hero image */}
+              <div className="relative overflow-hidden rounded-[16px] group">
+                <img
+                  src={hotel.image}
+                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
+                  alt="Exterior"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#333743]/25 via-transparent to-transparent pointer-events-none" />
+              </div>
+
+              {/* Right: 2×2 thumbnail grid — hidden on mobile, visible on md+ */}
+              <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-2">
+                <div className="overflow-hidden rounded-[16px]">
+                  <img
+                    src="https://images.unsplash.com/photo-1763207291832-819499e261dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJlc3RhdXJhbnQlMjBicmVha2Zhc3QlMjBidWZmZXR8ZW58MXx8fHwxNzY5NzgxMzM2fDA&ixlib=rb-4.1.0&q=80&w=1080"
+                    className="w-full h-full object-cover"
+                    alt="Interior"
+                  />
+                </div>
+                <div className="overflow-hidden rounded-[16px]">
+                  <img
+                    src="https://images.unsplash.com/photo-1729605411476-defbdab14c54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMGJhbGklMjBwb29sJTIwaW5maW5pdHl8ZW58MXx8fHwxNzY5NzgxMzM2fDA&ixlib=rb-4.1.0&q=80&w=1080"
+                    className="w-full h-full object-cover"
+                    alt="Pool"
+                  />
+                </div>
+                {/* Map thumbnail */}
+                <div className="overflow-hidden rounded-[16px] relative border border-[#e0e2e8]">
+                  <img
+                    src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.1.0&auto=format&fit=crop&w=600&q=80"
+                    className="w-full h-full object-cover"
+                    alt="Map"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white p-2 rounded-full shadow-lg">
+                      <MapPin size={22} className="text-[#2681FF]" />
+                    </div>
+                  </div>
+                </div>
+                {/* 4th slot — empty filler to complete the 2×2 grid */}
+                <div className="overflow-hidden rounded-[16px] bg-[#f3f5f6]" />
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Hotel Info Header */}
-        <div className="flex flex-col gap-4 pb-8">
-          {/* On mobile this stacks vertically; on sm+ it's side-by-side */}
-          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-0">
-            <div className="flex flex-col gap-1.5">
-              {/* Rating badge row — matches PackageDetailPage style */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <div className="flex items-center gap-2">
-                  <div className="bg-[#19A974] text-white text-[12px] font-bold px-2 py-0.5 rounded-[8px] leading-tight">
-                    {hotel.rating}
+          {/* ── HOTEL INFO + ACTION ROW ───────────────────────────────────────
+              Two-column grid matching PackageDetailPage:
+              Left col (flex-1): identity — rating, name, location, amenities
+              Right col (auto): share + book actions aligned to the right on lg+
+              Horizontal padding matches the back button and gallery above.
+          ─────────────────────────────────────────────────────────────────── */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 lg:gap-12 px-4 sm:px-6 md:px-10 py-5 md:py-8">
+
+            {/* LEFT: Hotel identity */}
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                {/* Rating badge row */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-[#19A974] text-white text-[12px] font-bold px-2 py-0.5 rounded-[8px] leading-tight">
+                      {hotel.rating}
+                    </div>
+                    <span className="text-[13px] font-bold text-[#333743]">
+                      {ratingLabel(hotel.rating)}
+                    </span>
                   </div>
-                  <span className="text-[13px] font-bold text-[#333743]">
-                    {ratingLabel(hotel.rating)}
+                  <span className="text-[13px] text-[#333743] underline">
+                    {hotel.reviewCount.toLocaleString()} reviews
                   </span>
                 </div>
-                <span className="text-[13px] text-[#333743] underline">
-                  {hotel.reviewCount.toLocaleString()} reviews
-                </span>
+
+                {/* Hotel name + stars */}
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <h1 className="text-[24px] sm:text-[32px] md:text-[40px] font-bold text-[#333743] leading-[1.1] tracking-tight">{hotel.name}</h1>
+                  <span className="text-[#FFB700] text-[16px] tracking-tight leading-none shrink-0">
+                    {"★".repeat(hotel.stars)}{"☆".repeat(Math.max(0, 5 - hotel.stars))}
+                  </span>
+                </div>
               </div>
 
-              {/* Hotel name + stars */}
-              <div className="flex items-baseline gap-3 flex-wrap">
-                <h1 className="text-[#333743] font-black text-[32px] leading-[46px]">{hotel.name}</h1>
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={18}
-                      className={`${i < hotel.stars ? 'fill-[#FFB700] text-[#FFB700]' : 'fill-[#e0e2e8] text-[#e0e2e8]'}`}
-                    />
-                  ))}
-                </div>
+              {/* Address */}
+              <div className="flex items-center gap-1.5 text-[#333743] flex-wrap">
+                <MapPin size={15} className="shrink-0" />
+                <span className="text-[16px]">{hotel.location}</span>
+              </div>
+
+              {/* Amenities heading */}
+              <h3 className="text-[18px] font-bold text-[#333743]">Hotel amenities and facilities</h3>
+
+              {/* Amenities list */}
+              <div className="flex flex-row flex-wrap gap-x-6 gap-y-2">
+                {hotel.amenities.slice(0, 4).map((amenity, i) => (
+                  <div key={i} className="flex items-center gap-1.5">
+                    {amenity === "Pet friendly" && <Dog size={15} className="text-[#333743]" />}
+                    {amenity === "Free Wifi" && <Wifi size={15} className="text-[#333743]" />}
+                    {amenity === "Indoor pool" && <Waves size={15} className="text-[#333743]" />}
+                    {amenity === "Gym" && <Dumbbell size={15} className="text-[#333743]" />}
+                    {["Pet friendly", "Free Wifi", "Indoor pool", "Gym"].indexOf(amenity) === -1 && <Check size={15} className="text-[#333743]" />}
+                    <span className="text-[14px] text-[#333743] font-medium">{amenity}</span>
+                  </div>
+                ))}
+                {hotel.amenities.length > 4 && (
+                  <button className="text-[#2681ff] font-bold text-[14px]">See all</button>
+                )}
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <button className="w-[40px] h-[40px] flex items-center justify-center border border-[#e0e2e8] rounded-[8px] text-[#333743] hover:bg-gray-50">
-                 <Share size={20} />
-              </button>
-              <button className="bg-[#2681ff] text-white font-bold px-4 py-2 rounded-[8px] text-[15px] h-[40px] w-[152px]">
-                Book for ${hotel.price}
-              </button>
-            </div>
-          </div>
-
-          {/* Address */}
-          <div className="flex items-center gap-2 text-[#333743]">
-            <MapPin size={20} />
-            <span className="text-[16px]">{hotel.location}</span>
-          </div>
-
-          {/* Amenities */}
-          <div className="flex flex-col gap-4 mt-2">
-            <h3 className="font-bold text-[#333743] text-[18px]">Hotel amenities and facilities</h3>
-            <div className="flex flex-wrap items-center gap-3 md:gap-6">
-              {hotel.amenities.slice(0, 4).map((amenity, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  {amenity === "Pet friendly" && <Dog size={20} className="text-[#333743]" />}
-                  {amenity === "Free Wifi" && <Wifi size={20} className="text-[#333743]" />}
-                  {amenity === "Indoor pool" && <Waves size={20} className="text-[#333743]" />}
-                  {amenity === "Gym" && <Dumbbell size={20} className="text-[#333743]" />}
-                  {/* Fallback icon for others */}
-                  {["Pet friendly", "Free Wifi", "Indoor pool", "Gym"].indexOf(amenity) === -1 && <Check size={20} className="text-[#333743]" />}
-                  <span className="text-[#333743] text-[16px]">{amenity}</span>
-                </div>
-              ))}
-              {hotel.amenities.length > 4 && (
-                 <button className="text-[#2681ff] font-bold text-[14px]">See all</button>
-              )}
+            {/* RIGHT: Share + Book actions */}
+            <div className="flex flex-col gap-3 lg:items-end">
+              <div className="flex items-center gap-3">
+                <button className="w-[40px] h-[40px] flex items-center justify-center border border-[#e0e2e8] rounded-[8px] text-[#333743] hover:bg-gray-50">
+                  <Share size={20} />
+                </button>
+                <button className="bg-[#2681ff] hover:bg-[#1a6fd9] text-white font-bold px-6 py-[16px] rounded-[10px] text-[16px] transition-colors">
+                  Book for ${hotel.price}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      </div>
 
-      {/* Select Rooms Section - Grey Background */}
-      <div className="w-full bg-[#F3F5F6]">
-        <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] py-[40px] flex flex-col gap-6">
-          <h2 className="font-black text-[#333743] text-[28px]">Select rooms</h2>
+      {/* Select Rooms Section */}
+      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
+        <h2 className="text-[26px] font-bold text-[#333743]">Select rooms</h2>
 
           {/* ── Inline Search Bar ──────────────────────────────────────────────
               Each field uses the same individual bordered card style as
@@ -661,7 +668,7 @@ export default function HotelDetailPage({
                 className={`h-[48px] rounded-[8px] border px-4 flex items-center gap-3 transition-colors cursor-pointer ${
                   openSearchPanel === "checkIn"
                     ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-                    : "border-[#e0e2e8] bg-[#f9fafb] hover:border-[#2681FF]"
+                    : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
                 }`}
                 onClick={() => setOpenSearchPanel(openSearchPanel === "checkIn" ? null : "checkIn")}
               >
@@ -702,7 +709,7 @@ export default function HotelDetailPage({
                 className={`h-[48px] rounded-[8px] border px-4 flex items-center gap-3 transition-colors cursor-pointer ${
                   openSearchPanel === "checkOut"
                     ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-                    : "border-[#e0e2e8] bg-[#f9fafb] hover:border-[#2681FF]"
+                    : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
                 }`}
                 onClick={() => setOpenSearchPanel(openSearchPanel === "checkOut" ? null : "checkOut")}
               >
@@ -741,7 +748,7 @@ export default function HotelDetailPage({
                 className={`h-[48px] rounded-[8px] border px-4 flex items-center gap-3 transition-colors cursor-pointer ${
                   openSearchPanel === "guests"
                     ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-                    : "border-[#e0e2e8] bg-[#f9fafb] hover:border-[#2681FF]"
+                    : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
                 }`}
                 onClick={() => setOpenSearchPanel(openSearchPanel === "guests" ? null : "guests")}
               >
@@ -854,7 +861,7 @@ export default function HotelDetailPage({
             {/* ── Update Search button — matches PackageSearchForm's search button style ── */}
             <button
               onClick={() => { setOpenSearchPanel(null); handleSearchUpdate(); }}
-              className="shrink-0 bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black text-[14px] h-[48px] px-5 rounded-[8px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
+              className="shrink-0 bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[14px] h-[48px] px-5 rounded-[8px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
             >
               <Search size={16} />
               {isSearching ? 'Searching...' : 'Update Search'}
@@ -982,29 +989,25 @@ export default function HotelDetailPage({
               })}
             </>
           )}
-        </div>
       </div>
 
-      {/* Hotel Policies Section - Grey Background */}
-      <div className="w-full bg-[#F3F5F6]">
-        <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] py-[40px] flex flex-col gap-6">
-          <h2 className="font-black text-[#333743] text-[24px]">Hotel information</h2>
-          
-          <PoliciesSection />
-        </div>
+      {/* Hotel Policies Section */}
+      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
+        <h2 className="text-[24px] font-bold text-[#333743]">Hotel information</h2>
+
+        <PoliciesSection />
       </div>
 
-      {/* Guest Reviews Section - Grey Background */}
-      <div className="w-full bg-[#F3F5F6]">
-        <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] py-[40px] flex flex-col gap-6">
-          <h2 className="font-black text-[#333743] text-[24px]">Guest Reviews</h2>
+      {/* Guest Reviews Section */}
+      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
+        <h2 className="text-[24px] font-bold text-[#333743]">Guest Reviews</h2>
           
           <div className="bg-white rounded-[16px] shadow-[0px_0px_4px_0px_rgba(125,130,147,0.4)] p-[24px] flex flex-col md:flex-row gap-6 md:gap-[72px] items-start overflow-hidden">
             {/* Left Side - Rating Summary */}
             <div className="flex flex-col items-start gap-[4px] min-w-[200px]">
               <div className="flex flex-col items-start w-full">
                 <p className="text-[24px] leading-[32px]">
-                  <span className="text-[#2681ff] font-black">{hotel.rating}</span>
+                  <span className="text-[#2681ff] font-bold">{hotel.rating}</span>
                   <span className="text-[#333743] font-bold">/10</span>
                 </p>
               </div>
@@ -1122,7 +1125,6 @@ export default function HotelDetailPage({
             </div>
           </div>
         </div>
-      </div>
 
       {/* Sticky Booking Bar */}
       {someRoomsSelected && (
@@ -1165,7 +1167,7 @@ export default function HotelDetailPage({
               <div className="flex items-center gap-6">
                 <div className="flex flex-col items-end">
                   <span className="text-[#9598a4] text-[12px]">Total Price</span>
-                  <span className="text-[#333743] font-black text-[24px]">{totalPrice}€</span>
+                  <span className="text-[#333743] font-bold text-[24px]">{totalPrice}€</span>
                 </div>
                 
                 <button

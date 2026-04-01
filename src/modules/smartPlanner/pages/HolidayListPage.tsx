@@ -38,7 +38,7 @@ type HolidayListPageProps = {
 };
 
 // Which filter pill dropdown is currently open
-type FilterDropdown = "sort" | "duration" | "stars" | "board" | "stops" | "price" | "triptype" | "style" | "country" | null;
+type FilterDropdown = "sort" | "duration" | "stars" | "board" | "stops" | "price" | "triptype" | "style" | null;
 
 // Travel style options — matches the discovery page section
 const TRAVEL_STYLE_OPTIONS = [
@@ -49,16 +49,6 @@ const TRAVEL_STYLE_OPTIONS = [
   "Spa & wellness",
   "Adventure",
   "Luxury",
-] as const;
-
-// Country options derived from the mock destinations
-const COUNTRY_OPTIONS = [
-  "Mexico",
-  "Thailand",
-  "Indonesia",
-  "Peru",
-  "Japan",
-  "Morocco",
 ] as const;
 
 // The trip type values — kept in sync with UnifiedPackage["tripType"] in types/index.ts
@@ -263,10 +253,6 @@ export default function HolidayListPage({
   const [filterStyles, setFilterStyles] = useState<Set<string>>(
     initialFilters?.style ? new Set([initialFilters.style]) : new Set()
   );
-  // Country filter — seed from initialFilters if provided
-  const [filterCountries, setFilterCountries] = useState<Set<string>>(
-    initialFilters?.country ? new Set([initialFilters.country]) : new Set()
-  );
   const [sortBy, setSortBy] = useState<SortId>("recommended");
 
   // ── Filter pill dropdown state ─────────────────────────────────────────────
@@ -298,7 +284,6 @@ export default function HolidayListPage({
     setFilterBoard(new Set());
     setFilterTripTypes(new Set());
     setFilterStyles(new Set());
-    setFilterCountries(new Set());
     setSortBy("recommended");
   };
 
@@ -313,12 +298,6 @@ export default function HolidayListPage({
       // Only apply trip type filter when at least one type is selected.
       // Packages without a tripType are included when no filter is active.
       if (filterTripTypes.size > 0 && !filterTripTypes.has(pkg.tripType ?? "")) return false;
-      // Country: match against the destination in the search criteria or hotel location
-      if (filterCountries.size > 0) {
-        const loc = pkg.hotel.location.toLowerCase();
-        const matchesCountry = [...filterCountries].some((c) => loc.includes(c.toLowerCase()));
-        if (!matchesCountry) return false;
-      }
       // Travel style: no style field on packages yet — filter is UI-only for now
       return true;
     });
@@ -329,7 +308,7 @@ export default function HolidayListPage({
       default: break;
     }
     return results;
-  }, [packages, priceMin, priceMax, filterStars, filterBoard, filterTripTypes, filterCountries, sortBy]);
+  }, [packages, priceMin, priceMax, filterStars, filterBoard, filterTripTypes, sortBy]);
 
   // ── Tours filtered to the searched destination ────────────────────────────
   // searchCriteria.to is the display label ("Cancún, Mexico"), so we look up
@@ -359,7 +338,6 @@ export default function HolidayListPage({
     filterBoard.size > 0,
     filterTripTypes.size > 0,
     filterStyles.size > 0,
-    filterCountries.size > 0,
   ].filter(Boolean).length;
 
   // ── Desktop filter dropdown renderer ──────────────────────────────────────
@@ -447,19 +425,6 @@ export default function HolidayListPage({
           <div className="flex flex-col gap-1">
             {TRAVEL_STYLE_OPTIONS.map((s) => (
               <CheckboxRow key={s} label={s} checked={filterStyles.has(s)} onChange={() => setFilterStyles(toggleSet(filterStyles, s))} />
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    if (openFilter === "country") {
-      return (
-        <div style={style} className="w-[200px] bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-200">
-          <h4 className="font-bold text-sm mb-3 text-[#333743]">Country</h4>
-          <div className="flex flex-col gap-1">
-            {COUNTRY_OPTIONS.map((c) => (
-              <CheckboxRow key={c} label={c} checked={filterCountries.has(c)} onChange={() => setFilterCountries(toggleSet(filterCountries, c))} />
             ))}
           </div>
         </div>
@@ -593,13 +558,6 @@ export default function HolidayListPage({
             active={openFilter === "style"}
             hasSelection={filterStyles.size > 0}
             onClick={(e) => handleFilterToggle("style", e)}
-          />
-
-          <FilterButton
-            label={filterCountries.size > 0 ? `Country (${filterCountries.size})` : "Country"}
-            active={openFilter === "country"}
-            hasSelection={filterCountries.size > 0}
-            onClick={(e) => handleFilterToggle("country", e)}
           />
 
           <FilterButton
@@ -897,14 +855,6 @@ export default function HolidayListPage({
               <h3 className="font-bold text-[#333743]">Travel style</h3>
               {TRAVEL_STYLE_OPTIONS.map((s) => (
                 <CheckboxRow key={s} label={s} checked={filterStyles.has(s)} onChange={() => setFilterStyles(toggleSet(filterStyles, s))} />
-              ))}
-            </div>
-            <div className="h-[1px] bg-[#e0e2e8]" />
-
-            <div className="flex flex-col gap-3">
-              <h3 className="font-bold text-[#333743]">Country</h3>
-              {COUNTRY_OPTIONS.map((c) => (
-                <CheckboxRow key={c} label={c} checked={filterCountries.has(c)} onChange={() => setFilterCountries(toggleSet(filterCountries, c))} />
               ))}
             </div>
 

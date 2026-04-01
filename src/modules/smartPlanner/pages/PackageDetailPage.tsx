@@ -797,7 +797,7 @@ export default function PackageDetailPage({
 
                 {/* Hotel name + star rating on the same line, stars 8px to the right */}
                 <div className="flex items-baseline gap-2">
-                  <h1 className="text-[24px] sm:text-[32px] md:text-[40px] font-black text-[#333743] leading-[1.1] tracking-tight">
+                  <h1 className="text-[24px] sm:text-[32px] md:text-[40px] font-bold text-[#333743] leading-[1.1] tracking-tight">
                     {pkg.hotel.name}
                   </h1>
                   <span className="text-[#FFB700] text-[16px] tracking-tight leading-none shrink-0">
@@ -863,7 +863,7 @@ export default function PackageDetailPage({
               <div className="flex flex-col gap-1">
                 {/* £828 per person — style_2E92LV: Mulish 900, ~30px */}
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-[30px] font-black text-[#333743] leading-none">
+                  <span className="text-[30px] font-bold text-[#333743] leading-none">
                     {currSym}{activePrice.toLocaleString()}
                   </span>
                   {/* "per person" — style_LEDUF8: smaller, regular weight */}
@@ -911,7 +911,7 @@ export default function PackageDetailPage({
         {/* ── "Hotel and flight information" H2 heading ─────────────────────
             Figma node 6117:1247: textStyle "Heading Black/H2", fill_3CZMCP
             This is the main section heading before the content columns begin. */}
-        <h2 className="text-[26px] font-black text-[#333743] mb-6">
+        <h2 className="text-[26px] font-bold text-[#333743] mb-6">
           Hotel and flight information
         </h2>
 
@@ -1134,7 +1134,7 @@ export default function PackageDetailPage({
               {/* Left column — score summary. Full width on mobile, fixed on desktop. */}
               <div className="flex flex-row md:flex-col items-center md:items-start gap-3 md:gap-1 md:shrink-0 md:w-[100px]">
                 {/* "4.3/5" — Heading Black/H3 (Mulish 900, 24px), green #227950 */}
-                <span className="text-[24px] font-black text-[#227950] leading-tight">
+                <span className="text-[24px] font-bold text-[#227950] leading-tight">
                   {ratingEU}/5
                 </span>
                 {/* "Exceptional" — Paragraph Bold/Default Bold (700, 16px) */}
@@ -1275,7 +1275,7 @@ export default function PackageDetailPage({
               <div className="p-5">
                 {/* £828 / per person */}
                 <div className="flex items-baseline gap-1.5 mb-1">
-                  <span className="text-[28px] font-black text-[#333743] leading-none">
+                  <span className="text-[28px] font-bold text-[#333743] leading-none">
                     {currSym}{activePrice.toLocaleString()}
                   </span>
                   <span className="text-[14px] font-normal text-[#333743]">
@@ -1405,7 +1405,7 @@ export default function PackageDetailPage({
       ══════════════════════════════════════════════════════════════════════ */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-[#E8E8E8] px-5 py-3 z-50 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
         <div>
-          <div className="text-[20px] font-black text-[#333743] leading-tight">
+          <div className="text-[20px] font-bold text-[#333743] leading-tight">
             {currSym}{activePrice.toLocaleString()}
             <span className="text-[13px] font-normal text-[#717171] ml-1">
               /pp
@@ -1537,7 +1537,7 @@ export default function PackageDetailPage({
           </DialogHeader>
           <div className="mt-2">
             <div className="flex items-center gap-5 pb-5 border-b border-[#ebebeb] mb-5">
-              <div className="text-[52px] font-black text-[#333743] leading-none">
+              <div className="text-[52px] font-bold text-[#333743] leading-none">
                 {ratingEU}
               </div>
               <div>
