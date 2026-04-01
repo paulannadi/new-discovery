@@ -20,7 +20,7 @@ import {
 import { DayPicker } from "react-day-picker";
 import { format, parseISO, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import PoliciesSection from "../components/PoliciesSection";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../../../shared/components/ui/tooltip";
 
@@ -516,7 +516,7 @@ export default function HotelDetailPage({
 
   return (
     <div className="bg-[#F3F5F6] min-h-screen">
-      <Toaster position="bottom-right" />
+
       
       {/* ── WHITE INFO CARD — structure matches PackageDetailPage ────────── */}
       <div className="bg-white">
@@ -656,9 +656,9 @@ export default function HotelDetailPage({
         </div>
       </div>
 
-      {/* Select Rooms Section */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
-        <h2 className="text-[26px] font-bold text-[#333743]">Select rooms</h2>
+      {/* Select Rooms Section - Grey Background */}
+        <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] pt-[40px] flex flex-col gap-6">
+          <h2 className="font-black text-[#333743] text-[28px]">Select rooms</h2>
 
           {/* ── Inline Search Bar ──────────────────────────────────────────────
               Each field uses the same individual bordered card style as

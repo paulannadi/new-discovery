@@ -383,8 +383,8 @@ export default function App() {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <>
-      {/* Toaster shows brief success/error notifications in the bottom-right corner */}
-      <Toaster position="bottom-right" />
+      {/* Toaster shows brief success/error notifications in the top-right corner */}
+      <Toaster position="top-right" />
 
       {/* Screen 1: Discovery page — multi-tab hub where the user starts */}
       {currentPage === "discovery" && (
