@@ -1,6 +1,12 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { BackButton } from "../../../shared/components/BackButton";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../../../shared/components/ui/dialog";
+import {
   MapPin,
   Wifi,
   Waves,
@@ -192,6 +198,13 @@ const generateRoomsForHotel = (hotel: Hotel, basePrice: number): Room[] => {
   // Sort by price
   return rooms.sort((a, b) => a.basePrice - b.basePrice);
 };
+
+const HOTEL_MOCK_REVIEWS = [
+  { score: "8/10", label: "Good",      text: "The staff were friendly and helpful. Great location.",                             date: "Feb 22, 2026" },
+  { score: "9/10", label: "Excellent", text: "Amazing pool and beautiful rooms. Highly recommend!",                              date: "Feb 12, 2026" },
+  { score: "10/10", label: "Perfect",  text: "Perfect in every way! Will definitely come back.",                                 date: "Jan 26, 2026" },
+  { score: "8/10", label: "Good",      text: "Good size room. Nice breakfast.",                                                  date: "Jan 14, 2026" },
+];
 
 // --- Components ---
 
@@ -426,6 +439,9 @@ export default function HotelDetailPage({
           (1000 * 60 * 60 * 24)
         ))
       : 7;
+
+  // Controls the "All reviews" modal
+  const [reviewsOpen, setReviewsOpen] = useState(false);
 
   // Tracks which panel popup is open — "checkIn", "checkOut", "guests", or null (closed)
   const [openSearchPanel, setOpenSearchPanel] = useState<"checkIn" | "checkOut" | "guests" | null>(null);
@@ -684,8 +700,9 @@ export default function HotelDetailPage({
               </div>
 
               {/* DayPicker popup — same pattern as PackageSearchForm's dates panel */}
+              {/* max-w-[calc(100vw-2rem)] prevents the calendar from overflowing the viewport on small phones */}
               {openSearchPanel === "checkIn" && (
-                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-150 max-w-[calc(100vw-2rem)] overflow-x-auto">
                   <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
                   <DayPicker
                     mode="single"
@@ -724,7 +741,7 @@ export default function HotelDetailPage({
               </div>
 
               {openSearchPanel === "checkOut" && (
-                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-150 max-w-[calc(100vw-2rem)] overflow-x-auto">
                   <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
                   <DayPicker
                     mode="single"
@@ -766,9 +783,9 @@ export default function HotelDetailPage({
                 <ChevronDown size={14} className="text-[#9598a4] shrink-0" />
               </div>
 
-              {/* Guests dropdown panel */}
+              {/* Guests dropdown panel — w-full on mobile so it doesn't overflow; capped at 300px on larger screens */}
               {openSearchPanel === "guests" && (
-                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4 w-[300px] flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4 w-full sm:w-[300px] max-w-[calc(100vw-2rem)] flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150">
                   {localRoomConfig.map((config, index) => (
                     <div key={config.id} className="flex flex-col gap-3">
                       {/* Room header row */}
@@ -859,9 +876,10 @@ export default function HotelDetailPage({
             </div>
 
             {/* ── Update Search button — matches PackageSearchForm's search button style ── */}
+            {/* w-full on mobile so it fills the stacked column; lg:w-auto so it shrinks to content on wide screens */}
             <button
               onClick={() => { setOpenSearchPanel(null); handleSearchUpdate(); }}
-              className="shrink-0 bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[14px] h-[48px] px-5 rounded-[8px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
+              className="w-full lg:w-auto shrink-0 bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[14px] h-[48px] px-5 rounded-[8px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
             >
               <Search size={16} />
               {isSearching ? 'Searching...' : 'Update Search'}
@@ -871,8 +889,8 @@ export default function HotelDetailPage({
           {/* Tabs for Multiple Rooms */}
           {localRoomConfig.length > 1 ? (
             <>
-              {/* Tab Navigation */}
-              <div className="flex items-center gap-2 border-b border-[#e0e2e8]">
+              {/* Tab Navigation — overflow-x-auto lets tabs scroll horizontally when there are many rooms */}
+              <div className="flex items-center gap-2 border-b border-[#e0e2e8] overflow-x-auto">
                 {localRoomConfig.map((config, index) => {
                   const selectedRoom = roomSelections[config.id];
                   const isActive = activeRoomTab === config.id;
@@ -1001,130 +1019,54 @@ export default function HotelDetailPage({
       {/* Guest Reviews Section */}
       <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
         <h2 className="text-[24px] font-bold text-[#333743]">Guest Reviews</h2>
-          
-          <div className="bg-white rounded-[16px] shadow-[0px_0px_4px_0px_rgba(125,130,147,0.4)] p-[24px] flex flex-col md:flex-row gap-6 md:gap-[72px] items-start overflow-hidden">
-            {/* Left Side - Rating Summary */}
-            <div className="flex flex-col items-start gap-[4px] min-w-[200px]">
-              <div className="flex flex-col items-start w-full">
-                <p className="text-[24px] leading-[32px]">
-                  <span className="text-[#2681ff] font-bold">{hotel.rating}</span>
-                  <span className="text-[#333743] font-bold">/10</span>
-                </p>
-              </div>
-              <div className="text-[#191e3b] font-bold text-[16px] leading-[24px]">
-                Exceptional
-              </div>
-              <div className="pt-[4px]">
-                <button className="flex items-center gap-[4px] text-[#333743] text-[12px] leading-[16px] hover:underline">
-                  <span>{hotel.reviewCount} verified reviews</span>
-                  <div className="relative size-[18px]">
-                    <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 18 18">
-                      <g>
-                        <path d={svgPaths.p37960400} fill="#191E3B" />
-                        <path clipRule="evenodd" d={svgPaths.p36227e00} fill="#191E3B" fillRule="evenodd" />
-                      </g>
-                    </svg>
-                  </div>
-                </button>
-              </div>
-            </div>
 
-            {/* Right Side - Reviews */}
-            <div className="flex-1 flex flex-col gap-[24px] min-w-0">
-              {/* Reviews Container */}
-              <div className="flex gap-[16px] overflow-x-auto pb-2 scrollbar-hide">
-                {/* Review 1 */}
-                <div className="flex flex-col h-[230px] w-[294.66px] p-[16px] rounded-[16px] border border-[#e0e2e8] flex-shrink-0">
-                  <div className="text-[#191e3b] font-bold text-[16px] leading-[24px] mb-2">
-                    8/10 Good
-                  </div>
-                  <div className="flex-1 flex flex-col">
-                    <p className="text-[#191e3b] text-[16px] leading-[24px] mb-2">
-                      The staff were friendly and helpful. Great location.
-                    </p>
-                    <button className="text-[#2681ff] font-bold text-[12px] leading-[16px] py-[4px] hover:underline text-left">
-                      See details
-                    </button>
-                  </div>
-                  <div className="text-[#191e3b] text-[16px] leading-[24px]">
-                    Feb 22, 2026
-                  </div>
-                  <div className="text-[#9598a4] text-[12px] leading-[16px]">
-                    Verified review
-                  </div>
-                </div>
+        <div className="bg-white rounded-[16px] shadow-[0_0_4px_0_rgba(125,130,147,0.4)] flex flex-col md:flex-row gap-5 md:gap-10 p-4 md:py-6 md:pl-6 md:pr-0">
 
-                {/* Review 2 */}
-                <div className="flex flex-col h-[230px] w-[294.66px] p-[16px] rounded-[16px] border border-[#e0e2e8] flex-shrink-0">
-                  <div className="text-[#191e3b] font-bold text-[16px] leading-[24px] mb-2">
-                    9/10 Excellent
-                  </div>
-                  <div className="flex-1 flex flex-col">
-                    <p className="text-[#191e3b] text-[16px] leading-[24px] mb-2">
-                      Amazing pool and beautiful rooms. Highly recommend!
-                    </p>
-                    <button className="text-[#2681ff] font-bold text-[12px] leading-[16px] py-[4px] hover:underline text-left">
-                      See details
-                    </button>
-                  </div>
-                  <div className="text-[#191e3b] text-[16px] leading-[24px]">
-                    Feb 12, 2026
-                  </div>
-                  <div className="text-[#9598a4] text-[12px] leading-[16px]">
-                    Verified review
-                  </div>
-                </div>
-
-                {/* Review 3 */}
-                <div className="flex flex-col h-[230px] w-[294.66px] p-[16px] rounded-[16px] border border-[#e0e2e8] flex-shrink-0">
-                  <div className="text-[#191e3b] font-bold text-[16px] leading-[24px] mb-2">
-                    10/10 Perfect
-                  </div>
-                  <div className="flex-1 flex flex-col">
-                    <p className="text-[#191e3b] text-[16px] leading-[24px] mb-2">
-                      Perfect in every way! Will definitely come back.
-                    </p>
-                    <button className="text-[#2681ff] font-bold text-[12px] leading-[16px] py-[4px] hover:underline text-left">
-                      See details
-                    </button>
-                  </div>
-                  <div className="text-[#191e3b] text-[16px] leading-[24px]">
-                    Jan 26, 2026
-                  </div>
-                  <div className="text-[#9598a4] text-[12px] leading-[16px]">
-                    Verified review
-                  </div>
-                </div>
-
-                {/* Review 4 */}
-                <div className="flex flex-col h-[230px] w-[294.66px] p-[16px] rounded-[16px] border border-[#e0e2e8] flex-shrink-0">
-                  <div className="text-[#191e3b] font-bold text-[16px] leading-[24px] mb-2">
-                    8/10 Good
-                  </div>
-                  <div className="flex-1 flex flex-col">
-                    <p className="text-[#191e3b] text-[16px] leading-[24px] mb-2">
-                      Good size room. Nice breakfast.
-                    </p>
-                    <button className="text-[#2681ff] font-bold text-[12px] leading-[16px] py-[4px] hover:underline text-left">
-                      See details
-                    </button>
-                  </div>
-                  <div className="text-[#191e3b] text-[16px] leading-[24px]">
-                    Jan 14, 2026
-                  </div>
-                  <div className="text-[#9598a4] text-[12px] leading-[16px]">
-                    Verified review
-                  </div>
-                </div>
-              </div>
-
-              {/* See All Reviews Button */}
-              <button className="text-[#2681ff] font-bold text-[16px] leading-[24px] py-[4px] hover:underline text-center">
-                See all {hotel.reviewCount} reviews
-              </button>
-            </div>
+          {/* Left column — score + label + review count. Row on mobile, column on desktop. */}
+          <div className="flex flex-row md:flex-col items-center md:items-start gap-3 md:gap-1 md:shrink-0 md:w-[100px]">
+            <span className="text-[24px] font-bold text-[#227950] leading-tight">
+              {(hotel.rating / 2).toFixed(1)}/5
+            </span>
+            <span className="text-[16px] font-bold text-[#191E3B]">
+              {ratingLabel(hotel.rating)}
+            </span>
+            <button onClick={() => setReviewsOpen(true)} className="text-[12px] text-[#333743] underline hover:no-underline text-left mt-1">
+              {hotel.reviewCount.toLocaleString()} verified reviews
+            </button>
           </div>
+
+          {/* Right column — scrollable cards + "See all" link */}
+          <div className="flex flex-col gap-6 flex-1 min-w-0 overflow-hidden">
+            {/* Cards scroll horizontally. w-[78vw] on mobile makes each card take most of the screen
+                so it's obvious there are more cards to scroll to. */}
+            <div className="flex flex-row gap-4 overflow-x-auto pb-1 pr-6" style={{ scrollbarWidth: "none" }}>
+              {HOTEL_MOCK_REVIEWS.map((review, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col border border-[#E0E2E8] rounded-[16px] p-4 shrink-0 w-[78vw] sm:w-[280px] md:w-[295px] h-[210px] sm:h-[230px]"
+                >
+                  <div className="text-[16px] font-bold text-[#191E3B] mb-2">
+                    {review.score} {review.label}
+                  </div>
+                  <p className="text-[16px] text-[#191E3B] leading-[1.5] flex-1 overflow-hidden">
+                    {review.text}
+                  </p>
+                  <button className="text-[12px] font-bold text-[#2681FF] hover:underline text-left mt-2 mb-1">
+                    See details
+                  </button>
+                  <div className="text-[16px] text-[#191E3B]">{review.date}</div>
+                  <div className="text-[12px] text-[#9598A4]">Verified review</div>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={() => setReviewsOpen(true)} className="text-[16px] font-bold text-[#2681FF] hover:underline text-left">
+              See all {hotel.reviewCount.toLocaleString()} reviews
+            </button>
+          </div>
+
         </div>
+      </div>
 
       {/* Sticky Booking Bar */}
       {someRoomsSelected && (
@@ -1163,8 +1105,8 @@ export default function HotelDetailPage({
                 </div>
               </div>
 
-              {/* Right: Price & CTA */}
-              <div className="flex items-center gap-6">
+              {/* Right: Price & CTA — on mobile takes full row width so price and button space out nicely */}
+              <div className="flex items-center justify-between w-full sm:w-auto sm:justify-end gap-4 sm:gap-6">
                 <div className="flex flex-col items-end">
                   <span className="text-[#9598a4] text-[12px]">Total Price</span>
                   <span className="text-[#333743] font-bold text-[24px]">{totalPrice}€</span>
@@ -1186,6 +1128,46 @@ export default function HotelDetailPage({
           </div>
         </div>
       )}
+
+      {/* All reviews modal */}
+      <Dialog open={reviewsOpen} onOpenChange={setReviewsOpen}>
+        <DialogContent className="max-w-[880px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Guest reviews</DialogTitle>
+          </DialogHeader>
+          <div className="mt-2">
+            <div className="flex items-center gap-5 pb-5 border-b border-[#ebebeb] mb-5">
+              <div className="text-[52px] font-bold text-[#333743] leading-none">
+                {(hotel.rating / 2).toFixed(1)}
+              </div>
+              <div>
+                <div className="text-[20px] font-bold text-[#333743]">
+                  {ratingLabel(hotel.rating)}
+                </div>
+                <div className="text-[13px] text-[#717171] mt-1">
+                  Based on {hotel.reviewCount.toLocaleString()} verified reviews
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {HOTEL_MOCK_REVIEWS.map((review, i) => (
+                <div key={i} className="border border-[#E8E8E8] rounded-[16px] p-4 flex flex-col gap-3">
+                  <div className="text-[14px] font-bold text-[#333743]">
+                    {review.score} {review.label}
+                  </div>
+                  <p className="text-[14px] text-[#333743] leading-[1.6] flex-1">
+                    {review.text}
+                  </p>
+                  <div className="flex items-center justify-between pt-1 border-t border-[#F0F0F0]">
+                    <span className="text-[12px] text-[#333743]">{review.date}</span>
+                    <span className="text-[12px] text-[#717171]">Verified review</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
