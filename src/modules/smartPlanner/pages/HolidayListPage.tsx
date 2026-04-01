@@ -236,6 +236,31 @@ export default function HolidayListPage({
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
+  // ── Map → card interaction ────────────────────────────────────────────────
+  // Tracks which card is highlighted because the user clicked its map pin.
+  const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
+  // Ref for the scrollable list container — used to scroll to a card.
+  const listScrollRef = useRef<HTMLDivElement>(null);
+  // A map of packageId → the card's DOM element, so we can scroll to it.
+  const cardRefsMap = useRef<Map<string, HTMLDivElement>>(new Map());
+
+  // Called when the user clicks a pin on the map.
+  // On mobile: switches to the list view first, then scrolls.
+  const handleMarkerClick = (id: string) => {
+    setHighlightedCardId(id);
+    // On mobile the map is shown instead of the list — switch back so the card is visible.
+    setMobileView("list");
+    // Wait a tick for the list to become visible before trying to scroll.
+    requestAnimationFrame(() => {
+      const cardEl = cardRefsMap.current.get(id);
+      const listEl = listScrollRef.current;
+      if (!cardEl || !listEl) return;
+      // scrollIntoView on the card relative to the list container
+      const cardTop = cardEl.offsetTop - listEl.offsetTop;
+      listEl.scrollTo({ top: cardTop - 16, behavior: "smooth" });
+    });
+  };
+
   // ── Filter state ──────────────────────────────────────────────────────────
   // When navigating from a Discovery "View all X" button, searchCriteria carries
   // initialFilters so the list opens with the matching filter already active.
@@ -628,7 +653,7 @@ export default function HolidayListPage({
       <div className="flex flex-1 max-w-[1920px] mx-auto w-full overflow-hidden relative">
 
         {/* LEFT: package results list */}
-        <div className={`w-full md:w-[65%] min-w-0 h-[calc(100vh-160px)] overflow-y-auto p-4 md:p-6 flex flex-col gap-4 ${mobileView === "map" ? "hidden md:flex" : "flex"}`}>
+        <div ref={listScrollRef} className={`w-full md:w-[65%] min-w-0 h-[calc(100vh-160px)] overflow-y-auto p-4 md:p-6 flex flex-col gap-4 ${mobileView === "map" ? "hidden md:flex" : "flex"}`}>
 
           {/* Results count header */}
           <div className="flex flex-col gap-2">
@@ -703,14 +728,25 @@ export default function HolidayListPage({
               ))}
 
               {filteredAndSorted.map((pkg) => (
-                <PackageCard
+                // The div gives us a stable DOM node to scroll to when a map pin is clicked.
+                // ref callback stores/removes the element in cardRefsMap by packageId.
+                <div
                   key={pkg.packageId}
-                  pkg={pkg}
-                  // During non-cached loading, phase 2 shows cards with details
-                  // but no confirmed price yet — PackageCard shows a spinner instead.
-                  isPricePending={isNonCachedLoading && !pricesReady}
-                  onSelect={(p) => onViewDetail(p)}
-                />
+                  ref={(el) => {
+                    if (el) cardRefsMap.current.set(pkg.packageId, el);
+                    else cardRefsMap.current.delete(pkg.packageId);
+                  }}
+                >
+                  <PackageCard
+                    pkg={pkg}
+                    // During non-cached loading, phase 2 shows cards with details
+                    // but no confirmed price yet — PackageCard shows a spinner instead.
+                    isPricePending={isNonCachedLoading && !pricesReady}
+                    onSelect={(p) => onViewDetail(p)}
+                    // Highlight this card if its pin was clicked on the map
+                    isHovered={pkg.packageId === highlightedCardId}
+                  />
+                </div>
               ))}
 
               {/* Live search progress banner — shows at the bottom of the list
@@ -756,7 +792,10 @@ export default function HolidayListPage({
                 lng: pkg.hotel.lng!,
                 label: pkg.hotel.name,
                 price: `£${pkg.price.perPerson.toLocaleString('en-GB')}`,
-                isHighlighted: false, // future: sync with hovered card
+                // Blue badge when this pin was clicked (matches the card highlight)
+                isHighlighted: pkg.packageId === highlightedCardId,
+                // Show the hotel photo above the badge when this pin is selected
+                image: pkg.hotel.mainImage,
               }));
 
             // If no hotel-level coordinates are available (shouldn't happen with
@@ -783,6 +822,9 @@ export default function HolidayListPage({
                 // leaves the user's pan/zoom alone.
                 centerKey={searchCriteria.to}
                 markers={markers}
+                // Clicking a pin highlights + scrolls to the matching card
+                onMarkerClick={handleMarkerClick}
+                onMarkerDeselect={() => setHighlightedCardId(null)}
               />
             );
           })()}

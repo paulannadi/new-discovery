@@ -323,7 +323,12 @@ export default function PackageSearchForm({
                   : "text-[#9598a4] hover:text-[#333743]"
               }`}
             >
-              {mode === "specific" ? "📅  Specific Date" : "✦  Flexible Dates"}
+              {mode === "specific" ? (
+                <span className="flex items-center gap-1.5">
+                  <CalendarIcon size={13} />
+                  Specific Date
+                </span>
+              ) : "✦  Flexible Dates"}
               {dateMode === mode && (
                 <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#2681FF] rounded-full" />
               )}

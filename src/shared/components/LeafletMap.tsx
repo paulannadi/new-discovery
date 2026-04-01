@@ -50,6 +50,8 @@ export type MapMarkerData = {
   price?: string;
   /** When true, the marker badge gets a highlighted (blue) style */
   isHighlighted?: boolean;
+  /** Optional hotel image URL — shown as a small thumbnail above the badge when highlighted */
+  image?: string;
 };
 
 type LeafletMapProps = {
@@ -64,6 +66,10 @@ type LeafletMapProps = {
   centerKey?: string;
   /** Called when hovering a marker — passes the marker id, or null on leave */
   onMarkerHover?: (id: string | null) => void;
+  /** Called when clicking a marker — passes the marker id */
+  onMarkerClick?: (id: string) => void;
+  /** Called when the popup X is closed — use to clear the highlight */
+  onMarkerDeselect?: () => void;
   className?: string;
 };
 
@@ -94,11 +100,22 @@ const MapCentreUpdater = ({
 }) => {
   const map = useMap();
   const lastKeyRef = useRef<string | undefined>(undefined);
+  // Tracks whether we've successfully fitted the map to actual marker bounds
+  // for the current centerKey. Resets to false when the destination changes.
+  const hasFittedMarkersRef = useRef<boolean>(false);
 
   useEffect(() => {
-    // Only act when the destination (centerKey) actually changes.
-    if (centerKey === lastKeyRef.current) return;
-    lastKeyRef.current = centerKey;
+    const keyChanged = centerKey !== lastKeyRef.current;
+
+    if (keyChanged) {
+      // Destination changed — reset so we fit again for the new destination.
+      lastKeyRef.current = centerKey;
+      hasFittedMarkersRef.current = false;
+    }
+
+    // If we already fitted to real pins for this destination, leave the user's
+    // pan/zoom alone — don't snap the map back every time results trickle in.
+    if (hasFittedMarkersRef.current) return;
 
     if (markers.length > 0) {
       // Fit the map tightly around all hotel pins for this destination.
@@ -106,8 +123,10 @@ const MapCentreUpdater = ({
       // maxZoom prevents zooming in so far that only one hotel fills the screen.
       const bounds = L.latLngBounds(markers.map(m => [m.lat, m.lng] as [number, number]));
       map.fitBounds(bounds, { padding: [60, 60], maxZoom: 13 });
+      // Mark as fitted so we don't reset the view on subsequent marker updates.
+      hasFittedMarkersRef.current = true;
     } else {
-      // No markers yet — at least move to the destination's region.
+      // No markers yet — at least move to the destination's region while we wait.
       map.setView(center, zoom);
     }
   }, [centerKey, markers, center, zoom, map]);
@@ -149,8 +168,7 @@ const createPriceIcon = (price: string, isHighlighted: boolean) => {
   `;
   return L.divIcon({
     html,
-    className: "", // remove Leaflet's default white background class
-    // Centre the badge horizontally and anchor its bottom edge at the marker point
+    className: "",
     iconSize: [estimatedWidth, height],
     iconAnchor: [estimatedWidth / 2, height],
   });
@@ -186,6 +204,8 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
   zoom,
   centerKey,
   onMarkerHover,
+  onMarkerClick,
+  onMarkerDeselect,
   className = "",
 }) => {
   return (
@@ -228,14 +248,24 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
             eventHandlers={{
               mouseover: () => onMarkerHover?.(marker.id),
               mouseout: () => onMarkerHover?.(null),
+              click: () => onMarkerClick?.(marker.id),
+              // fires when the popup X button is clicked
+              popupclose: () => onMarkerDeselect?.(),
             }}
           >
             {/* Popup appears when you click a marker */}
-            <Popup>
-              <div className="text-sm">
-                <div className="font-bold text-[#333743]">{marker.label}</div>
+            <Popup minWidth={160}>
+              <div className="text-sm flex flex-col gap-1.5">
+                <div className="font-bold text-[#333743] leading-tight">{marker.label}</div>
+                {marker.image && (
+                  <img
+                    src={marker.image}
+                    alt={marker.label}
+                    className="w-full h-[90px] object-cover rounded-md"
+                  />
+                )}
                 {marker.price && (
-                  <div className="text-[#2681FF] font-bold mt-0.5">{marker.price} / night</div>
+                  <div className="text-[#2681FF] font-bold">{marker.price} / night</div>
                 )}
               </div>
             </Popup>
