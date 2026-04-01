@@ -559,7 +559,7 @@ export default function PackageSearchForm({
         </div>
 
         {openPanel === "from" && (
-          <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] py-2 min-w-[260px] animate-in fade-in zoom-in-95 duration-150">
+          <div className="absolute top-[calc(100%+8px)] left-0 right-0 z-50 bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] py-2 min-w-0 animate-in fade-in zoom-in-95 duration-150 md:right-auto md:min-w-[260px]">
             {["London (LHR)", "London (LGW)", "Manchester (MAN)", "Edinburgh (EDI)", "Birmingham (BHX)", "Bristol (BRS)"].map(
               (city) => (
                 <button

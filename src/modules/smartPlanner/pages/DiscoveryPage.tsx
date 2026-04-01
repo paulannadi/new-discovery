@@ -84,9 +84,9 @@ type DiscoveryPageProps = {
 // Only 'hotels' is connected to a real search flow; the others are visual for now.
 const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   // Holidays is now first — Tours and Holidays have merged into one experience
-  { id: "holidays", label: "Holidays", icon: <Sun size={32} /> },
-  { id: "hotels", label: "Hotels", icon: <Building2 size={32} /> },
-  { id: "flights", label: "Flights", icon: <Plane size={32} /> },
+  { id: "holidays", label: "Holidays", icon: <Sun size={20} /> },
+  { id: "hotels", label: "Hotels", icon: <Building2 size={20} /> },
+  { id: "flights", label: "Flights", icon: <Plane size={20} /> },
 ];
 
 // --- Section data ---
@@ -693,7 +693,7 @@ export default function DiscoveryPage({
             >
               {/* Tab bar — sliding blue indicator driven by refs */}
               <div ref={tabBarRef} className="relative border-b border-[#e0e2e8]">
-                {/* justify-center centers tabs when they all fit; overflow-x-auto enables scroll when they don't */}
+                {/* Tab row — horizontal scroll on mobile, centered on desktop */}
                 <div className="flex justify-center overflow-x-auto">
                   {TABS.map((tab) => (
                     <button
@@ -701,7 +701,7 @@ export default function DiscoveryPage({
                       ref={(el) => {
                         tabRefs.current[tab.id] = el;
                       }}
-                      className={`flex flex-col items-center gap-1 pt-3 pb-2 px-3 sm:pt-4 sm:pb-3 sm:px-6 shrink-0 border-b-2 sm:border-0 ${
+                      className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 pt-4 pb-3 px-6 shrink-0 border-b-2 sm:border-0 ${
                         activeTab === tab.id
                           ? "text-[#2681FF] border-[#2681FF]"
                           : "text-[#333743] border-transparent"
@@ -713,7 +713,7 @@ export default function DiscoveryPage({
                       <span className={`transition-transform duration-200 ${activeTab === tab.id ? "scale-110" : ""}`}>
                         {tab.icon}
                       </span>
-                      <span className={`block text-[11px] sm:text-[18px] ${activeTab === tab.id ? "font-black" : "font-bold"}`}>
+                      <span className={`block text-[18px] ${activeTab === tab.id ? "font-black" : "font-bold"}`}>
                         {tab.label}
                       </span>
                     </button>
