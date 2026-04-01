@@ -1,12 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { BackButton } from "../../../shared/components/BackButton";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../../../shared/components/ui/dialog";
-import {
   MapPin,
   Wifi,
   Waves,
@@ -27,7 +21,6 @@ import { DayPicker } from "react-day-picker";
 import { format, parseISO, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { toast, Toaster } from "sonner";
-import svgPaths from "../components/svg-ttlkwt9m93";
 import PoliciesSection from "../components/PoliciesSection";
 
 // --- Types ---
@@ -1060,7 +1053,7 @@ export default function HotelDetailPage({
               ))}
             </div>
 
-            <button onClick={() => setReviewsOpen(true)} className="text-[16px] font-bold text-[#2681FF] hover:underline text-left">
+            <button className="text-[16px] font-bold text-[#2681FF] hover:underline text-left">
               See all {hotel.reviewCount.toLocaleString()} reviews
             </button>
           </div>
@@ -1128,46 +1121,6 @@ export default function HotelDetailPage({
           </div>
         </div>
       )}
-
-      {/* All reviews modal */}
-      <Dialog open={reviewsOpen} onOpenChange={setReviewsOpen}>
-        <DialogContent className="max-w-[880px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Guest reviews</DialogTitle>
-          </DialogHeader>
-          <div className="mt-2">
-            <div className="flex items-center gap-5 pb-5 border-b border-[#ebebeb] mb-5">
-              <div className="text-[52px] font-bold text-[#333743] leading-none">
-                {(hotel.rating / 2).toFixed(1)}
-              </div>
-              <div>
-                <div className="text-[20px] font-bold text-[#333743]">
-                  {ratingLabel(hotel.rating)}
-                </div>
-                <div className="text-[13px] text-[#717171] mt-1">
-                  Based on {hotel.reviewCount.toLocaleString()} verified reviews
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {HOTEL_MOCK_REVIEWS.map((review, i) => (
-                <div key={i} className="border border-[#E8E8E8] rounded-[16px] p-4 flex flex-col gap-3">
-                  <div className="text-[14px] font-bold text-[#333743]">
-                    {review.score} {review.label}
-                  </div>
-                  <p className="text-[14px] text-[#333743] leading-[1.6] flex-1">
-                    {review.text}
-                  </p>
-                  <div className="flex items-center justify-between pt-1 border-t border-[#F0F0F0]">
-                    <span className="text-[12px] text-[#333743]">{review.date}</span>
-                    <span className="text-[12px] text-[#717171]">Verified review</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
