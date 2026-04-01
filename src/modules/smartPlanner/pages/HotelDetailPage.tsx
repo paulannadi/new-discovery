@@ -883,7 +883,7 @@ export default function HotelDetailPage({
           {localRoomConfig.length > 1 ? (
             <>
               {/* Tab Navigation */}
-              <div className="sticky top-0 z-40 bg-[#F3F5F6] flex items-center gap-2 -mx-1 px-1 pt-2">
+              <div className="sticky top-0 z-40 bg-[#F3F5F6] flex items-center -mx-1 px-1 pt-2 border-b border-[#E0E2E8] overflow-x-auto whitespace-nowrap">
                 {localRoomConfig.map((config, index) => {
                   const selectedRoom = roomSelections[config.id];
                   const isActive = activeRoomTab === config.id;
@@ -897,10 +897,10 @@ export default function HotelDetailPage({
                       disabled={isDisabled}
                       className={`flex items-center gap-2 px-6 py-3 font-bold text-[14px] border-b-2 transition-colors relative ${
                         isDisabled
-                          ? 'border-transparent text-[#9598a4] opacity-40 cursor-not-allowed'
+                          ? 'border-transparent text-[#9598a4] cursor-not-allowed'
                           : isActive
                             ? 'border-[#2681ff] text-[#2681ff]'
-                            : 'border-transparent text-[#9598a4] hover:text-[#333743]'
+                            : 'border-transparent text-[#333743] hover:text-[#333743] hover:border-[#2681ff]'
                       }`}
                     >
                       <span>Room {index + 1}</span>
