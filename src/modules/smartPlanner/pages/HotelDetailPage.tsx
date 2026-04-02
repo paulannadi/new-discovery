@@ -20,8 +20,9 @@ import {
 import { DayPicker } from "react-day-picker";
 import { format, parseISO, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import PoliciesSection from "../components/PoliciesSection";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../../../shared/components/ui/tooltip";
 
 // --- Types ---
 
@@ -255,7 +256,7 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
   };
 
   return (
-    <div className={`bg-white rounded-[12px] overflow-hidden border-2 ${isSelected ? 'border-[#2681ff] shadow-lg' : 'border-[#e0e2e8]'} flex flex-col shadow-sm hover:shadow-md transition-all`}>
+    <div className={`bg-white rounded-[12px] overflow-hidden border-2 ${isSelected ? 'border-[#191e3b] shadow-lg' : 'border-[#e0e2e8]'} flex flex-col shadow-sm hover:shadow-md transition-all`}>
       {/* Image Carousel */}
       <div className="h-[200px] relative bg-gray-100 group">
         <img 
@@ -264,14 +265,6 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
           className="w-full h-full object-cover absolute inset-0"
         />
         <div className="absolute inset-0 bg-[#333743]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-        
-        {/* Selected Badge */}
-        {isSelected && (
-          <div className="absolute top-3 right-3 bg-[#2681ff] text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-            <Check size={14} />
-            Selected
-          </div>
-        )}
         
         {/* Carousel Controls */}
         {/* On mobile (touch screens) buttons are always visible; on desktop they appear on hover */}
@@ -354,12 +347,13 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
           <div className="text-right text-[10px] text-[#9598a4]">per person, per night</div>
           <button
             onClick={handleBookClick}
-            className={`w-full font-bold h-[40px] rounded-[8px] transition-colors flex items-center justify-center text-[15px] ${
+            className={`w-full font-bold h-[40px] rounded-[8px] transition-colors flex items-center justify-center gap-2 text-[15px] ${
               isSelected
-                ? 'bg-[#19a974] hover:bg-[#158a5d] text-white'
+                ? 'bg-[#f3f5f6] text-[#191e3b]'
                 : 'bg-[#2681ff] hover:bg-[#1a6fd9] text-white'
             }`}
           >
+            {isSelected && <Check size={16} />}
             {isSelected ? `Selected - ${totalPrice}€` : `Select for ${totalPrice}€`}
           </button>
         </div>
@@ -466,7 +460,13 @@ export default function HotelDetailPage({
       ...prev,
       [roomConfigId]: { room, cancelOption, extraOption }
     }));
-    
+
+    // Auto-advance to the next room tab (stay on current if it's the last one)
+    const currentIndex = localRoomConfig.findIndex(c => c.id === roomConfigId);
+    if (currentIndex < localRoomConfig.length - 1) {
+      setActiveRoomTab(localRoomConfig[currentIndex + 1].id);
+    }
+
     toast.success(`Room selected for ${roomConfiguration.find(r => r.id === roomConfigId)?.adults || 0} adults`);
   };
 
@@ -486,7 +486,7 @@ export default function HotelDetailPage({
   const totalPrice = calculateTotalPrice();
   // Use localRoomConfig so that after the user edits guests and hits Update Search,
   // all-rooms-selected checks against the new configuration.
-  const allRoomsSelected = localRoomConfig.every(config => roomSelections[config.id] !== null);
+  const allRoomsSelected = localRoomConfig.every(config => roomSelections[config.id] != null);
   const someRoomsSelected = Object.values(roomSelections).some(sel => sel !== null);
 
   // Triggered when user clicks "Update Search" in the search bar.
@@ -516,7 +516,7 @@ export default function HotelDetailPage({
 
   return (
     <div className="bg-[#F3F5F6] min-h-screen">
-      <Toaster position="bottom-right" />
+
       
       {/* ── WHITE INFO CARD — structure matches PackageDetailPage ────────── */}
       <div className="bg-white">
@@ -656,9 +656,9 @@ export default function HotelDetailPage({
         </div>
       </div>
 
-      {/* Select Rooms Section */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
-        <h2 className="text-[26px] font-bold text-[#333743]">Select rooms</h2>
+      {/* Select Rooms Section - Grey Background */}
+        <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] pt-[40px] flex flex-col gap-6">
+          <h2 className="font-black text-[#333743] text-[28px]">Select rooms</h2>
 
           {/* ── Inline Search Bar ──────────────────────────────────────────────
               Each field uses the same individual bordered card style as
@@ -882,20 +882,25 @@ export default function HotelDetailPage({
           {/* Tabs for Multiple Rooms */}
           {localRoomConfig.length > 1 ? (
             <>
-              {/* Tab Navigation — overflow-x-auto lets tabs scroll horizontally when there are many rooms */}
-              <div className="flex items-center gap-2 border-b border-[#e0e2e8] overflow-x-auto">
+              {/* Tab Navigation */}
+              <div className="sticky top-0 z-40 bg-[#F3F5F6] flex items-center -mx-1 px-1 pt-2 border-b border-[#E0E2E8] overflow-x-auto whitespace-nowrap">
                 {localRoomConfig.map((config, index) => {
                   const selectedRoom = roomSelections[config.id];
                   const isActive = activeRoomTab === config.id;
+                  // A tab is disabled if any previous room hasn't been selected yet
+                  const isDisabled = localRoomConfig.slice(0, index).some(prev => !roomSelections[prev.id]);
 
                   return (
                     <button
                       key={config.id}
-                      onClick={() => setActiveRoomTab(config.id)}
+                      onClick={() => !isDisabled && setActiveRoomTab(config.id)}
+                      disabled={isDisabled}
                       className={`flex items-center gap-2 px-6 py-3 font-bold text-[14px] border-b-2 transition-colors relative ${
-                        isActive
-                          ? 'border-[#2681ff] text-[#2681ff]'
-                          : 'border-transparent text-[#9598a4] hover:text-[#333743]'
+                        isDisabled
+                          ? 'border-transparent text-[#9598a4] cursor-not-allowed'
+                          : isActive
+                            ? 'border-[#2681ff] text-[#2681ff]'
+                            : 'border-transparent text-[#333743] hover:text-[#333743] hover:border-[#2681ff]'
                       }`}
                     >
                       <span>Room {index + 1}</span>
@@ -904,7 +909,7 @@ export default function HotelDetailPage({
                         <span>{config.adults + config.children}</span>
                       </div>
                       {selectedRoom && (
-                        <div className="absolute -top-1 -right-1 bg-[#19a974] rounded-full p-0.5">
+                        <div className="absolute top-0 right-0 bg-[#191e3b] rounded-full p-0.5">
                           <Check size={12} className="text-white" />
                         </div>
                       )}
@@ -1072,30 +1077,11 @@ export default function HotelDetailPage({
                   <span className="text-[#9598a4] text-[12px]">Booking Summary</span>
                   <div className="flex items-center gap-2">
                     <span className="text-[#333743] font-bold text-[16px]">
-                      {Object.values(roomSelections).filter(s => s !== null).length} of {roomConfiguration.length} room{roomConfiguration.length > 1 ? 's' : ''} selected
+                      {Object.values(roomSelections).filter(s => s !== null).length} of {localRoomConfig.length} room{localRoomConfig.length > 1 ? 's' : ''} selected
                     </span>
                   </div>
                 </div>
 
-                {/* Selected Rooms */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  {roomConfiguration.map((config, index) => {
-                    const selection = roomSelections[config.id];
-                    return (
-                      <div
-                        key={config.id}
-                        className={`px-3 py-1.5 rounded-full text-[12px] font-bold flex items-center gap-1 ${
-                          selection
-                            ? 'bg-[#19a974] text-white'
-                            : 'bg-[#f3f5f6] text-[#9598a4]'
-                        }`}
-                      >
-                        {selection && <Check size={12} />}
-                        Room {index + 1}
-                      </div>
-                    );
-                  })}
-                </div>
               </div>
 
               {/* Right: Price & CTA — on mobile takes full row width so price and button space out nicely */}
@@ -1105,17 +1091,28 @@ export default function HotelDetailPage({
                   <span className="text-[#333743] font-bold text-[24px]">{totalPrice}€</span>
                 </div>
                 
-                <button
-                  onClick={handleCompleteBooking}
-                  disabled={!allRoomsSelected}
-                  className={`px-6 py-3 rounded-[8px] font-bold text-[16px] transition-all ${
-                    allRoomsSelected
-                      ? 'bg-[#2681ff] hover:bg-[#1a6fd9] text-white cursor-pointer'
-                      : 'bg-[#e0e2e8] text-[#9598a4] cursor-not-allowed'
-                  }`}
-                >
-                  {allRoomsSelected ? 'Complete Booking' : 'Select All Rooms'}
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => allRoomsSelected && handleCompleteBooking()}
+                      aria-disabled={!allRoomsSelected}
+                      className={`inline-flex px-6 py-3 rounded-[8px] font-bold text-[16px] transition-all select-none ${
+                        allRoomsSelected
+                          ? 'bg-[#2681ff] hover:bg-[#1a6fd9] text-white cursor-pointer'
+                          : 'bg-[#e0e2e8] text-[#9598a4] cursor-not-allowed'
+                      }`}
+                    >
+                      Complete Booking
+                    </span>
+                  </TooltipTrigger>
+                  {!allRoomsSelected && (
+                    <TooltipContent side="top" sideOffset={8}>
+                      Please select a room for each guest configuration to proceed.
+                    </TooltipContent>
+                  )}
+                </Tooltip>
               </div>
             </div>
           </div>
