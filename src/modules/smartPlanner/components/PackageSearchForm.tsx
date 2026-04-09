@@ -31,6 +31,8 @@ import { format, addMonths, startOfMonth, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
 // useIsMobile: returns true when viewport is < 768px (phone sizes)
 import { useIsMobile } from "../../../shared/components/ui/use-mobile";
+// cn: utility for combining Tailwind classes conditionally
+import { cn } from "../../../shared/components/ui/utils";
 // Drawer: vaul-based bottom sheet — used to display the dates panel on mobile
 import {
   Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose,
@@ -281,23 +283,26 @@ export default function PackageSearchForm({
   // ── Sizing tokens by variant ──────────────────────────────────────────────
 
   const h         = variant === "hero" ? "h-[52px]" : "h-[48px]";
-  const r         = variant === "hero" ? "rounded-[12px]" : "rounded-[8px]";
-  const labelCls  = "text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5";
+  const r         = variant === "hero" ? "rounded-xl" : "rounded-lg";
+  const labelCls  = "text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5";
   // text-base (16px) on mobile: iOS Safari auto-zooms any input with font-size < 16px.
-  // md:text-[14px] / md:text-[13px] brings the tighter desktop size back at 768px+.
+  // md:text-sm brings the tighter desktop size back at 768px+.
   const valueCls  = variant === "hero"
-    ? "text-base md:text-[14px] font-semibold"
-    : "text-base md:text-[13px] font-semibold";
+    ? "text-base md:text-sm font-semibold"
+    : "text-base md:text-xs font-semibold";
   const iconSize  = variant === "hero" ? 18 : 16;
   const fieldGap  = variant === "hero" ? "gap-3" : "gap-2";
 
   // Shared field wrapper classes
   const fieldBase = (active: boolean) =>
-    `${h} ${r} border px-4 flex items-center gap-3 transition-colors ${
+    cn(
+      h,
+      r,
+      "border px-4 flex items-center gap-3 transition-colors",
       active
-        ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-        : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
-    }`;
+        ? "border-primary ring-2 ring-primary/20 bg-card"
+        : "border-border bg-card hover:border-primary"
+    );
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -309,7 +314,7 @@ export default function PackageSearchForm({
     <>
       {/* Mode toggle — only visible for cached destinations */}
       {isCached && (
-        <div className="flex border-b border-[#e0e2e8] px-2">
+        <div className="flex border-b border-border px-2">
           {(["specific", "flexible"] as const).map((mode) => (
             <button
               key={mode}
@@ -317,20 +322,21 @@ export default function PackageSearchForm({
                 e.stopPropagation();
                 setDateMode(mode);
               }}
-              className={`relative py-3 px-5 text-[13px] font-bold transition-colors ${
+              className={cn(
+                "relative py-3 px-5 text-xs font-bold transition-colors",
                 dateMode === mode
-                  ? "text-[#2681FF]"
-                  : "text-[#9598a4] hover:text-[#333743]"
-              }`}
+                  ? "text-primary"
+                  : "text-grey hover:text-foreground"
+              )}
             >
               {mode === "specific" ? (
                 <span className="flex items-center gap-1.5">
-                  <CalendarIcon size={13} />
+                  <CalendarIcon size={13} aria-hidden="true" />
                   Specific Date
                 </span>
               ) : "✦  Flexible Dates"}
               {dateMode === mode && (
-                <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#2681FF] rounded-full" />
+                <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-primary rounded-full" />
               )}
             </button>
           ))}
@@ -350,8 +356,8 @@ export default function PackageSearchForm({
           <style>{`
             /* v9: root class is .rdp-root, not .rdp */
             .rdp-root {
-              --rdp-accent-color: #2681FF;
-              --rdp-accent-background-color: rgba(38,129,255,0.10);
+              --rdp-accent-color: rgb(38, 129, 255);
+              --rdp-accent-background-color: rgb(38, 129, 255, 0.10);
               --rdp-day_button-border-radius: 8px;
               margin: 0;
             }
@@ -415,9 +421,9 @@ export default function PackageSearchForm({
               // modifiersStyles targets the .rdp-day wrapper (the td), not the
               // button inside — so we must set borderRadius here explicitly,
               // otherwise the background is a square behind the rounded button.
-              stay:       { backgroundColor: "#f0f4f8", borderRadius: "8px" },
-              tripReturn: { backgroundColor: "#dbeafe", outline: "1px solid #93c5fd", outlineOffset: "-1px", borderRadius: "8px" },
-              bestDeal:   { backgroundColor: "#EFF6FF", borderRadius: "8px" },
+              stay:       { backgroundColor: "rgb(240, 244, 248)", borderRadius: "8px" },
+              tripReturn: { backgroundColor: "rgb(219, 234, 254)", outline: "1px solid rgb(147, 197, 253)", outlineOffset: "-1px", borderRadius: "8px" },
+              bestDeal:   { backgroundColor: "rgb(239, 246, 255)", borderRadius: "8px" },
             } : {}}
             // ── DayButton: inject day-number + price inside each cell ───
             // react-day-picker v9 replaced DayContent with DayButton.
@@ -441,14 +447,14 @@ export default function PackageSearchForm({
                     <span className="flex flex-col items-center justify-center gap-0 leading-none">
                       {/* ★ badge — always blue, always visible on cheapest day */}
                       {isBestDeal && !isDisabled && (
-                        <span className="text-[9px] font-black leading-none mb-0.5 text-[#2681FF]">
+                        <span className="text-xs font-extrabold leading-none mb-0.5 text-primary" aria-hidden="true">
                           ★
                         </span>
                       )}
-                      <span className="text-[13px]">{day.date.getDate()}</span>
+                      <span className="text-xs">{day.date.getDate()}</span>
                       {price !== undefined && !isDisabled && (
                         // 11px is readable inside a 60px cell
-                        <span className="text-[11px] font-bold leading-tight mt-0.5 text-[#2681FF]">
+                        <span className="text-xs font-bold leading-tight mt-0.5 text-primary">
                           {price >= 1000
                             ? `£${(price / 1000).toFixed(1)}k`
                             : `£${price}`}
@@ -467,7 +473,7 @@ export default function PackageSearchForm({
       {/* w-full on mobile (stretches inside the drawer); md:w-[480px] restores the fixed width on desktop */}
       {dateMode === "flexible" && (
         <div className="p-4 w-full md:w-[480px]">
-          <p className="text-[12px] text-[#9598a4] mb-3">
+          <p className="text-xs text-grey mb-3">
             Select one or more months to see the best deals
           </p>
           {/* 2 columns on mobile (month cards need space); 3 columns on md+ */}
@@ -483,40 +489,43 @@ export default function PackageSearchForm({
                     e.stopPropagation();
                     if (isAvailable) toggleMonth(key);
                   }}
-                  className={`flex items-center gap-2 px-3 py-2.5 rounded-[10px] border text-left transition-all ${
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2.5 rounded-lg border text-left transition-all",
                     isSelected
-                      ? "border-[#2681FF] bg-[#EFF6FF]"
+                      ? "border-primary bg-primary/10"
                       : isAvailable
-                      ? "border-[#e0e2e8] hover:border-[#2681FF] bg-white"
-                      : "border-[#f0f0f0] bg-[#fafafa] opacity-40 cursor-not-allowed"
-                  }`}
+                      ? "border-border hover:border-primary bg-card"
+                      : "border-grey-light bg-grey-light opacity-40 cursor-not-allowed"
+                  )}
                 >
                   {/* Checkbox */}
                   <div
-                    className={`w-4 h-4 rounded-[4px] border flex items-center justify-center shrink-0 transition-colors ${
+                    className={cn(
+                      "w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 transition-colors",
                       isSelected
-                        ? "bg-[#2681FF] border-[#2681FF]"
-                        : "border-[#d0d5e0]"
-                    }`}
+                        ? "bg-primary border-primary"
+                        : "border-border"
+                    )}
                   >
-                    {isSelected && <Check size={9} className="text-white" />}
+                    {isSelected && <Check size={9} className="text-primary-foreground" aria-hidden="true" />}
                   </div>
 
                   {/* Label + price */}
                   <div className="flex flex-col min-w-0">
                     <span
-                      className={`text-[13px] font-bold leading-tight ${
+                      className={cn(
+                        "text-xs font-bold leading-tight",
                         isSelected
-                          ? "text-[#2681FF]"
+                          ? "text-primary"
                           : isAvailable
-                          ? "text-[#333743]"
-                          : "text-[#9598a4]"
-                      }`}
+                          ? "text-foreground"
+                          : "text-grey"
+                      )}
                     >
                       {label}
                     </span>
                     {isAvailable && (
-                      <span className="text-[11px] text-[#667080] leading-tight">
+                      <span className="text-xs text-muted-foreground leading-tight">
                         from £{price!.toLocaleString()}
                       </span>
                     )}
@@ -532,7 +541,7 @@ export default function PackageSearchForm({
                 e.stopPropagation();
                 setOpenPanel(null);
               }}
-              className="mt-4 w-full bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[14px] py-2.5 rounded-[10px] transition-colors"
+              className="mt-4 w-full bg-primary hover:brightness-85 text-white font-bold text-sm py-2.5 rounded-lg transition-colors"
             >
               Apply →
             </button>
@@ -550,33 +559,33 @@ export default function PackageSearchForm({
       {/* ── FLYING FROM ───────────────────────────────────────────────────── */}
       <div className="relative flex-1">
         <div
-          className={`${fieldBase(openPanel === "from")} cursor-pointer`}
+          className={cn(fieldBase(openPanel === "from"), "cursor-pointer")}
           onClick={() => setOpenPanel(openPanel === "from" ? null : "from")}
         >
-          <Plane size={iconSize} className="text-[#2681FF] shrink-0" />
+          <Plane size={iconSize} className="text-primary shrink-0" aria-hidden="true" />
           <div className="flex flex-col flex-1 min-w-0">
             <span className={labelCls}>Flying from</span>
-            <span className={`${valueCls} ${from ? "text-[#333743]" : "text-[#9598a4] font-normal"} truncate`}>
+            <span className={cn(valueCls, from ? "text-foreground" : "text-grey font-normal", "truncate")}>
               {from || "Departure city"}
             </span>
           </div>
-          <ChevronDown size={14} className="text-[#9598a4] shrink-0" />
+          <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
         </div>
 
         {openPanel === "from" && (
-          <div className="absolute top-[calc(100%+8px)] left-0 right-0 z-50 bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] py-2 min-w-0 animate-in fade-in zoom-in-95 duration-150 md:right-auto md:min-w-[260px]">
+          <div className="absolute top-[calc(100%+8px)] left-0 right-0 z-50 bg-card rounded-xl shadow-xl border border-border py-2 min-w-0 animate-in fade-in zoom-in-95 duration-150 md:right-auto md:min-w-[260px]">
             {["London (LHR)", "London (LGW)", "Manchester (MAN)", "Edinburgh (EDI)", "Birmingham (BHX)", "Bristol (BRS)"].map(
               (city) => (
                 <button
                   key={city}
-                  className="w-full text-left px-4 py-2.5 text-[14px] text-[#333743] hover:bg-[#f9fafb] flex items-center gap-2"
+                  className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-grey-light flex items-center gap-2"
                   onClick={(e) => {
                     e.stopPropagation();
                     setFrom(city);
                     setOpenPanel(null);
                   }}
                 >
-                  <Plane size={14} className="text-[#9598a4]" />
+                  <Plane size={14} className="text-grey" aria-hidden="true" />
                   {city}
                 </button>
               )
@@ -588,20 +597,23 @@ export default function PackageSearchForm({
       {/* ── GOING TO ──────────────────────────────────────────────────────── */}
       <div className="relative flex-1">
         <div
-          className={`${h} ${r} border px-4 flex items-center gap-3 transition-colors ${
+          className={cn(
+            h,
+            r,
+            "border px-4 flex items-center gap-3 transition-colors",
             openPanel === "to"
-              ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-              : "border-[#e0e2e8] bg-white focus-within:border-[#2681FF]"
-          }`}
+              ? "border-primary ring-2 ring-primary/20 bg-card"
+              : "border-border bg-card focus-within:border-primary"
+          )}
         >
-          <MapPin size={iconSize} className="text-[#2681FF] shrink-0" />
+          <MapPin size={iconSize} className="text-primary shrink-0" aria-hidden="true" />
           <div className="flex flex-col flex-1 min-w-0">
             <span className={labelCls}>Going to</span>
             <input
               type="text"
               value={toQuery}
               placeholder="Destination"
-              className={`bg-transparent ${valueCls} text-[#333743] outline-none placeholder:text-[#9598a4] placeholder:font-normal w-full`}
+              className={cn("bg-transparent", valueCls, "text-foreground outline-none placeholder:text-grey placeholder:font-normal w-full")}
               onChange={(e) => {
                 setToQuery(e.target.value);
                 setTo(e.target.value);
@@ -614,7 +626,7 @@ export default function PackageSearchForm({
           </div>
           {toQuery && (
             <button
-              className="text-[#9598a4] hover:text-[#333743] shrink-0"
+              className="text-grey hover:text-foreground shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
                 setToQuery("");
@@ -624,8 +636,9 @@ export default function PackageSearchForm({
                 setDateMode("specific");
                 setSelectedMonths([]);
               }}
+              aria-label="Clear destination"
             >
-              <X size={14} />
+              <X size={14} aria-hidden="true" />
             </button>
           )}
         </div>
@@ -633,9 +646,9 @@ export default function PackageSearchForm({
         {openPanel === "to" && (
           // left-0 right-0: stretches full width of the parent on mobile (avoids overflow).
           // md:right-auto md:min-w-[300px]: restores the natural min-width on desktop.
-          <div className="absolute top-[calc(100%+8px)] left-0 right-0 z-50 bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] py-2 min-w-0 max-h-[340px] overflow-y-auto animate-in fade-in zoom-in-95 duration-150 md:right-auto md:min-w-[300px]">
+          <div className="absolute top-[calc(100%+8px)] left-0 right-0 z-50 bg-card rounded-xl shadow-xl border border-border py-2 min-w-0 max-h-[340px] overflow-y-auto animate-in fade-in zoom-in-95 duration-150 md:right-auto md:min-w-[300px]">
             {filteredDests.length === 0 ? (
-              <div className="px-4 py-3 text-[13px] text-[#9598a4]">
+              <div className="px-4 py-3 text-xs text-grey">
                 No destinations found
               </div>
             ) : (
@@ -643,21 +656,21 @@ export default function PackageSearchForm({
                 {/* Popular (cached) destinations */}
                 {cachedDests.length > 0 && (
                   <>
-                    <div className="px-4 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#9598a4]">
+                    <div className="px-4 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-grey">
                       Popular
                     </div>
                     {cachedDests.map((dest) => (
                       <button
                         key={dest.label}
-                        className="w-full text-left px-4 py-2.5 text-[14px] text-[#333743] hover:bg-[#f9fafb] flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-grey-light flex items-center gap-2"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleSelectDestination(dest);
                         }}
                       >
-                        <MapPin size={14} className="text-[#9598a4] shrink-0" />
+                        <MapPin size={14} className="text-grey shrink-0" aria-hidden="true" />
                         <span className="flex-1">{dest.label}</span>
-                        <span className="text-[11px] font-bold text-[#2681FF] bg-[#EFF6FF] px-2 py-0.5 rounded-full shrink-0">
+                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full shrink-0">
                           Popular
                         </span>
                       </button>
@@ -669,21 +682,21 @@ export default function PackageSearchForm({
                 {nonCachedDests.length > 0 && (
                   <>
                     {cachedDests.length > 0 && (
-                      <div className="mx-4 my-1.5 border-t border-[#f0f0f0]" />
+                      <div className="mx-4 my-1.5 border-t border-grey-light" />
                     )}
-                    <div className="px-4 pt-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#9598a4]">
+                    <div className="px-4 pt-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-grey">
                       All destinations
                     </div>
                     {nonCachedDests.map((dest) => (
                       <button
                         key={dest.label}
-                        className="w-full text-left px-4 py-2.5 text-[14px] text-[#333743] hover:bg-[#f9fafb] flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-grey-light flex items-center gap-2"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleSelectDestination(dest);
                         }}
                       >
-                        <MapPin size={14} className="text-[#9598a4] shrink-0" />
+                        <MapPin size={14} className="text-grey shrink-0" aria-hidden="true" />
                         <span className="flex-1">{dest.label}</span>
                       </button>
                     ))}
@@ -701,21 +714,21 @@ export default function PackageSearchForm({
           prices show up when you open the calendar. */}
       <div className="relative">
         <div
-          className={`${fieldBase(openPanel === "duration")} cursor-pointer min-w-[140px]`}
+          className={cn(fieldBase(openPanel === "duration"), "cursor-pointer min-w-[140px]")}
           onClick={() => setOpenPanel(openPanel === "duration" ? null : "duration")}
         >
-          <Moon size={iconSize} className="text-[#2681FF] shrink-0" />
+          <Moon size={iconSize} className="text-primary shrink-0" aria-hidden="true" />
           <div className="flex flex-col flex-1 min-w-0">
             <span className={labelCls}>Duration</span>
-            <span className={`${valueCls} text-[#333743] truncate`}>
+            <span className={cn(valueCls, "text-foreground truncate")}>
               {nights} nights
             </span>
           </div>
-          <ChevronDown size={14} className="text-[#9598a4] shrink-0" />
+          <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
         </div>
 
         {openPanel === "duration" && (
-          <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] py-2 min-w-[160px] max-h-[320px] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+          <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-xl border border-border py-2 min-w-[160px] max-h-[320px] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
             {/* Simple list of night options — values are operator-configured.
                 We show 3–14 as the full range; in production this comes from config. */}
             {Array.from({ length: 12 }, (_, i) => i + 3).map((n) => (
@@ -730,14 +743,15 @@ export default function PackageSearchForm({
                   }
                   setOpenPanel(null);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-[14px] font-medium transition-colors flex items-center justify-between ${
+                className={cn(
+                  "w-full text-left px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-between",
                   nights === n
-                    ? "bg-[#EFF6FF] text-[#2681FF] font-bold"
-                    : "text-[#333743] hover:bg-[#f9fafb]"
-                }`}
+                    ? "bg-primary/10 text-primary font-bold"
+                    : "text-foreground hover:bg-grey-light"
+                )}
               >
                 {n} nights
-                {nights === n && <Check size={14} className="text-[#2681FF]" />}
+                {nights === n && <Check size={14} className="text-primary" aria-hidden="true" />}
               </button>
             ))}
           </div>
@@ -747,33 +761,35 @@ export default function PackageSearchForm({
       {/* ── DATES ─────────────────────────────────────────────────────────── */}
       <div className="relative flex-[1.2]">
         <div
-          className={`${fieldBase(openPanel === "dates")} cursor-pointer`}
+          className={cn(fieldBase(openPanel === "dates"), "cursor-pointer")}
           onClick={() => setOpenPanel(openPanel === "dates" ? null : "dates")}
         >
-          <CalendarIcon size={iconSize} className="text-[#2681FF] shrink-0" />
+          <CalendarIcon size={iconSize} className="text-primary shrink-0" aria-hidden="true" />
           <div className="flex flex-col flex-1 min-w-0">
             <span className={labelCls}>
               {dateMode === "flexible" ? "Flexible dates" : "Departure date"}
             </span>
             <span
-              className={`${valueCls} truncate ${
+              className={cn(
+                valueCls,
+                "truncate",
                 (dateMode === "specific" && dateRange?.from) ||
                 (dateMode === "flexible" && selectedMonths.length > 0)
-                  ? "text-[#333743]"
-                  : "text-[#9598a4] font-normal"
-              }`}
+                  ? "text-foreground"
+                  : "text-grey font-normal"
+              )}
             >
               {dateSummary}
             </span>
           </div>
-          <ChevronDown size={14} className="text-[#9598a4] shrink-0" />
+          <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
         </div>
 
         {/* Desktop: absolute dropdown, positioned below the field trigger */}
         {!isMobile && openPanel === "dates" && (
           // max-h + overflow-y-auto: if the calendar is near the bottom of the
           // viewport it won't clip — the panel becomes scrollable instead.
-          <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] animate-in fade-in zoom-in-95 duration-150 max-h-[calc(100vh-180px)] overflow-y-auto">
+          <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-xl border border-border animate-in fade-in zoom-in-95 duration-150 max-h-[calc(100vh-180px)] overflow-y-auto">
             {datesPanelContent}
           </div>
         )}
@@ -788,9 +804,9 @@ export default function PackageSearchForm({
           >
             <DrawerContent>
               <DrawerHeader className="flex flex-row items-center justify-between pb-0">
-                <DrawerTitle className="text-[15px] font-bold text-[#333743]">Select dates</DrawerTitle>
+                <DrawerTitle className="text-sm font-bold text-foreground">Select dates</DrawerTitle>
                 <DrawerClose asChild>
-                  <button className="text-[#9598a4] p-1"><X size={18} /></button>
+                  <button className="text-grey p-1" aria-label="Close"><X size={18} aria-hidden="true" /></button>
                 </DrawerClose>
               </DrawerHeader>
               {/* overflow-y-auto allows the calendar to scroll if it's taller than the drawer */}
@@ -805,46 +821,48 @@ export default function PackageSearchForm({
       {/* ── TRAVELLERS ────────────────────────────────────────────────────── */}
       <div className="relative">
         <div
-          className={`${fieldBase(openPanel === "guests")} cursor-pointer min-w-[196px]`}
+          className={cn(fieldBase(openPanel === "guests"), "cursor-pointer min-w-[196px]")}
           onClick={() => setOpenPanel(openPanel === "guests" ? null : "guests")}
         >
-          <Users size={iconSize} className="text-[#2681FF] shrink-0" />
+          <Users size={iconSize} className="text-primary shrink-0" aria-hidden="true" />
           <div className="flex flex-col flex-1 min-w-0">
             <span className={labelCls}>Travellers</span>
-            <span className={`${valueCls} text-[#333743] truncate`}>
+            <span className={cn(valueCls, "text-foreground truncate")}>
               {guestSummary}
             </span>
           </div>
-          <ChevronDown size={14} className="text-[#9598a4] shrink-0" />
+          <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
         </div>
 
         {openPanel === "guests" && (
-          <div className="absolute top-[calc(100%+8px)] right-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-5 w-[280px] flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="absolute top-[calc(100%+8px)] right-0 z-50 bg-card rounded-xl shadow-xl border border-border p-5 w-[280px] flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150">
             {[
               { label: "Adults",   sub: "Age 12+",  value: adults,   min: 1, set: setAdults   },
               { label: "Children", sub: "Age 2–11", value: children, min: 0, set: setChildren },
             ].map(({ label, sub, value, min, set }) => (
               <div key={label} className="flex items-center justify-between">
                 <div>
-                  <div className="text-[14px] font-semibold text-[#333743]">{label}</div>
-                  <div className="text-[12px] text-[#9598a4]">{sub}</div>
+                  <div className="text-sm font-semibold text-foreground">{label}</div>
+                  <div className="text-xs text-grey">{sub}</div>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => set(Math.max(min, value - 1))}
                     disabled={value <= min}
-                    className="w-8 h-8 rounded-full border border-[#e0e2e8] flex items-center justify-center text-[#333743] hover:border-[#2681FF] hover:text-[#2681FF] transition-colors disabled:opacity-30"
+                    className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-30"
+                    aria-label={`Decrease ${label}`}
                   >
-                    <Minus size={14} />
+                    <Minus size={14} aria-hidden="true" />
                   </button>
-                  <span className="text-[15px] font-bold text-[#333743] w-4 text-center">
+                  <span className="text-sm font-bold text-foreground w-4 text-center">
                     {value}
                   </span>
                   <button
                     onClick={() => set(Math.min(9, value + 1))}
-                    className="w-8 h-8 rounded-full border border-[#e0e2e8] flex items-center justify-center text-[#333743] hover:border-[#2681FF] hover:text-[#2681FF] transition-colors"
+                    className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors"
+                    aria-label={`Increase ${label}`}
                   >
-                    <Plus size={14} />
+                    <Plus size={14} aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -852,7 +870,7 @@ export default function PackageSearchForm({
 
             <button
               onClick={() => setOpenPanel(null)}
-              className="w-full bg-[#2681FF] text-white font-bold text-[14px] py-2.5 rounded-[10px] hover:bg-[#1a6fd9] transition-colors"
+              className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-colors"
             >
               Done
             </button>
@@ -863,13 +881,16 @@ export default function PackageSearchForm({
       {/* ── SEARCH BUTTON ─────────────────────────────────────────────────── */}
       <button
         onClick={handleSearch}
-        className={`shrink-0 bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black ${
+        className={cn(
+          "shrink-0 bg-primary hover:brightness-85 text-white font-extrabold",
           variant === "hero"
-            ? "text-[16px] h-[52px] px-6 rounded-[12px]"
-            : "text-[14px] h-[48px] px-5 rounded-[8px]"
-        } transition-colors flex items-center justify-center gap-2 whitespace-nowrap`}
+            ? "text-base h-[52px] px-6 rounded-xl"
+            : "text-sm h-[48px] px-5 rounded-lg",
+          "transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
+        )}
+        aria-label={variant === "hero" ? "Search Holidays" : "Search"}
       >
-        <Search size={variant === "hero" ? 20 : 16} />
+        <Search size={variant === "hero" ? 20 : 16} aria-hidden="true" />
         {variant === "hero" ? "Search Holidays" : "Search"}
       </button>
     </div>

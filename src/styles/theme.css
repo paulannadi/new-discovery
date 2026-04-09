@@ -25,6 +25,9 @@
   --input: transparent;
   --input-background: #f3f3f5;
   --switch-background: #cbced4;
+  --grey: #9598a4;
+  --grey-light: #e0e2e8;
+  --grey-lightest: #f3f5f6;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --ring: oklch(0.708 0 0);
@@ -102,6 +105,9 @@
   --color-input: var(--input);
   --color-input-background: var(--input-background);
   --color-switch-background: var(--switch-background);
+  --color-grey: var(--grey);
+  --color-grey-light: var(--grey-light);
+  --color-grey-lightest: var(--grey-lightest);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);

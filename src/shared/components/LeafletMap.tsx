@@ -256,7 +256,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
             {/* Popup appears when you click a marker */}
             <Popup minWidth={160}>
               <div className="text-sm flex flex-col gap-1.5">
-                <div className="font-bold text-[#333743] leading-tight">{marker.label}</div>
+                <div className="font-bold text-foreground leading-tight">{marker.label}</div>
                 {marker.image && (
                   <img
                     src={marker.image}
@@ -265,7 +265,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
                   />
                 )}
                 {marker.price && (
-                  <div className="text-[#2681FF] font-bold">{marker.price} / night</div>
+                  <div className="text-primary font-bold">{marker.price} / night</div>
                 )}
               </div>
             </Popup>

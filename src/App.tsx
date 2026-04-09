@@ -485,8 +485,7 @@ export default function App() {
       )}
 
       {/* Screen: Package detail — full-page view for a UnifiedPackage (hotel + flights).
-          Reached from HolidayListPage when the user clicks a package card.
-          Replaces the old HotelDetailModal with a full takeover experience. */}
+          Reached from HolidayListPage when the user clicks a package card. */}
       {currentPage === "package-detail" && selectedUnifiedPackage && (
         <PackageDetailPage
           pkg={selectedUnifiedPackage}

@@ -8,6 +8,8 @@
 // there may be more results coming — so they don't click away too soon.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { Loader2 } from "lucide-react";
+
 interface LiveSearchProgressBannerProps {
   progress: { completed: number; total: number } | null;
 }
@@ -19,9 +21,8 @@ export function LiveSearchProgressBanner({ progress }: LiveSearchProgressBannerP
     : 'Searching more suppliers…';
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3 bg-[#f0f7ff] border border-[#bfdbfe] rounded-[12px] text-sm text-[#3b82f6] mt-2">
-      {/* Spinning circle — the border-t-transparent trick creates the gap */}
-      <div className="w-4 h-4 border-2 border-[#3b82f6] border-t-transparent rounded-full animate-spin flex-shrink-0" />
+    <div className="flex items-center gap-3 px-4 py-3 bg-info/10 border border-info/30 rounded-xl text-sm text-info mt-2">
+      <Loader2 className="size-4 animate-spin shrink-0" />
       <span className="font-medium">{progressText}</span>
     </div>
   );

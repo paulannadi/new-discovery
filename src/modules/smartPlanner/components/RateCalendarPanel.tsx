@@ -2,10 +2,9 @@
 // RateCalendarPanel — Shared Component
 //
 // A mini monthly calendar that shows per-person prices for every departure date.
-// Used in three places:
-//   1. HotelDetailModal (right panel, full-size)
-//   2. PackageCard (expandable inline section for cached packages)
-//   3. DiscoveryPage holidays tab (featured deal section)
+// Used in two places:
+//   1. PackageCard (expandable inline section for cached packages)
+//   2. DiscoveryPage holidays tab (featured deal section)
 //
 // Props:
 //   rateCalendar  — array of { departureDate, pricePerPerson, available }
@@ -19,6 +18,7 @@ import { useState } from "react";
 import { format, addDays } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { RateCalendarEntry } from "../../../types";
+import { cn } from "../../../shared/components/ui/utils";
 
 // Converts a currency code to its symbol for display
 function sym(currency: string): string {
@@ -111,32 +111,34 @@ export function RateCalendarPanel({
   const currSym = sym(currency);
 
   return (
-    <div className="bg-[#f8fafc] border border-[#e0e2e8] rounded-[14px] p-4">
-      <div className="text-[13px] font-bold text-[#333743] mb-3">Explore travel dates</div>
+    <div className="bg-grey-light border border-border rounded-xl p-4">
+      <div className="text-xs font-bold text-foreground mb-3">Explore travel dates</div>
 
       {/* Month navigation row */}
       <div className="flex items-center justify-between mb-3">
         <button
           onClick={goToPrev}
           disabled={!canGoPrev}
-          className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#e0e2e8] disabled:opacity-30 transition-colors"
+          aria-label="Previous month"
+          className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-grey-light disabled:opacity-30 transition-colors"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={16} aria-hidden="true" />
         </button>
-        <span className="text-[13px] font-bold text-[#333743]">{monthLabel}</span>
+        <span className="text-xs font-bold text-foreground">{monthLabel}</span>
         <button
           onClick={goToNext}
           disabled={!canGoNext}
-          className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#e0e2e8] disabled:opacity-30 transition-colors"
+          aria-label="Next month"
+          className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-grey-light disabled:opacity-30 transition-colors"
         >
-          <ChevronRight size={16} />
+          <ChevronRight size={16} aria-hidden="true" />
         </button>
       </div>
 
       {/* Day name headers */}
       <div className="grid grid-cols-7 gap-0.5 mb-1">
         {dayNames.map(d => (
-          <div key={d} className="text-[10px] font-bold text-[#9598a4] text-center py-1">{d}</div>
+          <div key={d} className="text-xs font-bold text-grey text-center py-1">{d}</div>
         ))}
       </div>
 
@@ -158,51 +160,51 @@ export function RateCalendarPanel({
 
           // Cell background — priority order: departure > return > stay > available > unavailable
           const cellClass = isDeparture
-            ? "bg-[#2681FF] cursor-pointer"
+            ? "bg-primary cursor-pointer"
             : isReturn
-            ? "bg-[#DBEAFE] ring-1 ring-[#3B82F6] cursor-pointer hover:bg-[#bfdbfe]"
+            ? "bg-primary/20 ring-1 ring-primary cursor-pointer hover:bg-primary/30"
             : isStayDay
-            ? "bg-[#EFF6FF] cursor-default"
+            ? "bg-primary/10 cursor-default"
             : isAvailable
-            ? "hover:bg-[#EFF6FF] cursor-pointer"
+            ? "hover:bg-primary/10 cursor-pointer"
             : "cursor-not-allowed";
 
           // Day number text colour
           const dayNumClass = isDeparture
-            ? "text-white"
+            ? "text-primary-foreground"
             : isReturn || isStayDay
-            ? "text-[#1D4ED8]"
+            ? "text-primary"
             : isAvailable
-            ? "text-[#333743]"
-            : "text-[#9598a4]";
+            ? "text-foreground"
+            : "text-grey";
 
           // Price text colour follows the same hierarchy
           const priceClass = isDeparture
-            ? "text-white/90"
+            ? "text-primary-foreground/90"
             : isReturn || isStayDay
-            ? "text-[#3B82F6]"
+            ? "text-primary"
             : isAvailable
-            ? "text-[#2681FF]"
-            : "text-[#C4C7D0]"; // muted grey for sold-out dates
+            ? "text-primary"
+            : "text-muted-foreground"; // muted grey for sold-out dates
 
           return (
             <button
               key={dateStr}
               disabled={!isAvailable}
               onClick={() => isAvailable && onSelectDate(dateStr)}
-              className={`
-                flex flex-col items-center justify-center rounded-[8px] py-1.5 px-0.5
-                transition-all text-center min-h-[44px]
-                ${isAvailable || isDeparture || isReturn || isStayDay ? "" : "opacity-50"}
-                ${cellClass}
-              `}
+              className={cn(
+                "flex flex-col items-center justify-center rounded-lg py-1.5 px-0.5",
+                "transition-all text-center min-h-[44px]",
+                !(isAvailable || isDeparture || isReturn || isStayDay) && "opacity-50",
+                cellClass,
+              )}
             >
-              <span className={`text-[12px] font-semibold leading-tight ${dayNumClass}`}>
+              <span className={cn("text-xs font-semibold leading-tight", dayNumClass)}>
                 {day}
               </span>
               {/* Only show price for present/future dates — past dates show day number only */}
               {entry && !isPast && (
-                <span className={`text-[10px] font-bold leading-tight ${priceClass}`}>
+                <span className={cn("text-xs font-bold leading-tight", priceClass)}>
                   {currSym}{entry.pricePerPerson.toLocaleString()}
                 </span>
               )}

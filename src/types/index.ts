@@ -31,7 +31,7 @@ export interface RateCalendarEntry {
 }
 
 // A single holiday package result — combining hotel, room, flights, and price.
-// This is the core data model for the HolidayListPage and HotelDetailModal.
+// This is the core data model for the HolidayListPage and PackageDetailPage.
 export interface UnifiedPackage {
   packageId: string;
   // Where this result came from — drives the modal UX (calendar vs details)

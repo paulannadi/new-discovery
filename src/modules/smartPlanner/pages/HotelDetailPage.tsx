@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
+import { cn } from "../../../shared/components/ui/utils";
 import { BackButton } from "../../../shared/components/BackButton";
 import {
   MapPin,
@@ -71,7 +72,7 @@ type Hotel = {
   amenities: string[];
   boardTypes: string[];
   cancellationPolicy: "Free cancellation" | "Non-refundable";
-  coordinates: { x: number; y: number }; 
+  coordinates: { x: number; y: number };
 };
 
 // --- Mock Data Generators ---
@@ -148,7 +149,7 @@ const generateRoomsForHotel = (hotel: Hotel, basePrice: number): Room[] => {
 
     // Generate Cancellation Policies based on Hotel Offerings
     const policies: PricingOption[] = [];
-    
+
     // Always add non-refundable as the base option if applicable
     policies.push(CANCELLATION_OPTIONS[0]); // Non-refundable (cheaper base)
 
@@ -159,7 +160,7 @@ const generateRoomsForHotel = (hotel: Hotel, basePrice: number): Room[] => {
 
     // Generate Extras (Board Types) based on Hotel Offerings
     const extras: PricingOption[] = [];
-    
+
     // Map string board types to PricingOptions
     hotel.boardTypes.forEach(type => {
       if (type === "Room only") extras.push(BOARD_OPTIONS[0]);
@@ -171,7 +172,7 @@ const generateRoomsForHotel = (hotel: Hotel, basePrice: number): Room[] => {
     // Ensure we have unique options and at least one
     const uniqueExtras = Array.from(new Set(extras.map(e => e.id)))
       .map(id => extras.find(e => e.id === id)!);
-    
+
     if (uniqueExtras.length === 0) uniqueExtras.push(BOARD_OPTIONS[0]); // Fallback
 
     rooms.push({
@@ -240,7 +241,7 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
 
   const cancelOpt = room.cancellationPolicies.find(o => o.id === selectedCancel) || room.cancellationPolicies[0];
   const extraOpt = room.extras.find(o => o.id === selectedExtra) || room.extras[0];
-  
+
   const totalPrice = room.basePrice + cancelOpt.priceDelta + extraOpt.priceDelta;
 
   const handleCancelChange = (optId: string) => {
@@ -256,62 +257,74 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
   };
 
   return (
-    <div className={`bg-white rounded-[12px] overflow-hidden border-2 ${isSelected ? 'border-[#191e3b] shadow-lg' : 'border-[#e0e2e8]'} flex flex-col shadow-sm hover:shadow-md transition-all`}>
+    <div className={cn(
+      "bg-card rounded-xl overflow-hidden border-2 flex flex-col shadow-sm hover:shadow-md transition-all",
+      isSelected ? "border-foreground shadow-lg" : "border-border"
+    )}>
       {/* Image Carousel */}
       <div className="h-[200px] relative bg-gray-100 group">
-        <img 
-          src={room.image} 
-          alt={room.name} 
+        <img
+          src={room.image}
+          alt={room.name}
           className="w-full h-full object-cover absolute inset-0"
         />
-        <div className="absolute inset-0 bg-[#333743]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-        
+        <div className="absolute inset-0 bg-foreground/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
         {/* Carousel Controls */}
         {/* On mobile (touch screens) buttons are always visible; on desktop they appear on hover */}
-        <button className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 p-1.5 rounded-full shadow-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-white text-[#2681ff]">
+        <button
+          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 p-1.5 rounded-full shadow-md opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-white text-primary"
+          aria-hidden="true"
+        >
           <ChevronLeft size={16} />
         </button>
-        <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 p-1.5 rounded-full shadow-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-white text-[#2681ff]">
+        <button
+          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 p-1.5 rounded-full shadow-md opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-white text-primary"
+          aria-hidden="true"
+        >
           <ChevronRight size={16} />
         </button>
       </div>
 
       <div className="p-4 flex-1 flex flex-col">
         {/* Title */}
-        <h3 className="text-[#191e3b] font-bold text-[18px] leading-tight mb-3">{room.name}</h3>
+        <h3 className="text-foreground font-bold text-lg leading-tight mb-3">{room.name}</h3>
 
         {/* Room Details */}
         <div className="flex flex-col gap-2 mb-6">
-          <div className="flex items-center gap-2 text-[#191e3b]">
-            <Bed size={16} />
-            <span className="text-[14px]">{room.details.bedrooms} bedroom{room.details.bedrooms > 1 ? 's' : ''}</span>
+          <div className="flex items-center gap-2 text-foreground">
+            <Bed size={16} aria-hidden="true" />
+            <span className="text-sm">{room.details.bedrooms} bedroom{room.details.bedrooms > 1 ? 's' : ''}</span>
           </div>
-          <div className="flex items-center gap-2 text-[#191e3b]">
-            <Users size={16} />
-            <span className="text-[14px]">Sleeps {room.details.sleeps}</span>
+          <div className="flex items-center gap-2 text-foreground">
+            <Users size={16} aria-hidden="true" />
+            <span className="text-sm">Sleeps {room.details.sleeps}</span>
           </div>
-          <div className="flex items-center gap-2 text-[#191e3b]">
-            <Armchair size={16} />
-            <span className="text-[14px]">{room.details.bedType}</span>
+          <div className="flex items-center gap-2 text-foreground">
+            <Armchair size={16} aria-hidden="true" />
+            <span className="text-sm">{room.details.bedType}</span>
           </div>
         </div>
 
         {/* Cancellation Policy */}
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-[12px] font-bold text-[#333743]">Cancellation policy</span>
-            <span className="text-[10px] text-[#9598a4]">per person, per night</span>
+            <span className="text-xs font-bold text-foreground">Cancellation policy</span>
+            <span className="text-xs text-grey">per person, per night</span>
           </div>
           <div className="flex flex-col gap-2">
             {room.cancellationPolicies.map((opt) => (
               <label key={opt.id} className="flex items-center justify-between cursor-pointer group" onClick={() => handleCancelChange(opt.id)}>
                 <div className="flex items-center gap-2">
-                  <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selectedCancel === opt.id ? 'border-[#2681ff]' : 'border-[#e0e2e8]'}`}>
-                    {selectedCancel === opt.id && <div className="w-2.5 h-2.5 rounded-full bg-[#2681ff]" />}
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border flex items-center justify-center",
+                    selectedCancel === opt.id ? "border-primary" : "border-border"
+                  )}>
+                    {selectedCancel === opt.id && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                   </div>
-                  <span className="text-[12px] text-[#333743]">{opt.label}</span>
+                  <span className="text-xs text-foreground">{opt.label}</span>
                 </div>
-                {opt.priceDelta > 0 && <span className="text-[12px] text-[#333743]">+ ${opt.priceDelta}</span>}
+                {opt.priceDelta > 0 && <span className="text-xs text-foreground">+ ${opt.priceDelta}</span>}
               </label>
             ))}
           </div>
@@ -320,38 +333,42 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
         {/* Extras */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-[12px] font-bold text-[#333743]">Extras</span>
-            <span className="text-[10px] text-[#9598a4]">per person, per night</span>
+            <span className="text-xs font-bold text-foreground">Extras</span>
+            <span className="text-xs text-grey">per person, per night</span>
           </div>
           <div className="flex flex-col gap-2">
             {room.extras.map((opt) => (
               <label key={opt.id} className="flex items-center justify-between cursor-pointer group" onClick={() => handleExtraChange(opt.id)}>
                 <div className="flex items-center gap-2">
-                   <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selectedExtra === opt.id ? 'border-[#2681ff]' : 'border-[#e0e2e8]'}`}>
-                    {selectedExtra === opt.id && <div className="w-2.5 h-2.5 rounded-full bg-[#2681ff]" />}
+                   <div className={cn(
+                     "w-4 h-4 rounded-full border flex items-center justify-center",
+                     selectedExtra === opt.id ? "border-primary" : "border-border"
+                   )}>
+                    {selectedExtra === opt.id && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                   </div>
-                  <span className="text-[12px] text-[#333743]">{opt.label}</span>
+                  <span className="text-xs text-foreground">{opt.label}</span>
                 </div>
-                {opt.priceDelta > 0 && <span className="text-[12px] text-[#333743]">+ ${opt.priceDelta}</span>}
+                {opt.priceDelta > 0 && <span className="text-xs text-foreground">+ ${opt.priceDelta}</span>}
               </label>
             ))}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="mt-auto pt-4 border-t border-[#f3f5f6] flex flex-col gap-2">
+        <div className="mt-auto pt-4 border-t border-muted flex flex-col gap-2">
           {/* Total for the full stay — calculated as per-night price × number of nights */}
-          <div className="text-right text-[14px] font-bold text-[#333743]">
+          <div className="text-right text-sm font-bold text-foreground">
             Total for {nights} night{nights !== 1 ? 's' : ''}: {totalPrice * nights}€
           </div>
-          <div className="text-right text-[10px] text-[#9598a4]">per person, per night</div>
+          <div className="text-right text-xs text-grey">per person, per night</div>
           <button
             onClick={handleBookClick}
-            className={`w-full font-bold h-[40px] rounded-[8px] transition-colors flex items-center justify-center gap-2 text-[15px] ${
+            className={cn(
+              "w-full font-bold h-[40px] rounded-lg transition-colors flex items-center justify-center gap-2 text-base",
               isSelected
-                ? 'bg-[#f3f5f6] text-[#191e3b]'
-                : 'bg-[#2681ff] hover:bg-[#1a6fd9] text-white'
-            }`}
+                ? "bg-grey-light text-foreground"
+                : "bg-primary hover:brightness-85 text-white"
+            )}
           >
             {isSelected && <Check size={16} />}
             {isSelected ? `Selected - ${totalPrice}€` : `Select for ${totalPrice}€`}
@@ -515,11 +532,11 @@ export default function HotelDetailPage({
   };
 
   return (
-    <div className="bg-[#F3F5F6] min-h-screen">
+    <div className="bg-grey-lightest min-h-screen">
 
-      
+
       {/* ── WHITE INFO CARD — structure matches PackageDetailPage ────────── */}
-      <div className="bg-white">
+      <div className="bg-card">
         <div className="max-w-[1280px] mx-auto">
 
           {/* Back button — own container with responsive horizontal padding */}
@@ -535,25 +552,25 @@ export default function HotelDetailPage({
           <div className="relative mx-4 sm:mx-6 md:mx-10 mb-2">
             <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[280px] md:h-[402px] gap-2">
               {/* Left: Main hero image */}
-              <div className="relative overflow-hidden rounded-[16px] group">
+              <div className="relative overflow-hidden rounded-xl group">
                 <img
                   src={hotel.image}
                   className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
                   alt="Exterior"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#333743]/25 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-transparent pointer-events-none" />
               </div>
 
               {/* Right: 2×2 thumbnail grid — hidden on mobile, visible on md+ */}
               <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-2">
-                <div className="overflow-hidden rounded-[16px]">
+                <div className="overflow-hidden rounded-xl">
                   <img
                     src="https://images.unsplash.com/photo-1763207291832-819499e261dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJlc3RhdXJhbnQlMjBicmVha2Zhc3QlMjBidWZmZXR8ZW58MXx8fHwxNzY5NzgxMzM2fDA&ixlib=rb-4.1.0&q=80&w=1080"
                     className="w-full h-full object-cover"
                     alt="Interior"
                   />
                 </div>
-                <div className="overflow-hidden rounded-[16px]">
+                <div className="overflow-hidden rounded-xl">
                   <img
                     src="https://images.unsplash.com/photo-1729605411476-defbdab14c54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMGJhbGklMjBwb29sJTIwaW5maW5pdHl8ZW58MXx8fHwxNzY5NzgxMzM2fDA&ixlib=rb-4.1.0&q=80&w=1080"
                     className="w-full h-full object-cover"
@@ -561,7 +578,7 @@ export default function HotelDetailPage({
                   />
                 </div>
                 {/* Map thumbnail */}
-                <div className="overflow-hidden rounded-[16px] relative border border-[#e0e2e8]">
+                <div className="overflow-hidden rounded-xl relative border border-border">
                   <img
                     src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.1.0&auto=format&fit=crop&w=600&q=80"
                     className="w-full h-full object-cover"
@@ -569,12 +586,12 @@ export default function HotelDetailPage({
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="bg-white p-2 rounded-full shadow-lg">
-                      <MapPin size={22} className="text-[#2681FF]" />
+                      <MapPin size={22} className="text-primary" />
                     </div>
                   </div>
                 </div>
                 {/* 4th slot — empty filler to complete the 2×2 grid */}
-                <div className="overflow-hidden rounded-[16px] bg-[#f3f5f6]" />
+                <div className="overflow-hidden rounded-xl bg-grey-light" />
               </div>
             </div>
           </div>
@@ -593,50 +610,50 @@ export default function HotelDetailPage({
                 {/* Rating badge row */}
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <div className="bg-[#19A974] text-white text-[12px] font-bold px-2 py-0.5 rounded-[8px] leading-tight">
+                    <div className="bg-success text-white text-xs font-bold px-2 py-0.5 rounded-lg leading-tight">
                       {hotel.rating}
                     </div>
-                    <span className="text-[13px] font-bold text-[#333743]">
+                    <span className="text-sm font-bold text-foreground">
                       {ratingLabel(hotel.rating)}
                     </span>
                   </div>
-                  <span className="text-[13px] text-[#333743] underline">
+                  <span className="text-sm text-foreground underline">
                     {hotel.reviewCount.toLocaleString()} reviews
                   </span>
                 </div>
 
                 {/* Hotel name + stars */}
                 <div className="flex items-baseline gap-2 flex-wrap">
-                  <h1 className="text-[24px] sm:text-[32px] md:text-[40px] font-bold text-[#333743] leading-[1.1] tracking-tight">{hotel.name}</h1>
-                  <span className="text-[#FFB700] text-[16px] tracking-tight leading-none shrink-0">
+                  <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-foreground leading-[1.1] tracking-tight">{hotel.name}</h1>
+                  <span className="text-warning text-base tracking-tight leading-none shrink-0">
                     {"★".repeat(hotel.stars)}{"☆".repeat(Math.max(0, 5 - hotel.stars))}
                   </span>
                 </div>
               </div>
 
               {/* Address */}
-              <div className="flex items-center gap-1.5 text-[#333743] flex-wrap">
-                <MapPin size={15} className="shrink-0" />
-                <span className="text-[16px]">{hotel.location}</span>
+              <div className="flex items-center gap-1.5 text-foreground flex-wrap">
+                <MapPin size={15} className="shrink-0" aria-hidden="true" />
+                <span className="text-base">{hotel.location}</span>
               </div>
 
               {/* Amenities heading */}
-              <h3 className="text-[18px] font-bold text-[#333743]">Hotel amenities and facilities</h3>
+              <h3 className="text-lg font-bold text-foreground">Hotel amenities and facilities</h3>
 
               {/* Amenities list */}
               <div className="flex flex-row flex-wrap gap-x-6 gap-y-2">
                 {hotel.amenities.slice(0, 4).map((amenity, i) => (
                   <div key={i} className="flex items-center gap-1.5">
-                    {amenity === "Pet friendly" && <Dog size={15} className="text-[#333743]" />}
-                    {amenity === "Free Wifi" && <Wifi size={15} className="text-[#333743]" />}
-                    {amenity === "Indoor pool" && <Waves size={15} className="text-[#333743]" />}
-                    {amenity === "Gym" && <Dumbbell size={15} className="text-[#333743]" />}
-                    {["Pet friendly", "Free Wifi", "Indoor pool", "Gym"].indexOf(amenity) === -1 && <Check size={15} className="text-[#333743]" />}
-                    <span className="text-[14px] text-[#333743] font-medium">{amenity}</span>
+                    {amenity === "Pet friendly" && <Dog size={15} className="text-foreground" aria-hidden="true" />}
+                    {amenity === "Free Wifi" && <Wifi size={15} className="text-foreground" aria-hidden="true" />}
+                    {amenity === "Indoor pool" && <Waves size={15} className="text-foreground" aria-hidden="true" />}
+                    {amenity === "Gym" && <Dumbbell size={15} className="text-foreground" aria-hidden="true" />}
+                    {["Pet friendly", "Free Wifi", "Indoor pool", "Gym"].indexOf(amenity) === -1 && <Check size={15} className="text-foreground" aria-hidden="true" />}
+                    <span className="text-sm text-foreground font-medium">{amenity}</span>
                   </div>
                 ))}
                 {hotel.amenities.length > 4 && (
-                  <button className="text-[#2681ff] font-bold text-[14px]">See all</button>
+                  <button className="text-primary font-bold text-sm">See all</button>
                 )}
               </div>
             </div>
@@ -644,10 +661,10 @@ export default function HotelDetailPage({
             {/* RIGHT: Share + Book actions */}
             <div className="flex flex-col gap-3 lg:items-end">
               <div className="flex items-center gap-3">
-                <button className="w-[40px] h-[40px] flex items-center justify-center border border-[#e0e2e8] rounded-[8px] text-[#333743] hover:bg-gray-50">
-                  <Share size={20} />
+                <button className="w-[40px] h-[40px] flex items-center justify-center border border-border rounded-lg text-foreground hover:bg-grey-light">
+                  <Share size={20} aria-hidden="true" />
                 </button>
-                <button className="bg-[#2681ff] hover:bg-[#1a6fd9] text-white font-bold px-6 py-[16px] rounded-[10px] text-[16px] transition-colors">
+                <button className="bg-primary hover:brightness-85 text-white font-bold px-6 py-4 rounded-lg text-base transition-colors">
                   Book for ${hotel.price}
                 </button>
               </div>
@@ -658,7 +675,7 @@ export default function HotelDetailPage({
 
       {/* Select Rooms Section - Grey Background */}
         <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] pt-[40px] flex flex-col gap-6">
-          <h2 className="font-black text-[#333743] text-[28px]">Select rooms</h2>
+          <h2 className="font-extrabold text-foreground text-2xl">Select rooms</h2>
 
           {/* ── Inline Search Bar ──────────────────────────────────────────────
               Each field uses the same individual bordered card style as
@@ -674,28 +691,32 @@ export default function HotelDetailPage({
             <div className="relative flex-1">
               {/* Clickable field box — active state adds a blue ring, matching PackageSearchForm's fieldBase() */}
               <div
-                className={`h-[48px] rounded-[8px] border px-4 flex items-center gap-3 transition-colors cursor-pointer ${
+                className={cn(
+                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors cursor-pointer",
                   openSearchPanel === "checkIn"
-                    ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-                    : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
-                }`}
+                    ? "border-primary ring-2 ring-primary/20 bg-white"
+                    : "border-border bg-white hover:border-primary"
+                )}
                 onClick={() => setOpenSearchPanel(openSearchPanel === "checkIn" ? null : "checkIn")}
               >
-                <CalendarDays size={16} className="text-[#2681FF] shrink-0" />
+                <CalendarDays size={16} className="text-primary shrink-0" aria-hidden="true" />
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5">Check-in</span>
+                  <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Check-in</span>
                   {/* format() converts the ISO string ("2026-04-10") to "Apr 10, 2026" */}
-                  <span className={`text-[13px] font-semibold truncate ${searchDates.checkIn ? "text-[#333743]" : "text-[#9598a4] font-normal"}`}>
+                  <span className={cn(
+                    "text-sm font-semibold truncate",
+                    searchDates.checkIn ? "text-foreground" : "text-grey font-normal"
+                  )}>
                     {searchDates.checkIn ? format(parseISO(searchDates.checkIn), "MMM d, yyyy") : "Add date"}
                   </span>
                 </div>
-                <ChevronDown size={14} className="text-[#9598a4] shrink-0" />
+                <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
               </div>
 
               {/* DayPicker popup — same pattern as PackageSearchForm's dates panel */}
               {/* max-w-[calc(100vw-2rem)] prevents the calendar from overflowing the viewport on small phones */}
               {openSearchPanel === "checkIn" && (
-                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-150 max-w-[calc(100vw-2rem)] overflow-x-auto">
+                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-xl shadow-2xl border border-border p-4 animate-in fade-in zoom-in-95 duration-150 max-w-[calc(100vw-2rem)] overflow-x-auto">
                   <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
                   <DayPicker
                     mode="single"
@@ -716,25 +737,29 @@ export default function HotelDetailPage({
             {/* ── Check-out field ── */}
             <div className="relative flex-1">
               <div
-                className={`h-[48px] rounded-[8px] border px-4 flex items-center gap-3 transition-colors cursor-pointer ${
+                className={cn(
+                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors cursor-pointer",
                   openSearchPanel === "checkOut"
-                    ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-                    : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
-                }`}
+                    ? "border-primary ring-2 ring-primary/20 bg-white"
+                    : "border-border bg-white hover:border-primary"
+                )}
                 onClick={() => setOpenSearchPanel(openSearchPanel === "checkOut" ? null : "checkOut")}
               >
-                <CalendarDays size={16} className="text-[#2681FF] shrink-0" />
+                <CalendarDays size={16} className="text-primary shrink-0" aria-hidden="true" />
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5">Check-out</span>
-                  <span className={`text-[13px] font-semibold truncate ${searchDates.checkOut ? "text-[#333743]" : "text-[#9598a4] font-normal"}`}>
+                  <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Check-out</span>
+                  <span className={cn(
+                    "text-sm font-semibold truncate",
+                    searchDates.checkOut ? "text-foreground" : "text-grey font-normal"
+                  )}>
                     {searchDates.checkOut ? format(parseISO(searchDates.checkOut), "MMM d, yyyy") : "Add date"}
                   </span>
                 </div>
-                <ChevronDown size={14} className="text-[#9598a4] shrink-0" />
+                <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
               </div>
 
               {openSearchPanel === "checkOut" && (
-                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-150 max-w-[calc(100vw-2rem)] overflow-x-auto">
+                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-xl shadow-2xl border border-border p-4 animate-in fade-in zoom-in-95 duration-150 max-w-[calc(100vw-2rem)] overflow-x-auto">
                   <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
                   <DayPicker
                     mode="single"
@@ -755,17 +780,18 @@ export default function HotelDetailPage({
             {/* ── Guests & Rooms — clickable, opens a dropdown to edit travellers and rooms ── */}
             <div className="relative flex-1">
               <div
-                className={`h-[48px] rounded-[8px] border px-4 flex items-center gap-3 transition-colors cursor-pointer ${
+                className={cn(
+                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors cursor-pointer",
                   openSearchPanel === "guests"
-                    ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-                    : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
-                }`}
+                    ? "border-primary ring-2 ring-primary/20 bg-white"
+                    : "border-border bg-white hover:border-primary"
+                )}
                 onClick={() => setOpenSearchPanel(openSearchPanel === "guests" ? null : "guests")}
               >
-                <Users size={16} className="text-[#2681FF] shrink-0" />
+                <Users size={16} className="text-primary shrink-0" aria-hidden="true" />
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5">Guests & Rooms</span>
-                  <span className="text-[13px] font-semibold text-[#333743] truncate">
+                  <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Guests & Rooms</span>
+                  <span className="text-sm font-semibold text-foreground truncate">
                     {localRoomConfig.reduce((sum, r) => sum + r.adults, 0)} Adult{localRoomConfig.reduce((sum, r) => sum + r.adults, 0) !== 1 ? 's' : ''}
                     {localRoomConfig.reduce((sum, r) => sum + r.children, 0) > 0 &&
                       ` · ${localRoomConfig.reduce((sum, r) => sum + r.children, 0)} Child${localRoomConfig.reduce((sum, r) => sum + r.children, 0) !== 1 ? 'ren' : ''}`
@@ -773,22 +799,22 @@ export default function HotelDetailPage({
                     {' · '}{localRoomConfig.length} Room{localRoomConfig.length !== 1 ? 's' : ''}
                   </span>
                 </div>
-                <ChevronDown size={14} className="text-[#9598a4] shrink-0" />
+                <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
               </div>
 
               {/* Guests dropdown panel — w-full on mobile so it doesn't overflow; capped at 300px on larger screens */}
               {openSearchPanel === "guests" && (
-                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4 w-full sm:w-[300px] max-w-[calc(100vw-2rem)] flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-xl shadow-2xl border border-border p-4 w-full sm:w-[300px] max-w-[calc(100vw-2rem)] flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150">
                   {localRoomConfig.map((config, index) => (
                     <div key={config.id} className="flex flex-col gap-3">
                       {/* Room header row */}
                       <div className="flex items-center justify-between">
-                        <span className="text-[13px] font-bold text-[#333743]">Room {index + 1}</span>
+                        <span className="text-sm font-bold text-foreground">Room {index + 1}</span>
                         {/* Remove button — only shown when there's more than 1 room */}
                         {localRoomConfig.length > 1 && (
                           <button
                             onClick={() => setLocalRoomConfig(prev => prev.filter(r => r.id !== config.id))}
-                            className="text-[11px] text-[#e53935] font-bold hover:underline"
+                            className="text-xs text-red-500 font-bold hover:underline"
                           >
                             Remove
                           </button>
@@ -798,23 +824,23 @@ export default function HotelDetailPage({
                       {/* Adults counter */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-[13px] text-[#333743]">Adults</div>
-                          <div className="text-[11px] text-[#9598a4]">Age 18+</div>
+                          <div className="text-sm text-foreground">Adults</div>
+                          <div className="text-xs text-grey">Age 18+</div>
                         </div>
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => setLocalRoomConfig(prev => prev.map(r =>
                               r.id === config.id ? { ...r, adults: Math.max(1, r.adults - 1) } : r
                             ))}
-                            className="w-7 h-7 rounded-full border border-[#e0e2e8] flex items-center justify-center text-[#333743] font-bold text-[16px] hover:border-[#2681FF] hover:text-[#2681FF] disabled:opacity-30"
+                            className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground font-bold text-base hover:border-primary hover:text-primary disabled:opacity-30"
                             disabled={config.adults <= 1}
                           >−</button>
-                          <span className="text-[14px] font-bold text-[#333743] w-4 text-center">{config.adults}</span>
+                          <span className="text-sm font-bold text-foreground w-4 text-center">{config.adults}</span>
                           <button
                             onClick={() => setLocalRoomConfig(prev => prev.map(r =>
                               r.id === config.id ? { ...r, adults: Math.min(6, r.adults + 1) } : r
                             ))}
-                            className="w-7 h-7 rounded-full border border-[#e0e2e8] flex items-center justify-center text-[#333743] font-bold text-[16px] hover:border-[#2681FF] hover:text-[#2681FF] disabled:opacity-30"
+                            className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground font-bold text-base hover:border-primary hover:text-primary disabled:opacity-30"
                             disabled={config.adults >= 6}
                           >+</button>
                         </div>
@@ -823,23 +849,23 @@ export default function HotelDetailPage({
                       {/* Children counter */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-[13px] text-[#333743]">Children</div>
-                          <div className="text-[11px] text-[#9598a4]">Age 2–17</div>
+                          <div className="text-sm text-foreground">Children</div>
+                          <div className="text-xs text-grey">Age 2–17</div>
                         </div>
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => setLocalRoomConfig(prev => prev.map(r =>
                               r.id === config.id ? { ...r, children: Math.max(0, r.children - 1) } : r
                             ))}
-                            className="w-7 h-7 rounded-full border border-[#e0e2e8] flex items-center justify-center text-[#333743] font-bold text-[16px] hover:border-[#2681FF] hover:text-[#2681FF] disabled:opacity-30"
+                            className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground font-bold text-base hover:border-primary hover:text-primary disabled:opacity-30"
                             disabled={config.children <= 0}
                           >−</button>
-                          <span className="text-[14px] font-bold text-[#333743] w-4 text-center">{config.children}</span>
+                          <span className="text-sm font-bold text-foreground w-4 text-center">{config.children}</span>
                           <button
                             onClick={() => setLocalRoomConfig(prev => prev.map(r =>
                               r.id === config.id ? { ...r, children: Math.min(6, r.children + 1) } : r
                             ))}
-                            className="w-7 h-7 rounded-full border border-[#e0e2e8] flex items-center justify-center text-[#333743] font-bold text-[16px] hover:border-[#2681FF] hover:text-[#2681FF] disabled:opacity-30"
+                            className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground font-bold text-base hover:border-primary hover:text-primary disabled:opacity-30"
                             disabled={config.children >= 6}
                           >+</button>
                         </div>
@@ -847,7 +873,7 @@ export default function HotelDetailPage({
 
                       {/* Divider between rooms */}
                       {index < localRoomConfig.length - 1 && (
-                        <div className="border-t border-[#f3f5f6]" />
+                        <div className="border-t border-muted" />
                       )}
                     </div>
                   ))}
@@ -859,7 +885,7 @@ export default function HotelDetailPage({
                         const newId = Math.max(...localRoomConfig.map(r => r.id)) + 1;
                         setLocalRoomConfig(prev => [...prev, { id: newId, adults: 2, children: 0 }]);
                       }}
-                      className="w-full h-[36px] rounded-[8px] border border-dashed border-[#2681FF] text-[#2681FF] font-bold text-[13px] hover:bg-[#f0f6ff] transition-colors"
+                      className="w-full h-[36px] rounded-lg border border-dashed border-primary text-primary font-bold text-sm hover:bg-primary/10 transition-colors"
                     >
                       + Add another room
                     </button>
@@ -872,9 +898,9 @@ export default function HotelDetailPage({
             {/* w-full on mobile so it fills the stacked column; lg:w-auto so it shrinks to content on wide screens */}
             <button
               onClick={() => { setOpenSearchPanel(null); handleSearchUpdate(); }}
-              className="w-full lg:w-auto shrink-0 bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[14px] h-[48px] px-5 rounded-[8px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
+              className="w-full lg:w-auto shrink-0 bg-primary hover:brightness-85 text-white font-bold text-sm h-[48px] px-5 rounded-lg transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
             >
-              <Search size={16} />
+              <Search size={16} aria-hidden="true" />
               {isSearching ? 'Searching...' : 'Update Search'}
             </button>
           </div>
@@ -883,7 +909,7 @@ export default function HotelDetailPage({
           {localRoomConfig.length > 1 ? (
             <>
               {/* Tab Navigation */}
-              <div className="sticky top-0 z-40 bg-[#F3F5F6] flex items-center -mx-1 px-1 pt-2 border-b border-[#E0E2E8] overflow-x-auto whitespace-nowrap">
+              <div className="sticky top-0 z-40 bg-grey-lightest flex items-center -mx-1 px-1 pt-2 border-b border-border overflow-x-auto whitespace-nowrap">
                 {localRoomConfig.map((config, index) => {
                   const selectedRoom = roomSelections[config.id];
                   const isActive = activeRoomTab === config.id;
@@ -895,22 +921,23 @@ export default function HotelDetailPage({
                       key={config.id}
                       onClick={() => !isDisabled && setActiveRoomTab(config.id)}
                       disabled={isDisabled}
-                      className={`flex items-center gap-2 px-6 py-3 font-bold text-[14px] border-b-2 transition-colors relative ${
+                      className={cn(
+                        "flex items-center gap-2 px-6 py-3 font-bold text-sm border-b-2 transition-colors relative",
                         isDisabled
-                          ? 'border-transparent text-[#9598a4] cursor-not-allowed'
+                          ? "border-transparent text-grey cursor-not-allowed"
                           : isActive
-                            ? 'border-[#2681ff] text-[#2681ff]'
-                            : 'border-transparent text-[#333743] hover:text-[#333743] hover:border-[#2681ff]'
-                      }`}
+                            ? "border-primary text-primary"
+                            : "border-transparent text-foreground hover:text-foreground hover:border-primary"
+                      )}
                     >
                       <span>Room {index + 1}</span>
-                      <div className="flex items-center gap-1 text-[12px] font-normal">
-                        <Users size={14} />
+                      <div className="flex items-center gap-1 text-xs font-normal">
+                        <Users size={14} aria-hidden="true" />
                         <span>{config.adults + config.children}</span>
                       </div>
                       {selectedRoom && (
-                        <div className="absolute top-0 right-0 bg-[#191e3b] rounded-full p-0.5">
-                          <Check size={12} className="text-white" />
+                        <div className="absolute top-0 right-0 bg-foreground rounded-full p-0.5">
+                          <Check size={12} className="text-white" aria-hidden="true" />
                         </div>
                       )}
                     </button>
@@ -930,7 +957,7 @@ export default function HotelDetailPage({
                     {isSearching ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[1, 2, 3].map(n => (
-                          <div key={n} className="bg-white rounded-[12px] border-2 border-[#e0e2e8] h-[420px] animate-pulse" />
+                          <div key={n} className="bg-card rounded-xl border-2 border-border h-[420px] animate-pulse" />
                         ))}
                       </div>
                     ) : availableRooms.length > 0 ? (
@@ -948,11 +975,11 @@ export default function HotelDetailPage({
                         ))}
                       </div>
                     ) : (
-                      <div className="bg-[#fff9ea] border border-[#ffebc2] rounded-[12px] p-6 text-center">
-                        <p className="text-[#92400e] font-bold text-[14px]">
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+                        <p className="text-yellow-900 font-bold text-sm">
                           No rooms available for {getTotalGuests(config)} guest{getTotalGuests(config) > 1 ? 's' : ''}
                         </p>
-                        <p className="text-[#b45309] text-[12px] mt-2">
+                        <p className="text-yellow-700 text-xs mt-2">
                           Please try adjusting your guest configuration on the search page.
                         </p>
                       </div>
@@ -973,7 +1000,7 @@ export default function HotelDetailPage({
                     {isSearching ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[1, 2, 3].map(n => (
-                          <div key={n} className="bg-white rounded-[12px] border-2 border-[#e0e2e8] h-[420px] animate-pulse" />
+                          <div key={n} className="bg-card rounded-xl border-2 border-border h-[420px] animate-pulse" />
                         ))}
                       </div>
                     ) : availableRooms.length > 0 ? (
@@ -991,11 +1018,11 @@ export default function HotelDetailPage({
                         ))}
                       </div>
                     ) : (
-                      <div className="bg-[#fff9ea] border border-[#ffebc2] rounded-[12px] p-6 text-center">
-                        <p className="text-[#92400e] font-bold text-[14px]">
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+                        <p className="text-yellow-900 font-bold text-sm">
                           No rooms available for {getTotalGuests(config)} guest{getTotalGuests(config) > 1 ? 's' : ''}
                         </p>
-                        <p className="text-[#b45309] text-[12px] mt-2">
+                        <p className="text-yellow-700 text-xs mt-2">
                           Please try adjusting your guest configuration on the search page.
                         </p>
                       </div>
@@ -1009,26 +1036,26 @@ export default function HotelDetailPage({
 
       {/* Hotel Policies Section */}
       <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
-        <h2 className="text-[24px] font-bold text-[#333743]">Hotel information</h2>
+        <h2 className="text-2xl font-bold text-foreground">Hotel information</h2>
 
         <PoliciesSection />
       </div>
 
       {/* Guest Reviews Section */}
       <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
-        <h2 className="text-[24px] font-bold text-[#333743]">Guest Reviews</h2>
+        <h2 className="text-2xl font-bold text-foreground">Guest Reviews</h2>
 
-        <div className="bg-white rounded-[16px] shadow-[0_0_4px_0_rgba(125,130,147,0.4)] flex flex-col md:flex-row gap-5 md:gap-10 p-4 md:py-6 md:pl-6 md:pr-0">
+        <div className="bg-card rounded-xl shadow-md flex flex-col md:flex-row gap-5 md:gap-10 p-4 md:py-6 md:pl-6 md:pr-0">
 
           {/* Left column — score + label + review count. Row on mobile, column on desktop. */}
           <div className="flex flex-row md:flex-col items-center md:items-start gap-3 md:gap-1 md:shrink-0 md:w-[100px]">
-            <span className="text-[24px] font-bold text-[#227950] leading-tight">
+            <span className="text-2xl font-bold text-success leading-tight">
               {(hotel.rating / 2).toFixed(1)}/5
             </span>
-            <span className="text-[16px] font-bold text-[#191E3B]">
+            <span className="text-base font-bold text-foreground">
               {ratingLabel(hotel.rating)}
             </span>
-            <button onClick={() => setReviewsOpen(true)} className="text-[12px] text-[#333743] underline hover:no-underline text-left mt-1">
+            <button onClick={() => setReviewsOpen(true)} className="text-xs text-foreground underline hover:no-underline text-left mt-1">
               {hotel.reviewCount.toLocaleString()} verified reviews
             </button>
           </div>
@@ -1041,24 +1068,24 @@ export default function HotelDetailPage({
               {HOTEL_MOCK_REVIEWS.map((review, i) => (
                 <div
                   key={i}
-                  className="flex flex-col border border-[#E0E2E8] rounded-[16px] p-4 shrink-0 w-[78vw] sm:w-[280px] md:w-[295px] h-[210px] sm:h-[230px]"
+                  className="flex flex-col border border-border rounded-xl p-4 shrink-0 w-[78vw] sm:w-[280px] md:w-[295px] h-[210px] sm:h-[230px]"
                 >
-                  <div className="text-[16px] font-bold text-[#191E3B] mb-2">
+                  <div className="text-base font-bold text-foreground mb-2">
                     {review.score} {review.label}
                   </div>
-                  <p className="text-[16px] text-[#191E3B] leading-[1.5] flex-1 overflow-hidden">
+                  <p className="text-base text-foreground leading-normal flex-1 overflow-hidden">
                     {review.text}
                   </p>
-                  <button className="text-[12px] font-bold text-[#2681FF] hover:underline text-left mt-2 mb-1">
+                  <button className="text-xs font-bold text-primary hover:underline text-left mt-2 mb-1">
                     See details
                   </button>
-                  <div className="text-[16px] text-[#191E3B]">{review.date}</div>
-                  <div className="text-[12px] text-[#9598A4]">Verified review</div>
+                  <div className="text-base text-foreground">{review.date}</div>
+                  <div className="text-xs text-grey">Verified review</div>
                 </div>
               ))}
             </div>
 
-            <button className="text-[16px] font-bold text-[#2681FF] hover:underline text-left">
+            <button className="text-base font-bold text-primary hover:underline text-left">
               See all {hotel.reviewCount.toLocaleString()} reviews
             </button>
           </div>
@@ -1068,15 +1095,15 @@ export default function HotelDetailPage({
 
       {/* Sticky Booking Bar */}
       {someRoomsSelected && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e0e2e8] shadow-[0px_-4px_12px_rgba(0,0,0,0.1)] z-50">
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg z-50">
           <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] py-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6">
               {/* Left: Booking Summary */}
               <div className="flex flex-wrap items-center gap-3 sm:gap-6">
                 <div className="flex flex-col">
-                  <span className="text-[#9598a4] text-[12px]">Booking Summary</span>
+                  <span className="text-grey text-xs">Booking Summary</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-[#333743] font-bold text-[16px]">
+                    <span className="text-foreground font-bold text-base">
                       {Object.values(roomSelections).filter(s => s !== null).length} of {localRoomConfig.length} room{localRoomConfig.length > 1 ? 's' : ''} selected
                     </span>
                   </div>
@@ -1087,10 +1114,10 @@ export default function HotelDetailPage({
               {/* Right: Price & CTA — on mobile takes full row width so price and button space out nicely */}
               <div className="flex items-center justify-between w-full sm:w-auto sm:justify-end gap-4 sm:gap-6">
                 <div className="flex flex-col items-end">
-                  <span className="text-[#9598a4] text-[12px]">Total Price</span>
-                  <span className="text-[#333743] font-bold text-[24px]">{totalPrice}€</span>
+                  <span className="text-grey text-xs">Total Price</span>
+                  <span className="text-foreground font-bold text-2xl">{totalPrice}€</span>
                 </div>
-                
+
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span
@@ -1098,11 +1125,12 @@ export default function HotelDetailPage({
                       tabIndex={0}
                       onClick={() => allRoomsSelected && handleCompleteBooking()}
                       aria-disabled={!allRoomsSelected}
-                      className={`inline-flex px-6 py-3 rounded-[8px] font-bold text-[16px] transition-all select-none ${
+                      className={cn(
+                        "inline-flex px-6 py-3 rounded-lg font-bold text-base transition-all select-none",
                         allRoomsSelected
-                          ? 'bg-[#2681ff] hover:bg-[#1a6fd9] text-white cursor-pointer'
-                          : 'bg-[#e0e2e8] text-[#9598a4] cursor-not-allowed'
-                      }`}
+                          ? "bg-primary hover:brightness-85 text-white cursor-pointer"
+                          : "bg-border text-grey cursor-not-allowed"
+                      )}
                     >
                       Complete Booking
                     </span>

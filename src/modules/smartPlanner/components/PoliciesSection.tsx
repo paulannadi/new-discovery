@@ -17,7 +17,7 @@ type PolicyItem = {
 
 const POLICIES: PolicyItem[] = [
   {
-    icon: <Clock size={18} />,
+    icon: <Clock size={18} aria-hidden="true" />,
     title: "Check-in",
     details: [
       "From 3:00 PM — anytime after",
@@ -25,12 +25,12 @@ const POLICIES: PolicyItem[] = [
     ],
   },
   {
-    icon: <LogOut size={18} />,
+    icon: <LogOut size={18} aria-hidden="true" />,
     title: "Check-out",
     details: ["Before 12:00 PM (noon)"],
   },
   {
-    icon: <Info size={18} />,
+    icon: <Info size={18} aria-hidden="true" />,
     title: "Special check-in instructions",
     details: [
       "Front desk staff will greet guests on arrival",
@@ -38,12 +38,12 @@ const POLICIES: PolicyItem[] = [
     ],
   },
   {
-    icon: <KeyRound size={18} />,
+    icon: <KeyRound size={18} aria-hidden="true" />,
     title: "Access methods",
     details: ["Staffed front desk"],
   },
   {
-    icon: <Dog size={18} />,
+    icon: <Dog size={18} aria-hidden="true" />,
     title: "Pets",
     details: [
       "Pets not allowed",
@@ -51,7 +51,7 @@ const POLICIES: PolicyItem[] = [
     ],
   },
   {
-    icon: <Baby size={18} />,
+    icon: <Baby size={18} aria-hidden="true" />,
     title: "Children & extra beds",
     details: [
       "Children are welcome",
@@ -66,25 +66,25 @@ const PAYMENT_METHODS = ["Visa", "Mastercard", "Diners Club", "JCB", "PayPal"];
 
 export default function PoliciesSection() {
   return (
-    <div className="bg-white rounded-[16px] shadow-[0px_0px_4px_0px_rgba(125,130,147,0.4)] p-6 flex flex-col gap-6">
+    <div className="bg-card rounded-xl shadow-sm p-6 flex flex-col gap-6">
 
-      {/* Policy grid — 1 column on mobile, 2 on sm+, 3 on lg+ */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Policy grid — 1 column on mobile, 2 on md+, 3 on lg+ */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {POLICIES.map((policy) => (
           <div
             key={policy.title}
-            className="flex flex-col gap-2 p-4 rounded-[12px] bg-white border border-[#e0e2e8]"
+            className="flex flex-col gap-2 p-4 rounded-xl bg-card border border-border"
           >
             {/* Icon + title row */}
-            <div className="flex items-center gap-2 text-[#333743]">
-              <span className="shrink-0 text-[#333743]">{policy.icon}</span>
-              <span className="font-bold text-[14px]">{policy.title}</span>
+            <div className="flex items-center gap-2 text-foreground">
+              <span className="shrink-0">{policy.icon}</span>
+              <span className="font-bold text-sm">{policy.title}</span>
             </div>
 
             {/* Detail lines */}
             <ul className="flex flex-col gap-1">
               {policy.details.map((line) => (
-                <li key={line} className="text-[13px] text-[#6b7280] leading-[1.5]">
+                <li key={line} className="text-xs text-muted-foreground leading-normal">
                   {line}
                 </li>
               ))}
@@ -94,16 +94,16 @@ export default function PoliciesSection() {
       </div>
 
       {/* Payment types — full-width row of badges */}
-      <div className="flex flex-col gap-3 pt-2 border-t border-[#e0e2e8]">
-        <div className="flex items-center gap-2 text-[#333743]">
-          <CreditCard size={18} className="text-[#333743] shrink-0" />
-          <span className="font-bold text-[14px]">Accepted payment methods</span>
+      <div className="flex flex-col gap-3 pt-2 border-t border-border">
+        <div className="flex items-center gap-2 text-foreground">
+          <CreditCard size={18} className="shrink-0" aria-hidden="true" />
+          <span className="font-bold text-sm">Accepted payment methods</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {PAYMENT_METHODS.map((method) => (
             <span
               key={method}
-              className="px-3 py-1 rounded-full border border-[#e0e2e8] text-[13px] font-medium text-[#333743] bg-white"
+              className="px-3 py-1 rounded-full border border-border text-xs font-medium text-foreground bg-card"
             >
               {method}
             </span>

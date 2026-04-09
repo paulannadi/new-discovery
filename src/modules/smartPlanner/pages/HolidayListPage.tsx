@@ -12,6 +12,7 @@ import {
   List,
 } from "lucide-react";
 import { format } from "date-fns";
+import { cn } from "../../../shared/components/ui/utils";
 import type { HolidaySearchCriteria } from "../../../App";
 import type { UnifiedPackage } from "../../../types";
 import PackageSearchForm from "../components/PackageSearchForm";
@@ -84,11 +85,12 @@ const FilterButton = ({
   icon?: React.ReactNode;
 }) => (
   <button
-    className={`px-4 py-2 rounded-lg border text-sm font-semibold flex items-center gap-2 transition-all shrink-0 ${
+    className={cn(
+      "px-4 py-2 rounded-lg border text-sm font-semibold flex items-center gap-2 transition-all shrink-0",
       active || hasSelection
-        ? "bg-[#2681FF] border-[#2681FF] text-white"
-        : "bg-white border-[#e0e2e8] text-[#333743] hover:border-[#2681FF]"
-    }`}
+        ? "bg-primary border-primary text-white"
+        : "bg-card border-border text-foreground hover:border-primary"
+    )}
     onClick={onClick}
   >
     {icon}
@@ -105,13 +107,25 @@ const CheckboxRow = ({
   checked: boolean;
   onChange: () => void;
 }) => (
-  <div className="flex items-center gap-3 cursor-pointer group py-2" onClick={onChange}>
-    <div className={`w-5 h-5 rounded-[4px] border flex items-center justify-center transition-colors shrink-0 ${
-      checked ? "bg-[#2681FF] border-[#2681FF]" : "bg-white border-[#e0e2e8] group-hover:border-[#2681FF]"
-    }`}>
+  <div
+    className="flex items-center gap-3 cursor-pointer group py-2"
+    onClick={onChange}
+    role="button"
+    tabIndex={0}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onChange();
+      }
+    }}
+  >
+    <div className={cn(
+      "w-5 h-5 rounded-sm border flex items-center justify-center transition-colors shrink-0",
+      checked ? "bg-primary border-primary" : "bg-card border-border group-hover:border-primary"
+    )}>
       {checked && <Check size={14} className="text-white" />}
     </div>
-    <span className="text-[#333743] text-[14px] font-medium">{label}</span>
+    <span className="text-foreground text-sm font-medium">{label}</span>
   </div>
 );
 
@@ -124,35 +138,35 @@ const CheckboxRow = ({
 // ─────────────────────────────────────────────────────────────────────────────
 
 const PackageCardSkeleton = () => (
-  <div className="bg-white rounded-[16px] border border-[#e0e2e8] overflow-hidden shadow-sm flex flex-col md:flex-row animate-pulse">
+  <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm flex flex-col md:flex-row animate-pulse">
     {/* Left: image placeholder */}
-    <div className="md:w-[260px] shrink-0 h-[200px] md:h-auto bg-[#e8eaed]" />
+    <div className="md:w-[260px] shrink-0 h-[200px] md:h-auto bg-grey-light" />
 
     {/* Right: content placeholder */}
     <div className="flex-1 p-5 flex flex-col gap-3">
       {/* Location line */}
-      <div className="h-3 w-32 bg-[#e8eaed] rounded-full" />
+      <div className="h-3 w-32 bg-grey-light rounded-full" />
       {/* Hotel name */}
-      <div className="h-3 w-48 bg-[#e8eaed] rounded-full" />
+      <div className="h-3 w-48 bg-grey-light rounded-full" />
       {/* Room type */}
-      <div className="h-3 w-48 bg-[#e8eaed] rounded-full" />
+      <div className="h-3 w-48 bg-grey-light rounded-full" />
       {/* Board type */}
-      <div className="h-3 w-48 bg-[#e8eaed] rounded-full" />
+      <div className="h-3 w-48 bg-grey-light rounded-full" />
       {/* Amenity chips */}
       <div className="flex gap-2">
-        <div className="h-5 w-16 bg-[#e8eaed] rounded-full" />
-        <div className="h-5 w-20 bg-[#e8eaed] rounded-full" />
-        <div className="h-5 w-14 bg-[#e8eaed] rounded-full" />
+        <div className="h-5 w-16 bg-grey-light rounded-full" />
+        <div className="h-5 w-20 bg-grey-light rounded-full" />
+        <div className="h-5 w-14 bg-grey-light rounded-full" />
       </div>
       {/* Dates */}
-      <div className="h-3 w-52 bg-[#e8eaed] rounded-full" />
+      <div className="h-3 w-52 bg-grey-light rounded-full" />
       {/* Price + CTA row */}
-      <div className="flex items-center justify-between mt-auto pt-3 border-t border-[#f3f5f6]">
+      <div className="flex items-center justify-between mt-auto pt-3 border-t border-muted">
         <div className="flex flex-col gap-1.5">
-          <div className="h-2.5 w-20 bg-[#e8eaed] rounded-full" />
-          <div className="h-6 w-24 bg-[#e8eaed] rounded-full" />
+          <div className="h-2.5 w-20 bg-grey-light rounded-full" />
+          <div className="h-6 w-24 bg-grey-light rounded-full" />
         </div>
-        <div className="h-10 w-28 bg-[#e8eaed] rounded-[10px]" />
+        <div className="h-10 w-28 bg-grey-light rounded-lg" />
       </div>
     </div>
   </div>
@@ -378,14 +392,15 @@ export default function HolidayListPage({
 
     if (openFilter === "sort") {
       return (
-        <div style={style} className="w-[220px] bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] p-2 animate-in fade-in zoom-in-95 duration-200">
+        <div style={style} className="w-[220px] bg-card rounded-xl shadow-lg border border-border p-2 animate-in fade-in zoom-in-95 duration-200">
           {SORT_OPTIONS.map((opt) => (
             <button
               key={opt.id}
               onClick={() => { setSortBy(opt.id); setOpenFilter(null); }}
-              className={`w-full text-left px-4 py-2.5 rounded-[8px] text-[14px] font-medium transition-colors ${
-                sortBy === opt.id ? "bg-[#EFF6FF] text-[#2681FF] font-bold" : "text-[#333743] hover:bg-[#f9fafb]"
-              }`}
+              className={cn(
+                "w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                sortBy === opt.id ? "bg-primary/10 text-primary font-bold" : "text-foreground hover:bg-grey-light"
+              )}
             >
               {opt.label}
             </button>
@@ -396,13 +411,13 @@ export default function HolidayListPage({
 
     if (openFilter === "stars") {
       return (
-        <div style={style} className="w-[200px] bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-200">
-          <h4 className="font-bold text-sm mb-3 text-[#333743]">Hotel stars</h4>
+        <div style={style} className="w-[200px] bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-200">
+          <h4 className="font-bold text-sm mb-3 text-foreground">Hotel stars</h4>
           <div className="flex flex-col gap-1">
             {[5, 4, 3, 2].map((s) => (
               <CheckboxRow
                 key={s}
-                label={<span className="text-[#FFB700] font-bold">{"★".repeat(s)}</span>}
+                label={<span className="text-warning font-bold">{"★".repeat(s)}</span>}
                 checked={filterStars.has(s)}
                 onChange={() => setFilterStars(toggleSet(filterStars, s))}
               />
@@ -414,8 +429,8 @@ export default function HolidayListPage({
 
     if (openFilter === "board") {
       return (
-        <div style={style} className="w-[240px] bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-200">
-          <h4 className="font-bold text-sm mb-3 text-[#333743]">Board type</h4>
+        <div style={style} className="w-[240px] bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-200">
+          <h4 className="font-bold text-sm mb-3 text-foreground">Board type</h4>
           <div className="flex flex-col gap-1">
             {["All Inclusive", "Half Board", "Breakfast Included", "Room Only"].map((b) => (
               <CheckboxRow key={b} label={b} checked={filterBoard.has(b)} onChange={() => setFilterBoard(toggleSet(filterBoard, b))} />
@@ -427,8 +442,8 @@ export default function HolidayListPage({
 
     if (openFilter === "triptype") {
       return (
-        <div style={style} className="w-[220px] bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-200">
-          <h4 className="font-bold text-sm mb-3 text-[#333743]">Trip type</h4>
+        <div style={style} className="w-[220px] bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-200">
+          <h4 className="font-bold text-sm mb-3 text-foreground">Trip type</h4>
           <div className="flex flex-col gap-1">
             {TRIP_TYPE_OPTIONS.map((opt) => (
               <CheckboxRow
@@ -445,8 +460,8 @@ export default function HolidayListPage({
 
     if (openFilter === "style") {
       return (
-        <div style={style} className="w-[220px] bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-200">
-          <h4 className="font-bold text-sm mb-3 text-[#333743]">Travel style</h4>
+        <div style={style} className="w-[220px] bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-200">
+          <h4 className="font-bold text-sm mb-3 text-foreground">Travel style</h4>
           <div className="flex flex-col gap-1">
             {TRAVEL_STYLE_OPTIONS.map((s) => (
               <CheckboxRow key={s} label={s} checked={filterStyles.has(s)} onChange={() => setFilterStyles(toggleSet(filterStyles, s))} />
@@ -458,16 +473,16 @@ export default function HolidayListPage({
 
     if (openFilter === "price") {
       return (
-        <div style={style} className="w-[260px] bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] p-4 animate-in fade-in zoom-in-95 duration-200">
-          <h4 className="font-bold text-sm mb-3 text-[#333743]">Price per person</h4>
-          <div className="flex justify-between text-[13px] text-[#667080] mb-3">
+        <div style={style} className="w-[260px] bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-200">
+          <h4 className="font-bold text-sm mb-3 text-foreground">Price per person</h4>
+          <div className="flex justify-between text-xs text-muted-foreground mb-3">
             <span>£{priceMin.toLocaleString()}</span>
             <span>£{priceMax.toLocaleString()}</span>
           </div>
           <div className="relative h-5 flex items-center">
-            <div className="absolute w-full h-[4px] bg-[#e0e2e8] rounded-full" />
+            <div className="absolute w-full h-[4px] bg-border rounded-full" />
             <div
-              className="absolute h-[4px] bg-[#2681FF] rounded-full"
+              className="absolute h-[4px] bg-primary rounded-full"
               style={{
                 left: `${((priceMin - 500) / 4500) * 100}%`,
                 right: `${100 - ((priceMax - 500) / 4500) * 100}%`,
@@ -476,13 +491,13 @@ export default function HolidayListPage({
             <input
               type="range" min={500} max={5000} step={50} value={priceMin}
               onChange={(e) => setPriceMin(Math.min(Number(e.target.value), priceMax - 50))}
-              className="absolute w-full appearance-none bg-transparent cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#2681FF] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow"
+              className="absolute w-full appearance-none bg-transparent cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow"
               style={{ zIndex: priceMin > 4500 ? 5 : 3 }}
             />
             <input
               type="range" min={500} max={5000} step={50} value={priceMax}
               onChange={(e) => setPriceMax(Math.max(Number(e.target.value), priceMin + 50))}
-              className="absolute w-full appearance-none bg-transparent cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#2681FF] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow"
+              className="absolute w-full appearance-none bg-transparent cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow"
               style={{ zIndex: 4 }}
             />
           </div>
@@ -498,7 +513,7 @@ export default function HolidayListPage({
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#F3F5F6] flex flex-col">
+    <div className="min-h-screen bg-grey-lightest flex flex-col">
 
       {/* Click-away backdrop — closes filter dropdowns when clicking outside */}
       {openFilter && (
@@ -509,7 +524,7 @@ export default function HolidayListPage({
       )}
 
       {/* ── HEADER: editable search criteria ─────────────────────────────── */}
-      <div className="bg-white border-b border-[#e0e2e8] relative z-40">
+      <div className="bg-card border-b border-border relative z-40">
         <div className="max-w-[1920px] mx-auto px-4 md:px-6 py-4">
 
           {/* Back to Discovery — always visible, including on mobile */}
@@ -522,18 +537,18 @@ export default function HolidayListPage({
                 className="flex-1 flex flex-col cursor-pointer"
                 onClick={() => setIsMobileSearchExpanded(true)}
               >
-                <div className="font-bold text-[#333743] text-[15px] flex items-center gap-2">
-                  <Plane size={16} className="text-[#2681FF]" />
+                <div className="font-bold text-foreground text-sm flex items-center gap-2">
+                  <Plane size={16} className="text-primary" aria-hidden="true" />
                   <span className="truncate">
                     {searchCriteria.from || "London"} → {searchCriteria.to || "Anywhere"}
                   </span>
                 </div>
-                <div className="text-[#9598a4] text-xs mt-0.5 ml-6">
+                <div className="text-grey text-xs mt-0.5 ml-6">
                   {searchDateLabel} · {(searchCriteria.adults || 2) + (searchCriteria.children || 0)} Guests · {searchCriteria.nights || 7} nights
                 </div>
               </div>
               <button
-                className="text-[#2681FF] font-bold text-sm px-4 py-2 bg-[#f3f5f6] rounded-lg shrink-0"
+                className="text-primary font-bold text-sm px-4 py-2 bg-grey-light rounded-lg shrink-0"
                 onClick={() => setIsMobileSearchExpanded(true)}
               >
                 Edit
@@ -558,7 +573,7 @@ export default function HolidayListPage({
       </div>
 
       {/* ── FILTER BAR: desktop ───────────────────────────────────────────── */}
-      <div className="hidden md:block bg-[#F3F5F6] sticky top-0 z-30 border-b border-[#e0e2e8]">
+      <div className="hidden md:block bg-grey-lightest sticky top-0 z-30 border-b border-border">
         <div className="max-w-[1920px] mx-auto px-4 md:px-6 py-3 flex gap-3 overflow-x-auto items-center">
 
           <FilterButton
@@ -609,7 +624,7 @@ export default function HolidayListPage({
           {activeFilterCount > 0 && (
             <button
               onClick={resetFilters}
-              className="text-[#2681FF] text-sm font-bold hover:underline ml-3 shrink-0"
+              className="text-primary text-sm font-bold hover:underline ml-3 shrink-0"
             >
               Reset all
             </button>
@@ -619,28 +634,28 @@ export default function HolidayListPage({
       </div>
 
       {/* ── FILTER BAR: mobile ────────────────────────────────────────────── */}
-      <div className="md:hidden bg-[#F3F5F6] sticky top-0 z-30 px-4 py-3">
-        <div className="bg-white border border-[#e0e2e8] rounded-full flex items-center h-[48px] w-full">
-          <button className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-bold text-[#333743] first:rounded-l-full">
+      <div className="md:hidden bg-grey-lightest sticky top-0 z-30 px-4 py-3">
+        <div className="bg-card border border-border rounded-full flex items-center h-[48px] w-full">
+          <button className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-bold text-foreground first:rounded-l-full">
             <ArrowUpDown size={14} />
             Sort
           </button>
-          <div className="w-[1px] h-6 bg-[#e0e2e8]" />
+          <div className="w-[1px] h-6 bg-border" />
           <button
-            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-bold text-[#333743]"
+            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-bold text-foreground"
             onClick={() => setIsMobileFiltersOpen(true)}
           >
             <SlidersHorizontal size={14} />
             Filters
             {activeFilterCount > 0 && (
-              <span className="bg-[#2681FF] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="bg-primary text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">
                 {activeFilterCount}
               </span>
             )}
           </button>
-          <div className="w-[1px] h-6 bg-[#e0e2e8]" />
+          <div className="w-[1px] h-6 bg-border" />
           <button
-            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-bold text-[#333743] last:rounded-r-full"
+            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-bold text-foreground last:rounded-r-full"
             onClick={() => setMobileView(mobileView === "list" ? "map" : "list")}
           >
             {mobileView === "list" ? <MapIcon size={14} /> : <List size={14} />}
@@ -657,7 +672,7 @@ export default function HolidayListPage({
 
           {/* Results count header */}
           <div className="flex flex-col gap-2">
-            <h2 className="text-[#333743] font-bold text-[20px]">
+            <h2 className="text-foreground font-bold text-xl">
               {/* While non-cached search is running, show a searching state */}
               {isNonCachedLoading
                 ? "Searching for holidays…"
@@ -671,7 +686,7 @@ export default function HolidayListPage({
             {showLoadingBar && (
               <div className={`h-1 w-full bg-gray-200/50 rounded-full overflow-hidden transition-opacity duration-500 ${loadingProgress >= 100 ? "opacity-0" : "opacity-100"}`}>
                 <div
-                  className="h-full bg-[#2681ff] transition-all duration-75 ease-linear"
+                  className="h-full bg-primary transition-all duration-75 ease-linear"
                   style={{ width: `${loadingProgress}%` }}
                 />
               </div>
@@ -693,20 +708,20 @@ export default function HolidayListPage({
             // Brief loading state before the 200ms cached results arrive
             <div className="flex flex-col gap-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-[16px] border border-[#e0e2e8] h-[200px] animate-pulse" />
+                <div key={i} className="bg-card rounded-xl border border-border h-[200px] animate-pulse" />
               ))}
             </div>
           )}
 
           {/* Empty state — no results after filtering */}
           {filteredAndSorted.length === 0 && packages.length > 0 && (
-            <div className="bg-white rounded-[16px] border border-[#e0e2e8] p-12 text-center flex flex-col items-center">
-              <Search size={40} className="text-[#9598a4] mb-4" />
-              <div className="text-[18px] font-bold text-[#333743] mb-2">No holidays match your filters</div>
-              <div className="text-[14px] text-[#667080] mb-6">Try adjusting the price range, stars, or board type.</div>
+            <div className="bg-card rounded-xl border border-border p-12 text-center flex flex-col items-center">
+              <Search size={40} className="text-grey mb-4" />
+              <div className="text-lg font-bold text-foreground mb-2">No holidays match your filters</div>
+              <div className="text-sm text-muted-foreground mb-6">Try adjusting the price range, stars, or board type.</div>
               <button
                 onClick={resetFilters}
-                className="bg-[#2681FF] text-white font-bold px-5 py-2.5 rounded-[10px] hover:bg-[#1a6fd9] transition-colors"
+                className="bg-primary text-white font-bold px-5 py-2.5 rounded-lg hover:brightness-85 transition-colors"
               >
                 Clear all filters
               </button>
@@ -837,51 +852,51 @@ export default function HolidayListPage({
 
       {/* ── MOBILE FILTERS PANEL ─────────────────────────────────────────── */}
       {isMobileFiltersOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-white flex flex-col animate-in slide-in-from-bottom duration-300">
-          <div className="flex items-center justify-between p-4 border-b border-[#e0e2e8]">
-            <h2 className="text-lg font-bold text-[#333743]">Filters</h2>
+        <div className="md:hidden fixed inset-0 z-50 bg-card flex flex-col animate-in slide-in-from-bottom duration-300">
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <h2 className="text-lg font-bold text-foreground">Filters</h2>
             <button
-              className="p-2 hover:bg-[#f3f5f6] rounded-full"
+              className="p-2 hover:bg-grey-light rounded-full"
               onClick={() => setIsMobileFiltersOpen(false)}
             >
-              <X size={24} className="text-[#333743]" />
+              <X size={24} className="text-foreground" />
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6 pb-24">
 
             <div className="flex flex-col gap-4">
-              <h3 className="font-bold text-[#333743]">Price per person</h3>
-              <div className="flex justify-between text-sm font-bold text-[#333743]">
-                <div className="px-4 py-2 rounded-[8px] border border-[#e0e2e8]">£{priceMin.toLocaleString()}</div>
-                <div className="px-4 py-2 rounded-[8px] border border-[#e0e2e8]">£{priceMax.toLocaleString()}</div>
+              <h3 className="font-bold text-foreground">Price per person</h3>
+              <div className="flex justify-between text-sm font-bold text-foreground">
+                <div className="px-4 py-2 rounded-lg border border-border">£{priceMin.toLocaleString()}</div>
+                <div className="px-4 py-2 rounded-lg border border-border">£{priceMax.toLocaleString()}</div>
               </div>
             </div>
-            <div className="h-[1px] bg-[#e0e2e8]" />
+            <div className="h-[1px] bg-border" />
 
             <div className="flex flex-col gap-3">
-              <h3 className="font-bold text-[#333743]">Hotel stars</h3>
+              <h3 className="font-bold text-foreground">Hotel stars</h3>
               {[5, 4, 3, 2].map((s) => (
                 <CheckboxRow
                   key={s}
-                  label={<span className="text-[#FFB700] font-bold">{"★".repeat(s)}</span>}
+                  label={<span className="text-warning font-bold">{"★".repeat(s)}</span>}
                   checked={filterStars.has(s)}
                   onChange={() => setFilterStars(toggleSet(filterStars, s))}
                 />
               ))}
             </div>
-            <div className="h-[1px] bg-[#e0e2e8]" />
+            <div className="h-[1px] bg-border" />
 
             <div className="flex flex-col gap-3">
-              <h3 className="font-bold text-[#333743]">Board type</h3>
+              <h3 className="font-bold text-foreground">Board type</h3>
               {["All Inclusive", "Half Board", "Breakfast Included", "Room Only"].map((b) => (
                 <CheckboxRow key={b} label={b} checked={filterBoard.has(b)} onChange={() => setFilterBoard(toggleSet(filterBoard, b))} />
               ))}
             </div>
-            <div className="h-[1px] bg-[#e0e2e8]" />
+            <div className="h-[1px] bg-border" />
 
             <div className="flex flex-col gap-3">
-              <h3 className="font-bold text-[#333743]">Trip type</h3>
+              <h3 className="font-bold text-foreground">Trip type</h3>
               {TRIP_TYPE_OPTIONS.map((opt) => (
                 <CheckboxRow
                   key={opt.id}
@@ -891,10 +906,10 @@ export default function HolidayListPage({
                 />
               ))}
             </div>
-            <div className="h-[1px] bg-[#e0e2e8]" />
+            <div className="h-[1px] bg-border" />
 
             <div className="flex flex-col gap-3">
-              <h3 className="font-bold text-[#333743]">Travel style</h3>
+              <h3 className="font-bold text-foreground">Travel style</h3>
               {TRAVEL_STYLE_OPTIONS.map((s) => (
                 <CheckboxRow key={s} label={s} checked={filterStyles.has(s)} onChange={() => setFilterStyles(toggleSet(filterStyles, s))} />
               ))}
@@ -902,10 +917,10 @@ export default function HolidayListPage({
 
           </div>
 
-          <div className="sticky bottom-0 bg-white px-4 py-4 border-t border-[#e0e2e8]">
+          <div className="sticky bottom-0 bg-card px-4 py-4 border-t border-border">
             <button
               onClick={() => setIsMobileFiltersOpen(false)}
-              className="w-full bg-[#2681FF] text-white font-bold text-[15px] py-3 rounded-[12px] hover:bg-[#1a6fd9] transition-colors"
+              className="w-full bg-primary text-white font-bold text-sm py-3 rounded-xl hover:brightness-85 transition-colors"
             >
               Show {filteredAndSorted.length} holiday{filteredAndSorted.length !== 1 ? "s" : ""}
             </button>

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { BackButton } from "../../../shared/components/BackButton";
+import { cn } from "../../../shared/components/ui/utils";
 import {
   Plane,
   Clock,
@@ -143,8 +144,8 @@ function parseDurationToMinutes(duration: string): number {
 // The 2-letter airline code shown as a small square badge
 function AirlineBadge({ code }: { code: string }) {
   return (
-    <div className="w-10 h-10 rounded-[8px] bg-[#f3f5f6] flex items-center justify-center shrink-0">
-      <span className="text-[11px] font-black text-[#333743] tracking-tight">{code}</span>
+    <div className="w-10 h-10 rounded-lg bg-grey-light flex items-center justify-center shrink-0">
+      <span className="text-xs font-extrabold text-foreground tracking-tight">{code}</span>
     </div>
   );
 }
@@ -152,12 +153,12 @@ function AirlineBadge({ code }: { code: string }) {
 // Badge pill shown on certain flights: "Best", "Cheapest", or "Fastest"
 function ResultBadge({ label }: { label: "Best" | "Cheapest" | "Fastest" }) {
   const styles = {
-    Best: "bg-green-50 text-green-700",
-    Cheapest: "bg-amber-50 text-amber-700",
+    Best: "bg-success/10 text-success",
+    Cheapest: "bg-warning/10 text-warning",
     Fastest: "bg-purple-50 text-purple-700",
   };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold ${styles[label]}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${styles[label]}`}>
       {label}
     </span>
   );
@@ -174,7 +175,7 @@ function FlightCard({
   onSelect: () => void;
 }) {
   return (
-    <div className="bg-white rounded-[16px] border border-[#e0e2e8] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 ease-out overflow-hidden">
+    <div className="bg-card rounded-xl border border-border shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 ease-out overflow-hidden">
       <div className="p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-4">
 
         {/* Left: airline info + flight bar */}
@@ -185,12 +186,12 @@ function FlightCard({
             <AirlineBadge code={option.airlineCode} />
             <div className="flex flex-col gap-0.5">
               <div className="flex items-center gap-2">
-                <span className="text-[14px] font-bold text-[#333743]">
+                <span className="text-sm font-bold text-foreground">
                   {option.airline}
                 </span>
                 {option.badge && <ResultBadge label={option.badge} />}
               </div>
-              <span className="text-[12px] text-[#9598a4]">
+              <span className="text-xs text-grey">
                 {cabinLabel} · 1 checked bag included
               </span>
             </div>
@@ -200,31 +201,31 @@ function FlightCard({
           <div className="flex items-center gap-3">
             {/* Departure time */}
             <div className="text-center shrink-0 min-w-[44px]">
-              <div className="text-[18px] font-black text-[#333743] leading-none">
+              <div className="text-lg font-extrabold text-foreground leading-none">
                 {option.departure}
               </div>
             </div>
 
             {/* Connecting bar */}
             <div className="flex-1 flex flex-col gap-1 items-center">
-              <div className="text-[11px] font-semibold text-[#9598a4]">
+              <div className="text-xs font-semibold text-grey">
                 {option.stops}
                 {option.stopInfo ? ` · ${option.stopInfo}` : ""}
               </div>
               <div className="w-full flex items-center gap-1">
-                <div className="flex-1 h-px bg-[#e0e2e8]" />
-                <Plane size={12} className="text-[#9598a4] shrink-0" />
-                <div className="flex-1 h-px bg-[#e0e2e8]" />
+                <div className="flex-1 h-px bg-border" />
+                <Plane size={12} className="text-grey shrink-0" aria-hidden="true" />
+                <div className="flex-1 h-px bg-border" />
               </div>
-              <div className="flex items-center gap-1 text-[11px] text-[#9598a4]">
-                <Clock size={10} />
+              <div className="flex items-center gap-1 text-xs text-grey">
+                <Clock size={10} aria-hidden="true" />
                 {option.duration}
               </div>
             </div>
 
             {/* Arrival time */}
             <div className="text-center shrink-0 min-w-[44px]">
-              <div className="text-[18px] font-black text-[#333743] leading-none">
+              <div className="text-lg font-extrabold text-foreground leading-none">
                 {option.arrival}
               </div>
             </div>
@@ -232,16 +233,16 @@ function FlightCard({
         </div>
 
         {/* Right: price + select button */}
-        <div className="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-3 md:min-w-[140px] pt-3 md:pt-0 border-t md:border-t-0 md:border-l border-[#f3f5f6] md:pl-5">
+        <div className="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-3 md:min-w-[140px] pt-3 md:pt-0 border-t md:border-t-0 md:border-l border-muted md:pl-5">
           <div className="text-right">
-            <div className="text-[11px] text-[#9598a4]">per person</div>
-            <div className="text-[22px] font-black text-[#333743] leading-tight">
+            <div className="text-xs text-grey">per person</div>
+            <div className="text-2xl font-extrabold text-foreground leading-tight">
               ${option.price}
             </div>
           </div>
           <button
             onClick={onSelect}
-            className="bg-[#2681FF] hover:bg-[#1a6fd9] text-white text-[14px] font-bold px-5 py-2.5 rounded-[10px] transition-colors whitespace-nowrap"
+            className="bg-primary hover:brightness-85 text-white text-sm font-bold px-5 py-2.5 rounded-lg transition-colors whitespace-nowrap"
           >
             Select
           </button>
@@ -262,18 +263,19 @@ function StepDot({
   return (
     <div className="flex flex-col items-center gap-1.5">
       <div
-        className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+        className={cn(
+          "w-7 h-7 rounded-full flex items-center justify-center transition-all",
           status === "done"
-            ? "bg-[#16a34a] text-white"
+            ? "bg-success text-white"
             : status === "current"
-            ? "bg-[#2681FF] text-white ring-4 ring-[#2681FF]/20"
-            : "bg-white border-2 border-[#e0e2e8] text-[#9598a4]"
-        }`}
+            ? "bg-primary text-white ring-4 ring-primary/20"
+            : "bg-card border-2 border-border text-grey"
+        )}
       >
         {status === "done" ? (
-          <Check size={14} strokeWidth={3} />
+          <Check size={14} strokeWidth={3} aria-hidden="true" />
         ) : (
-          <span className="text-[11px] font-black">{label}</span>
+          <span className="text-xs font-extrabold">{label}</span>
         )}
       </div>
     </div>
@@ -333,12 +335,12 @@ export default function FlightListPage({
   const passengersLabel = `${total} passenger${total !== 1 ? "s" : ""} · ${cabinLabel}`;
 
   return (
-    <div className="min-h-screen bg-[#f3f5f6]">
+    <div className="min-h-screen bg-grey-lightest">
 
       {/* ── STICKY CRITERIA BAR ─────────────────────────────────────────────
           Shows all legs as pills. Done = green check, current = blue border,
           future = grey. Stays on screen while scrolling results. */}
-      <div className="sticky top-0 z-40 bg-white border-b border-[#e0e2e8] shadow-sm">
+      <div className="sticky top-0 z-40 bg-card border-b border-border shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3 flex-wrap">
 
@@ -346,7 +348,7 @@ export default function FlightListPage({
             <BackButton label="Back to discovery" onClick={onBack} />
 
             {/* Divider */}
-            <span className="hidden sm:block w-px h-5 bg-[#e0e2e8]" />
+            <span className="hidden sm:block w-px h-5 bg-border" />
 
             {/* Leg pills — map over all legs and show status */}
             <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
@@ -357,18 +359,19 @@ export default function FlightListPage({
                   <React.Fragment key={leg.id}>
                     {/* Show connector arrow between legs */}
                     {i > 0 && (
-                      <ArrowRight size={12} className="text-[#9598a4] shrink-0 hidden sm:block" />
+                      <ArrowRight size={12} className="text-grey shrink-0 hidden sm:block" aria-hidden="true" />
                     )}
                     <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold border transition-all ${
+                      className={cn(
+                        "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all",
                         isDone
-                          ? "bg-green-50 border-green-200 text-green-700"
+                          ? "bg-success/10 border-success/30 text-success"
                           : isCurrent
-                          ? "bg-[#eff6ff] border-[#2681FF] text-[#2681FF]"
-                          : "bg-[#f9fafb] border-[#e0e2e8] text-[#9598a4]"
-                      }`}
+                          ? "bg-primary/10 border-primary text-primary"
+                          : "bg-grey-light border-border text-grey"
+                      )}
                     >
-                      {isDone && <Check size={10} strokeWidth={3} />}
+                      {isDone && <Check size={10} strokeWidth={3} aria-hidden="true" />}
                       {formatLegPill(leg)}
                     </span>
                   </React.Fragment>
@@ -376,8 +379,8 @@ export default function FlightListPage({
               })}
 
               {/* Passengers pill */}
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[12px] font-bold bg-[#f9fafb] border border-[#e0e2e8] text-[#667080]">
-                <Users size={10} />
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-grey-light border border-border text-muted-foreground">
+                <Users size={10} aria-hidden="true" />
                 {passengersLabel}
               </span>
             </div>
@@ -406,9 +409,10 @@ export default function FlightListPage({
                     {/* Connecting line between dots */}
                     {i < totalLegs - 1 && (
                       <div
-                        className={`flex-1 h-0.5 min-w-[24px] max-w-[60px] ${
-                          i < currentLegIndex ? "bg-[#16a34a]" : "bg-[#e0e2e8]"
-                        }`}
+                        className={cn(
+                          "flex-1 h-0.5 min-w-[24px] max-w-[60px]",
+                          i < currentLegIndex ? "bg-success" : "bg-border"
+                        )}
                       />
                     )}
                   </React.Fragment>
@@ -419,15 +423,15 @@ export default function FlightListPage({
 
           {/* Heading */}
           <div className="flex items-center gap-2.5">
-            <Plane size={24} className="text-[#2681FF] shrink-0" />
+            <Plane size={24} className="text-primary shrink-0" aria-hidden="true" />
             <div>
-              <h1 className="text-[22px] md:text-[28px] font-black text-[#333743] leading-tight">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight">
                 {totalLegs > 1
                   ? `Choose flight ${currentLegIndex + 1} of ${totalLegs}`
                   : "Choose your flight"}
               </h1>
               {currentLeg && (
-                <p className="text-[15px] text-[#667080] mt-0.5">
+                <p className="text-sm text-muted-foreground mt-0.5">
                   {currentLeg.from || "Origin"} → {currentLeg.to || "Destination"}
                   {currentLeg.date ? ` · ${format(currentLeg.date, "EEE d MMM yyyy")}` : ""}
                 </p>
@@ -438,22 +442,23 @@ export default function FlightListPage({
 
         {/* ── SORT / FILTER BAR ───────────────────────────────────────────── */}
         <div className="flex items-center gap-2 mb-4">
-          <Filter size={14} className="text-[#9598a4]" />
-          <span className="text-[12px] text-[#9598a4] font-bold mr-1">Sort:</span>
+          <Filter size={14} className="text-grey" aria-hidden="true" />
+          <span className="text-xs text-grey font-bold mr-1">Sort:</span>
           {(["best", "cheapest", "fastest"] as SortMode[]).map((mode) => (
             <button
               key={mode}
               onClick={() => setActiveSort(mode)}
-              className={`px-3 py-1 rounded-full text-[12px] font-bold border transition-all ${
+              className={cn(
+                "px-3 py-1 rounded-full text-xs font-bold border transition-all",
                 activeSort === mode
-                  ? "bg-[#2681FF] text-white border-[#2681FF]"
-                  : "bg-white text-[#667080] border-[#e0e2e8] hover:border-[#2681FF] hover:text-[#2681FF]"
-              }`}
+                  ? "bg-primary text-white border-primary"
+                  : "bg-card text-muted-foreground border-border hover:border-primary hover:text-primary"
+              )}
             >
               {mode.charAt(0).toUpperCase() + mode.slice(1)}
             </button>
           ))}
-          <span className="ml-auto text-[13px] text-[#9598a4]">
+          <span className="ml-auto text-xs text-grey">
             {sortedFlights.length} flights found
           </span>
         </div>
@@ -472,24 +477,24 @@ export default function FlightListPage({
 
         {/* Already selected legs summary (shown after leg 1 is chosen) */}
         {selectedLegs.length > 0 && (
-          <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded-[12px]">
+          <div className="mt-8 p-4 bg-success/10 border border-success/30 rounded-xl">
             <div className="flex items-center gap-2 mb-3">
-              <Check size={16} className="text-green-600" />
-              <span className="text-[13px] font-bold text-green-700">
+              <Check size={16} className="text-success" aria-hidden="true" />
+              <span className="text-xs font-bold text-success">
                 Flights chosen so far
               </span>
             </div>
             <div className="flex flex-col gap-2">
               {selectedLegs.map((s, i) => (
-                <div key={i} className="flex items-center gap-3 text-[13px] text-green-800">
+                <div key={i} className="flex items-center gap-3 text-xs text-success">
                   <span className="font-bold">
                     {s.leg.from} → {s.leg.to}
                   </span>
-                  <span className="text-green-600">·</span>
+                  <span className="text-success/60">·</span>
                   <span>{s.option.airline}</span>
-                  <span className="text-green-600">·</span>
+                  <span className="text-success/60">·</span>
                   <span>{s.option.departure} → {s.option.arrival}</span>
-                  <span className="text-green-600">·</span>
+                  <span className="text-success/60">·</span>
                   <span className="font-bold">${s.option.price}</span>
                 </div>
               ))}

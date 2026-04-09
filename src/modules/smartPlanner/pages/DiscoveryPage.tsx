@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
+import { cn } from "../../../shared/components/ui/utils";
 import PackageSearchForm from "../components/PackageSearchForm";
 import heroBg from "../../../../assets/hero-background-45ee0a.png";
 import tourCard1 from "../../../../assets/tour-card-1-4c2e30.png";
@@ -538,7 +539,7 @@ export default function DiscoveryPage({
   };
 
   return (
-    <div className="min-h-screen bg-[#F3F5F6]">
+    <div className="min-h-screen bg-grey-lightest">
       {/* HERO — full-width background image with search card */}
       {/* On mobile: white background, no image. On sm+: image shows behind floating card */}
       {/* When aiExperienceMode is on, the background swaps to a melted gradient instead */}
@@ -552,14 +553,14 @@ export default function DiscoveryPage({
           as the hero image transition below — no cross-fade timing gap or flash.
         */}
         <motion.div
-          className={`absolute inset-0 overflow-hidden ${aiExperienceMode ? "block" : "hidden sm:block"}`}
+          className={`absolute inset-0 overflow-hidden ${aiExperienceMode ? "block" : "hidden md:block"}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: aiExperienceMode ? 1 : 0 }}
           transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
           style={{ pointerEvents: aiExperienceMode ? "auto" : "none" }}
         >
               {/* Base — cool grey from the design theme */}
-              <div className="absolute inset-0 bg-[#dde0ea]" />
+              <div className="absolute inset-0 bg-grey-light" />
 
               {/* Sky zone — wide flat oval, cool grey-blue at the top (matches sky) */}
               <motion.div
@@ -634,17 +635,17 @@ export default function DiscoveryPage({
             alt="Discover the world"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#333743]/25 to-black/10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-foreground/25 to-black/10" />
         </motion.div>
 
         <div className={`relative z-10 flex flex-col ${aiExperienceMode ? "h-full" : ""}`}>
 
           {/* ── Toggle + tagline — always rendered, text swaps on mode change ── */}
-          <div className={`flex flex-col items-center px-6 lg:px-12 pt-16 sm:pt-32 pb-6 gap-5`}>
+          <div className={`flex flex-col items-center px-6 lg:px-12 pt-16 md:pt-32 pb-6 gap-5`}>
             {/* Toggle pill — pulses when mode changes */}
             <motion.div animate={toggleControls}>
               <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm px-5 py-2.5 rounded-full border border-white/30">
-                <span className="text-white font-bold text-[15px] whitespace-nowrap">AI Experience</span>
+                <span className="text-white font-bold text-sm whitespace-nowrap">AI Experience</span>
                 <Switch
                   checked={aiExperienceMode}
                   onCheckedChange={setAiExperienceMode}
@@ -655,7 +656,7 @@ export default function DiscoveryPage({
             <div className="relative flex items-center justify-center min-h-[56px] lg:min-h-[68px] w-full">
               {/* Default tagline — fades out when AI mode turns on */}
               <h1
-                className={`absolute text-white font-black text-[36px] lg:text-[48px] text-center drop-shadow-md leading-tight transition-all duration-500 ${
+                className={`absolute text-white font-extrabold text-3xl lg:text-4xl text-center drop-shadow-md leading-tight transition-all duration-500 ${
                   aiExperienceMode ? "opacity-0 -translate-y-2 pointer-events-none" : "opacity-100 translate-y-0"
                 }`}
               >
@@ -663,7 +664,7 @@ export default function DiscoveryPage({
               </h1>
               {/* AI tagline — fades in when AI mode turns on */}
               <h1
-                className={`absolute text-white font-black text-[36px] lg:text-[48px] text-center drop-shadow-md leading-tight transition-all duration-500 ${
+                className={`absolute text-white font-extrabold text-3xl lg:text-4xl text-center drop-shadow-md leading-tight transition-all duration-500 ${
                   aiExperienceMode ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"
                 }`}
               >
@@ -686,13 +687,13 @@ export default function DiscoveryPage({
                 aiExperienceMode ? "opacity-0 pointer-events-none absolute inset-0" : "opacity-100"
               }`}
             >
-            <div className="sm:px-6 lg:px-12 sm:pb-16 lg:pb-[128px] flex justify-center">
+            <div className="md:px-6 lg:px-12 md:pb-16 lg:pb-[128px] flex justify-center">
             <div
               ref={searchCardRef}
-              className="bg-white sm:rounded-[24px] sm:shadow-2xl w-full sm:max-w-[1200px]"
+              className="bg-card md:rounded-2xl md:shadow-2xl w-full md:max-w-[1200px]"
             >
               {/* Tab bar — sliding blue indicator driven by refs */}
-              <div ref={tabBarRef} className="relative border-b border-[#e0e2e8]">
+              <div ref={tabBarRef} className="relative border-b border-border">
                 {/* Tab row — horizontal scroll on mobile, centered on desktop */}
                 <div className="flex justify-center overflow-x-auto">
                   {TABS.map((tab) => (
@@ -701,10 +702,10 @@ export default function DiscoveryPage({
                       ref={(el) => {
                         tabRefs.current[tab.id] = el;
                       }}
-                      className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 pt-4 pb-3 px-6 shrink-0 border-b-2 sm:border-0 ${
+                      className={`flex flex-col md:flex-row items-center gap-1 md:gap-2 pt-4 pb-3 px-6 shrink-0 border-b-2 md:border-0 ${
                         activeTab === tab.id
-                          ? "text-[#2681FF] border-[#2681FF]"
-                          : "text-[#333743] border-transparent"
+                          ? cn("text-primary border-primary")
+                          : cn("text-foreground border-transparent")
                       }`}
                       onClick={() => setActiveTab(tab.id)}
                       onMouseEnter={() => setHoveredTab(tab.id)}
@@ -713,16 +714,16 @@ export default function DiscoveryPage({
                       <span className={`transition-transform duration-200 ${activeTab === tab.id ? "scale-110" : ""}`}>
                         {tab.icon}
                       </span>
-                      <span className={`block text-[18px] ${activeTab === tab.id ? "font-black" : "font-bold"}`}>
+                      <span className={`block text-lg ${activeTab === tab.id ? "font-extrabold" : "font-bold"}`}>
                         {tab.label}
                       </span>
                     </button>
                   ))}
                 </div>
 
-                {/* Sliding blue underline — only on sm+ (on mobile each tab has its own border-b-2 instead) */}
+                {/* Sliding blue underline — only on md+ (on mobile each tab has its own border-b-2 instead) */}
                 <div
-                  className="hidden sm:block absolute bottom-0 h-[2.5px] bg-[#2681FF] rounded-full transition-all duration-300 ease-out"
+                  className="hidden md:block absolute bottom-0 h-[2.5px] bg-primary rounded-full transition-all duration-300 ease-out"
                   style={{
                     left: indicatorStyle.left,
                     width: indicatorStyle.width,
@@ -732,7 +733,7 @@ export default function DiscoveryPage({
 
               {/* Search panels — one shown at a time based on activeTab */}
               {/* p-4 on mobile (tighter), p-6 on desktop */}
-              <div className="p-4 sm:p-6">
+              <div className="p-4 md:p-6">
 
                 {/* HOTELS PANEL */}
                 {activeTab === "hotels" && (
@@ -741,10 +742,10 @@ export default function DiscoveryPage({
                       {/* Destination */}
                       <div className="flex-1 relative">
                         <button
-                          className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border text-left transition-all ${
+                          className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border text-left transition-all ${
                             hotelOpenPanel === "destination"
-                              ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-                              : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
+                              ? "border-primary ring-2 ring-primary/20 bg-white"
+                              : "border-border bg-white hover:border-primary"
                           }`}
                           onClick={() =>
                             setHotelOpenPanel(
@@ -756,25 +757,21 @@ export default function DiscoveryPage({
                         >
                           <MapPin
                             size={18}
-                            className="text-[#2681FF] shrink-0"
+                            className="text-primary shrink-0"
                           />
                           <div className="flex flex-col items-start flex-1 min-w-0">
-                            <span className="text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5">
+                            <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
                               Destination
                             </span>
                             <span
-                              className={`text-[14px] font-semibold truncate w-full ${
-                                hotelLocation
-                                  ? "text-[#333743]"
-                                  : "text-[#9598a4]"
-                              }`}
+                              className={cn("text-sm font-semibold truncate w-full", hotelLocation ? "text-foreground" : "text-grey")}
                             >
                               {hotelLocation || "Where are you going?"}
                             </span>
                           </div>
                           <ChevronDown
                             size={16}
-                            className={`text-[#9598a4] shrink-0 transition-transform ${
+                            className={`text-grey shrink-0 transition-transform ${
                               hotelOpenPanel === "destination"
                                 ? "rotate-180"
                                 : ""
@@ -783,14 +780,14 @@ export default function DiscoveryPage({
                         </button>
 
                         {hotelOpenPanel === "destination" && (
-                          <div className="absolute top-full left-0 mt-2 w-full min-w-[280px] bg-white rounded-[16px] shadow-xl border border-[#e0e2e8] z-50 overflow-hidden">
-                            <div className="p-3 border-b border-[#f3f5f6]">
-                              <div className="flex items-center gap-2 bg-[#f3f5f6] rounded-[10px] px-3 py-2">
-                                <Search size={16} className="text-[#9598a4]" />
+                          <div className="absolute top-full left-0 mt-2 w-full min-w-[280px] bg-card rounded-xl shadow-xl border border-border z-50 overflow-hidden">
+                            <div className="p-3 border-b border-muted">
+                              <div className="flex items-center gap-2 bg-grey-light rounded-lg px-3 py-2">
+                                <Search size={16} className="text-grey" />
                                 <input
                                   type="text"
                                   placeholder="Search destination..."
-                                  className="flex-1 bg-transparent text-[14px] text-[#333743] outline-none placeholder:text-[#9598a4]"
+                                  className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-grey"
                                   value={hotelLocation}
                                   onChange={(e) =>
                                     setHotelLocation(e.target.value)
@@ -800,7 +797,7 @@ export default function DiscoveryPage({
                               </div>
                             </div>
                             <div className="p-2">
-                              <p className="text-[11px] font-bold text-[#9598a4] uppercase tracking-wide px-3 py-2">
+                              <p className="text-[10px] font-bold text-grey uppercase tracking-wide px-3 py-2">
                                 Popular destinations
                               </p>
                               {POPULAR_DESTINATIONS.filter(
@@ -812,7 +809,7 @@ export default function DiscoveryPage({
                               ).map((dest) => (
                                 <button
                                   key={dest}
-                                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[8px] text-left hover:bg-[#f3f5f6] transition-colors"
+                                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-grey-light transition-colors"
                                   onClick={() => {
                                     setHotelLocation(dest);
                                     setHotelOpenPanel(null);
@@ -820,9 +817,9 @@ export default function DiscoveryPage({
                                 >
                                   <MapPin
                                     size={16}
-                                    className="text-[#2681FF] shrink-0"
+                                    className="text-primary shrink-0"
                                   />
-                                  <span className="text-[14px] text-[#333743] font-medium">
+                                  <span className="text-sm text-foreground font-medium">
                                     {dest}
                                   </span>
                                 </button>
@@ -835,10 +832,10 @@ export default function DiscoveryPage({
                       {/* Dates */}
                       <div className="flex-1 relative">
                         <button
-                          className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border text-left transition-all ${
+                          className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border text-left transition-all ${
                             hotelOpenPanel === "dates"
-                              ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-                              : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
+                              ? "border-primary ring-2 ring-primary/20 bg-white"
+                              : "border-border bg-white hover:border-primary"
                           }`}
                           onClick={() =>
                             setHotelOpenPanel(
@@ -848,26 +845,26 @@ export default function DiscoveryPage({
                         >
                           <CalendarIcon
                             size={18}
-                            className="text-[#2681FF] shrink-0"
+                            className="text-primary shrink-0"
                           />
                           <div className="flex flex-col items-start flex-1 min-w-0">
-                            <span className="text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5">
+                            <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
                               Check-in – Check-out
                             </span>
-                            <span className="text-[14px] font-semibold text-[#333743] truncate w-full">
+                            <span className="text-sm font-semibold text-foreground truncate w-full">
                               {hotelDateLabel}
                             </span>
                           </div>
                           <ChevronDown
                             size={16}
-                            className={`text-[#9598a4] shrink-0 transition-transform ${
+                            className={`text-grey shrink-0 transition-transform ${
                               hotelOpenPanel === "dates" ? "rotate-180" : ""
                             }`}
                           />
                         </button>
 
                         {hotelOpenPanel === "dates" && (
-                          <div className="absolute top-full left-0 mt-2 bg-white rounded-[16px] shadow-xl border border-[#e0e2e8] z-50 overflow-hidden">
+                          <div className="absolute top-full left-0 mt-2 bg-card rounded-xl shadow-xl border border-border z-50 overflow-hidden">
                             <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
                             <DayPicker
                               mode="range"
@@ -893,10 +890,10 @@ export default function DiscoveryPage({
                       {/* Guests & rooms */}
                       <div className="flex-1 relative">
                         <button
-                          className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border text-left transition-all ${
+                          className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border text-left transition-all ${
                             hotelOpenPanel === "guests"
-                              ? "border-[#2681FF] ring-2 ring-[#2681FF]/20 bg-white"
-                              : "border-[#e0e2e8] bg-white hover:border-[#2681FF]"
+                              ? "border-primary ring-2 ring-primary/20 bg-white"
+                              : "border-border bg-white hover:border-primary"
                           }`}
                           onClick={() =>
                             setHotelOpenPanel(
@@ -906,38 +903,38 @@ export default function DiscoveryPage({
                         >
                           <Users
                             size={18}
-                            className="text-[#2681FF] shrink-0"
+                            className="text-primary shrink-0"
                           />
                           <div className="flex flex-col items-start flex-1 min-w-0">
-                            <span className="text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5">
+                            <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
                               Travellers
                             </span>
-                            <span className="text-[14px] font-semibold text-[#333743] truncate w-full">
+                            <span className="text-sm font-semibold text-foreground truncate w-full">
                               {hotelGuestsLabel}
                             </span>
                           </div>
                           <ChevronDown
                             size={16}
-                            className={`text-[#9598a4] shrink-0 transition-transform ${
+                            className={`text-grey shrink-0 transition-transform ${
                               hotelOpenPanel === "guests" ? "rotate-180" : ""
                             }`}
                           />
                         </button>
 
                         {hotelOpenPanel === "guests" && (
-                          <div className="absolute top-full right-0 mt-2 w-[300px] bg-white rounded-[16px] shadow-xl border border-[#e0e2e8] z-50 p-4">
+                          <div className="absolute top-full right-0 mt-2 w-[300px] bg-card rounded-xl shadow-xl border border-border z-50 p-4">
                             {hotelRooms.map((room, index) => (
                               <div
                                 key={room.id}
-                                className="mb-4 last:mb-0 pb-4 last:pb-0 border-b last:border-b-0 border-[#f3f5f6]"
+                                className="mb-4 last:mb-0 pb-4 last:pb-0 border-b last:border-b-0 border-muted"
                               >
                                 <div className="flex items-center justify-between mb-3">
-                                  <span className="font-bold text-[14px] text-[#333743]">
+                                  <span className="font-bold text-sm text-foreground">
                                     Room {index + 1}
                                   </span>
                                   {hotelRooms.length > 1 && (
                                     <button
-                                      className="text-[12px] text-red-500 hover:underline font-medium"
+                                      className="text-xs text-red-500 hover:underline font-medium"
                                       onClick={() =>
                                         setHotelRooms(
                                           hotelRooms.filter(
@@ -952,10 +949,10 @@ export default function DiscoveryPage({
                                 </div>
                                 <div className="flex items-center justify-between mb-2">
                                   <div>
-                                    <div className="text-[14px] font-medium text-[#333743]">
+                                    <div className="text-sm font-medium text-foreground">
                                       Adults
                                     </div>
-                                    <div className="text-[12px] text-[#9598a4]">
+                                    <div className="text-xs text-grey">
                                       Age 18+
                                     </div>
                                   </div>
@@ -973,10 +970,10 @@ export default function DiscoveryPage({
                                 </div>
                                 <div className="flex items-center justify-between">
                                   <div>
-                                    <div className="text-[14px] font-medium text-[#333743]">
+                                    <div className="text-sm font-medium text-foreground">
                                       Children
                                     </div>
-                                    <div className="text-[12px] text-[#9598a4]">
+                                    <div className="text-xs text-grey">
                                       Under 18
                                     </div>
                                   </div>
@@ -996,7 +993,7 @@ export default function DiscoveryPage({
                             ))}
                             {hotelRooms.length < 5 && (
                               <button
-                                className="mt-3 w-full h-[36px] border border-dashed border-[#2681FF] rounded-[8px] text-[#2681FF] text-[13px] font-bold hover:bg-[#f0f7ff] transition-colors"
+                                className="mt-3 w-full h-[36px] border border-dashed border-primary rounded-lg text-primary text-xs font-bold hover:bg-primary/10 transition-colors"
                                 onClick={() =>
                                   setHotelRooms([
                                     ...hotelRooms,
@@ -1012,7 +1009,7 @@ export default function DiscoveryPage({
                               </button>
                             )}
                             <button
-                              className="mt-3 w-full h-[40px] bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold rounded-[8px] text-[14px] transition-colors"
+                              className="mt-3 w-full h-[40px] bg-primary hover:brightness-85 text-white font-bold rounded-lg text-sm transition-all"
                               onClick={() => setHotelOpenPanel(null)}
                             >
                               Done
@@ -1022,7 +1019,7 @@ export default function DiscoveryPage({
                       </div>
                     {/* w-full on mobile so button spans the full width; lg:w-auto restores shrink behaviour on desktop */}
                     <button
-                      className="w-full lg:w-auto bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black text-[16px] h-[52px] px-6 rounded-[12px] transition-colors flex items-center justify-center gap-2 shadow-md"
+                      className="w-full lg:w-auto bg-primary hover:brightness-85 text-white font-extrabold text-base h-[52px] px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
                       onClick={handleHotelSearch}
                     >
                       <Search size={20} />
@@ -1035,20 +1032,20 @@ export default function DiscoveryPage({
                 {activeTab === "flights" && (
                   <div className="flex flex-col gap-4">
 
-                    {/* Secondary criteria row — stacks on mobile, inline pills on sm+ */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:flex-wrap">
+                    {/* Secondary criteria row — stacks on mobile, inline pills on md+ */}
+                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:flex-wrap">
 
                       {/* 1. Trip type dropdown */}
-                      <div className="relative w-full sm:w-auto">
+                      <div className="relative w-full md:w-auto">
                         <button
                           onClick={() => { setFlightTripTypeOpen((o) => !o); setFlightCabinClassOpen(false); setFlightPassengersOpen(false); }}
-                          className={`w-full sm:w-auto flex items-center gap-1.5 h-[52px] sm:h-8 px-4 sm:px-3 rounded-[12px] sm:rounded-[8px] border text-[14px] sm:text-[13px] font-semibold transition-all ${flightTripTypeOpen ? "border-[#2681FF] bg-white text-[#2681FF]" : "border-[#e0e2e8] bg-white text-[#333743] hover:border-[#2681FF]"}`}
+                          className={`w-full md:w-auto flex items-center gap-1.5 h-[52px] md:h-8 px-4 md:px-3 rounded-xl md:rounded-lg border text-sm md:text-xs font-semibold transition-all ${flightTripTypeOpen ? "border-primary bg-white text-primary" : "border-border bg-white text-foreground hover:border-primary"}`}
                         >
                           {flightTripType === "roundtrip" ? "Round trip" : "Multi-city"}
                           <ChevronDown size={13} className={`shrink-0 transition-transform ${flightTripTypeOpen ? "rotate-180" : ""}`} />
                         </button>
                         {flightTripTypeOpen && (
-                          <div className="absolute top-full right-0 sm:left-0 sm:right-auto mt-1.5 z-50 bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] p-1.5 w-[140px] flex flex-col gap-0.5">
+                          <div className="absolute top-full right-0 md:left-0 md:right-auto mt-1.5 z-50 bg-card rounded-xl shadow-xl border border-border p-1.5 w-[140px] flex flex-col gap-0.5">
                             {(["roundtrip", "multicity"] as const).map((type) => (
                               <button
                                 key={type}
@@ -1057,7 +1054,7 @@ export default function DiscoveryPage({
                                   if (type === "roundtrip") setFlightLegs((prev) => prev.slice(0, 2));
                                   setFlightTripTypeOpen(false);
                                 }}
-                                className={`w-full text-left px-3 py-2 rounded-[8px] text-[13px] font-semibold transition-colors ${flightTripType === type ? "bg-[#2681FF] text-white" : "text-[#333743] hover:bg-[#f3f5f6]"}`}
+                                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${flightTripType === type ? "bg-primary text-white" : "text-foreground hover:bg-grey-light"}`}
                               >
                                 {type === "roundtrip" ? "Round trip" : "Multi-city"}
                               </button>
@@ -1067,21 +1064,21 @@ export default function DiscoveryPage({
                       </div>
 
                       {/* 2. Cabin class dropdown */}
-                      <div className="relative w-full sm:w-auto">
+                      <div className="relative w-full md:w-auto">
                         <button
                           onClick={() => { setFlightCabinClassOpen((o) => !o); setFlightTripTypeOpen(false); setFlightPassengersOpen(false); }}
-                          className={`w-full sm:w-auto flex items-center gap-1.5 h-[52px] sm:h-8 px-4 sm:px-3 rounded-[12px] sm:rounded-[8px] border text-[14px] sm:text-[13px] font-semibold transition-all ${flightCabinClassOpen ? "border-[#2681FF] bg-white text-[#2681FF]" : "border-[#e0e2e8] bg-white text-[#333743] hover:border-[#2681FF]"}`}
+                          className={`w-full md:w-auto flex items-center gap-1.5 h-[52px] md:h-8 px-4 md:px-3 rounded-xl md:rounded-lg border text-sm md:text-xs font-semibold transition-all ${flightCabinClassOpen ? "border-primary bg-white text-primary" : "border-border bg-white text-foreground hover:border-primary"}`}
                         >
                           {CABIN_CLASS_LABELS[flightCabinClass]}
                           <ChevronDown size={13} className={`shrink-0 transition-transform ${flightCabinClassOpen ? "rotate-180" : ""}`} />
                         </button>
                         {flightCabinClassOpen && (
-                          <div className="absolute top-full right-0 sm:left-0 sm:right-auto mt-1.5 z-50 bg-white rounded-[12px] shadow-xl border border-[#e0e2e8] p-1.5 w-[180px] flex flex-col gap-0.5">
+                          <div className="absolute top-full right-0 md:left-0 md:right-auto mt-1.5 z-50 bg-card rounded-xl shadow-xl border border-border p-1.5 w-[180px] flex flex-col gap-0.5">
                             {(["economy", "premium-economy", "business", "first"] as const).map((cls) => (
                               <button
                                 key={cls}
                                 onClick={() => { setFlightCabinClass(cls); setFlightCabinClassOpen(false); }}
-                                className={`w-full text-left px-3 py-2 rounded-[8px] text-[13px] font-semibold transition-colors ${flightCabinClass === cls ? "bg-[#2681FF] text-white" : "text-[#333743] hover:bg-[#f3f5f6]"}`}
+                                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${flightCabinClass === cls ? "bg-primary text-white" : "text-foreground hover:bg-grey-light"}`}
                               >
                                 {CABIN_CLASS_LABELS[cls]}
                               </button>
@@ -1091,37 +1088,37 @@ export default function DiscoveryPage({
                       </div>
 
                       {/* 3. Travellers dropdown — counters for adults/children */}
-                      <div className="relative w-full sm:w-auto">
+                      <div className="relative w-full md:w-auto">
                         <button
                           onClick={() => { setFlightPassengersOpen((o) => !o); setFlightTripTypeOpen(false); setFlightCabinClassOpen(false); }}
-                          className={`w-full sm:w-auto flex items-center gap-1.5 h-[52px] sm:h-8 px-4 sm:px-3 rounded-[12px] sm:rounded-[8px] border text-[14px] sm:text-[13px] font-semibold transition-all ${flightPassengersOpen ? "border-[#2681FF] bg-white text-[#2681FF]" : "border-[#e0e2e8] bg-white text-[#333743] hover:border-[#2681FF]"}`}
+                          className={`w-full md:w-auto flex items-center gap-1.5 h-[52px] md:h-8 px-4 md:px-3 rounded-xl md:rounded-lg border text-sm md:text-xs font-semibold transition-all ${flightPassengersOpen ? "border-primary bg-white text-primary" : "border-border bg-white text-foreground hover:border-primary"}`}
                         >
                           {flightPassengersLabel}
                           <ChevronDown size={13} className={`shrink-0 transition-transform ${flightPassengersOpen ? "rotate-180" : ""}`} />
                         </button>
                         {flightPassengersOpen && (
-                          <div className="absolute top-full right-0 sm:left-0 sm:right-auto mt-1.5 z-50 bg-white rounded-[16px] shadow-xl border border-[#e0e2e8] p-5 w-[260px] flex flex-col gap-4">
+                          <div className="absolute top-full right-0 md:left-0 md:right-auto mt-1.5 z-50 bg-card rounded-2xl shadow-xl border border-border p-5 w-[260px] flex flex-col gap-4">
                             {[
                               { label: "Adults", sub: "Age 12+", key: "adults" as const, min: 1 },
                               { label: "Children", sub: "Age 2–11", key: "children" as const, min: 0 },
                             ].map(({ label, sub, key, min }) => (
                               <div key={key} className="flex items-center justify-between">
                                 <div>
-                                  <div className="text-[14px] font-semibold text-[#333743]">{label}</div>
-                                  <div className="text-[12px] text-[#9598a4]">{sub}</div>
+                                  <div className="text-sm font-semibold text-foreground">{label}</div>
+                                  <div className="text-xs text-grey">{sub}</div>
                                 </div>
                                 <div className="flex items-center gap-3">
                                   <button
                                     onClick={() => setFlightPassengers((p) => ({ ...p, [key]: Math.max(min, p[key] - 1) }))}
                                     disabled={flightPassengers[key] <= min}
-                                    className="w-8 h-8 rounded-full border border-[#e0e2e8] flex items-center justify-center text-[#333743] hover:border-[#2681FF] hover:text-[#2681FF] transition-colors disabled:opacity-30"
+                                    className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-30"
                                   >
                                     <Minus size={14} />
                                   </button>
-                                  <span className="text-[15px] font-bold text-[#333743] w-4 text-center">{flightPassengers[key]}</span>
+                                  <span className="text-sm font-bold text-foreground w-4 text-center">{flightPassengers[key]}</span>
                                   <button
                                     onClick={() => setFlightPassengers((p) => ({ ...p, [key]: Math.min(9, p[key] + 1) }))}
-                                    className="w-8 h-8 rounded-full border border-[#e0e2e8] flex items-center justify-center text-[#333743] hover:border-[#2681FF] hover:text-[#2681FF] transition-colors"
+                                    className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors"
                                   >
                                     <Plus size={14} />
                                   </button>
@@ -1130,7 +1127,7 @@ export default function DiscoveryPage({
                             ))}
                             <button
                               onClick={() => setFlightPassengersOpen(false)}
-                              className="w-full bg-[#2681FF] text-white font-bold text-[14px] py-2.5 rounded-[10px] hover:bg-[#1a6fd9] transition-colors"
+                              className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-all"
                             >
                               Done
                             </button>
@@ -1145,10 +1142,10 @@ export default function DiscoveryPage({
 
                         {/* From */}
                         <div className="flex-1">
-                          <div className="w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-white focus-within:border-[#2681FF] transition-all">
-                            <Plane size={18} className="text-[#2681FF] shrink-0" />
+                          <div className="w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border border-border bg-white focus-within:border-primary transition-all">
+                            <Plane size={18} className="text-primary shrink-0" />
                             <div className="flex flex-col flex-1 min-w-0">
-                              <span className="text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5">From</span>
+                              <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">From</span>
                               <input
                                 type="text"
                                 placeholder="Departure city"
@@ -1158,7 +1155,7 @@ export default function DiscoveryPage({
                                   updateLeg(flightLegs[0].id, "from", e.target.value);
                                   updateLeg(flightLegs[1].id, "to", e.target.value);
                                 }}
-                                className="bg-transparent text-[14px] font-semibold text-[#333743] outline-none placeholder:text-[#9598a4] placeholder:font-normal"
+                                className="bg-transparent text-sm font-semibold text-foreground outline-none placeholder:text-grey placeholder:font-normal"
                               />
                             </div>
                           </div>
@@ -1166,10 +1163,10 @@ export default function DiscoveryPage({
 
                         {/* To */}
                         <div className="flex-1">
-                          <div className="w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-white focus-within:border-[#2681FF] transition-all">
-                            <Plane size={18} className="text-[#2681FF] shrink-0 rotate-90" />
+                          <div className="w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border border-border bg-white focus-within:border-primary transition-all">
+                            <Plane size={18} className="text-primary shrink-0 rotate-90" />
                             <div className="flex flex-col flex-1 min-w-0">
-                              <span className="text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5">To</span>
+                              <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">To</span>
                               <input
                                 type="text"
                                 placeholder="Destination city"
@@ -1179,7 +1176,7 @@ export default function DiscoveryPage({
                                   updateLeg(flightLegs[0].id, "to", e.target.value);
                                   updateLeg(flightLegs[1].id, "from", e.target.value);
                                 }}
-                                className="bg-transparent text-[14px] font-semibold text-[#333743] outline-none placeholder:text-[#9598a4] placeholder:font-normal"
+                                className="bg-transparent text-sm font-semibold text-foreground outline-none placeholder:text-grey placeholder:font-normal"
                               />
                             </div>
                           </div>
@@ -1189,19 +1186,19 @@ export default function DiscoveryPage({
                         <div className="flex-1">
                           <div className="relative w-full">
                             <button
-                              className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-[12px] border bg-white transition-all ${flightDatesOpen ? "border-[#2681FF]" : "border-[#e0e2e8] hover:border-[#2681FF]"}`}
+                              className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border bg-white transition-all ${flightDatesOpen ? "border-primary" : "border-border hover:border-primary"}`}
                               onClick={() => setFlightDatesOpen(!flightDatesOpen)}
                             >
-                              <CalendarIcon size={18} className="text-[#2681FF] shrink-0" />
+                              <CalendarIcon size={18} className="text-primary shrink-0" />
                               <div className="flex flex-col items-start flex-1 min-w-0">
-                                <span className="text-[10px] font-bold text-[#9598a4] uppercase tracking-wide leading-none mb-0.5">Depart – Return</span>
-                                <span className={`text-[14px] font-semibold ${flightDateRange?.from ? "text-[#333743]" : "text-[#9598a4]"}`}>
+                                <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Depart – Return</span>
+                                <span className={cn("text-sm font-semibold", flightDateRange?.from ? "text-foreground" : "text-grey")}>
                                   {flightDateLabel}
                                 </span>
                               </div>
                             </button>
                             {flightDatesOpen && (
-                              <div className="absolute top-[60px] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4">
+                              <div className="absolute top-[60px] left-0 z-50 bg-card rounded-2xl shadow-2xl border border-border p-4">
                                 <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
                                 <DayPicker
                                   mode="range"
@@ -1223,7 +1220,7 @@ export default function DiscoveryPage({
 
                         {/* Search button — w-full on mobile (stacked), lg:w-auto on desktop (inline row) */}
                         <button
-                          className="w-full lg:w-auto bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black text-[16px] h-[52px] px-6 rounded-[12px] transition-colors flex items-center justify-center gap-2 shadow-md"
+                          className="w-full lg:w-auto bg-primary hover:brightness-85 text-white font-extrabold text-base h-[52px] px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
                           onClick={() => {
                             setFlightDatesOpen(false);
                             setFlightPassengersOpen(false);
@@ -1248,53 +1245,53 @@ export default function DiscoveryPage({
 
                         {/* One row per leg */}
                         {flightLegs.map((leg, index) => (
-                          <div key={leg.id} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                          <div key={leg.id} className="flex flex-col md:flex-row items-stretch md:items-center gap-2">
 
                             {/* Leg label */}
-                            <span className="text-[11px] font-black text-[#9598a4] uppercase tracking-wide shrink-0 sm:w-12 pt-3.5 sm:pt-0 text-left sm:text-right">
+                            <span className="text-[10px] font-extrabold text-grey uppercase tracking-wide shrink-0 md:w-12 pt-3.5 md:pt-0 text-left md:text-right">
                               {index === 0 ? "Leg 1" : index === 1 ? "Leg 2" : `Leg ${index + 1}`}
                             </span>
 
                             {/* From input */}
-                            <div className="flex-1 flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-white focus-within:border-[#2681FF] transition-all">
-                              <Plane size={16} className="text-[#2681FF] shrink-0" />
+                            <div className="flex-1 flex items-center gap-3 h-[52px] px-4 rounded-xl border border-border bg-white focus-within:border-primary transition-all">
+                              <Plane size={16} className="text-primary shrink-0" />
                               <input
                                 type="text"
                                 placeholder="From city"
                                 value={leg.from}
                                 onChange={(e) => updateLeg(leg.id, "from", e.target.value)}
-                                className="bg-transparent text-[14px] font-semibold text-[#333743] outline-none placeholder:text-[#9598a4] placeholder:font-normal w-full"
+                                className="bg-transparent text-sm font-semibold text-foreground outline-none placeholder:text-grey placeholder:font-normal w-full"
                               />
                             </div>
 
                             {/* Arrow between From and To */}
-                            <ArrowRight size={14} className="text-[#9598a4] shrink-0 hidden sm:block" />
+                            <ArrowRight size={14} className="text-grey shrink-0 hidden md:block" />
 
                             {/* To input */}
-                            <div className="flex-1 flex items-center gap-3 h-[52px] px-4 rounded-[12px] border border-[#e0e2e8] bg-white focus-within:border-[#2681FF] transition-all">
-                              <Plane size={16} className="text-[#2681FF] shrink-0 rotate-90" />
+                            <div className="flex-1 flex items-center gap-3 h-[52px] px-4 rounded-xl border border-border bg-white focus-within:border-primary transition-all">
+                              <Plane size={16} className="text-primary shrink-0 rotate-90" />
                               <input
                                 type="text"
                                 placeholder="To city"
                                 value={leg.to}
                                 onChange={(e) => updateLeg(leg.id, "to", e.target.value)}
-                                className="bg-transparent text-[14px] font-semibold text-[#333743] outline-none placeholder:text-[#9598a4] placeholder:font-normal w-full"
+                                className="bg-transparent text-sm font-semibold text-foreground outline-none placeholder:text-grey placeholder:font-normal w-full"
                               />
                             </div>
 
                             {/* Date picker for this leg (single date) */}
-                            <div className="relative sm:w-[160px]">
+                            <div className="relative md:w-[160px]">
                               <button
-                                className={`w-full flex items-center gap-2 h-[52px] px-3 rounded-[12px] border bg-white transition-all ${openLegDateId === leg.id ? "border-[#2681FF]" : "border-[#e0e2e8] hover:border-[#2681FF]"}`}
+                                className={`w-full flex items-center gap-2 h-[52px] px-3 rounded-xl border bg-white transition-all ${openLegDateId === leg.id ? "border-primary" : "border-border hover:border-primary"}`}
                                 onClick={() => setOpenLegDateId(openLegDateId === leg.id ? null : leg.id)}
                               >
-                                <CalendarIcon size={15} className="text-[#2681FF] shrink-0" />
-                                <span className={`text-[13px] font-semibold truncate ${leg.date ? "text-[#333743]" : "text-[#9598a4]"}`}>
+                                <CalendarIcon size={15} className="text-primary shrink-0" />
+                                <span className={cn("text-xs font-semibold truncate", leg.date ? "text-foreground" : "text-grey")}>
                                   {leg.date ? format(leg.date, "d MMM yyyy") : "Select date"}
                                 </span>
                               </button>
                               {openLegDateId === leg.id && (
-                                <div className="absolute top-[60px] left-0 z-50 bg-white rounded-[16px] shadow-2xl border border-[#e0e2e8] p-4">
+                                <div className="absolute top-[60px] left-0 z-50 bg-card rounded-2xl shadow-2xl border border-border p-4">
                                   <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
                                   <DayPicker
                                     mode="single"
@@ -1313,14 +1310,14 @@ export default function DiscoveryPage({
                             {index >= 2 ? (
                               <button
                                 onClick={() => removeLeg(leg.id)}
-                                className="shrink-0 w-9 h-9 rounded-full border border-[#e0e2e8] flex items-center justify-center text-[#9598a4] hover:border-red-300 hover:text-red-400 transition-colors self-center"
+                                className="shrink-0 w-9 h-9 rounded-full border border-border flex items-center justify-center text-grey hover:border-red-300 hover:text-red-400 transition-colors self-center"
                                 title="Remove this leg"
                               >
                                 <X size={14} />
                               </button>
                             ) : (
                               // Placeholder to keep alignment when no remove button
-                              <div className="shrink-0 w-9 hidden sm:block" />
+                              <div className="shrink-0 w-9 hidden md:block" />
                             )}
                           </div>
                         ))}
@@ -1329,7 +1326,7 @@ export default function DiscoveryPage({
                         {flightLegs.length < 6 && (
                           <button
                             onClick={addLeg}
-                            className="mt-1 h-[44px] w-full border border-dashed border-[#2681FF] rounded-[10px] text-[#2681FF] text-[13px] font-bold hover:bg-[#f0f7ff] transition-colors flex items-center justify-center gap-2"
+                            className="mt-1 h-[44px] w-full border border-dashed border-primary rounded-lg text-primary text-xs font-bold hover:bg-primary/10 transition-colors flex items-center justify-center gap-2"
                           >
                             <Plus size={14} />
                             Add another flight
@@ -1341,7 +1338,7 @@ export default function DiscoveryPage({
 
                           {/* Search button */}
                           <button
-                            className="flex-1 sm:flex-none bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black text-[16px] h-[52px] px-6 rounded-[12px] transition-colors flex items-center justify-center gap-2 shadow-md"
+                            className="flex-1 md:flex-none bg-primary hover:brightness-85 text-white font-extrabold text-base h-[52px] px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
                             onClick={() => {
                               setFlightPassengersOpen(false);
                               setOpenLegDateId(null);
@@ -1382,9 +1379,9 @@ export default function DiscoveryPage({
               }`}
             >
               {/* AI search card */}
-              <div className="px-4 sm:px-6 lg:px-12 pb-6 lg:pb-[128px] flex justify-center">
+              <div className="px-4 md:px-6 lg:px-12 pb-6 lg:pb-[128px] flex justify-center">
                 <div
-                  className="bg-white rounded-[24px] shadow-2xl w-full max-w-[860px] flex flex-col"
+                  className="bg-card rounded-2xl shadow-2xl w-full max-w-[860px] flex flex-col"
                   // lockedCardHeight keeps the AI card the same size as the search card it replaced.
                   // Using minHeight (not height) so the card can grow on mobile when the stacked
                   // (flex-col) button row needs extra space — prevents the CTA from overflowing.
@@ -1393,19 +1390,19 @@ export default function DiscoveryPage({
                   <div className="flex-1 p-6">
                     <textarea
                       placeholder="Describe your ideal trip — destination, dates, budget, travel style…"
-                      className="w-full h-full bg-transparent text-[16px] text-[#333743] outline-none placeholder:text-[#9598a4] resize-none leading-relaxed"
+                      className="w-full h-full bg-transparent text-base text-foreground outline-none placeholder:text-grey resize-none leading-relaxed"
                       value={aiPrompt}
                       onChange={(e) => setAiPrompt(e.target.value)}
                     />
                   </div>
-                  <div className="flex items-center px-6 pb-6 border-t border-[#e0e2e8] pt-4 shrink-0 gap-3 sm:justify-between">
-                    {/* Attachment — icon-only on mobile, text label on sm+ */}
-                    <button className="flex items-center justify-center gap-2 shrink-0 h-[52px] rounded-[12px] border border-[#e0e2e8] text-[#9598a4] hover:text-[#667080] hover:border-[#667080] transition-colors w-[52px] sm:w-auto sm:px-4 sm:font-bold sm:text-[14px]">
+                  <div className="flex items-center px-6 pb-6 border-t border-border pt-4 shrink-0 gap-3 md:justify-between">
+                    {/* Attachment — icon-only on mobile, text label on md+ */}
+                    <button className="flex items-center justify-center gap-2 shrink-0 h-[52px] rounded-xl border border-border text-grey hover:text-muted-foreground hover:border-muted-foreground transition-colors w-[52px] md:w-auto md:px-4 md:font-bold md:text-sm">
                       <Paperclip size={18} />
-                      <span className="hidden sm:inline">Attach files</span>
+                      <span className="hidden md:inline">Attach files</span>
                     </button>
-                    {/* CTA — fills remaining space on mobile, auto width on sm+ */}
-                    <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-black text-[16px] h-[52px] px-6 rounded-[12px] transition-colors shadow-md">
+                    {/* CTA — fills remaining space on mobile, auto width on md+ */}
+                    <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-primary hover:brightness-85 text-white font-extrabold text-base h-[52px] px-6 rounded-xl transition-all shadow-md">
                       <Send size={18} />
                       Plan my trip
                     </button>
@@ -1415,7 +1412,7 @@ export default function DiscoveryPage({
 
               {/* Suggestion prompts */}
               <div className="flex flex-col items-center gap-3 px-6 pb-16 lg:pb-[128px] relative z-10">
-                <span className="text-white/70 text-[14px]">Try asking:</span>
+                <span className="text-white/70 text-sm">Try asking:</span>
                 <div className="flex flex-wrap gap-3 justify-center max-w-[860px]">
                   {[
                     "Find me a beach resort in Bali for next month",
@@ -1425,7 +1422,7 @@ export default function DiscoveryPage({
                   ].map((suggestion) => (
                     <button
                       key={suggestion}
-                      className="bg-white/15 backdrop-blur-sm hover:bg-white/25 text-white text-[14px] px-4 py-2 rounded-full border border-white/30 transition-colors"
+                      className="bg-white/15 backdrop-blur-sm hover:bg-white/25 text-white text-sm px-4 py-2 rounded-full border border-white/30 transition-colors"
                       onClick={() => setAiPrompt(suggestion)}
                     >
                       {suggestion}
@@ -1454,17 +1451,17 @@ export default function DiscoveryPage({
 
       {/* ── HOTELS ── */}
       {activeTab === "hotels" && (
-        <section className="py-10 sm:py-16 px-4 sm:px-6 lg:px-12">
+        <section className="py-10 md:py-16 px-4 md:px-6 lg:px-12">
           <div className="max-w-[1200px] mx-auto">
 
-            <div className="mb-6 sm:mb-8">
+            <div className="mb-6 md:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
-                <Heart size={24} className="text-[#2681FF] sm:size-7" />
-                <h2 className="text-[#333743] font-bold text-[22px] sm:text-[32px] leading-tight">
+                <Heart size={24} className="text-primary md:size-7" />
+                <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
                   Our favourite picks
                 </h2>
               </div>
-              <p className="text-[#667080] text-[14px] sm:text-[18px]">
+              <p className="text-muted-foreground text-sm md:text-lg">
                 Average prices based on current calendar month
               </p>
             </div>
@@ -1473,7 +1470,7 @@ export default function DiscoveryPage({
               {HOTEL_PICKS.map((hotel) => (
                 <div
                   key={hotel.id}
-                  className="shrink-0 w-[389px] bg-white rounded-[16px] overflow-hidden shadow-[0_4px_6px_-4px_rgba(0,0,0,0.10),0_10px_15px_-3px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-200 snap-start"
+                  className="shrink-0 w-[389px] bg-card rounded-2xl overflow-hidden shadow-[0_4px_6px_-4px_rgba(0,0,0,0.10),0_10px_15px_-3px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-200 snap-start"
                   onClick={() => {
                     // Map the HOTEL_PICKS card data to the Hotel shape that
                     // HotelDetailPage expects. We fill in sensible defaults for
@@ -1506,29 +1503,29 @@ export default function DiscoveryPage({
                   <div className="p-4 flex flex-col gap-2.5">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex flex-col">
-                        <span className="text-[18px] font-bold text-[#0A0A0A] leading-snug">
+                        <span className="text-lg font-bold text-foreground leading-snug">
                           {hotel.name}
                         </span>
-                        <span className="text-[13px] text-[#FFB700] tracking-wide mt-0.5">
+                        <span className="text-xs text-warning tracking-wide mt-0.5">
                           {"★".repeat(hotel.stars)}{"☆".repeat(5 - hotel.stars)}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="bg-[#16a34a] text-white text-[12px] font-bold px-2 py-1 rounded-[8px] leading-none">
+                        <span className="bg-success text-white text-xs font-bold px-2 py-1 rounded-lg leading-none">
                           {hotel.score}
                         </span>
                         <div className="flex flex-col">
-                          <span className="text-[12px] font-bold text-[#333743]">
+                          <span className="text-xs font-bold text-foreground">
                             {hotel.label}
                           </span>
-                          <span className="text-[12px] text-[#667080]">
+                          <span className="text-xs text-muted-foreground">
                             {hotel.reviews}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-[#667080] text-[13px]">
+                    <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
                       <MapPin size={13} className="shrink-0" />
                       {hotel.location}
                     </div>
@@ -1537,7 +1534,7 @@ export default function DiscoveryPage({
                       {hotel.amenities.map((a) => (
                         <span
                           key={a.label}
-                          className="flex items-center gap-1 bg-[#EFF6FF] text-[#2681FF] text-[12px] font-medium px-2.5 py-1 rounded-full"
+                          className="flex items-center gap-1 bg-primary/10 text-primary text-xs font-medium px-2.5 py-1 rounded-full"
                         >
                           <AmenityIcon name={a.icon} />
                           {a.label}
@@ -1545,9 +1542,9 @@ export default function DiscoveryPage({
                       ))}
                     </div>
 
-                    <div className="pt-2 border-t border-[#f3f5f6]">
-                      <div className="text-[13px] text-[#667080]">Per person, per night</div>
-                      <div className="text-[22px] font-bold text-[#333743]">{hotel.price}</div>
+                    <div className="pt-2 border-t border-muted">
+                      <div className="text-xs text-muted-foreground">Per person, per night</div>
+                      <div className="text-2xl font-bold text-foreground">{hotel.price}</div>
                     </div>
                   </div>
                 </div>
@@ -1556,7 +1553,7 @@ export default function DiscoveryPage({
 
             <div className="flex justify-center">
               <button
-                className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors"
+                className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
                 onClick={() =>
                   onHotelSearch({
                     location: "Any destination",
@@ -1575,17 +1572,17 @@ export default function DiscoveryPage({
 
       {/* ── FLIGHTS ── */}
       {activeTab === "flights" && (
-        <section className="py-16 px-4 sm:px-6 lg:px-12">
+        <section className="py-16 px-4 md:px-6 lg:px-12">
           <div className="max-w-[1200px] mx-auto">
 
             <div className="mb-8">
               <div className="flex items-center gap-2.5 mb-2">
-                <Plane size={28} className="text-[#2681FF]" />
-                <h2 className="text-[#333743] font-bold text-[32px] leading-tight">
+                <Plane size={28} className="text-primary" />
+                <h2 className="text-foreground font-bold text-3xl leading-tight">
                   Popular flight routes
                 </h2>
               </div>
-              <p className="text-[#667080] text-[18px]">
+              <p className="text-muted-foreground text-lg">
                 Average prices based on current calendar month
               </p>
             </div>
@@ -1594,7 +1591,7 @@ export default function DiscoveryPage({
               {FLIGHT_ROUTES.map((route) => (
                 <div
                   key={route.id}
-                  className="bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
+                  className="bg-card rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
                   onClick={() => onFlightSearch({
                     tripType: "roundtrip",
                     legs: [
@@ -1614,13 +1611,13 @@ export default function DiscoveryPage({
                     />
                     {route.badge && (
                       <span
-                        className={`absolute top-3 left-3 text-white text-[12px] font-bold px-2.5 py-1 rounded-[6px] ${
+                        className={cn("absolute top-3 left-3 text-white text-xs font-bold px-2.5 py-1 rounded-md",
                           route.badge === "Best value"
-                            ? "bg-[#16a34a]"
+                            ? "bg-success"
                             : route.badge === "Direct"
-                            ? "bg-[#f59e0b]"
-                            : "bg-[#2681FF]"
-                        }`}
+                            ? "bg-warning"
+                            : "bg-primary"
+                        )}
                       >
                         {route.badge}
                       </span>
@@ -1628,14 +1625,14 @@ export default function DiscoveryPage({
                   </div>
 
                   <div className="p-4 flex flex-col gap-3">
-                    <div className="flex items-center gap-1.5 text-[#333743] text-[15px] font-bold">
+                    <div className="flex items-center gap-1.5 text-foreground text-base font-bold">
                       <img
                         src={`https://flagcdn.com/w40/${route.fromFlag}.png`}
                         alt={route.from}
                         className="w-5 h-3.5 rounded-sm object-cover"
                       />
                       {route.from}
-                      <ArrowRight size={14} className="text-[#9598a4] mx-0.5" />
+                      <ArrowRight size={14} className="text-grey mx-0.5" />
                       <img
                         src={`https://flagcdn.com/w40/${route.toFlag}.png`}
                         alt={route.to}
@@ -1644,30 +1641,30 @@ export default function DiscoveryPage({
                       {route.to}
                     </div>
 
-                    <div className="flex items-center gap-2 text-[13px] text-[#667080]">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <GitBranch size={12} />
                         {route.stops}
                       </span>
-                      <span className="w-px h-3 bg-[#e0e2e8]" />
+                      <span className="w-px h-3 bg-border" />
                       <span className="flex items-center gap-1">
                         <Clock size={12} />
                         {route.duration}
                       </span>
-                      <span className="w-px h-3 bg-[#e0e2e8]" />
-                      <span className="bg-[#f3f5f6] text-[#333743] font-bold text-[11px] px-2 py-0.5 rounded-[4px]">
+                      <span className="w-px h-3 bg-border" />
+                      <span className="bg-grey-light text-foreground font-bold text-xs px-2 py-0.5 rounded-sm">
                         {route.airline}
                       </span>
                     </div>
 
-                    <div className="flex items-end justify-between pt-2 border-t border-[#f3f5f6]">
-                      <div className="flex items-center gap-1.5 text-[13px] text-[#667080]">
+                    <div className="flex items-end justify-between pt-2 border-t border-muted">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                         <CalendarIcon size={13} />
                         {route.dates}
                       </div>
                       <div className="text-right">
-                        <div className="text-[13px] text-[#667080]">Per person</div>
-                        <div className="text-[22px] font-bold text-[#333743]">{route.price}</div>
+                        <div className="text-xs text-muted-foreground">Per person</div>
+                        <div className="text-2xl font-bold text-foreground">{route.price}</div>
                       </div>
                     </div>
                   </div>
@@ -1689,22 +1686,22 @@ export default function DiscoveryPage({
               headings + tab bars with the hero card. Scroll rows use dynamic
               pl-[max(pad, (100vw-1200px)/2)] so the first card starts at exactly
               the same left edge on all screen sizes, including wide viewports. */}
-          <section className="py-10 sm:py-16">
+          <section className="py-10 md:py-16">
 
             {/* Constrained content — aligns with hero card left edge */}
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-5 sm:mb-8">
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-5 md:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
-                <TreePalm size={24} className="text-[#2681FF] sm:size-7" />
-                <h2 className="text-[#333743] font-bold text-[22px] sm:text-[32px] leading-tight">
+                <TreePalm size={24} className="text-primary md:size-7" />
+                <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
                   Tours for every travel style
                 </h2>
               </div>
-              <p className="text-[#667080] text-[14px] sm:text-[18px]">
+              <p className="text-muted-foreground text-sm md:text-lg">
                 Average prices based on current calendar month
               </p>
             </div>
 
-            <div ref={styleTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] sm:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-[#E0E2E8] mb-5 sm:mb-8 flex gap-0 overflow-x-auto">
+            <div ref={styleTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] md:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto">
               {TOUR_STYLE_FILTERS.map((style) => (
                 <button
                   key={style}
@@ -1712,19 +1709,19 @@ export default function DiscoveryPage({
                   onClick={() => setActiveTourStyle(style)}
                   onMouseEnter={() => setHoveredStyle(style)}
                   onMouseLeave={() => setHoveredStyle(null)}
-                  className={`shrink-0 px-5 py-3 text-[15px] font-bold whitespace-nowrap ${
-                    activeTourStyle === style ? "text-[#2681FF]" : "text-[#333743]"
-                  }`}
+                  className={cn("shrink-0 px-5 py-3 text-base font-bold whitespace-nowrap",
+                    activeTourStyle === style ? "text-primary" : "text-foreground"
+                  )}
                 >
                   {style}
                 </button>
               ))}
-              <button className="shrink-0 ml-auto px-5 py-3 text-[15px] font-bold text-[#2681FF] flex items-center gap-1.5">
+              <button className="shrink-0 ml-auto px-5 py-3 text-base font-bold text-primary flex items-center gap-1.5">
                 Other styles
                 <ChevronDown size={16} />
               </button>
               <div
-                className="absolute bottom-0 h-[2.5px] bg-[#2681FF] rounded-full transition-all duration-300 ease-out"
+                className="absolute bottom-0 h-[2.5px] bg-primary rounded-full transition-all duration-300 ease-out"
                 style={{ left: styleIndicator.left, width: styleIndicator.width }}
               />
             </div>
@@ -1732,7 +1729,7 @@ export default function DiscoveryPage({
             {/* Scroll row: starts at the same left edge as the hero card.
                 pl-[max(pad,(100vw-75rem)/2)] dynamically tracks the mx-auto centering
                 so cards align correctly on both narrow and wide screens. */}
-            <div className="pl-[max(1rem,calc((100vw-75rem)/2))] sm:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] sm:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+            <div className="pl-[max(1rem,calc((100vw-75rem)/2))] md:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
               {TOUR_CARDS.map((tour) => (
                 <div key={tour.id} className="shrink-0 w-[320px] snap-start">
                   <TourCard tour={tour} onSelect={() => onTourSelect(tour)} />
@@ -1740,7 +1737,7 @@ export default function DiscoveryPage({
               ))}
             </div>
 
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
               <button
                 onClick={() => onHolidaySearch({
                   from: "London (LHR)",
@@ -1755,7 +1752,7 @@ export default function DiscoveryPage({
                   // Pre-select the travel style filter so the list opens already filtered
                   initialFilters: { style: activeTourStyle },
                 })}
-                className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors"
+                className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
               >
                 View all {activeTourStyle} tours (35)
               </button>
@@ -1763,24 +1760,24 @@ export default function DiscoveryPage({
 
           </section>
 
-          <hr className="border-[#E0E2E8] mx-4 sm:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
+          <hr className="border-border mx-4 md:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
 
           {/* ── Section 2: Tours by destination ──────────────────────────── */}
-          <section className="py-10 sm:py-16">
+          <section className="py-10 md:py-16">
 
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-5 sm:mb-8">
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-5 md:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
-                <Flag size={24} className="text-[#2681FF] sm:size-7" />
-                <h2 className="text-[#333743] font-bold text-[22px] sm:text-[32px] leading-tight">
+                <Flag size={24} className="text-primary md:size-7" />
+                <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
                   Your next dream destination
                 </h2>
               </div>
-              <p className="text-[#667080] text-[14px] sm:text-[18px]">
+              <p className="text-muted-foreground text-sm md:text-lg">
                 Average prices based on current calendar month
               </p>
             </div>
 
-            <div ref={countryTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] sm:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-[#E0E2E8] mb-5 sm:mb-8 flex gap-0 overflow-x-auto">
+            <div ref={countryTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] md:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto">
               {DESTINATION_FILTERS.map((country) => (
                 <button
                   key={country}
@@ -1788,24 +1785,24 @@ export default function DiscoveryPage({
                   onClick={() => setActiveCountry(country)}
                   onMouseEnter={() => setHoveredCountry(country)}
                   onMouseLeave={() => setHoveredCountry(null)}
-                  className={`shrink-0 px-5 py-3 text-[15px] font-bold whitespace-nowrap ${
-                    activeCountry === country ? "text-[#2681FF]" : "text-[#333743]"
-                  }`}
+                  className={cn("shrink-0 px-5 py-3 text-base font-bold whitespace-nowrap",
+                    activeCountry === country ? "text-primary" : "text-foreground"
+                  )}
                 >
                   {country}
                 </button>
               ))}
-              <button className="shrink-0 ml-auto px-5 py-3 text-[15px] font-bold text-[#2681FF] flex items-center gap-1.5">
+              <button className="shrink-0 ml-auto px-5 py-3 text-base font-bold text-primary flex items-center gap-1.5">
                 More destinations
                 <ChevronDown size={16} />
               </button>
               <div
-                className="absolute bottom-0 h-[2.5px] bg-[#2681FF] rounded-full transition-all duration-300 ease-out"
+                className="absolute bottom-0 h-[2.5px] bg-primary rounded-full transition-all duration-300 ease-out"
                 style={{ left: countryIndicator.left, width: countryIndicator.width }}
               />
             </div>
 
-            <div className="pl-[max(1rem,calc((100vw-75rem)/2))] sm:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] sm:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+            <div className="pl-[max(1rem,calc((100vw-75rem)/2))] md:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
               {(TOURS_BY_COUNTRY[activeCountry] ?? []).map((tour) => (
                 <div key={tour.id} className="shrink-0 w-[320px] snap-start">
                   <TourCard tour={tour} onSelect={() => onTourSelect(tour)} />
@@ -1813,7 +1810,7 @@ export default function DiscoveryPage({
               ))}
             </div>
 
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
               <button
                 onClick={() => onHolidaySearch({
                   from: "London (LHR)",
@@ -1828,7 +1825,7 @@ export default function DiscoveryPage({
                   // Pre-select the country filter so the list opens already filtered
                   initialFilters: { country: activeCountry },
                 })}
-                className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors"
+                className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
               >
                 View all {activeCountry} tours (22)
               </button>
@@ -1836,24 +1833,24 @@ export default function DiscoveryPage({
 
           </section>
 
-          <hr className="border-[#E0E2E8] mx-4 sm:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
+          <hr className="border-border mx-4 md:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
 
           {/* ── Section 3: Travel the way you like ───────────────────────── */}
-          <section className="py-10 sm:py-16">
+          <section className="py-10 md:py-16">
 
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-5 sm:mb-8">
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-5 md:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
-                <GitBranch size={24} className="text-[#2681FF] sm:size-7" />
-                <h2 className="text-[#333743] font-bold text-[22px] sm:text-[32px] leading-tight">
+                <GitBranch size={24} className="text-primary md:size-7" />
+                <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
                   Travel the way you like
                 </h2>
               </div>
-              <p className="text-[#667080] text-[14px] sm:text-[18px]">
+              <p className="text-muted-foreground text-sm md:text-lg">
                 Find the right style of holiday for you
               </p>
             </div>
 
-            <div ref={tripTypeTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] sm:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-[#E0E2E8] mb-5 sm:mb-8 flex gap-0 overflow-x-auto">
+            <div ref={tripTypeTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] md:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto">
               {TRIP_TYPES.map((tt) => (
                 <button
                   key={tt.id}
@@ -1861,21 +1858,21 @@ export default function DiscoveryPage({
                   onClick={() => setActiveTripType(tt.id)}
                   onMouseEnter={() => setHoveredTripType(tt.id)}
                   onMouseLeave={() => setHoveredTripType(null)}
-                  className={`shrink-0 px-5 py-3 text-[15px] font-bold whitespace-nowrap ${
-                    activeTripType === tt.id ? "text-[#2681FF]" : "text-[#333743]"
-                  }`}
+                  className={cn("shrink-0 px-5 py-3 text-base font-bold whitespace-nowrap",
+                    activeTripType === tt.id ? "text-primary" : "text-foreground"
+                  )}
                 >
                   {tt.label}
                 </button>
               ))}
               <div
-                className="absolute bottom-0 h-[2.5px] bg-[#2681FF] rounded-full transition-all duration-300 ease-out"
+                className="absolute bottom-0 h-[2.5px] bg-primary rounded-full transition-all duration-300 ease-out"
                 style={{ left: tripTypeIndicator.left, width: tripTypeIndicator.width }}
               />
             </div>
 
             {activeTripType === "hotel-flight" && (
-              <div className="pl-[max(1rem,calc((100vw-75rem)/2))] sm:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] sm:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+              <div className="pl-[max(1rem,calc((100vw-75rem)/2))] md:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
                 {HOLIDAY_DESTINATIONS.map((dest) => (
                   <div key={dest.id} className="shrink-0 w-[320px] snap-start">
                     <HolidayCard
@@ -1898,11 +1895,11 @@ export default function DiscoveryPage({
             )}
 
             {activeTripType !== "hotel-flight" && (
-              <div className="pl-[max(1rem,calc((100vw-75rem)/2))] sm:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] sm:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+              <div className="pl-[max(1rem,calc((100vw-75rem)/2))] md:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
                 {(TRIP_TYPE_CARDS[activeTripType] ?? []).map((card) => (
                   <div key={card.id} className="shrink-0 w-[300px] snap-start">
                     <div
-                      className="bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
+                      className="bg-card rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
                       onClick={() => onHolidaySearch({
                         from: "London (LHR)",
                         to: card.destination,
@@ -1917,27 +1914,27 @@ export default function DiscoveryPage({
                     >
                       <div className="relative">
                         <img src={card.image} alt={card.title} className="w-full h-[180px] object-cover" />
-                        <span className={`absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                        <span className={cn("absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold",
                           activeTripType === "group-tour"      ? "bg-purple-100 text-purple-700" :
                           activeTripType === "individual-tour" ? "bg-green-100 text-green-700" :
                           activeTripType === "round-trip"      ? "bg-amber-100 text-amber-700" :
                                                                  "bg-red-100 text-red-700"
-                        }`}>
+                        )}>
                           {TRIP_TYPES.find((t) => t.id === activeTripType)?.icon}
                           {TRIP_TYPES.find((t) => t.id === activeTripType)?.label}
                         </span>
                       </div>
                       <div className="p-4 flex flex-col gap-2">
-                        <div className="text-[13px] text-[#667080]">{card.destination}</div>
-                        <div className="text-[15px] font-bold text-[#333743] leading-snug">{card.title}</div>
+                        <div className="text-xs text-muted-foreground">{card.destination}</div>
+                        <div className="text-sm font-bold text-foreground leading-snug">{card.title}</div>
                         <div className="flex items-end justify-between mt-1">
-                          <div className="flex items-center gap-1.5 text-[13px] text-[#333743]">
+                          <div className="flex items-center gap-1.5 text-xs text-foreground">
                             <Clock size={14} />
                             {card.duration}
                           </div>
                           <div className="text-right">
-                            <div className="text-[12px] text-[#667080]">Per person</div>
-                            <div className="text-[20px] font-bold text-[#333743]">{card.price}</div>
+                            <div className="text-xs text-muted-foreground">Per person</div>
+                            <div className="text-xl font-bold text-foreground">{card.price}</div>
                           </div>
                         </div>
                       </div>
@@ -1947,7 +1944,7 @@ export default function DiscoveryPage({
               </div>
             )}
 
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
               <button
                 onClick={() => onHolidaySearch({
                   from: "London (LHR)",
@@ -1962,7 +1959,7 @@ export default function DiscoveryPage({
                   // Pre-select the trip type filter so the list opens already filtered
                   initialFilters: { tripType: activeTripType },
                 })}
-                className="border border-[#2681FF] text-[#2681FF] font-bold text-[15px] px-5 py-2.5 rounded-[8px] hover:bg-[#eff6ff] transition-colors"
+                className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
               >
                 View all {TRIP_TYPES.find((t) => t.id === activeTripType)?.label} holidays
               </button>
@@ -1970,22 +1967,22 @@ export default function DiscoveryPage({
 
           </section>
 
-          <hr className="border-[#E0E2E8] mx-4 sm:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
+          <hr className="border-border mx-4 md:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
 
           {/* ── Section 5: Why book with us ───────────────────────────────── */}
-          <section className="py-10 sm:py-16">
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] sm:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))]">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <section className="py-10 md:py-16">
+            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))]">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {[
-                  { icon: <Sun size={22} className="text-[#2681FF]" />, title: "Buy together & save", desc: "Bundle your flights and hotel for the best combined price." },
-                  { icon: <Heart size={22} className="text-[#2681FF]" />, title: "Tailor your holiday", desc: "Mix and match hotels, room types, and board options." },
-                  { icon: <Plane size={22} className="text-[#2681FF]" />, title: "Flexible dates", desc: "See prices across different dates to find the best deal." },
-                  { icon: <Users size={22} className="text-[#2681FF]" />, title: "24 / 7 support", desc: "Our travel experts are here before, during, and after your trip." },
+                  { icon: <Sun size={22} className="text-primary" />, title: "Buy together & save", desc: "Bundle your flights and hotel for the best combined price." },
+                  { icon: <Heart size={22} className="text-primary" />, title: "Tailor your holiday", desc: "Mix and match hotels, room types, and board options." },
+                  { icon: <Plane size={22} className="text-primary" />, title: "Flexible dates", desc: "See prices across different dates to find the best deal." },
+                  { icon: <Users size={22} className="text-primary" />, title: "24 / 7 support", desc: "Our travel experts are here before, during, and after your trip." },
                 ].map(({ icon, title, desc }) => (
                   <div key={title} className="flex flex-col gap-2">
-                    <div className="w-10 h-10 bg-[#EFF6FF] rounded-[10px] flex items-center justify-center">{icon}</div>
-                    <div className="text-[14px] font-bold text-[#333743]">{title}</div>
-                    <div className="text-[13px] text-[#667080] leading-relaxed">{desc}</div>
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">{icon}</div>
+                    <div className="text-sm font-bold text-foreground">{title}</div>
+                    <div className="text-xs text-muted-foreground leading-relaxed">{desc}</div>
                   </div>
                 ))}
               </div>
@@ -1996,8 +1993,8 @@ export default function DiscoveryPage({
       )}
 
       {/* Footer */}
-      <div className="text-center py-8 border-t border-[#e0e2e8]">
-        <p className="text-[#9598a4] text-[13px]">
+      <div className="text-center py-8 border-t border-border">
+        <p className="text-grey text-xs">
           © 2026 Nezasa · TripBuilder · Over 500,000 hotels worldwide
         </p>
       </div>
@@ -2026,17 +2023,17 @@ function CounterControl({
       <button
         onClick={onDecrement}
         disabled={value <= min}
-        className="w-[28px] h-[28px] rounded-full border border-[#e0e2e8] flex items-center justify-center text-[#333743] hover:border-[#2681FF] hover:text-[#2681FF] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="w-[28px] h-[28px] rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >
         <Minus size={14} />
       </button>
-      <span className="w-[20px] text-center font-bold text-[15px] text-[#333743]">
+      <span className="w-[20px] text-center font-bold text-sm text-foreground">
         {value}
       </span>
       <button
         onClick={onIncrement}
         disabled={value >= max}
-        className="w-[28px] h-[28px] rounded-full border border-[#e0e2e8] flex items-center justify-center text-[#333743] hover:border-[#2681FF] hover:text-[#2681FF] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="w-[28px] h-[28px] rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >
         <Plus size={14} />
       </button>
@@ -2060,7 +2057,7 @@ type TourCardData = {
 function TourCard({ tour, onSelect }: { tour: TourCardData; onSelect?: () => void }) {
   return (
     <div
-      className="bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
+      className="bg-card rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
       onClick={onSelect}
     >
       <img
@@ -2069,7 +2066,7 @@ function TourCard({ tour, onSelect }: { tour: TourCardData; onSelect?: () => voi
         className="w-full h-[200px] object-cover"
       />
       <div className="p-4 flex flex-col gap-2">
-        <div className="flex items-center gap-1.5 text-[13px] text-[#333743]">
+        <div className="flex items-center gap-1.5 text-xs text-foreground">
           <img
             src={`https://flagcdn.com/w40/${tour.flag}.png`}
             alt={tour.country}
@@ -2077,20 +2074,20 @@ function TourCard({ tour, onSelect }: { tour: TourCardData; onSelect?: () => voi
           />
           {tour.country}
         </div>
-        <div className="text-[15px] font-bold text-[#333743] leading-snug">
+        <div className="text-sm font-bold text-foreground leading-snug">
           {tour.title}
         </div>
-        <div className="text-[14px] text-[#667080] leading-relaxed line-clamp-2">
+        <div className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
           {tour.desc}
         </div>
         <div className="flex items-end justify-between mt-1">
-          <div className="flex items-center gap-1.5 text-[13px] text-[#333743]">
+          <div className="flex items-center gap-1.5 text-xs text-foreground">
             <Clock size={14} />
             {tour.duration}
           </div>
           <div className="text-right">
-            <div className="text-[13px] text-[#333743]">Per person</div>
-            <div className="text-[22px] font-bold text-[#333743]">{tour.price}</div>
+            <div className="text-xs text-foreground">Per person</div>
+            <div className="text-2xl font-bold text-foreground">{tour.price}</div>
           </div>
         </div>
       </div>
@@ -2120,7 +2117,7 @@ function HolidayCard({
 }) {
   return (
     <div
-      className="bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
+      className="bg-card rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
       onClick={onSelect}
     >
       <img
@@ -2130,7 +2127,7 @@ function HolidayCard({
       />
 
       <div className="p-4 flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-[18px] font-bold text-[#333743] leading-snug">
+        <div className="flex items-center gap-2 text-lg font-bold text-foreground leading-snug">
           <img
             src={`https://flagcdn.com/w40/${dest.flag}.png`}
             alt={dest.country}
@@ -2138,23 +2135,23 @@ function HolidayCard({
           />
           {dest.destination}
         </div>
-        <div className="text-[14px] text-[#667080] leading-relaxed line-clamp-2">
+        <div className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
           {dest.desc}
         </div>
-        <div className="flex items-end justify-between mt-1 pt-2 border-t border-[#f3f5f6]">
+        <div className="flex items-end justify-between mt-1 pt-2 border-t border-muted">
           <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-1.5 text-[13px] text-[#333743]">
+            <div className="flex items-center gap-1.5 text-xs text-foreground">
               <RotateCcw size={14} />
               Return flights
             </div>
-            <div className="flex items-center gap-1.5 text-[13px] text-[#333743]">
+            <div className="flex items-center gap-1.5 text-xs text-foreground">
               <Moon size={14} />
               {dest.nights} nights
             </div>
           </div>
           <div className="text-right">
-            <div className="text-[13px] text-[#333743]">Per person</div>
-            <div className="text-[22px] font-bold text-[#333743]">{dest.price}</div>
+            <div className="text-xs text-foreground">Per person</div>
+            <div className="text-2xl font-bold text-foreground">{dest.price}</div>
           </div>
         </div>
       </div>

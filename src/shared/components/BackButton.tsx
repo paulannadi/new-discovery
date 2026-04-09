@@ -22,7 +22,7 @@ export function BackButton({ label, onClick, className = "" }: BackButtonProps) 
     // `group` enables the child arrow to animate on hover via group-hover:
     <button
       onClick={onClick}
-      className={`group flex items-center gap-1.5 text-[#2681FF] text-[13px] font-bold hover:underline w-fit transition-colors ${className}`}
+      className={`group flex items-center gap-1.5 text-primary text-xs font-bold hover:underline w-fit transition-colors ${className}`}
     >
       {/* Arrow shifts left slightly on hover to feel interactive */}
       <ArrowLeft

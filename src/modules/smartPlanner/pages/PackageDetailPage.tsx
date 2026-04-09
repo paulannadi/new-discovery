@@ -62,6 +62,7 @@ import {
   PopoverTrigger,
 } from "../../../shared/components/ui/popover";
 import { Button } from "../../../shared/components/ui/button";
+import { cn } from "../../../shared/components/ui/utils";
 import LeafletMap from "../../../shared/components/LeafletMap";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -189,9 +190,9 @@ function AmenityIcon({ name, size = 15 }: { name: string; size?: number }) {
     lower.includes("beach") ||
     lower.includes("water")
   )
-    return <Waves size={size} className="text-[#2681FF] shrink-0" />;
+    return <Waves size={size} className="text-primary shrink-0" aria-hidden="true" />;
   if (lower.includes("wifi") || lower.includes("internet"))
-    return <Wifi size={size} className="text-[#2681FF] shrink-0" />;
+    return <Wifi size={size} className="text-primary shrink-0" aria-hidden="true" />;
   if (
     lower.includes("dine") ||
     lower.includes("restaurant") ||
@@ -199,18 +200,18 @@ function AmenityIcon({ name, size = 15 }: { name: string; size?: number }) {
     lower.includes("dining") ||
     lower.includes("breakfast")
   )
-    return <Utensils size={size} className="text-[#2681FF] shrink-0" />;
+    return <Utensils size={size} className="text-primary shrink-0" aria-hidden="true" />;
   if (
     lower.includes("gym") ||
     lower.includes("fitness") ||
     lower.includes("sport")
   )
-    return <Dumbbell size={size} className="text-[#2681FF] shrink-0" />;
+    return <Dumbbell size={size} className="text-primary shrink-0" aria-hidden="true" />;
   if (lower.includes("spa") || lower.includes("wellness"))
-    return <Star size={size} className="text-[#2681FF] shrink-0" />;
+    return <Star size={size} className="text-primary shrink-0" aria-hidden="true" />;
   // Default: blue dot bullet (matches Figma's "●" for extra highlights)
   return (
-    <span className="w-[15px] h-[15px] flex items-center justify-center text-[#2681FF] text-[7px] shrink-0">
+    <span className="w-[15px] h-[15px] flex items-center justify-center text-primary text-xs shrink-0" aria-hidden="true">
       ●
     </span>
   );
@@ -244,7 +245,7 @@ function PriceTrendChart({
 
   return (
     <div className="mb-4">
-      <div className="text-[11px] font-semibold text-[#9598a4] uppercase tracking-wide mb-2">
+      <div className="text-xs font-semibold text-grey uppercase tracking-wide mb-2">
         Price trend
       </div>
       <div className="flex items-end gap-[2px] h-[40px]">
@@ -254,23 +255,21 @@ function PriceTrendChart({
           const isSelected = entry.departureDate === selectedDate;
           const isCheapest =
             entry.departureDate === cheapestEntry.departureDate;
-          const barColour = isSelected
-            ? "bg-[#2681FF]"
-            : isCheapest
-            ? "bg-[#16a34a]"
-            : "bg-[#e0e2e8]";
+          const barColour = cn(
+            isSelected ? "bg-primary" : isCheapest ? "bg-success" : "bg-grey-light"
+          );
           return (
             <button
               key={entry.departureDate}
               onClick={() => onSelectDate(entry.departureDate)}
               title={`${formatDate(entry.departureDate)}: £${entry.pricePerPerson.toLocaleString()}`}
-              className={`flex-1 rounded-t-[2px] transition-opacity hover:opacity-70 ${barColour}`}
+              className={cn(`flex-1 rounded-t-[2px] transition-opacity hover:opacity-70`, barColour)}
               style={{ height: `${heightPct}%` }}
             />
           );
         })}
       </div>
-      <div className="flex justify-between mt-1 text-[10px] text-[#9598a4]">
+      <div className="flex justify-between mt-1 text-xs text-grey">
         <span>
           {months[0] ? format(new Date(months[0] + "-01"), "MMM yyyy") : ""}
         </span>
@@ -283,13 +282,13 @@ function PriceTrendChart({
           </span>
         )}
       </div>
-      <div className="flex gap-3 mt-1.5 text-[11px] text-[#9598a4]">
+      <div className="flex gap-3 mt-1.5 text-xs text-grey">
         <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-[#16a34a] inline-block" />
+          <span className="w-2 h-2 rounded-full bg-success inline-block" />
           Best price
         </span>
         <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-[#2681FF] inline-block" />
+          <span className="w-2 h-2 rounded-full bg-primary inline-block" />
           Selected
         </span>
       </div>
@@ -326,32 +325,33 @@ function FlightCard({
     .toUpperCase();
 
   return (
-    <div className="bg-white rounded-[16px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow">
+    <div className="bg-card rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow">
       {/* ── Header: airline badge + name/number + direction badge */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           {/* Airline circle — dark blue like real airline logos */}
-          <div className="w-9 h-9 rounded-full bg-[#003399] flex items-center justify-center text-white text-[11px] font-bold shrink-0">
+          <div className="w-9 h-9 rounded-full bg-[#003399] flex items-center justify-center text-white text-xs font-bold shrink-0">
             {initials}
           </div>
           <div>
             {/* Airline name: Mulish 600, 14px — style_YT0WJ2 in Figma */}
-            <div className="text-[14px] font-semibold text-[#333743]">
+            <div className="text-sm font-semibold text-foreground">
               {leg.carrier}
             </div>
             {/* Flight number: Mulish 400, 12px — style for "EZY8302" */}
-            <div className="text-[12px] text-[#717171] font-normal">
+            <div className="text-sm text-muted-foreground font-normal">
               {leg.flightNumber}
             </div>
           </div>
         </div>
         {/* Direction badge — exact Figma colors per direction */}
         <span
-          className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${
+          className={cn(
+            `text-xs font-semibold px-2.5 py-1 rounded-full`,
             direction === "Outbound"
-              ? "bg-[#EFF6FF] text-[#2681FF]"   // Figma: fill_6PNZ13 + fill_CTT1AZ
-              : "bg-[#F0FDF4] text-[#16A34A]"   // Figma: fill_8SIHEG + fill_A7KTJI
-          }`}
+              ? "bg-primary/10 text-primary"   // Figma: fill_6PNZ13 + fill_CTT1AZ
+              : "bg-success/10 text-success"   // Figma: fill_8SIHEG + fill_A7KTJI
+          )}
         >
           {direction}
         </span>
@@ -362,37 +362,37 @@ function FlightCard({
         {/* Departure side */}
         <div>
           {/* Time: Mulish 700, 22px — style_8FBHDW in Figma */}
-          <div className="text-[22px] font-bold text-[#222222] leading-tight tabular-nums">
+          <div className="text-2xl font-bold text-foreground leading-tight tabular-nums">
             {formatTime(leg.departureTime)}
           </div>
           {/* Airport code: Mulish 500, 12px — style_OFZSTJ in Figma */}
-          <div className="text-[12px] text-[#717171] mt-0.5 font-medium">
+          <div className="text-sm text-muted-foreground mt-0.5 font-medium">
             {leg.departureAirport}
           </div>
         </div>
 
         {/* Flight path line in the middle */}
         <div className="flex-1 flex flex-col items-center gap-1">
-          <div className="text-[12px] text-[#717171]">
+          <div className="text-sm text-muted-foreground">
             {formatDuration(leg.durationMinutes)}
           </div>
           <div className="w-full flex items-center gap-1">
-            <div className="flex-1 h-[1px] bg-[#e0e0e0]" />
-            <Plane size={12} className="text-[#9598a4] shrink-0" />
-            <div className="flex-1 h-[1px] bg-[#e0e0e0]" />
+            <div className="flex-1 h-[1px] bg-border" />
+            <Plane size={12} className="text-grey shrink-0" aria-hidden="true" />
+            <div className="flex-1 h-[1px] bg-border" />
           </div>
           {/* "Direct" in green — fill_A7KTJI = #16A34A in Figma */}
-          <div className="text-[11px] text-[#16A34A] font-semibold">
+          <div className="text-xs text-success font-semibold">
             Direct
           </div>
         </div>
 
         {/* Arrival side */}
         <div className="text-right">
-          <div className="text-[22px] font-bold text-[#222222] leading-tight tabular-nums">
+          <div className="text-2xl font-bold text-foreground leading-tight tabular-nums">
             {formatTime(leg.arrivalTime)}
           </div>
-          <div className="text-[12px] text-[#717171] mt-0.5 font-medium">
+          <div className="text-sm text-muted-foreground mt-0.5 font-medium">
             {leg.arrivalAirport}
           </div>
         </div>
@@ -402,15 +402,15 @@ function FlightCard({
           Figma shows a horizontal border separating this from the flight info,
           with "🧳 Hand luggage included" on the left and an "Add baggage and
           extras →" text button on the right (fills: fill_CTT1AZ = #2681FF). */}
-      <div className="mt-4 pt-3 border-t border-[#F0F0F0] flex items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 text-[12px] text-[#717171]">
-          <Luggage size={13} className="shrink-0" />
+      <div className="mt-4 pt-3 border-t border-border flex items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Luggage size={13} className="shrink-0" aria-hidden="true" />
           <span>Hand luggage included</span>
         </div>
         {/* "Add baggage and extras →" — text button, fill_CTT1AZ (#2681FF) */}
-        <button className="text-[12px] font-semibold text-[#2681FF] flex items-center gap-1 hover:underline shrink-0">
+        <button className="text-sm font-semibold text-primary flex items-center gap-1 hover:underline shrink-0">
           Add baggage and extras
-          <span className="text-[10px]">›</span>
+          <span className="text-xs">›</span>
         </button>
       </div>
     </div>
@@ -688,11 +688,11 @@ export default function PackageDetailPage({
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    // ── ROOT: page background is #F3F5F6 (fill_LOB3ZX), font is Mulish ──────
+    // ── ROOT: page background is muted, font is Mulish ──────
     // Mulish is loaded via Google Fonts @import inside the <style> tag below.
     // All font sizes and weights in this file reference Figma text styles.
     <div
-      className="min-h-screen bg-[#F3F5F6]"
+      className="min-h-screen bg-grey-lightest"
       style={{ fontFamily: "'Mulish', sans-serif" }}
     >
       {/* Inject Mulish from Google Fonts — only for the prototype */}
@@ -700,11 +700,11 @@ export default function PackageDetailPage({
 
       {/* ══════════════════════════════════════════════════════════════════════
           PACKAGE MAIN INFO CARD
-          This is the white card (fills: fill_0UTAA8, effects: Elevation L)
+          This is a white card (bg-card)
           that wraps both the hero gallery AND the hotel info + price row.
-          It sits on the grey page background like an elevated card.
+          It sits on the muted page background like an elevated card.
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="bg-white">
+      <div className="bg-card">
         <div className="max-w-[1280px] mx-auto">
 
           {/* Back button — sits above the hero inside the white card */}
@@ -722,14 +722,14 @@ export default function PackageDetailPage({
             <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[280px] md:h-[402px] gap-2">
 
               {/* Main hero image — rounded corners on all sides */}
-              <div className="relative overflow-hidden rounded-[16px] group">
+              <div className="relative overflow-hidden rounded-xl group">
                 <img
                   src={pkg.hotel.mainImage}
                   alt={pkg.hotel.name}
                   className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
                 />
                 {/* Subtle gradient for the bottom edge legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#333743]/25 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-transparent pointer-events-none" />
               </div>
 
               {/* 2×2 thumbnail grid — desktop only */}
@@ -737,7 +737,7 @@ export default function PackageDetailPage({
                 {hotelImages.gallery.map((url, i) => (
                   <div
                     key={url}
-                    className="overflow-hidden rounded-[16px] cursor-pointer group"
+                    className="overflow-hidden rounded-xl cursor-pointer group"
                     onClick={() => setPhotosOpen(true)}
                   >
                     <img
@@ -751,10 +751,10 @@ export default function PackageDetailPage({
             </div>
 
             {/* "See all photos" secondary button — overlaid bottom-right.
-                Figma: Type=Secondary, text "See all photos", fill_CTT1AZ text */}
+                Figma: Type=Secondary, text "See all photos", primary text */}
             <button
               onClick={() => setPhotosOpen(true)}
-              className="absolute bottom-4 right-4 md:right-4 bg-white/95 backdrop-blur-sm border border-[#DDDDDD] rounded-[8px] px-4 py-2 text-[14px] font-semibold text-[#2681FF] flex items-center gap-2 hover:bg-white transition-colors shadow-sm"
+              className="absolute bottom-4 right-4 md:right-4 bg-white/95 backdrop-blur-sm border border-border rounded-md px-4 py-2 text-sm font-semibold text-primary flex items-center gap-2 hover:bg-white transition-colors shadow-sm"
             >
               ⊞ See all photos
             </button>
@@ -775,21 +775,21 @@ export default function PackageDetailPage({
               <div className="flex flex-col gap-1.5">
 
                 {/* Rating badge row — "4,3" green badge + "Excellent" + "367 reviews" */}
-                {/* Figma: Number box fills fill_0YMCEL (#19A974), borderRadius: 8px */}
+                {/* Figma: Number box fills success, borderRadius: rounded-md */}
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <div className="bg-[#19A974] text-white text-[12px] font-bold px-2 py-0.5 rounded-[8px] leading-tight">
+                    <div className="bg-success text-white text-xs font-bold px-2 py-0.5 rounded-md leading-tight">
                       {ratingEU}
                     </div>
-                    {/* "Excellent" — Paragraph Bold/Small Bold, fill_3CZMCP (#333743) */}
-                    <span className="text-[13px] font-bold text-[#333743]">
+                    {/* "Excellent" — Paragraph Bold/Small Bold, foreground */}
+                    <span className="text-sm font-bold text-foreground">
                       {ratingLabel(pkg.hotel.trustYou.rating)}
                     </span>
                   </div>
-                  {/* Review count — Paragraph Regular/Small, fill_3CZMCP */}
+                  {/* Review count — Paragraph Regular/Small, foreground */}
                   <button
                     onClick={() => setReviewsOpen(true)}
-                    className="text-[13px] text-[#333743] underline hover:no-underline"
+                    className="text-sm text-foreground underline hover:no-underline"
                   >
                     {pkg.hotel.trustYou.reviewCount.toLocaleString()} reviews
                   </button>
@@ -797,10 +797,10 @@ export default function PackageDetailPage({
 
                 {/* Hotel name + star rating on the same line, stars 8px to the right */}
                 <div className="flex items-baseline gap-2">
-                  <h1 className="text-[24px] sm:text-[32px] md:text-[40px] font-bold text-[#333743] leading-[1.1] tracking-tight">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground leading-[1.1] tracking-tight">
                     {pkg.hotel.name}
                   </h1>
-                  <span className="text-[#FFB700] text-[16px] tracking-tight leading-none shrink-0">
+                  <span className="text-warning text-base tracking-tight leading-none shrink-0">
                     {"★".repeat(pkg.hotel.category)}
                     {"☆".repeat(Math.max(0, 5 - pkg.hotel.category))}
                   </span>
@@ -808,44 +808,44 @@ export default function PackageDetailPage({
               </div>
 
               {/* Duration + Location row — duration first, then location, then map link */}
-              <div className="flex items-center gap-4 text-[16px] text-[#333743] flex-wrap">
+              <div className="flex items-center gap-4 text-base text-foreground flex-wrap">
                 <div className="flex items-center gap-1.5">
-                  <CalendarDays size={15} className="text-[#333743] shrink-0" />
+                  <CalendarDays size={15} className="text-foreground shrink-0" aria-hidden="true" />
                   <span>{nights} days</span>
                 </div>
-                <span className="text-[#DDDDDD] hidden sm:block">|</span>
+                <span className="text-border hidden sm:block">|</span>
                 <div className="flex items-center gap-1.5">
-                  <MapPin size={15} className="text-[#333743] shrink-0" />
+                  <MapPin size={15} className="text-foreground shrink-0" aria-hidden="true" />
                   <span>{pkg.hotel.location}</span>
                 </div>
                 {/* "Show on map" link — same style as TourDetailPage */}
                 <button
                   onClick={() => setShowMapModal(true)}
-                  className="flex items-center gap-1.5 text-[14px] font-semibold text-[#2681FF] hover:underline"
+                  className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
                 >
-                  <MapPinned size={14} />
+                  <MapPinned size={14} aria-hidden="true" />
                   Show on map
                 </button>
               </div>
 
               {/* Package details — Figma: small heading + 3-item list
-                  "Package details" heading style_X26QUN (medium bold)
+                  "Package details" heading (medium bold)
                   Items: plane icon + "Return flights from London"
                          building icon + "Superior Ocean View Room"
                          utensils icon + "All Inclusive" */}
               {/* Package details — horizontal row, no background, Lucide icons */}
-              <h3 className="text-[18px] font-bold text-[#333743]">Package details</h3>
+              <h3 className="text-lg font-bold text-foreground">Package details</h3>
               <div className="flex flex-row flex-wrap gap-x-6 gap-y-2">
-                <div className="flex items-center gap-2 text-[16px] text-[#333743]">
-                  <Plane size={15} className="text-[#333743] shrink-0" />
+                <div className="flex items-center gap-2 text-base text-foreground">
+                  <Plane size={15} className="text-foreground shrink-0" aria-hidden="true" />
                   <span>Return flights from {pkg.flights.outbound.departureAirport}</span>
                 </div>
-                <div className="flex items-center gap-2 text-[16px] text-[#333743]">
-                  <Building2 size={15} className="text-[#333743] shrink-0" />
+                <div className="flex items-center gap-2 text-base text-foreground">
+                  <Building2 size={15} className="text-foreground shrink-0" aria-hidden="true" />
                   <span>{pkg.room.roomType}</span>
                 </div>
-                <div className="flex items-center gap-2 text-[16px] text-[#333743]">
-                  <Utensils size={15} className="text-[#333743] shrink-0" />
+                <div className="flex items-center gap-2 text-base text-foreground">
+                  <Utensils size={15} className="text-foreground shrink-0" aria-hidden="true" />
                   <span>{pkg.room.boardType}</span>
                 </div>
               </div>
@@ -855,42 +855,41 @@ export default function PackageDetailPage({
                 Figma node 6115:4151 "Frame 10029" — price block on the right.
                 Contains: £828 bold + "per person" + "Flight + hotel · 7 nights"
                           + "Total for 2 adults: £1,656" + CTA button
-                CTA: fills fill_CTT1AZ (#2681FF), borderRadius: 10px, white text
+                CTA: primary background, rounded-lg, white text
             ──────────────────────────────────────────────────────────────── */}
             <div className="flex flex-col gap-3 lg:min-w-[280px] lg:items-end">
 
               {/* Price block */}
               <div className="flex flex-col gap-1">
-                {/* £828 per person — style_2E92LV: Mulish 900, ~30px */}
+                {/* £828 per person — font-bold, ~30px */}
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-[30px] font-bold text-[#333743] leading-none">
+                  <span className="text-3xl font-bold text-foreground leading-none">
                     {currSym}{activePrice.toLocaleString()}
                   </span>
-                  {/* "per person" — style_LEDUF8: smaller, regular weight */}
-                  <span className="text-[14px] font-normal text-[#333743] leading-none">
+                  {/* "per person" — smaller, regular weight */}
+                  <span className="text-sm font-normal text-foreground leading-none">
                     per person
                   </span>
                 </div>
 
-                {/* "Flight + hotel · 7 nights" — style_6C8QNI: small, regular */}
-                <div className="text-[13px] text-[#333743] font-normal">
+                {/* "Flight + hotel · 7 nights" — small, regular */}
+                <div className="text-sm text-foreground font-normal">
                   Flight + hotel · {nights} nights
                 </div>
 
-                {/* "Total for 2 adults: £1,656" — style_25B0K7: bold inline */}
-                <div className="text-[13px] text-[#717171] font-normal">
+                {/* "Total for 2 adults: £1,656" — bold inline */}
+                <div className="text-sm text-muted-foreground font-normal">
                   Total for {adults} adults:{" "}
-                  <strong className="text-[#333743] font-bold">
+                  <strong className="text-foreground font-bold">
                     {currSym}{totalPrice.toLocaleString()}
                   </strong>
                 </div>
               </div>
 
-              {/* CTA button — fill_CTT1AZ (#2681FF), borderRadius: 10px, Mulish 700 16px
-                  Figma: "Personalise Your Holiday →" in white text */}
+              {/* CTA button — primary background, rounded-lg, white text */}
               <button
                 onClick={() => onBook(pkg, selectedDate)}
-                className="w-full lg:min-w-[280px] bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[15px] md:text-[16px] py-3 md:py-[16px] px-4 md:px-6 rounded-[10px] transition-colors text-center"
+                className="w-full lg:min-w-[280px] bg-primary hover:brightness-85 text-white font-bold text-base md:text-base py-3 md:py-4 px-4 md:px-6 rounded-lg transition-colors text-center"
               >
                 Personalise Your Holiday →
               </button>
@@ -909,9 +908,8 @@ export default function PackageDetailPage({
       <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8">
 
         {/* ── "Hotel and flight information" H2 heading ─────────────────────
-            Figma node 6117:1247: textStyle "Heading Black/H2", fill_3CZMCP
-            This is the main section heading before the content columns begin. */}
-        <h2 className="text-[26px] font-bold text-[#333743] mb-6">
+            Main section heading before the content columns begin. */}
+        <h2 className="text-3xl font-bold text-foreground mb-6">
           Hotel and flight information
         </h2>
 
@@ -930,19 +928,19 @@ export default function PackageDetailPage({
             <div>
               {/* Section header row */}
               <div className="flex items-center justify-between mb-4">
-                {/* "Selected room" — Heading Bold/H3, fill_DR3WCC (#222222) */}
-                <h3 className="text-[20px] font-bold text-[#222222]">
+                {/* "Selected room" — Heading Bold/H3 */}
+                <h3 className="text-xl font-bold text-foreground">
                   Selected room
                 </h3>
-                {/* "Change room" — text button with pencil icon, fill_CTT1AZ */}
-                <button className="flex items-center gap-1.5 text-[14px] font-semibold text-[#2681FF] hover:underline">
-                  <Pencil size={13} />
+                {/* "Change room" — text button with pencil icon */}
+                <button className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                  <Pencil size={13} aria-hidden="true" />
                   Change room
                 </button>
               </div>
 
-              {/* Room card — bg-white, rounded-[20px], Elevation S shadow */}
-              <div className="bg-white rounded-[20px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow">
+              {/* Room card — bg-card, rounded-3xl, shadow */}
+              <div className="bg-card rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex flex-col sm:flex-row">
                   {/* Room photo */}
                   <div className="h-[200px] sm:h-auto sm:w-[240px] shrink-0 overflow-hidden group">
@@ -956,33 +954,34 @@ export default function PackageDetailPage({
                   {/* Room details */}
                   <div className="p-5 flex flex-col justify-between flex-1">
                     <div>
-                      <div className="font-bold text-[#222222] text-[18px] mb-3">
+                      <div className="font-bold text-foreground text-lg mb-3">
                         {pkg.room.roomType}
                       </div>
                       <div className="flex flex-wrap items-center gap-2 mb-4">
-                        <span className="flex items-center gap-1.5 border border-[#E8E8E8] rounded-full px-3 py-1 text-[13px] text-[#333743]">
-                          <UtensilsCrossed size={12} className="shrink-0 text-[#667080]" />
+                        <span className="flex items-center gap-1.5 border border-border rounded-full px-3 py-1 text-sm text-foreground">
+                          <UtensilsCrossed size={12} className="shrink-0 text-muted-foreground" aria-hidden="true" />
                           {pkg.room.boardType}
                         </span>
-                        <span className="flex items-center gap-1.5 border border-[#E8E8E8] rounded-full px-3 py-1 text-[13px] text-[#333743]">
-                          <Users size={12} className="shrink-0 text-[#667080]" />
+                        <span className="flex items-center gap-1.5 border border-border rounded-full px-3 py-1 text-sm text-foreground">
+                          <Users size={12} className="shrink-0 text-muted-foreground" aria-hidden="true" />
                           {adults} guests
                         </span>
                       </div>
                       <div className="flex flex-col gap-2">
                         {[
-                          { icon: <BedDouble size={13} className="text-[#667080] shrink-0" />, label: "Double bed" },
-                          { icon: <Eye size={13} className="text-[#667080] shrink-0" />, label: "Ocean or garden view" },
-                          { icon: <AirVent size={13} className="text-[#667080] shrink-0" />, label: "Air conditioning" },
-                          { icon: <Wifi size={13} className="text-[#667080] shrink-0" />, label: "Free WiFi" },
+                          { icon: <BedDouble size={13} className="text-muted-foreground shrink-0" />, label: "Double bed" },
+                          { icon: <Eye size={13} className="text-muted-foreground shrink-0" />, label: "Ocean or garden view" },
+                          { icon: <AirVent size={13} className="text-muted-foreground shrink-0" />, label: "Air conditioning" },
+                          { icon: <Wifi size={13} className="text-muted-foreground shrink-0" />, label: "Free WiFi" },
                         ].map(({ icon, label }) => (
                           <div
                             key={label}
-                            className="flex items-center gap-2 text-[13px] text-[#333743]"
+                            className="flex items-center gap-2 text-sm text-foreground"
                           >
                             <Check
                               size={13}
-                              className="text-[#16a34a] shrink-0"
+                              className="text-success shrink-0"
+                              aria-hidden="true"
                             />
                             {icon}
                             {label}
@@ -992,7 +991,7 @@ export default function PackageDetailPage({
                     </div>
                     <button
                       onClick={() => setRoomFacilitiesOpen(true)}
-                      className="mt-4 text-[14px] font-semibold text-[#2681FF] hover:underline transition-all self-start"
+                      className="mt-4 text-sm font-semibold text-primary hover:underline transition-all self-start"
                     >
                       Show all room facilities →
                     </button>
@@ -1002,18 +1001,18 @@ export default function PackageDetailPage({
             </div>
 
             {/* ── SELECTED FLIGHTS ──────────────────────────────────────────
-                Each FlightCard is now white with Elevation S shadow.
+                Each FlightCard is now card with shadow.
                 "Change flights" link top-right.
             ──────────────────────────────────────────────────────────────── */}
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Plane size={18} className="text-[#222222]" />
-                  <h3 className="text-[20px] font-bold text-[#222222]">
+                  <Plane size={18} className="text-foreground" aria-hidden="true" />
+                  <h3 className="text-xl font-bold text-foreground">
                     Selected flights
                   </h3>
                 </div>
-                <button className="text-[14px] font-semibold text-[#2681FF] hover:underline">
+                <button className="text-sm font-semibold text-primary hover:underline">
                   Change flights
                 </button>
               </div>
@@ -1027,35 +1026,35 @@ export default function PackageDetailPage({
                 All hotel-level content merged into one card so it reads as
                 one cohesive topic rather than three separate sections.
             ──────────────────────────────────────────────────────────────── */}
-            <div className="bg-white rounded-[16px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] overflow-hidden">
+            <div className="bg-card rounded-lg shadow-sm overflow-hidden">
 
               {/* Description */}
               <div className="p-5 pb-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Info size={15} className="text-[#2681FF] shrink-0" />
-                  <h3 className="text-[17px] font-bold text-[#333743]">About the hotel</h3>
+                  <Info size={15} className="text-primary shrink-0" aria-hidden="true" />
+                  <h3 className="text-base font-bold text-foreground">About the hotel</h3>
                 </div>
-                <p className="text-[15px] text-[#333743] leading-[1.75] mb-2">
+                <p className="text-base text-foreground leading-normal mb-2">
                   {desc.short}
                 </p>
-                <p className="text-[15px] text-[#333743] leading-[1.75]">
+                <p className="text-base text-foreground leading-normal">
                   {desc.long}
                 </p>
                 <button
                   onClick={() => setDescriptionOpen(true)}
-                  className="mt-4 text-[14px] font-semibold text-[#2681FF] flex items-center gap-1 hover:underline"
+                  className="mt-4 text-sm font-semibold text-primary flex items-center gap-1 hover:underline"
                 >
                   Read more about the hotel
-                  <span className="text-[10px]">›</span>
+                  <span className="text-xs">›</span>
                 </button>
               </div>
 
               {/* Divider */}
-              <div className="border-t border-[#f3f5f6] mx-5" />
+              <div className="border-t border-muted mx-5" />
 
               {/* Highlights — amenity pills */}
               <div className="p-5 pb-4">
-                <h3 className="text-[14px] font-bold text-[#333743] mb-3">Highlights</h3>
+                <h3 className="text-sm font-bold text-foreground mb-3">Highlights</h3>
                 <div className="flex flex-wrap gap-2">
                   {(pkg.hotel.amenities.length > 0
                     ? pkg.hotel.amenities.slice(0, 5)
@@ -1069,10 +1068,10 @@ export default function PackageDetailPage({
                   ).map((amenity) => (
                     <div
                       key={amenity}
-                      className="flex items-center gap-1.5 bg-white border border-[#E8E8E8] rounded-full px-3.5 py-2"
+                      className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3.5 py-2"
                     >
                       <AmenityIcon name={amenity} size={15} />
-                      <span className="text-[14px] text-[#333743] font-medium">
+                      <span className="text-sm text-foreground font-medium">
                         {amenity}
                       </span>
                     </div>
@@ -1081,42 +1080,42 @@ export default function PackageDetailPage({
               </div>
 
               {/* Divider */}
-              <div className="border-t border-[#f3f5f6] mx-5" />
+              <div className="border-t border-muted mx-5" />
 
               {/* Location map */}
               <div className="p-5 pb-4">
-                <h3 className="text-[14px] font-bold text-[#333743] mb-3">Location</h3>
-                <div className="rounded-[16px] overflow-hidden h-[220px] relative mb-4 cursor-pointer group">
+                <h3 className="text-sm font-bold text-foreground mb-3">Location</h3>
+                <div className="rounded-lg overflow-hidden h-[220px] relative mb-4 cursor-pointer group">
                   <img
                     src={hotelImages.area}
                     alt="Hotel area map"
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#333743]/25 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-transparent pointer-events-none" />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white rounded-full p-2.5 shadow-xl">
-                      <MapPin size={22} className="text-[#2681FF]" />
+                    <div className="bg-card rounded-full p-2.5 shadow-lg">
+                      <MapPin size={22} className="text-primary" aria-hidden="true" />
                     </div>
                   </div>
-                  <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm rounded-[8px] px-3 py-1.5 text-[13px] font-semibold text-[#222222] flex items-center gap-1.5 shadow-sm">
-                    <MapPin size={12} className="text-[#2681FF] shrink-0" />
+                  <div className="absolute bottom-3 left-3 bg-card/95 backdrop-blur-sm rounded-md px-3 py-1.5 text-sm font-semibold text-foreground flex items-center gap-1.5 shadow-sm">
+                    <MapPin size={12} className="text-primary shrink-0" aria-hidden="true" />
                     {pkg.hotel.location}
                   </div>
                 </div>
 
                 {/* Getting around — POI pills with MapPin instead of emoji */}
-                <h3 className="text-[14px] font-bold text-[#333743] mb-3">Getting around</h3>
+                <h3 className="text-sm font-bold text-foreground mb-3">Getting around</h3>
                 <div className="flex flex-wrap gap-2">
                   {nearbyPOIs(pkg.hotel.location).map((poi) => (
                     <span
                       key={poi.label}
-                      className="flex items-center gap-1.5 bg-white border border-[#E8E8E8] rounded-full px-3.5 py-2 text-[13px]"
+                      className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3.5 py-2 text-sm"
                     >
-                      <MapPin size={12} className="text-[#2681FF] shrink-0" />
-                      <span className="font-medium text-[#333743]">
+                      <MapPin size={12} className="text-primary shrink-0" aria-hidden="true" />
+                      <span className="font-medium text-foreground">
                         {poi.label}
                       </span>
-                      <span className="text-[#717171]">· {poi.distance}</span>
+                      <span className="text-muted-foreground">· {poi.distance}</span>
                     </span>
                   ))}
                 </div>
@@ -1125,26 +1124,26 @@ export default function PackageDetailPage({
             </div>
 
             {/* ── REVIEWS ───────────────────────────────────────────────────
-                Figma node 6117:2032: row layout, white card, rounded-[16px], Elevation S.
+                Row layout, card, rounded-lg, shadow.
                 Left: score summary column. Right: horizontally scrollable review cards.
             ──────────────────────────────────────────────────────────────── */}
-            <h3 className="text-[20px] font-bold text-[#333743]">Guest reviews</h3>
-            <div className="bg-white rounded-[16px] shadow-[0_0_4px_0_rgba(125,130,147,0.4)] flex flex-col md:flex-row gap-5 md:gap-10 p-4 md:py-6 md:pl-6 md:pr-0">
+            <h3 className="text-xl font-bold text-foreground">Guest reviews</h3>
+            <div className="bg-card rounded-lg shadow-xs flex flex-col md:flex-row gap-5 md:gap-10 p-4 md:py-6 md:pl-6 md:pr-0">
 
               {/* Left column — score summary. Full width on mobile, fixed on desktop. */}
               <div className="flex flex-row md:flex-col items-center md:items-start gap-3 md:gap-1 md:shrink-0 md:w-[100px]">
-                {/* "4.3/5" — Heading Black/H3 (Mulish 900, 24px), green #227950 */}
-                <span className="text-[24px] font-bold text-[#227950] leading-tight">
+                {/* "4.3/5" — Heading Black/H3, green */}
+                <span className="text-2xl font-bold text-success leading-tight">
                   {ratingEU}/5
                 </span>
-                {/* "Exceptional" — Paragraph Bold/Default Bold (700, 16px) */}
-                <span className="text-[16px] font-bold text-[#191E3B]">
+                {/* "Exceptional" — Paragraph Bold/Default Bold */}
+                <span className="text-base font-bold text-foreground">
                   {ratingLabel(pkg.hotel.trustYou.rating)}
                 </span>
                 {/* "472 verified reviews" — small text link */}
                 <button
                   onClick={() => setReviewsOpen(true)}
-                  className="text-[12px] text-[#333743] underline hover:no-underline text-left mt-1"
+                  className="text-xs text-foreground underline hover:no-underline text-left mt-1"
                 >
                   {pkg.hotel.trustYou.reviewCount.toLocaleString()} verified reviews
                 </button>
@@ -1156,39 +1155,39 @@ export default function PackageDetailPage({
                 {/* Scrollable card row — cards are ~295px wide, gap 16px, pr-6 for breathing room */}
                 <div className="flex flex-row gap-4 overflow-x-auto pb-1 pr-6" style={{ scrollbarWidth: "none" }}>
                   {MOCK_REVIEWS.map((review, i) => (
-                    // Each card: fixed 295×230px, border #E0E2E8, rounded-[16px], p-4
+                    // Each card: fixed 295×230px, border, rounded-lg, p-4
                     <div
                       key={i}
-                      className="flex flex-col border border-[#E0E2E8] rounded-[16px] p-4 shrink-0 w-[78vw] sm:w-[280px] md:w-[295px] h-[210px] sm:h-[230px]"
+                      className="flex flex-col border border-border rounded-lg p-4 shrink-0 w-[78vw] sm:w-[280px] md:w-[295px] h-[210px] sm:h-[230px]"
                     >
-                      {/* "8/10 Good" — Paragraph Bold/Default Bold (700, 16px) */}
-                      <div className="text-[16px] font-bold text-[#191E3B] mb-2">
+                      {/* "8/10 Good" — Paragraph Bold/Default Bold */}
+                      <div className="text-base font-bold text-foreground mb-2">
                         {review.score} {review.label}
                       </div>
 
                       {/* Review text — fills remaining space */}
-                      <p className="text-[16px] text-[#191E3B] leading-[1.5] flex-1 overflow-hidden">
+                      <p className="text-base text-foreground leading-normal flex-1 overflow-hidden">
                         {review.text}
                       </p>
 
-                      {/* "See details" — text button, #2681FF, Paragraph Bold/Small Bold */}
-                      <button className="text-[12px] font-bold text-[#2681FF] hover:underline text-left mt-2 mb-1">
+                      {/* "See details" — text button, primary, Paragraph Bold/Small Bold */}
+                      <button className="text-xs font-bold text-primary hover:underline text-left mt-2 mb-1">
                         See details
                       </button>
 
                       {/* Date */}
-                      <div className="text-[16px] text-[#191E3B]">{review.date}</div>
+                      <div className="text-base text-foreground">{review.date}</div>
 
-                      {/* "Verified review" — Paragraph Regular/Small, #9598A4 */}
-                      <div className="text-[12px] text-[#9598A4]">Verified review</div>
+                      {/* "Verified review" — Paragraph Regular/Small, grey */}
+                      <div className="text-xs text-grey">Verified review</div>
                     </div>
                   ))}
                 </div>
 
-                {/* "See all 472 reviews" — Paragraph Bold/Default Bold, #2681FF */}
+                {/* "See all 472 reviews" — Paragraph Bold/Default Bold, primary */}
                 <button
                   onClick={() => setReviewsOpen(true)}
-                  className="text-[16px] font-bold text-[#2681FF] hover:underline text-left"
+                  className="text-base font-bold text-primary hover:underline text-left"
                 >
                   See all {pkg.hotel.trustYou.reviewCount.toLocaleString()} reviews
                 </button>
@@ -1201,7 +1200,7 @@ export default function PackageDetailPage({
                 On mobile, surfaced here as an accordion (same as v5). */}
             {pkg.sourceMode === "cache" && pkg.rateCalendar && (
               <div className="lg:hidden">
-                <div className="bg-white rounded-[16px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+                <div className="bg-card rounded-lg overflow-hidden shadow-sm">
                   <button
                     className="w-full flex items-center justify-between px-5 py-5"
                     onClick={() =>
@@ -1210,15 +1209,15 @@ export default function PackageDetailPage({
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <CalendarDays size={16} className="text-[#2681FF]" />
-                        <span className="text-[16px] font-bold text-[#333743]">
+                        <CalendarDays size={16} className="text-primary" aria-hidden="true" />
+                        <span className="text-base font-bold text-foreground">
                           Explore travel dates
                         </span>
                       </div>
                       {!mobileDatesExpanded && (
-                        <div className="text-[13px] text-[#717171] mt-1 ml-[24px]">
+                        <div className="text-sm text-muted-foreground mt-1 ml-[24px]">
                           {formatDate(selectedDate)} ·{" "}
-                          <span className="font-bold text-[#333743]">
+                          <span className="font-bold text-foreground">
                             {currSym}{activePrice.toLocaleString()}/pp
                           </span>
                         </div>
@@ -1227,18 +1226,20 @@ export default function PackageDetailPage({
                     {mobileDatesExpanded ? (
                       <ChevronUp
                         size={18}
-                        className="text-[#717171] shrink-0"
+                        className="text-muted-foreground shrink-0"
+                        aria-hidden="true"
                       />
                     ) : (
                       <ChevronDown
                         size={18}
-                        className="text-[#717171] shrink-0"
+                        className="text-muted-foreground shrink-0"
+                        aria-hidden="true"
                       />
                     )}
                   </button>
 
                   {mobileDatesExpanded && (
-                    <div className="px-5 pb-5 border-t border-[#F0F0F0]">
+                    <div className="px-5 pb-5 border-t border-border">
                       <div className="pt-5">
                         <RateCalendarPanel
                           rateCalendar={pkg.rateCalendar}
@@ -1259,50 +1260,43 @@ export default function PackageDetailPage({
 
           {/* ╔═══════════════════════════════════════════════════════════════
               RIGHT COLUMN — STICKY RATE CALENDAR SIDEBAR
-              Figma node 6117:2077:
-                fills: fill_0UTAA8 (white)
-                strokes: stroke_TUG3MO (border)
-                effects: effect_KT5AHR (shadow)
-                borderRadius: 16px
               Contains: price summary + "Explore travel dates" section
               with calendar and CTA button.
           ═══════════════════════════════════════════════════════════════╗ */}
           <div className="hidden lg:block sticky top-[64px] pt-2">
-            {/* Sidebar card — bg-white, border, rounded-[16px], shadow */}
-            <div className="bg-white border border-[#E8E8E8] rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.10)] overflow-hidden">
+            {/* Sidebar card — bg-card, border, rounded-lg, shadow */}
+            <div className="bg-card border border-border rounded-lg shadow-md overflow-hidden">
 
               {/* ── Price summary block ──────────────────────────────────── */}
               <div className="p-5">
                 {/* £828 / per person */}
                 <div className="flex items-baseline gap-1.5 mb-1">
-                  <span className="text-[28px] font-bold text-[#333743] leading-none">
+                  <span className="text-3xl font-bold text-foreground leading-none">
                     {currSym}{activePrice.toLocaleString()}
                   </span>
-                  <span className="text-[14px] font-normal text-[#333743]">
+                  <span className="text-sm font-normal text-foreground">
                     per person
                   </span>
                 </div>
 
                 {/* "Flight + hotel · 7 nights" */}
-                <div className="text-[13px] text-[#333743] mb-1.5">
+                <div className="text-sm text-foreground mb-1.5">
                   Flight + hotel · {nights} nights
                 </div>
 
                 {/* "Total for 2 adults: £1,656" */}
-                <div className="text-[13px] text-[#717171]">
+                <div className="text-sm text-muted-foreground">
                   Total for {adults} adults:{" "}
-                  <strong className="text-[#333743] font-bold">
+                  <strong className="text-foreground font-bold">
                     {currSym}{totalPrice.toLocaleString()}
                   </strong>
                 </div>
               </div>
 
               {/* ── "Explore travel dates" section ────────────────────────
-                  Figma: background fill_OTCSA3 (slightly grey) with a header
-                  showing "Explore travel dates" + month navigation + calendar.
                   For cached packages we show the rate calendar; for live
                   packages we show a date picker. */}
-              <div className="bg-white p-5">
+              <div className="bg-card p-5">
                 {pkg.sourceMode === "cache" && pkg.rateCalendar ? (
                   <div>
                     <RateCalendarPanel
@@ -1315,7 +1309,7 @@ export default function PackageDetailPage({
                   </div>
                 ) : (
                   <div>
-                    <p className="text-[12px] text-[#717171] mb-3 leading-relaxed">
+                    <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
                       This price is for a specific departure. Pick a different
                       date to request an updated quote.
                     </p>
@@ -1326,11 +1320,12 @@ export default function PackageDetailPage({
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
-                          className="w-full justify-start text-left font-normal border-[#CCCCCC] hover:border-[#333743] text-[13px] h-10 rounded-[10px]"
+                          className="w-full justify-start text-left font-normal border-border hover:border-foreground text-sm h-10 rounded-lg"
                         >
                           <CalendarDays
                             size={15}
-                            className="mr-2 text-[#2681FF] shrink-0"
+                            className="mr-2 text-primary shrink-0"
+                            aria-hidden="true"
                           />
                           {selectedDate
                             ? format(new Date(selectedDate), "EEE, d MMM yyyy")
@@ -1356,22 +1351,22 @@ export default function PackageDetailPage({
                     </Popover>
 
                     {/* Compact room/board summary */}
-                    <div className="mt-3 bg-white border border-[#EEEEEE] rounded-[10px] p-3 flex flex-col gap-2">
-                      <div className="flex justify-between text-[12px]">
-                        <span className="text-[#717171]">Room</span>
-                        <span className="font-medium text-[#333743] text-right max-w-[55%]">
+                    <div className="mt-3 bg-card border border-border rounded-lg p-3 flex flex-col gap-2">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Room</span>
+                        <span className="font-medium text-foreground text-right max-w-[55%]">
                           {pkg.room.roomType}
                         </span>
                       </div>
-                      <div className="flex justify-between text-[12px]">
-                        <span className="text-[#717171]">Board</span>
-                        <span className="font-medium text-[#333743]">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Board</span>
+                        <span className="font-medium text-foreground">
                           {pkg.room.boardType}
                         </span>
                       </div>
-                      <div className="flex justify-between text-[12px]">
-                        <span className="text-[#717171]">Cancellation</span>
-                        <span className="font-medium text-[#16a34a]">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Cancellation</span>
+                        <span className="font-medium text-success">
                           Free until 14 days
                         </span>
                       </div>
@@ -1381,10 +1376,10 @@ export default function PackageDetailPage({
               </div>
 
               {/* ── CTA button ───────────────────────────────────────────── */}
-              <div className="px-5 pb-5 bg-white">
+              <div className="px-5 pb-5 bg-card">
                 <button
                   onClick={() => onBook(pkg, selectedDate)}
-                  className="w-full bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[16px] py-[16px] rounded-[10px] transition-colors"
+                  className="w-full bg-primary hover:brightness-85 text-white font-bold text-base py-4 rounded-lg transition-colors"
                 >
                   Personalise Your Holiday →
                 </button>
@@ -1403,21 +1398,21 @@ export default function PackageDetailPage({
           MOBILE STICKY FOOTER
           Fixed bar at the bottom on mobile. Price left, CTA right.
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-[#E8E8E8] px-5 py-3 z-50 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border px-5 py-3 z-50 flex items-center justify-between gap-3 shadow-lg">
         <div>
-          <div className="text-[20px] font-bold text-[#333743] leading-tight">
+          <div className="text-2xl font-bold text-foreground leading-tight">
             {currSym}{activePrice.toLocaleString()}
-            <span className="text-[13px] font-normal text-[#717171] ml-1">
+            <span className="text-sm font-normal text-muted-foreground ml-1">
               /pp
             </span>
           </div>
-          <div className="text-[12px] text-[#717171]">
+          <div className="text-xs text-muted-foreground">
             Total: {currSym}{totalPrice.toLocaleString()} · {nights} nights
           </div>
         </div>
         <button
           onClick={() => onBook(pkg, selectedDate)}
-          className="bg-[#2681FF] hover:bg-[#1a6fd9] text-white font-bold text-[14px] px-5 py-3 rounded-[10px] transition-colors whitespace-nowrap"
+          className="bg-primary hover:brightness-85 text-white font-bold text-sm px-5 py-3 rounded-lg transition-colors whitespace-nowrap"
         >
           Personalise →
         </button>
@@ -1438,7 +1433,7 @@ export default function PackageDetailPage({
               <img
                 src={pkg.hotel.mainImage}
                 alt={pkg.hotel.name}
-                className="w-full aspect-[16/7] object-cover rounded-[16px]"
+                className="w-full aspect-[16/7] object-cover rounded-xl"
               />
             </div>
             {hotelImages.modal.map((url, i) => (
@@ -1446,7 +1441,7 @@ export default function PackageDetailPage({
                 key={url}
                 src={url}
                 alt={`Hotel photo ${i + 2}`}
-                className="w-full aspect-[4/3] object-cover rounded-[16px]"
+                className="w-full aspect-[4/3] object-cover rounded-xl"
               />
             ))}
           </div>
@@ -1459,7 +1454,7 @@ export default function PackageDetailPage({
           <DialogHeader>
             <DialogTitle>About {pkg.hotel.name}</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col gap-4 mt-2 text-[15px] text-[#444444] leading-[1.75]">
+          <div className="flex flex-col gap-4 mt-2 text-base text-foreground leading-normal">
             <p>
               {desc.short} {desc.long}
             </p>
@@ -1489,16 +1484,16 @@ export default function PackageDetailPage({
           <div className="mt-2">
             {AMENITY_GROUPS.map((group) => (
               <div key={group.label} className="mb-5">
-                <div className="text-[12px] font-bold uppercase tracking-[0.5px] text-[#9598a4] mb-2 mt-3 first:mt-0">
+                <div className="text-xs font-bold uppercase tracking-wider text-grey mb-2 mt-3 first:mt-0">
                   {group.label}
                 </div>
                 <div className="grid grid-cols-2 gap-x-6 gap-y-3">
                   {group.items.map((item) => (
                     <div
                       key={item}
-                      className="flex items-center gap-3 text-[14px] text-[#333333]"
+                      className="flex items-center gap-3 text-sm text-foreground"
                     >
-                      <span className="text-[20px] w-7 text-center shrink-0">
+                      <span className="text-xl w-7 text-center shrink-0">
                         {item.split(" ")[0]}
                       </span>
                       <span>{item.split(" ").slice(1).join(" ")}</span>
@@ -1509,14 +1504,14 @@ export default function PackageDetailPage({
             ))}
             {pkg.hotel.amenities.length > 0 && (
               <div className="mb-5">
-                <div className="text-[12px] font-bold uppercase tracking-[0.5px] text-[#9598a4] mb-2">
+                <div className="text-xs font-bold uppercase tracking-wider text-grey mb-2">
                   From this property
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {pkg.hotel.amenities.map((amenity) => (
                     <span
                       key={amenity}
-                      className="flex items-center gap-1.5 bg-[#f7f7f7] border border-[#ebebeb] rounded-full px-3 py-1.5 text-[13px] text-[#333333]"
+                      className="flex items-center gap-1.5 bg-grey-light border border-border rounded-full px-3 py-1.5 text-sm text-foreground"
                     >
                       <AmenityIcon name={amenity} size={13} />
                       {amenity}
@@ -1536,20 +1531,20 @@ export default function PackageDetailPage({
             <DialogTitle>Guest reviews</DialogTitle>
           </DialogHeader>
           <div className="mt-2">
-            <div className="flex items-center gap-5 pb-5 border-b border-[#ebebeb] mb-5">
-              <div className="text-[52px] font-bold text-[#333743] leading-none">
+            <div className="flex items-center gap-5 pb-5 border-b border-border mb-5">
+              <div className="text-5xl font-bold text-foreground leading-none">
                 {ratingEU}
               </div>
               <div>
-                <div className="text-[20px] font-bold text-[#333743]">
+                <div className="text-xl font-bold text-foreground">
                   {ratingLabel(pkg.hotel.trustYou.rating)}
                 </div>
-                <div className="text-[13px] text-[#717171] mt-1">
+                <div className="text-sm text-muted-foreground mt-1">
                   Based on{" "}
                   {pkg.hotel.trustYou.reviewCount.toLocaleString()} verified
                   reviews · Powered by TrustYou
                 </div>
-                <div className="text-[13px] text-[#717171] mt-0.5">
+                <div className="text-sm text-muted-foreground mt-0.5">
                   {pkg.hotel.trustYou.recommendationScore}% of guests recommend
                   this hotel
                 </div>
@@ -1559,19 +1554,19 @@ export default function PackageDetailPage({
               {MOCK_REVIEWS.map((review, i) => (
                 <div
                   key={i}
-                  className="border border-[#E8E8E8] rounded-[16px] p-4 flex flex-col gap-3"
+                  className="border border-border rounded-lg p-4 flex flex-col gap-3"
                 >
-                  <div className="text-[14px] font-bold text-[#333743]">
+                  <div className="text-sm font-bold text-foreground">
                     {review.score} {review.label}
                   </div>
-                  <p className="text-[14px] text-[#333743] leading-[1.6] flex-1">
+                  <p className="text-sm text-foreground leading-normal flex-1">
                     {review.text}
                   </p>
-                  <div className="flex items-center justify-between pt-1 border-t border-[#F0F0F0]">
-                    <span className="text-[12px] text-[#333743]">
+                  <div className="flex items-center justify-between pt-1 border-t border-border">
+                    <span className="text-xs text-foreground">
                       {review.date}
                     </span>
-                    <span className="text-[12px] text-[#717171]">
+                    <span className="text-xs text-muted-foreground">
                       Verified review
                     </span>
                   </div>
@@ -1597,16 +1592,16 @@ export default function PackageDetailPage({
             {Object.entries(ROOM_FACILITIES_FULL).map(
               ([category, items]) => (
                 <div key={category} className="mb-5">
-                  <div className="text-[12px] font-bold uppercase tracking-[0.5px] text-[#9598a4] mb-3">
+                  <div className="text-xs font-bold uppercase tracking-wider text-grey mb-3">
                     {category}
                   </div>
                   <div className="grid grid-cols-2 gap-y-2 gap-x-4">
                     {items.map((item) => (
                       <div
                         key={item}
-                        className="flex items-center gap-2 text-[14px] text-[#333333]"
+                        className="flex items-center gap-2 text-sm text-foreground"
                       >
-                        <span className="text-[18px] w-6 text-center shrink-0">
+                        <span className="text-lg w-6 text-center shrink-0">
                           {item.split(" ")[0]}
                         </span>
                         <span>{item.split(" ").slice(1).join(" ")}</span>

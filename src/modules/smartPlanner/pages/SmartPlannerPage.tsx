@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { format, addDays, parseISO } from "date-fns";
 import { Button } from "../../../shared/components/ui/button";
+import { cn } from "../../../shared/components/ui/utils";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -164,15 +165,15 @@ export default function SmartPlannerPage({
   const endDate   = addDays(startDate, nights);
 
   return (
-    // Page background is light grey — matches real TripBuilder's bg-background (#f3f5f6)
-    <div className="min-h-screen bg-[#f3f5f6]">
+    // Page background is light grey — matches real TripBuilder's bg-grey-lightest
+    <div className="min-h-screen bg-grey-lightest">
 
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* HERO SECTION                                                        */}
       {/* In the real app this is a white card at the top of the page.       */}
       {/* It contains: back button row → hero image → trip title + actions.  */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      <div className="bg-white">
+      <div className="bg-card">
         <div className="flex flex-col gap-5 py-5 max-w-5xl mx-auto">
 
           {/* Top row: back button on the left, expert mode toggle on the right */}
@@ -188,7 +189,7 @@ export default function SmartPlannerPage({
 
             {/* Expert Mode toggle — visual only, no additional UI change yet */}
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-[#667080]">Expert</span>
+              <span className="text-sm font-semibold text-muted-foreground">Expert</span>
               {/*
                 Inline toggle switch — replicates TripBuilder's ViewModeToggle.
                 The real app uses a Switch component from shadcn/ui.
@@ -197,14 +198,16 @@ export default function SmartPlannerPage({
                 onClick={() => setExpertMode(!expertMode)}
                 role="switch"
                 aria-checked={expertMode}
-                className={`w-10 h-5 rounded-full transition-colors relative shrink-0 ${
-                  expertMode ? "bg-[#2681FF]" : "bg-[#e0e2e8]"
-                }`}
+                className={cn(
+                  "w-10 h-5 rounded-full transition-colors relative shrink-0",
+                  expertMode ? "bg-primary" : "bg-grey-light"
+                )}
               >
                 <span
-                  className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                  className={cn(
+                    "absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform",
                     expertMode ? "translate-x-5" : "translate-x-0"
-                  }`}
+                  )}
                 />
               </button>
             </div>
@@ -229,15 +232,15 @@ export default function SmartPlannerPage({
                 h1 matches real HeroSection: text-2xl md:text-3xl font-extrabold.
                 The real app shows the full itinerary title here.
               */}
-              <h1 className="text-2xl md:text-3xl font-extrabold leading-tight text-[#333743]">
+              <h1 className="text-2xl md:text-3xl font-extrabold leading-tight text-foreground">
                 Individual trip to {cityName}
               </h1>
               {/* Dates + pax info — "flex-wrap" so it wraps cleanly on narrow screens */}
-              <p className="flex flex-wrap items-center gap-1 font-semibold text-[#333743] leading-tight">
+              <p className="flex flex-wrap items-center gap-1 font-semibold text-foreground leading-tight">
                 <span>For 2 adults</span>
-                <span className="text-[#9598a4]">·</span>
+                <span className="text-grey">·</span>
                 <span>from {format(startDate, "dd MMM")}</span>
-                <span className="text-[#9598a4]">to</span>
+                <span className="text-grey">to</span>
                 <span>{format(endDate, "dd MMM yyyy")}</span>
               </p>
             </div>
@@ -250,7 +253,7 @@ export default function SmartPlannerPage({
                 className="hover:bg-transparent"
                 aria-label="Share itinerary"
               >
-                <Share size={20} />
+                <Share size={20} aria-hidden="true" />
               </Button>
               {/* Book button — large, primary blue — same in hero, footer, and sticky bar */}
               <Button size="lg">
@@ -332,15 +335,15 @@ function TourItinerary({
     <>
       {/* Tour product */}
       <ProductHeader
-        icon={<MapPin className="size-6 md:size-8 shrink-0" />}
+        icon={<MapPin className="size-6 md:size-8 shrink-0" aria-hidden="true" />}
         title="Your Tour"
       >
-        <p className="font-semibold mb-3 md:mb-4 text-[#333743]">
+        <p className="font-semibold mb-3 md:mb-4 text-foreground">
           {format(startDate, "EEE, dd MMM yyyy")}
         </p>
-        <div className="border border-[#e0e2e8] rounded-xl md:rounded-3xl shadow-sm overflow-hidden mb-0">
+        <div className="border border-border rounded-lg md:rounded-3xl shadow-sm overflow-hidden mb-0">
           <img src={tour.image} alt={tour.title} className="w-full h-48 object-cover" />
-          <div className="bg-white p-4 md:p-6">
+          <div className="bg-card p-4 md:p-6">
             {/* Flag + country + "Added" badge */}
             <div className="flex items-center gap-2 mb-2">
               <img
@@ -348,19 +351,19 @@ function TourItinerary({
                 alt={tour.country}
                 className="w-5 h-3.5 rounded-sm object-cover shrink-0"
               />
-              <span className="text-sm text-[#667080]">{tour.country}</span>
+              <span className="text-sm text-muted-foreground">{tour.country}</span>
               <AddedBadge />
             </div>
-            <p className="font-bold text-[#333743] mb-1">{tour.title}</p>
-            <p className="text-sm text-[#667080] leading-relaxed mb-4">{tour.desc}</p>
+            <p className="font-bold text-foreground mb-1">{tour.title}</p>
+            <p className="text-sm text-muted-foreground leading-normal mb-4">{tour.desc}</p>
             {/* Duration + price */}
-            <div className="flex items-center justify-between pt-3 border-t border-[#e0e2e8]">
-              <span className="flex items-center gap-1.5 text-sm text-[#333743]">
-                <Clock size={14} /> {tour.duration}
+            <div className="flex items-center justify-between pt-3 border-t border-border">
+              <span className="flex items-center gap-1.5 text-sm text-foreground">
+                <Clock size={14} aria-hidden="true" /> {tour.duration}
               </span>
               <div className="text-right">
-                <div className="text-xs text-[#9598a4]">Per person</div>
-                <div className="text-lg font-bold text-[#333743]">{tour.price}</div>
+                <div className="text-xs text-grey">Per person</div>
+                <div className="text-lg font-bold text-foreground">{tour.price}</div>
               </div>
             </div>
           </div>
@@ -369,11 +372,11 @@ function TourItinerary({
 
       {/* Suggestion: add a flight */}
       <ProductHeader
-        icon={<Plane className="size-6 md:size-8 shrink-0" />}
+        icon={<Plane className="size-6 md:size-8 shrink-0" aria-hidden="true" />}
         title={`Flying to ${cityName}?`}
       >
         <RecommendationCard
-          icon={<Plane size={20} className="text-[#2681FF]" />}
+          icon={<Plane size={20} className="text-primary" aria-hidden="true" />}
           title={`Flying to ${cityName}?`}
           description="Add a return flight to complete your itinerary."
           ctaLabel="Choose flight"
@@ -382,11 +385,11 @@ function TourItinerary({
 
       {/* Suggestion: add a hotel */}
       <ProductHeader
-        icon={<Building2 className="size-6 md:size-8 shrink-0" />}
+        icon={<Building2 className="size-6 md:size-8 shrink-0" aria-hidden="true" />}
         title={`Where will you stay?`}
       >
         <RecommendationCard
-          icon={<Building2 size={20} className="text-[#2681FF]" />}
+          icon={<Building2 size={20} className="text-primary" aria-hidden="true" />}
           title={`Where will you stay in ${cityName}?`}
           description={`Browse hotels and accommodation in ${cityName}.`}
           ctaLabel="Browse hotels"
@@ -412,11 +415,11 @@ function HotelItinerary({
     <>
       {/* Suggestion: add a flight */}
       <ProductHeader
-        icon={<Plane className="size-6 md:size-8 shrink-0" />}
+        icon={<Plane className="size-6 md:size-8 shrink-0" aria-hidden="true" />}
         title={`Flying to ${cityName}?`}
       >
         <RecommendationCard
-          icon={<Plane size={20} className="text-[#2681FF]" />}
+          icon={<Plane size={20} className="text-primary" aria-hidden="true" />}
           title={`Flying to ${cityName}?`}
           description="Add a return flight to complete your itinerary."
           ctaLabel="Choose flight"
@@ -425,10 +428,10 @@ function HotelItinerary({
 
       {/* Confirmed hotel */}
       <ProductHeader
-        icon={<Building2 className="size-6 md:size-8 shrink-0" />}
+        icon={<Building2 className="size-6 md:size-8 shrink-0" aria-hidden="true" />}
         title={`Stay in ${cityName} · ${nights} night${nights !== 1 ? "s" : ""}`}
       >
-        <p className="font-semibold mb-3 md:mb-4 text-[#333743]">
+        <p className="font-semibold mb-3 md:mb-4 text-foreground">
           {format(startDate, "EEE, dd MMM yyyy")} – {format(addDays(startDate, nights), "dd MMM yyyy")}
         </p>
         <AccommodationCard hotel={hotel} nights={nights} />
@@ -460,7 +463,7 @@ function FlightItinerary({
     <>
       {/* Confirmed flight(s) */}
       <ProductHeader
-        icon={<Plane className="size-6 md:size-8 shrink-0" />}
+        icon={<Plane className="size-6 md:size-8 shrink-0" aria-hidden="true" />}
         title={isMultiCity ? `Your Flights · ${routeLabel}` : "Your Flight"}
       >
         {isMultiCity ? (
@@ -469,7 +472,7 @@ function FlightItinerary({
             {flight.legs!.map((leg, i) => (
               <div key={i}>
                 {/* Leg label */}
-                <p className="text-[11px] font-bold text-[#9598a4] uppercase tracking-wide mb-2">
+                <p className="text-xs font-bold text-grey uppercase tracking-wide mb-2">
                   Flight {i + 1} · {leg.date}
                 </p>
                 <FlightCard
@@ -488,7 +491,7 @@ function FlightItinerary({
         ) : (
           // Single leg (round trip): show the single card with date
           <>
-            <p className="font-semibold mb-3 md:mb-4 text-[#333743]">
+            <p className="font-semibold mb-3 md:mb-4 text-foreground">
               {format(startDate, "EEE, dd MMM yyyy")}
             </p>
             <FlightCard flight={flight} />
@@ -498,11 +501,11 @@ function FlightItinerary({
 
       {/* Suggestion: add a hotel */}
       <ProductHeader
-        icon={<Building2 className="size-6 md:size-8 shrink-0" />}
+        icon={<Building2 className="size-6 md:size-8 shrink-0" aria-hidden="true" />}
         title={`Where will you stay in ${cityName}?`}
       >
         <RecommendationCard
-          icon={<Building2 size={20} className="text-[#2681FF]" />}
+          icon={<Building2 size={20} className="text-primary" aria-hidden="true" />}
           title={`Where will you stay in ${cityName}?`}
           description="We have over 500,000 hotels worldwide. Search now for the best rates."
           ctaLabel="Browse hotels"
@@ -547,10 +550,10 @@ function HolidayItinerary({
     <>
       {/* Confirmed flight */}
       <ProductHeader
-        icon={<Plane className="size-6 md:size-8 shrink-0" />}
+        icon={<Plane className="size-6 md:size-8 shrink-0" aria-hidden="true" />}
         title="Your Flight"
       >
-        <p className="font-semibold mb-3 md:mb-4 text-[#333743]">
+        <p className="font-semibold mb-3 md:mb-4 text-foreground">
           {format(startDate, "EEE, dd MMM yyyy")}
         </p>
         <FlightCard flight={flight} />
@@ -558,10 +561,10 @@ function HolidayItinerary({
 
       {/* Confirmed hotel */}
       <ProductHeader
-        icon={<Building2 className="size-6 md:size-8 shrink-0" />}
+        icon={<Building2 className="size-6 md:size-8 shrink-0" aria-hidden="true" />}
         title={`Stay in ${cityName} · ${nights} night${nights !== 1 ? "s" : ""}`}
       >
-        <p className="font-semibold mb-3 md:mb-4 text-[#333743]">
+        <p className="font-semibold mb-3 md:mb-4 text-foreground">
           {format(startDate, "EEE, dd MMM yyyy")} – {format(addDays(startDate, nights), "dd MMM yyyy")}
         </p>
         <AccommodationCard hotel={hotel} nights={nights} showPrice={false} />
@@ -610,11 +613,11 @@ function AIItinerary({
   return (
     <div>
       {/* AI attribution banner — gradient from blue tint to green tint */}
-      <div className="mb-6 flex items-center gap-3 bg-gradient-to-r from-[#eff6ff] to-[#f0fdf4] border border-[#2681FF]/20 rounded-xl p-4">
-        <Sparkles size={20} className="text-[#2681FF] shrink-0" />
+      <div className="mb-6 flex items-center gap-3 bg-gradient-to-r from-primary/10 to-success/10 border border-primary/20 rounded-lg p-4">
+        <Sparkles size={20} className="text-primary shrink-0" aria-hidden="true" />
         <div>
-          <div className="font-bold text-[#333743]">AI-generated itinerary</div>
-          <div className="text-sm text-[#667080] line-clamp-1">Based on: "{prompt}"</div>
+          <div className="font-bold text-foreground">AI-generated itinerary</div>
+          <div className="text-sm text-muted-foreground line-clamp-1">Based on: "{prompt}"</div>
         </div>
       </div>
 
@@ -625,35 +628,35 @@ function AIItinerary({
           className="border-l border-dashed border-foreground pl-4 ml-3 md:pl-7 md:ml-4 relative pt-1 pb-6"
         >
           {/* Timeline dot */}
-          <div className="absolute -left-[7px] top-4 w-3.5 h-3.5 rounded-full bg-[#2681FF] border-2 border-white shadow-sm" />
+          <div className="absolute -left-[7px] top-4 w-3.5 h-3.5 rounded-full bg-primary border-2 border-white shadow-sm" />
 
           {/* Day badge + heading */}
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs font-bold text-[#2681FF] bg-[#eff6ff] px-2 py-0.5 rounded">
+            <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-sm">
               Day {dayItem.day}
             </span>
-            <span className="text-lg font-extrabold text-[#333743]">{dayItem.label}</span>
+            <span className="text-lg font-extrabold text-foreground">{dayItem.label}</span>
           </div>
 
           <div className="flex flex-col gap-2">
             {dayItem.items.map((item, j) => (
               <div
                 key={j}
-                className="bg-white rounded-xl border border-[#e0e2e8] p-3 flex items-center gap-3"
+                className="bg-card rounded-lg border border-border p-3 flex items-center gap-3"
               >
-                <div className="p-2 rounded-lg bg-[#f3f5f6] border border-[#e0e2e8] shrink-0">
+                <div className="p-2 rounded-lg bg-grey-light border border-border shrink-0">
                   {item.icon === "flight"
-                    ? <Plane size={15} className="text-[#2681FF]" />
+                    ? <Plane size={15} className="text-primary" aria-hidden="true" />
                     : item.icon === "hotel"
-                    ? <Building2 size={15} className="text-[#2681FF]" />
-                    : <MapPin size={15} className="text-[#2681FF]" />
+                    ? <Building2 size={15} className="text-primary" aria-hidden="true" />
+                    : <MapPin size={15} className="text-primary" aria-hidden="true" />
                   }
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-[#333743]">{item.label}</div>
-                  <div className="text-xs text-[#667080]">{item.detail}</div>
+                  <div className="text-sm font-semibold text-foreground">{item.label}</div>
+                  <div className="text-xs text-muted-foreground">{item.detail}</div>
                 </div>
-                <span className="shrink-0 bg-[#19a974]/10 text-[#19a974] text-xs font-bold px-2 py-0.5 rounded-full">
+                <span className="shrink-0 bg-success/10 text-success text-xs font-bold px-2 py-0.5 rounded-full">
                   Suggested
                 </span>
               </div>
@@ -698,7 +701,7 @@ function ProductHeader({
       {/* Icon + section title */}
       <div className="flex mb-1 items-center gap-1.5 md:gap-3">
         {icon}
-        <h2 className="font-extrabold text-lg md:text-2xl leading-tight text-[#333743] mr-3">
+        <h2 className="font-extrabold text-lg md:text-2xl leading-tight text-foreground mr-3">
           {title}
         </h2>
       </div>
@@ -729,8 +732,8 @@ function FlightCard({ flight }: { flight: FlightData }) {
   const arrTime = "14:10";
 
   return (
-    <div className="border border-[#e0e2e8] shadow-sm rounded-xl md:rounded-3xl">
-      <div className="bg-white p-4 md:p-6 rounded-xl md:flex md:gap-6 md:rounded-3xl">
+    <div className="border border-border shadow-sm rounded-lg md:rounded-3xl">
+      <div className="bg-card p-4 md:p-6 rounded-lg md:flex md:gap-6 md:rounded-3xl">
 
         {/* Left/main column: airline → flight bar → baggage */}
         <div className="space-y-5 md:grow">
@@ -741,56 +744,56 @@ function FlightCard({ flight }: { flight: FlightData }) {
             {/* Airline badge — shown as a grey pill since we don't have logos */}
             <div className="hidden sm:flex w-28 lg:w-36 shrink-0">
               {flight.airline ? (
-                <span className="inline-flex items-center px-2.5 py-1 rounded bg-[#f3f5f6] text-xs font-bold text-[#333743]">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-sm bg-grey-light text-xs font-bold text-foreground">
                   {flight.airline}
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#f3f5f6] text-xs font-bold text-[#333743]">
-                  <Plane size={12} /> Unknown airline
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-grey-light text-xs font-bold text-foreground">
+                  <Plane size={12} aria-hidden="true" /> Unknown airline
                 </span>
               )}
             </div>
 
             {/* Departure */}
             <div className="flex flex-col items-center text-center shrink-0">
-              <span className="font-bold text-[#333743]">{depTime}</span>
-              <span className="hidden sm:block text-xs text-[#667080] max-w-28 leading-tight mt-0.5">
+              <span className="font-bold text-foreground">{depTime}</span>
+              <span className="hidden sm:block text-xs text-muted-foreground max-w-28 leading-tight mt-0.5">
                 {flight.from}
               </span>
-              <span className="sm:hidden text-xs text-[#667080]">
+              <span className="sm:hidden text-xs text-muted-foreground">
                 {flight.from.split(" ")[0]}
               </span>
             </div>
 
             {/* Connecting bar: stops + duration + class */}
             <div className="flex-grow flex flex-col gap-1 text-center text-xs">
-              <p className="font-semibold text-[#333743]">
+              <p className="font-semibold text-foreground">
                 {flight.stops === "Direct" || !flight.stops ? "Non-stop" : flight.stops}
               </p>
               {/* The horizontal bar with a dot for each stop */}
-              <div className="w-full h-0.5 bg-[#e0e2e8] flex items-center justify-center" />
-              <p className="text-[#667080]">{flight.duration} · Economy</p>
+              <div className="w-full h-0.5 bg-border flex items-center justify-center" />
+              <p className="text-muted-foreground">{flight.duration} · Economy</p>
             </div>
 
             {/* Arrival */}
             <div className="flex flex-col items-center text-center shrink-0">
-              <span className="font-bold text-[#333743]">{arrTime}</span>
-              <span className="hidden sm:block text-xs text-[#667080] max-w-28 leading-tight mt-0.5">
+              <span className="font-bold text-foreground">{arrTime}</span>
+              <span className="hidden sm:block text-xs text-muted-foreground max-w-28 leading-tight mt-0.5">
                 {flight.to}
               </span>
-              <span className="sm:hidden text-xs text-[#667080]">
+              <span className="sm:hidden text-xs text-muted-foreground">
                 {flight.to.split(" ")[0]}
               </span>
             </div>
           </div>
 
           {/* Divider */}
-          <hr className="border-[#e0e2e8]" />
+          <hr className="border-border" />
 
           {/* Baggage info + "More details" link */}
-          <div className="flex justify-between items-center text-xs text-[#667080]">
+          <div className="flex justify-between items-center text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5">
-              <Briefcase size={12} />
+              <Briefcase size={12} aria-hidden="true" />
               <span>1 checked bag included</span>
             </div>
             <Button variant="link" size="sm" className="px-0 h-auto text-xs">
@@ -804,7 +807,7 @@ function FlightCard({ flight }: { flight: FlightData }) {
           On mobile the button appears below the card in a border-top section.
           Matches real AccommodationCard / FlightManagementCard right-column pattern.
         */}
-        <div className="mt-6 md:mt-0 max-md:pt-6 md:w-[160px] lg:w-[220px] md:min-w-[160px] max-md:border-t border-[#e0e2e8] md:border-l flex flex-row-reverse md:flex-col justify-between md:items-end">
+        <div className="mt-6 md:mt-0 max-md:pt-6 md:w-[160px] lg:w-[220px] md:min-w-[160px] max-md:border-t border-border md:border-l flex flex-row-reverse md:flex-col justify-between md:items-end">
           <Button variant="outline" className="max-sm:w-full">
             Change Flight
           </Button>
@@ -829,37 +832,37 @@ function AccommodationCard({
   showPrice?: boolean;
 }) {
   return (
-    <div className="border border-[#e0e2e8] rounded-xl md:rounded-3xl shadow-sm">
-      <div className="bg-white rounded-xl md:rounded-3xl grid md:grid-cols-[160px_1fr] lg:grid-cols-[270px_1fr] md:grid-rows-[250px]">
+    <div className="border border-border rounded-lg md:rounded-3xl shadow-sm">
+      <div className="bg-card rounded-lg md:rounded-3xl grid md:grid-cols-[160px_1fr] lg:grid-cols-[270px_1fr] md:grid-rows-[250px]">
 
         {/* Hotel image — full-width on mobile, fixed-width column on desktop */}
         <img
           src={hotel.image}
           alt={hotel.name}
-          className="block w-full h-32 md:h-full object-cover max-md:rounded-t-xl md:rounded-l-3xl"
+          className="block w-full h-32 md:h-full object-cover max-md:rounded-t-lg md:rounded-l-3xl"
         />
 
         {/* Content grid: left info column | right actions column */}
         <div className="p-4 md:p-6 grid md:grid-cols-[1fr_160px] lg:grid-cols-[1fr_220px]">
 
           {/* Left: hotel details */}
-          <div className="flex flex-col gap-6 justify-between md:border-r md:pr-6 border-[#e0e2e8]">
+          <div className="flex flex-col gap-6 justify-between md:border-r md:pr-6 border-border">
             <div className="space-y-1">
               {/* Star rating — rendered as gold star icons */}
               <div className="flex items-center gap-0.5">
                 {Array.from({ length: hotel.stars }).map((_, i) => (
-                  <Star key={i} size={14} className="fill-[#FFB700] text-[#FFB700]" />
+                  <Star key={i} size={14} className="fill-warning text-warning" aria-hidden="true" />
                 ))}
               </div>
               {/* Hotel name */}
-              <h3 className="font-bold text-[#333743] leading-tight">{hotel.name}</h3>
+              <h3 className="font-bold text-foreground leading-tight">{hotel.name}</h3>
               {/* Location */}
-              <div className="flex items-center gap-1 text-sm text-[#667080]">
-                <MapPin size={12} className="shrink-0" />
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <MapPin size={12} className="shrink-0" aria-hidden="true" />
                 {hotel.location}
               </div>
               {/* Room info — "1x Standard Room" */}
-              <p className="text-sm text-[#333743]">
+              <p className="text-sm text-foreground">
                 <span className="font-bold">1</span> Standard Room
               </p>
             </div>
@@ -867,8 +870,8 @@ function AccommodationCard({
             {/* Meal type + map toggle */}
             <div className="flex justify-between items-end gap-4">
               <div className="space-y-0.5">
-                <p className="text-xs text-[#667080]">Breakfast included</p>
-                <p className="text-xs text-[#19a974] font-semibold">Free cancellation</p>
+                <p className="text-xs text-muted-foreground">Breakfast included</p>
+                <p className="text-xs text-success font-semibold">Free cancellation</p>
               </div>
               <Button variant="link" size="sm" className="px-0 text-xs h-auto shrink-0">
                 Show map
@@ -881,7 +884,7 @@ function AccommodationCard({
             On mobile they appear in a row (flex-row-reverse) separated by a top border.
             On desktop they stack vertically (flex-col), right-aligned.
           */}
-          <div className="flex flex-row-reverse md:flex-col justify-between items-center md:items-end border-t border-[#e0e2e8] pt-5 mt-5 md:border-0 md:pt-0 md:mt-0">
+          <div className="flex flex-row-reverse md:flex-col justify-between items-center md:items-end border-t border-border pt-5 mt-5 md:border-0 md:pt-0 md:mt-0">
             <Button variant="outline" className="px-4">
               Change Hotel
             </Button>
@@ -898,7 +901,7 @@ function AccommodationCard({
 /*
   RecommendationCard — the empty/suggestion state.
   Matches real TripBuilder's AccommodationEmptyWithRecommendations light-blue style.
-  bg-[#2681FF]/10 gives a soft blue tint — makes it clear this is "not yet chosen".
+  bg-primary/10 gives a soft blue tint — makes it clear this is "not yet chosen".
 */
 function RecommendationCard({
   icon,
@@ -912,14 +915,14 @@ function RecommendationCard({
   ctaLabel: string;
 }) {
   return (
-    <div className="bg-[#2681FF]/10 rounded-xl max-md:rounded-r-none max-md:-mr-4 p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <div className="bg-primary/10 rounded-lg max-md:rounded-r-none max-md:-mr-4 p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
       {/* Icon in a white circle */}
-      <div className="p-3 bg-white rounded-xl border border-[#e0e2e8] shrink-0">
+      <div className="p-3 bg-card rounded-lg border border-border shrink-0">
         {icon}
       </div>
       <div className="flex-1 min-w-0">
-        <h3 className="font-extrabold text-[#333743] mb-1">{title}</h3>
-        <p className="text-sm text-[#667080]">{description}</p>
+        <h3 className="font-extrabold text-foreground mb-1">{title}</h3>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       <Button className="shrink-0 max-sm:w-full">
         {ctaLabel}
@@ -938,7 +941,7 @@ function AddStopButton() {
       {/* Left dashed line — only shown on mobile (the border-l handles desktop) */}
       <span className="md:hidden w-full h-px m-auto mr-4 border-t border-dashed border-foreground" />
       <Button variant="outline">
-        <Plus size={16} />
+        <Plus size={16} aria-hidden="true" />
         Add Stop
       </Button>
       {/* Right dashed line — always shown */}
@@ -954,13 +957,13 @@ function AddStopButton() {
 */
 function PageFooter({ onBack }: { onBack: () => void }) {
   return (
-    <div className="flex justify-between items-center mt-8 pt-6 border-t border-[#e0e2e8]">
+    <div className="flex justify-between items-center mt-8 pt-6 border-t border-border">
       <Button
         variant="ghost"
         className="px-0 gap-1 hover:bg-transparent"
         onClick={onBack}
       >
-        <ChevronLeft size={18} />
+        <ChevronLeft size={18} aria-hidden="true" />
         Back
       </Button>
       <Button size="lg">
@@ -989,34 +992,34 @@ function StickySummary({
   nights: number;
 }) {
   return (
-    <div className="fixed bottom-0 left-0 w-full px-4 z-30 bg-white shadow-[0_-4px_24px_rgba(0,0,0,0.12)] rounded-t-3xl">
+    <div className="fixed bottom-0 left-0 w-full px-4 z-30 bg-card shadow-lg rounded-t-3xl">
       <div className="flex max-w-5xl mx-auto py-4 lg:py-5 justify-between items-center">
 
         {/* Desktop: full departure / return / pax details */}
-        <div className="hidden lg:flex items-center gap-4 text-sm text-[#333743]">
+        <div className="hidden lg:flex items-center gap-4 text-sm text-foreground">
           <p>
             Departing&nbsp;
             <span className="font-semibold">{format(startDate, "EEE, d MMM yyyy")}</span>
           </p>
-          <hr className="w-12 border-[#e0e2e8]" />
+          <hr className="w-12 border-border" />
           <p>
             Returning&nbsp;
             <span className="font-semibold">{format(endDate, "EEE, d MMM yyyy")}</span>
           </p>
         </div>
-        <div className="hidden lg:flex flex-col items-center font-semibold text-sm text-[#333743]">
+        <div className="hidden lg:flex flex-col items-center font-semibold text-sm text-foreground">
           <p>{adults} adult{adults !== 1 ? "s" : ""}</p>
           <p>{nights} night{nights !== 1 ? "s" : ""}</p>
         </div>
 
         {/* Mobile: compact icon-based summary */}
-        <div className="flex lg:hidden flex-col gap-1 text-sm text-[#333743]">
+        <div className="flex lg:hidden flex-col gap-1 text-sm text-foreground">
           <p className="flex items-center gap-1.5">
-            <User size={15} className="text-[#9598a4]" />
+            <User size={15} className="text-grey" aria-hidden="true" />
             <span>{adults} adult{adults !== 1 ? "s" : ""}</span>
           </p>
           <p className="flex items-center gap-1.5">
-            <CalendarDays size={15} className="text-[#9598a4]" />
+            <CalendarDays size={15} className="text-grey" aria-hidden="true" />
             <span>
               {format(startDate, "dd MMM")} – {format(endDate, "dd MMM yyyy")}
             </span>
@@ -1035,7 +1038,7 @@ function StickySummary({
 // Small green "Added ✓" badge used on confirmed product cards
 function AddedBadge() {
   return (
-    <span className="ml-auto flex items-center gap-1 bg-[#19a974] text-white text-xs font-bold px-2 py-0.5 rounded-full shrink-0">
+    <span className="ml-auto flex items-center gap-1 bg-success text-white text-xs font-bold px-2 py-0.5 rounded-full shrink-0">
       ✓ Added
     </span>
   );
