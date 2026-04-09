@@ -111,7 +111,7 @@ export function RateCalendarPanel({
   const currSym = sym(currency);
 
   return (
-    <div className="bg-grey-light border border-border rounded-xl p-4">
+    <div className="bg-white border border-border rounded-xl p-4">
       <div className="text-xs font-bold text-foreground mb-3">Explore travel dates</div>
 
       {/* Month navigation row */}
@@ -158,8 +158,10 @@ export function RateCalendarPanel({
           const isReturn = dateStr === returnDateStr;
           const isStayDay = stayDaySet.has(dateStr);
 
-          // Cell background — priority order: departure > return > stay > available > unavailable
-          const cellClass = isDeparture
+          // Cell background — priority order: past > departure > return > stay > available > unavailable
+          const cellClass = isPast
+            ? "cursor-not-allowed"
+            : isDeparture
             ? "bg-primary cursor-pointer"
             : isReturn
             ? "bg-primary/20 ring-1 ring-primary cursor-pointer hover:bg-primary/30"
@@ -169,8 +171,10 @@ export function RateCalendarPanel({
             ? "hover:bg-primary/10 cursor-pointer"
             : "cursor-not-allowed";
 
-          // Day number text colour
-          const dayNumClass = isDeparture
+          // Day number text colour — past dates always grey, regardless of availability
+          const dayNumClass = isPast
+            ? "text-grey"
+            : isDeparture
             ? "text-primary-foreground"
             : isReturn || isStayDay
             ? "text-primary"
@@ -190,8 +194,8 @@ export function RateCalendarPanel({
           return (
             <button
               key={dateStr}
-              disabled={!isAvailable}
-              onClick={() => isAvailable && onSelectDate(dateStr)}
+              disabled={!isAvailable || isPast}
+              onClick={() => isAvailable && !isPast && onSelectDate(dateStr)}
               className={cn(
                 "flex flex-col items-center justify-center rounded-lg py-1.5 px-0.5",
                 "transition-all text-center min-h-[44px]",

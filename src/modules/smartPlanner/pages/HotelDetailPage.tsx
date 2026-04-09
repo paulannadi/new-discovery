@@ -620,7 +620,7 @@ export default function HotelDetailPage({
 
                 {/* Hotel name + stars */}
                 <div className="flex items-start gap-2 flex-wrap">
-                  <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-foreground leading-[1.1] tracking-tight">{hotel.name}</h1>
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground leading-[1.1] tracking-tight">{hotel.name}</h1>
                   <AccommodationStar
                     rating={hotel.stars}
                     offerName={hotel.name}

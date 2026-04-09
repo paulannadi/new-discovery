@@ -16,6 +16,8 @@ import { MapPin, BedDouble, Utensils, Calendar as CalendarIcon, ArrowRight, Wifi
 import { format } from "date-fns";
 import { UnifiedPackage } from "../../../types";
 import { cn } from "../../../shared/components/ui/utils";
+import AccommodationStar from "../../../shared/components/AccommodationStar";
+import RatingBlock from "../../../shared/components/RatingBlock";
 
 // ── Currency symbol helper ──────────────────────────────────────────────────
 // Converts ISO currency code to a symbol. Add more as needed.
@@ -143,27 +145,23 @@ export function PackageCard({ pkg, onSelect, onHover, isHovered, isPricePending 
 
         {/* Col 1: all details */}
         <div className="flex-1 flex flex-col gap-3">
-          <p className="text-lg font-bold text-foreground leading-snug">
-            {pkg.hotel.name}{" "}
-            <span className="text-xs text-warning whitespace-nowrap align-top">
-              {"★".repeat(pkg.hotel.category)}
-            </span>
-          </p>
-
-          <div className="flex items-center gap-2">
-            <div className="bg-success text-white text-xs font-bold px-1.5 py-0.5 rounded-sm">
-              {(pkg.hotel.trustYou.rating / 10).toFixed(1)}
-            </div>
-            <span className="text-foreground text-xs font-bold">
-              {pkg.hotel.trustYou.rating >= 90 ? "Exceptional"
-                : pkg.hotel.trustYou.rating >= 85 ? "Outstanding"
-                : pkg.hotel.trustYou.rating >= 80 ? "Excellent"
-                : "Very good"}
-            </span>
-            <span className="text-foreground text-xs">
-              ({pkg.hotel.trustYou.reviewCount.toLocaleString()} reviews)
-            </span>
+          {/* Hotel name + star rating — AccommodationStar handles full/half/empty star logic */}
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <p className="text-lg font-bold text-foreground leading-snug">
+              {pkg.hotel.name}
+            </p>
+            <AccommodationStar
+              rating={pkg.hotel.category}
+              offerName={pkg.hotel.name}
+              size={14}
+            />
           </div>
+
+          {/* TrustYou rating — shared RatingBlock (same as HotelDetailPage) */}
+          <RatingBlock
+            reviewScore={pkg.hotel.trustYou.rating / 10}
+            reviewCount={pkg.hotel.trustYou.reviewCount}
+          />
 
           <span className="flex items-center gap-1 text-xs text-foreground">
             <MapPin size={12} className="shrink-0" aria-hidden="true" />

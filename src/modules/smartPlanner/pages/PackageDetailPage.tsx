@@ -35,7 +35,6 @@ import {
   ChevronUp,
   CalendarDays,
   Pencil,
-  Check,
   Building2,
   Luggage,
   BedDouble,
@@ -48,6 +47,9 @@ import {
 import { UnifiedPackage } from "../../../types";
 import type { HolidaySearchCriteria } from "../../../App";
 import { BackButton } from "../../../shared/components/BackButton";
+import { Button } from "../../../shared/components/ui/button";
+import AccommodationStar from "../../../shared/components/AccommodationStar";
+import RatingBlock from "../../../shared/components/RatingBlock";
 import { RateCalendarPanel } from "../components/RateCalendarPanel";
 import {
   Dialog,
@@ -55,13 +57,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../../shared/components/ui/dialog";
-import { Calendar } from "../../../shared/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../../shared/components/ui/popover";
-import { Button } from "../../../shared/components/ui/button";
+import { DayPicker } from "react-day-picker";
 import { cn } from "../../../shared/components/ui/utils";
 import LeafletMap from "../../../shared/components/LeafletMap";
 
@@ -410,7 +406,6 @@ function FlightCard({
         {/* "Add baggage and extras →" — text button, fill_CTT1AZ (#2681FF) */}
         <button className="text-sm font-semibold text-primary flex items-center gap-1 hover:underline shrink-0">
           Add baggage and extras
-          <span className="text-xs">›</span>
         </button>
       </div>
     </div>
@@ -661,8 +656,8 @@ export default function PackageDetailPage({
   // Mobile "Explore dates" accordion
   const [mobileDatesExpanded, setMobileDatesExpanded] = useState(false);
 
-  // Live mode date picker
-  const [datePickerOpen, setDatePickerOpen] = useState(false);
+  // Date picker panel (for live/non-cached packages)
+  const [datePanelOpen, setDatePanelOpen] = useState(false);
 
   // ── Derived values ─────────────────────────────────────────────────────────
   const currSym = currencySymbol(pkg.price.currency);
@@ -717,7 +712,7 @@ export default function PackageDetailPage({
               Left: large main hero image. Right: 2×2 thumbnail grid.
               "See all photos" secondary button floats bottom-right.
           ──────────────────────────────────────────────────────────────────── */}
-          <div className="relative mx-4 sm:mx-6 md:mx-10 mb-2">
+          <div className="relative mx-4 sm:mx-6 md:mx-10">
             {/* Photo grid — h-[402px] on desktop matches Figma exactly */}
             <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[280px] md:h-[402px] gap-2">
 
@@ -752,12 +747,13 @@ export default function PackageDetailPage({
 
             {/* "See all photos" secondary button — overlaid bottom-right.
                 Figma: Type=Secondary, text "See all photos", primary text */}
-            <button
+            <Button
+              variant="secondary"
               onClick={() => setPhotosOpen(true)}
-              className="absolute bottom-4 right-4 md:right-4 bg-white/95 backdrop-blur-sm border border-border rounded-md px-4 py-2 text-sm font-semibold text-primary flex items-center gap-2 hover:bg-white transition-colors shadow-sm"
+              className="absolute bottom-4 right-4"
             >
               ⊞ See all photos
-            </button>
+            </Button>
           </div>
 
           {/* ── HOTEL INFO + PRICE ROW ─────────────────────────────────────────
@@ -765,7 +761,7 @@ export default function PackageDetailPage({
               and the price/CTA block on the RIGHT.
               This matches the Figma "Frame 1000002102" structure exactly.
           ──────────────────────────────────────────────────────────────────── */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 lg:gap-12 px-4 sm:px-6 md:px-10 py-5 md:py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 lg:gap-12 px-4 sm:px-6 md:px-10 pt-8 pb-5 md:pb-8">
 
             {/* ── LEFT: Hotel identity + Package details ──────────────────── */}
             <div className="flex flex-col gap-4">
@@ -774,19 +770,12 @@ export default function PackageDetailPage({
               {/* Figma node 6113:2448 "Quick facts" */}
               <div className="flex flex-col gap-1.5">
 
-                {/* Rating badge row — "4,3" green badge + "Excellent" + "367 reviews" */}
-                {/* Figma: Number box fills success, borderRadius: rounded-md */}
+                {/* Rating badge — uses shared RatingBlock component (same as HotelDetailPage) */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-success text-white text-xs font-bold px-2 py-0.5 rounded-md leading-tight">
-                      {ratingEU}
-                    </div>
-                    {/* "Excellent" — Paragraph Bold/Small Bold, foreground */}
-                    <span className="text-sm font-bold text-foreground">
-                      {ratingLabel(pkg.hotel.trustYou.rating)}
-                    </span>
-                  </div>
-                  {/* Review count — Paragraph Regular/Small, foreground */}
+                  <RatingBlock
+                    reviewScore={pkg.hotel.trustYou.rating / 10}
+                    reviewCount={pkg.hotel.trustYou.reviewCount}
+                  />
                   <button
                     onClick={() => setReviewsOpen(true)}
                     className="text-sm text-foreground underline hover:no-underline"
@@ -795,15 +784,16 @@ export default function PackageDetailPage({
                   </button>
                 </div>
 
-                {/* Hotel name + star rating on the same line, stars 8px to the right */}
+                {/* Hotel name + star rating — AccommodationStar handles full/half/empty star logic */}
                 <div className="flex items-baseline gap-2">
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground leading-[1.1] tracking-tight">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground leading-[1.1] tracking-tight">
                     {pkg.hotel.name}
                   </h1>
-                  <span className="text-warning text-base tracking-tight leading-none shrink-0">
-                    {"★".repeat(pkg.hotel.category)}
-                    {"☆".repeat(Math.max(0, 5 - pkg.hotel.category))}
-                  </span>
+                  <AccommodationStar
+                    rating={pkg.hotel.category}
+                    offerName={pkg.hotel.name}
+                    size={16}
+                  />
                 </div>
               </div>
 
@@ -860,30 +850,11 @@ export default function PackageDetailPage({
             <div className="flex flex-col gap-3 lg:min-w-[280px] lg:items-end">
 
               {/* Price block */}
-              <div className="flex flex-col gap-1">
-                {/* £828 per person — font-bold, ~30px */}
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-3xl font-bold text-foreground leading-none">
-                    {currSym}{activePrice.toLocaleString()}
-                  </span>
-                  {/* "per person" — smaller, regular weight */}
-                  <span className="text-sm font-normal text-foreground leading-none">
-                    per person
-                  </span>
-                </div>
-
-                {/* "Flight + hotel · 7 nights" — small, regular */}
-                <div className="text-sm text-foreground font-normal">
-                  Flight + hotel · {nights} nights
-                </div>
-
-                {/* "Total for 2 adults: £1,656" — bold inline */}
-                <div className="text-sm text-muted-foreground font-normal">
-                  Total for {adults} adults:{" "}
-                  <strong className="text-foreground font-bold">
-                    {currSym}{totalPrice.toLocaleString()}
-                  </strong>
-                </div>
+              <div className="flex flex-col items-end text-right">
+                {/* Small grey label: per-person rate + package details */}
+                <span className="text-grey text-xs">{currSym}{activePrice.toLocaleString()} per person · Flight + hotel · {nights} nights</span>
+                {/* Big bold total — same structure as hotel page */}
+                <span className="text-foreground font-bold text-2xl">Total for {adults} adults: {currSym}{totalPrice.toLocaleString()}</span>
               </div>
 
               {/* CTA button — primary background, rounded-lg, white text */}
@@ -891,7 +862,7 @@ export default function PackageDetailPage({
                 onClick={() => onBook(pkg, selectedDate)}
                 className="w-full lg:min-w-[280px] bg-primary hover:brightness-85 text-white font-bold text-base md:text-base py-3 md:py-4 px-4 md:px-6 rounded-lg transition-colors text-center"
               >
-                Personalise Your Holiday →
+                Personalise Your Holiday
               </button>
 
             </div>
@@ -929,7 +900,8 @@ export default function PackageDetailPage({
               {/* Section header row */}
               <div className="flex items-center justify-between mb-4">
                 {/* "Selected room" — Heading Bold/H3 */}
-                <h3 className="text-xl font-bold text-foreground">
+                <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                  <BedDouble size={20} className="text-foreground" aria-hidden="true" />
                   Selected room
                 </h3>
                 {/* "Change room" — text button with pencil icon */}
@@ -978,11 +950,6 @@ export default function PackageDetailPage({
                             key={label}
                             className="flex items-center gap-2 text-sm text-foreground"
                           >
-                            <Check
-                              size={13}
-                              className="text-success shrink-0"
-                              aria-hidden="true"
-                            />
                             {icon}
                             {label}
                           </div>
@@ -993,7 +960,7 @@ export default function PackageDetailPage({
                       onClick={() => setRoomFacilitiesOpen(true)}
                       className="mt-4 text-sm font-semibold text-primary hover:underline transition-all self-start"
                     >
-                      Show all room facilities →
+                      Show all room facilities
                     </button>
                   </div>
                 </div>
@@ -1012,7 +979,8 @@ export default function PackageDetailPage({
                     Selected flights
                   </h3>
                 </div>
-                <button className="text-sm font-semibold text-primary hover:underline">
+                <button className="text-sm font-semibold text-primary hover:underline flex items-center gap-1">
+                  <Pencil size={13} aria-hidden="true" />
                   Change flights
                 </button>
               </div>
@@ -1130,17 +1098,12 @@ export default function PackageDetailPage({
             <h3 className="text-xl font-bold text-foreground">Guest reviews</h3>
             <div className="bg-card rounded-lg shadow-xs flex flex-col md:flex-row gap-5 md:gap-10 p-4 md:py-6 md:pl-6 md:pr-0">
 
-              {/* Left column — score summary. Full width on mobile, fixed on desktop. */}
+              {/* Left column — score summary using shared RatingBlock */}
               <div className="flex flex-row md:flex-col items-center md:items-start gap-3 md:gap-1 md:shrink-0 md:w-[100px]">
-                {/* "4.3/5" — Heading Black/H3, green */}
-                <span className="text-2xl font-bold text-success leading-tight">
-                  {ratingEU}/5
-                </span>
-                {/* "Exceptional" — Paragraph Bold/Default Bold */}
-                <span className="text-base font-bold text-foreground">
-                  {ratingLabel(pkg.hotel.trustYou.rating)}
-                </span>
-                {/* "472 verified reviews" — small text link */}
+                <RatingBlock
+                  reviewScore={pkg.hotel.trustYou.rating / 10}
+                  reviewCount={pkg.hotel.trustYou.reviewCount}
+                />
                 <button
                   onClick={() => setReviewsOpen(true)}
                   className="text-xs text-foreground underline hover:no-underline text-left mt-1"
@@ -1265,31 +1228,15 @@ export default function PackageDetailPage({
           ═══════════════════════════════════════════════════════════════╗ */}
           <div className="hidden lg:block sticky top-[64px] pt-2">
             {/* Sidebar card — bg-card, border, rounded-lg, shadow */}
-            <div className="bg-card border border-border rounded-lg shadow-md overflow-hidden">
+            <div className="bg-card border border-border rounded-lg shadow-md">
 
               {/* ── Price summary block ──────────────────────────────────── */}
-              <div className="p-5">
-                {/* £828 / per person */}
-                <div className="flex items-baseline gap-1.5 mb-1">
-                  <span className="text-3xl font-bold text-foreground leading-none">
-                    {currSym}{activePrice.toLocaleString()}
-                  </span>
-                  <span className="text-sm font-normal text-foreground">
-                    per person
-                  </span>
-                </div>
-
-                {/* "Flight + hotel · 7 nights" */}
-                <div className="text-sm text-foreground mb-1.5">
-                  Flight + hotel · {nights} nights
-                </div>
-
-                {/* "Total for 2 adults: £1,656" */}
-                <div className="text-sm text-muted-foreground">
-                  Total for {adults} adults:{" "}
-                  <strong className="text-foreground font-bold">
-                    {currSym}{totalPrice.toLocaleString()}
-                  </strong>
+              <div className="px-5 pt-5 pb-0">
+                <div className="flex flex-col items-end text-right">
+                  {/* Small grey label: per-person rate + package details */}
+                  <span className="text-grey text-xs">{currSym}{activePrice.toLocaleString()} per person · Flight + hotel · {nights} nights</span>
+                  {/* Big bold total — same as hotel page */}
+                  <span className="text-foreground font-bold text-2xl">Total for {adults} adults: {currSym}{totalPrice.toLocaleString()}</span>
                 </div>
               </div>
 
@@ -1313,42 +1260,42 @@ export default function PackageDetailPage({
                       This price is for a specific departure. Pick a different
                       date to request an updated quote.
                     </p>
-                    <Popover
-                      open={datePickerOpen}
-                      onOpenChange={setDatePickerOpen}
-                    >
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal border-border hover:border-foreground text-sm h-10 rounded-lg"
-                        >
-                          <CalendarDays
-                            size={15}
-                            className="mr-2 text-primary shrink-0"
-                            aria-hidden="true"
-                          />
-                          {selectedDate
-                            ? format(new Date(selectedDate), "EEE, d MMM yyyy")
-                            : "Pick a date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={
-                            selectedDate ? new Date(selectedDate) : undefined
-                          }
-                          onSelect={(date) => {
-                            if (date) {
+                    <div className="relative">
+                      <button
+                        onClick={() => setDatePanelOpen(o => !o)}
+                        className={cn(
+                          "h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                          datePanelOpen
+                            ? "border-primary ring-2 ring-primary/20 bg-card"
+                            : "border-border bg-card hover:border-primary"
+                        )}
+                      >
+                        <CalendarDays size={16} className="text-primary shrink-0" aria-hidden="true" />
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Travel date</span>
+                          <span className="text-xs font-semibold text-foreground truncate">
+                            {selectedDate ? format(new Date(selectedDate), "EEE, d MMM yyyy") : "Pick a date"}
+                          </span>
+                        </div>
+                        <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", datePanelOpen && "rotate-180")} aria-hidden="true" />
+                      </button>
+                      {datePanelOpen && (
+                        <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-150">
+                          <style>{`.rdp-root { --rdp-accent-color: hsl(var(--primary)); --rdp-accent-background-color: hsl(var(--primary) / 0.10); --rdp-day_button-border-radius: 6px; margin: 0; }`}</style>
+                          <DayPicker
+                            mode="single"
+                            selected={selectedDate ? new Date(selectedDate) : undefined}
+                            onSelect={(date) => {
+                              if (!date) return;
                               setSelectedDate(format(date, "yyyy-MM-dd"));
-                              setDatePickerOpen(false);
-                            }
-                          }}
-                          disabled={{ before: new Date() }}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                              setDatePanelOpen(false);
+                            }}
+                            disabled={{ before: new Date() }}
+                            numberOfMonths={1}
+                          />
+                        </div>
+                      )}
+                    </div>
 
                     {/* Compact room/board summary */}
                     <div className="mt-3 bg-card border border-border rounded-lg p-3 flex flex-col gap-2">
@@ -1381,7 +1328,7 @@ export default function PackageDetailPage({
                   onClick={() => onBook(pkg, selectedDate)}
                   className="w-full bg-primary hover:brightness-85 text-white font-bold text-base py-4 rounded-lg transition-colors"
                 >
-                  Personalise Your Holiday →
+                  Personalise Your Holiday
                 </button>
               </div>
             </div>
@@ -1399,22 +1346,17 @@ export default function PackageDetailPage({
           Fixed bar at the bottom on mobile. Price left, CTA right.
       ══════════════════════════════════════════════════════════════════════ */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border px-5 py-3 z-50 flex items-center justify-between gap-3 shadow-lg">
-        <div>
-          <div className="text-2xl font-bold text-foreground leading-tight">
-            {currSym}{activePrice.toLocaleString()}
-            <span className="text-sm font-normal text-muted-foreground ml-1">
-              /pp
-            </span>
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Total: {currSym}{totalPrice.toLocaleString()} · {nights} nights
-          </div>
+        <div className="flex flex-col">
+          {/* Small grey label — same as hotel mobile footer */}
+          <span className="text-grey text-xs">{currSym}{activePrice.toLocaleString()} per person · {nights} nights</span>
+          {/* Bold total */}
+          <span className="text-foreground font-bold text-base">Total for {adults} adults: {currSym}{totalPrice.toLocaleString()}</span>
         </div>
         <button
           onClick={() => onBook(pkg, selectedDate)}
           className="bg-primary hover:brightness-85 text-white font-bold text-sm px-5 py-3 rounded-lg transition-colors whitespace-nowrap"
         >
-          Personalise →
+          Personalise
         </button>
       </div>
 

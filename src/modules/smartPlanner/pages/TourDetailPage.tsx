@@ -29,7 +29,6 @@ import {
   ChevronDown,
   ChevronUp,
   Play,
-  ArrowRight,
   Plus,
   Minus,
 } from "lucide-react";
@@ -328,24 +327,15 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               Sits at sticky top-[64px], hidden on mobile (has footer instead).
           ═══════════════════════════════════════════════════════════════╗ */}
           <div className="hidden lg:block sticky top-[64px] pt-2">
-            <div className="bg-card border border-border rounded-xl shadow-md overflow-hidden">
+            <div className="bg-card border border-border rounded-xl shadow-md">
 
-              {/* ── Price summary — same pattern as PackageDetailPage sidebar ── */}
+              {/* ── Price summary ── */}
               <div className="p-5">
-                <div className="flex items-baseline gap-1.5 mb-1">
-                  <span className="text-3xl font-extrabold text-foreground leading-none">
-                    {currency}{tour.price.perPerson.toLocaleString()}
-                  </span>
-                  <span className="text-sm font-normal text-foreground">per person</span>
-                </div>
-                <div className="text-xs text-foreground mb-1">
-                  {tour.duration}-day guided tour
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Total for {adults} {adults === 1 ? "adult" : "adults"}:{" "}
-                  <strong className="text-foreground font-bold">
-                    {currency}{totalPrice.toLocaleString()}
-                  </strong>
+                <div className="flex flex-col">
+                  {/* Small grey label: per-person rate + tour length */}
+                  <span className="text-grey text-xs">{currency}{tour.price.perPerson.toLocaleString()} per person · {tour.duration}-day guided tour</span>
+                  {/* Big bold total — same as hotel page */}
+                  <span className="text-foreground font-bold text-2xl">Total for {adults} {adults === 1 ? "adult" : "adults"}: {currency}{totalPrice.toLocaleString()}</span>
                 </div>
               </div>
 
@@ -515,7 +505,6 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   className="w-full bg-primary hover:brightness-85 text-white font-bold text-base py-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
                   Start planning
-                  <ArrowRight size={16} aria-hidden="true" />
                 </button>
               </div>
 
@@ -534,18 +523,17 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
           Same pattern as PackageDetailPage mobile footer.
       ══════════════════════════════════════════════════════════════════════ */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border px-5 py-3 z-50 flex items-center justify-between gap-3 shadow-lg">
-        <div>
-          <div className="text-xs text-muted-foreground">Per person from</div>
-          <div className="text-xl font-extrabold text-foreground leading-none">
-            {currency}{tour.price.perPerson.toLocaleString()}
-          </div>
+        <div className="flex flex-col">
+          {/* Small grey label — same as hotel mobile footer */}
+          <span className="text-grey text-xs">{currency}{tour.price.perPerson.toLocaleString()} per person</span>
+          {/* Bold total */}
+          <span className="text-foreground font-bold text-base">Total for {adults} {adults === 1 ? "adult" : "adults"}: {currency}{totalPrice.toLocaleString()}</span>
         </div>
         <button
           onClick={() => onBook(tour, travelDate, adults, hotelPreference)}
           className="flex items-center gap-2 bg-primary hover:brightness-85 text-white font-bold text-sm px-5 py-3 rounded-lg transition-colors"
         >
           Start planning
-          <ArrowRight size={15} aria-hidden="true" />
         </button>
       </div>
 
