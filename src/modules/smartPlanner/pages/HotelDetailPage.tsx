@@ -252,8 +252,8 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
 
   return (
     <div className={cn(
-      "bg-card rounded-xl overflow-hidden border-2 flex flex-col shadow-sm hover:shadow-md transition-all",
-      isSelected ? "border-foreground shadow-lg" : "border-border"
+      "bg-card rounded-xl overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all",
+      isSelected ? "shadow-lg" : ""
     )}>
       {/* Image Carousel */}
       <div className="h-[200px] relative bg-gray-100 group">
@@ -300,6 +300,8 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
           </div>
         </div>
 
+        <hr className="border-border mb-4" />
+
         {/* Cancellation Policy */}
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
@@ -323,6 +325,8 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
             ))}
           </div>
         </div>
+
+        <hr className="border-border mb-4" />
 
         {/* Extras */}
         <div className="mb-6">
@@ -350,11 +354,11 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
 
         {/* Footer */}
         <div className="mt-auto pt-4 border-t border-muted flex flex-col gap-2">
+          <div className="text-right text-xs text-grey">{totalPrice}€ per person, per night</div>
           {/* Total for the full stay — calculated as per-night price × number of nights */}
           <div className="text-right text-sm font-bold text-foreground">
             Total for {nights} night{nights !== 1 ? 's' : ''}: {totalPrice * nights}€
           </div>
-          <div className="text-right text-xs text-grey">per person, per night</div>
           <button
             onClick={handleBookClick}
             className={cn(
@@ -365,7 +369,7 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
             )}
           >
             {isSelected && <Check size={16} />}
-            {isSelected ? `Selected - ${totalPrice}€` : `Select for ${totalPrice}€`}
+            {isSelected ? "Selected" : "Select"}
           </button>
         </div>
       </div>
@@ -659,7 +663,7 @@ export default function HotelDetailPage({
       </div>
 
       {/* Select Rooms Section - Grey Background */}
-        <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] pt-[40px] flex flex-col gap-6">
+        <div className="w-full max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 pt-[40px] flex flex-col gap-6">
           <h2 className="font-extrabold text-foreground text-2xl">Select rooms</h2>
 
           {/* ── Inline Search Bar ──────────────────────────────────────────────
