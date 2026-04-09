@@ -12,7 +12,9 @@ import SmartPlannerPage, {
   type StartingContext,
 } from "./modules/smartPlanner/pages/SmartPlannerPage";
 import type { UnifiedPackage } from "./types";
-import { Toaster } from "sonner";
+import { Toast } from "./shared/components/ui/toast";
+import "react-toastify/dist/ReactToastify.css";
+import "./styles/toastify.css";
 import { DateRange } from "react-day-picker";
 import { format, addDays } from "date-fns";
 
@@ -383,8 +385,8 @@ export default function App() {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <>
-      {/* Toaster shows brief success/error notifications in the top-right corner */}
-      <Toaster position="top-right" />
+      {/* Toast container — top-right, matches real TripBuilder notifications */}
+      <Toast />
 
       {/* Screen 1: Discovery page — multi-tab hub where the user starts */}
       {currentPage === "discovery" && (

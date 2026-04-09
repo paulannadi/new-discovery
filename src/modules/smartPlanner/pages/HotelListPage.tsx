@@ -33,7 +33,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import * as Slider from "@radix-ui/react-slider";
-import { toast } from "sonner";
+import { showToast } from "../../../shared/utils/toast";
 import { DayPicker, DateRange } from "react-day-picker";
 import { format, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
@@ -475,9 +475,7 @@ export default function HotelListPage({
       });
     }, intervalTime);
 
-    toast.success("Search updated!", {
-      description: `Found ${filteredAndSortedHotels.length} hotels in ${location}`
-    });
+    showToast.success(`Search updated! Found ${filteredAndSortedHotels.length} hotels in ${location}`);
   };
 
   const toggleBoardType = (type: string) => {
@@ -519,7 +517,7 @@ export default function HotelListPage({
     setSelectedCancellation([]);
     setSelectedStars([]);
     setSortOption("recommended");
-    toast.info("Filters reset");
+    showToast.info("Filters reset");
   };
 
   // --- Filter & Sort Logic ---

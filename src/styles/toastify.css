@@ -1,0 +1,75 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Toastify overrides — matches the real TripBuilder notification style.
+   Variables are mapped to the prototype's theme tokens.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Icon colours — reuse the theme tokens */
+  --toastify-icon-color-info: var(--primary);
+  --toastify-icon-color-success: var(--success);
+  --toastify-icon-color-warning: var(--warning);
+  --toastify-icon-color-error: var(--destructive);
+
+  /* Toast shell */
+  --toastify-toast-width: 448px;
+  --toastify-toast-padding: 8px 32px 8px 16px;
+  --toastify-toast-bd-radius: var(--radius);
+  --toastify-font-family: var(--font-family);
+  --toastify-text-color-light: var(--foreground);
+
+  /* Progress bar colours */
+  --toastify-color-progress-info: var(--primary);
+  --toastify-color-progress-success: var(--success);
+  --toastify-color-progress-warning: var(--warning);
+  --toastify-color-progress-error: var(--destructive);
+
+  /* Hide the default progress bar background tint */
+  --toastify-color-progress-bgo: 0;
+
+  /* Background colours per type — same values as real TripBuilder */
+  --toastify-toast-background-info: #d4e6ff;
+  --toastify-toast-background-success: #d1eee3;
+  --toastify-toast-background-warning: #fff1cc;
+  --toastify-toast-background-error: #ffd9d7;
+}
+
+/* Add a 1px border on every toast */
+.Toastify__toast {
+  font-size: 12px;
+  border: solid 1px;
+}
+
+/* Move the progress bar to the top (like real TripBuilder) */
+.Toastify__progress-bar--wrp {
+  height: 3px;
+  top: 0;
+  bottom: unset;
+  border-top-left-radius: var(--toastify-toast-bd-radius);
+  border-top-right-radius: var(--toastify-toast-bd-radius);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Centre the close button vertically */
+.Toastify__close-button {
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 1;
+}
+
+.Toastify__close-button:hover {
+  opacity: 0.5;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .Toastify__toast-container {
+    padding: 1rem;
+  }
+
+  .Toastify__toast {
+    border-radius: var(--toastify-toast-bd-radius);
+    margin-bottom: 1rem;
+  }
+}

@@ -18,12 +18,13 @@ import {
   Dog,
   Check,
   CalendarDays,
-  Search
+  Search,
+  ArrowRight
 } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import { format, parseISO, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
-import { toast } from "sonner";
+import { showToast } from "../../../shared/utils/toast";
 import PoliciesSection from "../components/PoliciesSection";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../../../shared/components/ui/tooltip";
 
@@ -252,8 +253,8 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
 
   return (
     <div className={cn(
-      "bg-card rounded-xl overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all",
-      isSelected ? "shadow-lg" : ""
+      "bg-card rounded-xl overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all border-2",
+      isSelected ? "border-foreground shadow-lg" : "border-transparent"
     )}>
       {/* Image Carousel */}
       <div className="h-[200px] relative bg-gray-100 group">
@@ -263,6 +264,7 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
           className="w-full h-full object-cover absolute inset-0"
         />
         <div className="absolute inset-0 bg-foreground/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
 
         {/* Carousel Controls */}
         {/* On mobile (touch screens) buttons are always visible; on desktop they appear on hover */}
@@ -320,7 +322,7 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
                   </div>
                   <span className="text-xs text-foreground">{opt.label}</span>
                 </div>
-                {opt.priceDelta > 0 && <span className="text-xs text-foreground">+ ${opt.priceDelta}</span>}
+                {opt.priceDelta > 0 && <span className="text-xs text-foreground">+ {opt.priceDelta}€</span>}
               </label>
             ))}
           </div>
@@ -346,7 +348,7 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
                   </div>
                   <span className="text-xs text-foreground">{opt.label}</span>
                 </div>
-                {opt.priceDelta > 0 && <span className="text-xs text-foreground">+ ${opt.priceDelta}</span>}
+                {opt.priceDelta > 0 && <span className="text-xs text-foreground">+ {opt.priceDelta}€</span>}
               </label>
             ))}
           </div>
@@ -460,6 +462,19 @@ export default function HotelDetailPage({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Use localRoomConfig so that after the user edits guests and hits Update Search,
+  // all-rooms-selected checks against the new configuration.
+  const allRoomsSelected = localRoomConfig.every(config => roomSelections[config.id] != null);
+  const someRoomsSelected = Object.values(roomSelections).some(sel => sel !== null);
+
+  // Fire a success toast (top-right, matching real TripBuilder style)
+  // whenever all rooms become selected.
+  useEffect(() => {
+    if (allRoomsSelected) {
+      showToast.success("All rooms selected — ready to complete your booking!");
+    }
+  }, [allRoomsSelected]);
+
   // Helper to get total guest count for a room config
   const getTotalGuests = (config: RoomConfig) => config.adults + config.children;
 
@@ -482,7 +497,6 @@ export default function HotelDetailPage({
       setActiveRoomTab(localRoomConfig[currentIndex + 1].id);
     }
 
-    toast.success(`Room selected for ${roomConfiguration.find(r => r.id === roomConfigId)?.adults || 0} adults`);
   };
 
   // Calculate total price for all selected rooms
@@ -499,10 +513,6 @@ export default function HotelDetailPage({
   };
 
   const totalPrice = calculateTotalPrice();
-  // Use localRoomConfig so that after the user edits guests and hits Update Search,
-  // all-rooms-selected checks against the new configuration.
-  const allRoomsSelected = localRoomConfig.every(config => roomSelections[config.id] != null);
-  const someRoomsSelected = Object.values(roomSelections).some(sel => sel !== null);
 
   // Triggered when user clicks "Update Search" in the search bar.
   // Resets all selected rooms and briefly shows a loading state to simulate fetching new prices.
@@ -521,11 +531,11 @@ export default function HotelDetailPage({
 
   const handleCompleteBooking = () => {
     if (allRoomsSelected) {
-      toast.success(`Booking confirmed for ${roomConfiguration.length} room(s) - Total: ${totalPrice}€`);
+      showToast.success(`Booking confirmed for ${roomConfiguration.length} room(s) - Total: ${totalPrice}€`);
       // Navigate to SmartPlanner — App.tsx handles the actual page switch
       onBook(hotel, roomSelections);
     } else {
-      toast.error(`Please select a room for each guest configuration`);
+      showToast.error(`Please select a room for each guest configuration`);
     }
   };
 
@@ -653,8 +663,17 @@ export default function HotelDetailPage({
                 <button className="w-[40px] h-[40px] flex items-center justify-center border border-border rounded-lg text-foreground hover:bg-grey-light">
                   <Share size={20} aria-hidden="true" />
                 </button>
-                <button className="bg-primary hover:brightness-85 text-white font-bold px-6 py-4 rounded-lg text-base transition-colors">
-                  Book for ${hotel.price}
+                <button
+                  className="bg-primary hover:brightness-85 text-white font-bold px-6 py-4 rounded-lg text-base transition-colors"
+                  onClick={() => {
+                    if (!allRoomsSelected) {
+                      document.getElementById('room-selection')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                >
+                  {allRoomsSelected
+                    ? `Book for ${totalPrice * nights}€`
+                    : localRoomConfig.length > 1 ? 'Select rooms' : 'Select room'}
                 </button>
               </div>
             </div>
@@ -663,7 +682,7 @@ export default function HotelDetailPage({
       </div>
 
       {/* Select Rooms Section - Grey Background */}
-        <div className="w-full max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 pt-[40px] flex flex-col gap-6">
+        <div id="room-selection" className="w-full max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 pt-[40px] flex flex-col gap-6">
           <h2 className="font-extrabold text-foreground text-2xl">Select rooms</h2>
 
           {/* ── Inline Search Bar ──────────────────────────────────────────────
@@ -1077,31 +1096,46 @@ export default function HotelDetailPage({
         </div>
       </div>
 
+      {/* All-rooms-done banner — fades in above the sticky bar.
+          Matches the real TripBuilder Alert component structure:
+          grid layout with icon column + text column, same color token pattern. */}
+
       {/* Sticky Booking Bar */}
       {someRoomsSelected && (
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg z-50">
-          <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] py-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6">
-              {/* Left: Booking Summary */}
-              <div className="flex flex-wrap items-center gap-3 sm:gap-6">
-                <div className="flex flex-col">
-                  <span className="text-grey text-xs">Booking Summary</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-foreground font-bold text-base">
-                      {Object.values(roomSelections).filter(s => s !== null).length} of {localRoomConfig.length} room{localRoomConfig.length > 1 ? 's' : ''} selected
-                    </span>
-                  </div>
-                </div>
+          <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] py-3 md:py-4">
 
+            {/* Mobile layout: compact room pills + price/button row */}
+            <div className="flex flex-col gap-2 sm:hidden">
+              {/* Room status pills */}
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                {localRoomConfig.map((config, index) => {
+                  const sel = roomSelections[config.id];
+                  return (
+                    <div key={config.id} className="flex items-center gap-1.5 min-w-0">
+                      {sel ? (
+                        <div className="shrink-0 bg-foreground rounded-full p-0.5">
+                          <Check size={10} className="text-white" aria-hidden="true" />
+                        </div>
+                      ) : (
+                        <ArrowRight size={14} className="shrink-0 text-foreground" aria-hidden="true" />
+                      )}
+                      <span className="text-xs font-semibold text-foreground shrink-0 flex items-center gap-1">
+                        Room {index + 1} <Users size={12} aria-hidden="true" /> {config.adults + config.children}:
+                      </span>
+                      <span className="text-xs text-foreground truncate min-w-0">
+                        {sel ? sel.room.name : <span className="text-grey italic">Selecting now</span>}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-
-              {/* Right: Price & CTA — on mobile takes full row width so price and button space out nicely */}
-              <div className="flex items-center justify-between w-full sm:w-auto sm:justify-end gap-4 sm:gap-6">
-                <div className="flex flex-col items-end">
-                  <span className="text-grey text-xs">Total Price</span>
-                  <span className="text-foreground font-bold text-2xl">{totalPrice}€</span>
+              {/* Price + button */}
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-col">
+                  <span className="text-grey text-xs">{totalPrice}€ per person, per night</span>
+                  <span className="text-foreground font-bold text-base">Total for {nights} night{nights !== 1 ? 's' : ''}: {totalPrice * nights}€</span>
                 </div>
-
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span
@@ -1110,13 +1144,80 @@ export default function HotelDetailPage({
                       onClick={() => allRoomsSelected && handleCompleteBooking()}
                       aria-disabled={!allRoomsSelected}
                       className={cn(
-                        "inline-flex px-6 py-3 rounded-lg font-bold text-base transition-all select-none",
+                        "inline-flex shrink-0 px-4 py-2.5 rounded-lg font-bold text-sm transition-all select-none items-center gap-2",
                         allRoomsSelected
-                          ? "bg-primary hover:brightness-85 text-white cursor-pointer"
+                          ? "bg-primary hover:brightness-85 text-white cursor-pointer shadow-lg"
                           : "bg-border text-grey cursor-not-allowed"
                       )}
                     >
-                      Complete Booking
+                      Book
+                    </span>
+                  </TooltipTrigger>
+                  {!allRoomsSelected && (
+                    <TooltipContent side="top" sideOffset={8}>
+                      Please select a room for each guest configuration to proceed.
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </div>
+            </div>
+
+            {/* Desktop layout: full detail side by side */}
+            <div className="hidden sm:flex items-center justify-between gap-6">
+              {/* Left: Per-room breakdown */}
+              <div className="flex flex-col gap-2">
+                <span className="text-grey text-xs font-semibold uppercase tracking-wide">Room Selection</span>
+                {localRoomConfig.map((config, index) => {
+                  const sel = roomSelections[config.id];
+                  const cancelLabel = sel?.room.cancellationPolicies.find(p => p.id === sel.cancelOption)?.label;
+                  const boardLabel  = sel?.room.extras.find(p => p.id === sel.extraOption)?.label;
+                  return (
+                    <div key={config.id} className="flex items-center gap-2 min-w-0">
+                      {sel ? (
+                        <div className="shrink-0 bg-foreground rounded-full p-0.5">
+                          <Check size={12} className="text-white" aria-hidden="true" />
+                        </div>
+                      ) : (
+                        <ArrowRight size={16} className="shrink-0 text-foreground" aria-hidden="true" />
+                      )}
+                      <span className="text-sm font-semibold text-foreground shrink-0 flex items-center gap-1">
+                        Room {index + 1}
+                        <Users size={14} aria-hidden="true" />
+                        {config.adults + config.children}:
+                      </span>
+                      {sel ? (
+                        <span className="text-sm font-semibold text-foreground truncate min-w-0">
+                          {sel.room.name} · {cancelLabel} · {boardLabel}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-grey italic shrink-0">· Selecting now</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Right: Price & CTA */}
+              <div className="flex items-center gap-6">
+                <div className="flex flex-col items-end">
+                  <span className="text-grey text-xs">{totalPrice}€ per person, per night</span>
+                  <span className="text-foreground font-bold text-2xl">Total for {nights} night{nights !== 1 ? 's' : ''}: {totalPrice * nights}€</span>
+                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => allRoomsSelected && handleCompleteBooking()}
+                      aria-disabled={!allRoomsSelected}
+                      className={cn(
+                        "inline-flex px-6 py-3 rounded-lg font-bold text-base transition-all select-none items-center gap-2",
+                        allRoomsSelected
+                          ? "bg-primary hover:brightness-85 text-white cursor-pointer shadow-lg"
+                          : "bg-border text-grey cursor-not-allowed"
+                      )}
+                    >
+                      Book
                     </span>
                   </TooltipTrigger>
                   {!allRoomsSelected && (
