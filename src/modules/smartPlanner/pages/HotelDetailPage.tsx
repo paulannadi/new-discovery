@@ -1,6 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "../../../shared/components/ui/utils";
 import { BackButton } from "../../../shared/components/BackButton";
+import AccommodationStar from "../../../shared/components/AccommodationStar";
+import RatingBlock from "../../../shared/components/RatingBlock";
 import {
   MapPin,
   Wifi,
@@ -111,14 +113,6 @@ const CANCELLATION_OPTIONS: PricingOption[] = [
   { id: "free_cancellation", label: "Free cancellation", priceDelta: 25 }
 ];
 
-// Converts a 0–10 rating score to a label (matching the style in PackageDetailPage)
-function ratingLabel(score: number): string {
-  if (score >= 9) return "Exceptional";
-  if (score >= 8.5) return "Outstanding";
-  if (score >= 8) return "Excellent";
-  if (score >= 7) return "Very Good";
-  return "Good";
-}
 
 // Simple pseudo-random number generator seeded by string
 const seededRandom = (seed: string) => {
@@ -608,26 +602,17 @@ export default function HotelDetailPage({
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 {/* Rating badge row */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-success text-white text-xs font-bold px-2 py-0.5 rounded-lg leading-tight">
-                      {hotel.rating}
-                    </div>
-                    <span className="text-sm font-bold text-foreground">
-                      {ratingLabel(hotel.rating)}
-                    </span>
-                  </div>
-                  <span className="text-sm text-foreground underline">
-                    {hotel.reviewCount.toLocaleString()} reviews
-                  </span>
-                </div>
+                <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
 
                 {/* Hotel name + stars */}
-                <div className="flex items-baseline gap-2 flex-wrap">
+                <div className="flex items-start gap-2 flex-wrap">
                   <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-foreground leading-[1.1] tracking-tight">{hotel.name}</h1>
-                  <span className="text-warning text-base tracking-tight leading-none shrink-0">
-                    {"★".repeat(hotel.stars)}{"☆".repeat(Math.max(0, 5 - hotel.stars))}
-                  </span>
+                  <AccommodationStar
+                    rating={hotel.stars}
+                    offerName={hotel.name}
+                    offerId={hotel.id}
+                    size={16}
+                  />
                 </div>
               </div>
 
@@ -1049,14 +1034,9 @@ export default function HotelDetailPage({
 
           {/* Left column — score + label + review count. Row on mobile, column on desktop. */}
           <div className="flex flex-row md:flex-col items-center md:items-start gap-3 md:gap-1 md:shrink-0 md:w-[100px]">
-            <span className="text-2xl font-bold text-success leading-tight">
-              {(hotel.rating / 2).toFixed(1)}/5
-            </span>
-            <span className="text-base font-bold text-foreground">
-              {ratingLabel(hotel.rating)}
-            </span>
+            <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
             <button onClick={() => setReviewsOpen(true)} className="text-xs text-foreground underline hover:no-underline text-left mt-1">
-              {hotel.reviewCount.toLocaleString()} verified reviews
+              See all verified reviews
             </button>
           </div>
 

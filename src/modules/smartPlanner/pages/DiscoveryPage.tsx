@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { cn } from "../../../shared/components/ui/utils";
+// AccommodationStar renders the real star icons (same component as production TripBuilder)
+import AccommodationStar from "../../../shared/components/AccommodationStar";
+import RatingBlock from "../../../shared/components/RatingBlock";
 import PackageSearchForm from "../components/PackageSearchForm";
 import heroBg from "../../../../assets/hero-background-45ee0a.png";
 import tourCard1 from "../../../../assets/tour-card-1-4c2e30.png";
@@ -1506,23 +1509,18 @@ export default function DiscoveryPage({
                         <span className="text-lg font-bold text-foreground leading-snug">
                           {hotel.name}
                         </span>
-                        <span className="text-xs text-warning tracking-wide mt-0.5">
-                          {"★".repeat(hotel.stars)}{"☆".repeat(5 - hotel.stars)}
-                        </span>
+                        <AccommodationStar
+                          rating={hotel.stars}
+                          offerName={hotel.name}
+                          offerId={String(hotel.id)}
+                          size={14}
+                        />
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="bg-success text-white text-xs font-bold px-2 py-1 rounded-lg leading-none">
-                          {hotel.score}
-                        </span>
-                        <div className="flex flex-col">
-                          <span className="text-xs font-bold text-foreground">
-                            {hotel.label}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {hotel.reviews}
-                          </span>
-                        </div>
-                      </div>
+                      {/* score is 0–5 in HOTEL_PICKS; RatingBlock expects 0–10 */}
+                      <RatingBlock
+                        reviewScore={parseFloat(hotel.score) * 2}
+                        reviewCount={parseInt(hotel.reviews.replace(/[^0-9]/g, ""), 10)}
+                      />
                     </div>
 
                     <div className="flex items-center gap-1.5 text-muted-foreground text-xs">

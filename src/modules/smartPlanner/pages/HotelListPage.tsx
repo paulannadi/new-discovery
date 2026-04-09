@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { cn } from "../../../shared/components/ui/utils";
 import { BackButton } from "../../../shared/components/BackButton";
+import AccommodationStar from "../../../shared/components/AccommodationStar";
+import RatingBlock from "../../../shared/components/RatingBlock";
 import {
   MapPin,
   Star,
@@ -81,7 +83,7 @@ const HOTELS: Hotel[] = [
   {
     id: "h2",
     name: "UNAHOTELS T Hotel Cagliari",
-    image: "https://images.unsplash.com/photo-1694595437436-2ccf5a95591f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMGV4dGVyaW9yJTIwbW9kZXJuJTIwYXJjaGl0ZWN0dXJlfGVufDF8fHx8MTc3MDYzODYyN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1080&h=720&fit=crop&auto=format",
     stars: 4,
     rating: 9.2,
     reviewCount: 367,
@@ -183,7 +185,7 @@ const HOTELS: Hotel[] = [
 const FilterButton = ({ label, active, onClick, hasSelection, icon }: { label: string, active: boolean, onClick: (e: React.MouseEvent<HTMLButtonElement>) => void, hasSelection?: boolean, icon?: React.ReactNode }) => (
   <button
     className={cn(
-      "px-4 py-2 rounded-full border text-sm flex items-center gap-2 transition-all shrink-0 font-[Mulish]",
+      "px-4 py-2 rounded-lg border text-sm font-semibold flex items-center gap-2 transition-all shrink-0",
       active || hasSelection
         ? "bg-primary border-primary text-white"
         : "bg-card border-border text-foreground hover:border-primary"
@@ -264,24 +266,17 @@ const HotelCard = ({ hotel, displayPrice, onSelect, onHover, isHovered }: { hote
           {/* min-w-0 + flex-1 let the name column shrink so the rating badge never gets pushed off-screen */}
           <div className="flex flex-col gap-1 min-w-0 flex-1">
             {/* Name + stars inline — stars follow the name naturally and wrap with it */}
-            <p className="font-extrabold text-foreground text-lg group-hover:text-primary transition-colors leading-snug">
-              {hotel.name}{" "}
-              <span className="text-warning text-xs whitespace-nowrap align-top">{"★".repeat(hotel.stars)}</span>
-            </p>
+            <div className="flex items-start gap-1.5 flex-wrap">
+              <p className="font-extrabold text-foreground text-lg group-hover:text-primary transition-colors leading-snug">{hotel.name}</p>
+              <AccommodationStar rating={hotel.stars} offerName={hotel.name} offerId={String(hotel.id)} size={14} />
+            </div>
             {/* Location sits below the name row */}
             <div className="text-foreground text-xs flex items-center gap-1.5">
               <MapPin size={12} />
               {hotel.location}
             </div>
           </div>
-          {/* TrustYou rating alligned to the left in the row */}
-          <div className="flex flex-col items-end">
-            <div className="flex items-center gap-2">
-              <div className="bg-success text-white text-xs font-extrabold px-1.5 py-0.5 rounded-sm">{hotel.rating}</div>
-              <span className="text-foreground text-xs font-extrabold">Excellent</span>
-            </div>
-            <span className="text-foreground text-xs">{hotel.reviewCount} reviews</span>
-          </div>
+          <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
         </div>
 
         <div className="flex flex-wrap gap-2">
