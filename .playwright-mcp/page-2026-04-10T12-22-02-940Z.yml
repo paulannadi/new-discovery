@@ -1,0 +1,417 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e679]:
+    - generic [ref=e681]:
+      - button "Back to all hotels" [ref=e683]:
+        - img [ref=e684]
+        - text: Back to all hotels
+      - generic [ref=e686]:
+        - generic [ref=e687]:
+          - img "Exterior" [ref=e689] [cursor=pointer]
+          - generic [ref=e690]:
+            - img "Breakfast" [ref=e692] [cursor=pointer]
+            - img "Pool" [ref=e694] [cursor=pointer]
+            - img "Room" [ref=e696] [cursor=pointer]
+            - img "Lounge" [ref=e698] [cursor=pointer]
+        - button "⊞ See all photos" [ref=e699] [cursor=pointer]
+      - generic [ref=e700]:
+        - generic [ref=e701]:
+          - generic [ref=e702]:
+            - generic [ref=e703]:
+              - generic [ref=e704]:
+                - generic [ref=e705]: "8.6"
+                - generic [ref=e706]:
+                  - generic [ref=e707]: Very Good
+                  - generic [ref=e708]: 367 reviews
+              - button "367 reviews" [ref=e709]
+            - generic [ref=e710]:
+              - heading "Green Paradise Resort" [level=1] [ref=e711]
+              - generic [ref=e712]:
+                - img [ref=e713]
+                - img [ref=e715]
+                - img [ref=e717]
+                - img [ref=e719]
+                - img [ref=e721]
+          - generic [ref=e723]:
+            - generic [ref=e724]:
+              - img [ref=e725]
+              - generic [ref=e728]: Bali, Indonesia
+            - button "Show on map" [ref=e729]:
+              - img [ref=e730]
+              - text: Show on map
+          - heading "Hotel amenities and facilities" [level=3] [ref=e734]
+          - generic [ref=e735]:
+            - generic [ref=e736]:
+              - img [ref=e737]
+              - generic [ref=e741]: Pet friendly
+            - generic [ref=e742]:
+              - img [ref=e743]
+              - generic [ref=e747]: Free Wifi
+            - generic [ref=e748]:
+              - img [ref=e749]
+              - generic [ref=e753]: Indoor pool
+        - generic [ref=e755]:
+          - button [ref=e756]:
+            - img [ref=e757]
+          - button "Select room" [ref=e760]
+    - generic [ref=e761]:
+      - heading "Select rooms" [level=2] [ref=e762]
+      - generic [ref=e763]:
+        - generic [ref=e765] [cursor=pointer]:
+          - img [ref=e766]
+          - generic [ref=e768]:
+            - generic [ref=e769]: Check-in
+            - generic [ref=e770]: May 10, 2026
+          - img [ref=e771]
+        - generic [ref=e774] [cursor=pointer]:
+          - img [ref=e775]
+          - generic [ref=e777]:
+            - generic [ref=e778]: Check-out
+            - generic [ref=e779]: May 17, 2026
+          - img [ref=e780]
+        - generic [ref=e783] [cursor=pointer]:
+          - img [ref=e784]
+          - generic [ref=e789]:
+            - generic [ref=e790]: Guests & Rooms
+            - generic [ref=e791]: 2 Adults · 1 Room
+          - img [ref=e792]
+        - button "Update Search" [ref=e794]:
+          - img [ref=e795]
+          - text: Update Search
+      - generic [ref=e799]:
+        - generic [ref=e800]:
+          - generic [ref=e801]:
+            - img "Twin Room" [ref=e802]
+            - button [ref=e804]:
+              - img [ref=e805]
+            - button [ref=e807]:
+              - img [ref=e808]
+          - generic [ref=e810]:
+            - heading "Twin Room" [level=3] [ref=e811]
+            - generic [ref=e812]:
+              - generic [ref=e813]:
+                - img [ref=e814]
+                - generic [ref=e816]: 1 bedroom
+              - generic [ref=e817]:
+                - img [ref=e818]
+                - generic [ref=e823]: Sleeps 2
+              - generic [ref=e824]:
+                - img [ref=e825]
+                - generic [ref=e828]: 2 Single Beds
+            - separator [ref=e829]
+            - generic [ref=e830]:
+              - generic [ref=e831]:
+                - generic [ref=e832]: Cancellation policy
+                - generic [ref=e833]: per person, per night
+              - generic [ref=e834]:
+                - generic [ref=e839] [cursor=pointer]: Non-refundable
+                - generic [ref=e840] [cursor=pointer]:
+                  - generic [ref=e843]: Free cancellation
+                  - generic [ref=e844]: + 25€
+            - separator [ref=e845]
+            - generic [ref=e846]:
+              - generic [ref=e847]:
+                - generic [ref=e848]: Extras
+                - generic [ref=e849]: per person, per night
+              - generic [ref=e850]:
+                - generic [ref=e855] [cursor=pointer]: Room only
+                - generic [ref=e856] [cursor=pointer]:
+                  - generic [ref=e859]: Breakfast
+                  - generic [ref=e860]: + 15€
+                - generic [ref=e861] [cursor=pointer]:
+                  - generic [ref=e864]: Half board
+                  - generic [ref=e865]: + 45€
+            - generic [ref=e866]:
+              - generic [ref=e867]: 106€ per person, per night
+              - generic [ref=e868]: "Total for 7 nights: 742€"
+              - button "Select" [ref=e869]
+        - generic [ref=e870]:
+          - generic [ref=e871]:
+            - img "Twin Room" [ref=e872]
+            - button [ref=e874]:
+              - img [ref=e875]
+            - button [ref=e877]:
+              - img [ref=e878]
+          - generic [ref=e880]:
+            - heading "Twin Room" [level=3] [ref=e881]
+            - generic [ref=e882]:
+              - generic [ref=e883]:
+                - img [ref=e884]
+                - generic [ref=e886]: 1 bedroom
+              - generic [ref=e887]:
+                - img [ref=e888]
+                - generic [ref=e893]: Sleeps 2
+              - generic [ref=e894]:
+                - img [ref=e895]
+                - generic [ref=e898]: 2 Single Beds
+            - separator [ref=e899]
+            - generic [ref=e900]:
+              - generic [ref=e901]:
+                - generic [ref=e902]: Cancellation policy
+                - generic [ref=e903]: per person, per night
+              - generic [ref=e904]:
+                - generic [ref=e909] [cursor=pointer]: Non-refundable
+                - generic [ref=e910] [cursor=pointer]:
+                  - generic [ref=e913]: Free cancellation
+                  - generic [ref=e914]: + 25€
+            - separator [ref=e915]
+            - generic [ref=e916]:
+              - generic [ref=e917]:
+                - generic [ref=e918]: Extras
+                - generic [ref=e919]: per person, per night
+              - generic [ref=e920]:
+                - generic [ref=e925] [cursor=pointer]: Room only
+                - generic [ref=e926] [cursor=pointer]:
+                  - generic [ref=e929]: Breakfast
+                  - generic [ref=e930]: + 15€
+                - generic [ref=e931] [cursor=pointer]:
+                  - generic [ref=e934]: Half board
+                  - generic [ref=e935]: + 45€
+            - generic [ref=e936]:
+              - generic [ref=e937]: 106€ per person, per night
+              - generic [ref=e938]: "Total for 7 nights: 742€"
+              - button "Select" [ref=e939]
+        - generic [ref=e940]:
+          - generic [ref=e941]:
+            - img "Quadruple Room" [ref=e942]
+            - button [ref=e944]:
+              - img [ref=e945]
+            - button [ref=e947]:
+              - img [ref=e948]
+          - generic [ref=e950]:
+            - heading "Quadruple Room" [level=3] [ref=e951]
+            - generic [ref=e952]:
+              - generic [ref=e953]:
+                - img [ref=e954]
+                - generic [ref=e956]: 2 bedrooms
+              - generic [ref=e957]:
+                - img [ref=e958]
+                - generic [ref=e963]: Sleeps 4
+              - generic [ref=e964]:
+                - img [ref=e965]
+                - generic [ref=e968]: 2 Queen Beds
+            - separator [ref=e969]
+            - generic [ref=e970]:
+              - generic [ref=e971]:
+                - generic [ref=e972]: Cancellation policy
+                - generic [ref=e973]: per person, per night
+              - generic [ref=e974]:
+                - generic [ref=e979] [cursor=pointer]: Non-refundable
+                - generic [ref=e980] [cursor=pointer]:
+                  - generic [ref=e983]: Free cancellation
+                  - generic [ref=e984]: + 25€
+            - separator [ref=e985]
+            - generic [ref=e986]:
+              - generic [ref=e987]:
+                - generic [ref=e988]: Extras
+                - generic [ref=e989]: per person, per night
+              - generic [ref=e990]:
+                - generic [ref=e995] [cursor=pointer]: Room only
+                - generic [ref=e996] [cursor=pointer]:
+                  - generic [ref=e999]: Breakfast
+                  - generic [ref=e1000]: + 15€
+                - generic [ref=e1001] [cursor=pointer]:
+                  - generic [ref=e1004]: Half board
+                  - generic [ref=e1005]: + 45€
+            - generic [ref=e1006]:
+              - generic [ref=e1007]: 200€ per person, per night
+              - generic [ref=e1008]: "Total for 7 nights: 1400€"
+              - button "Select" [ref=e1009]
+        - generic [ref=e1010]:
+          - generic [ref=e1011]:
+            - img "Quadruple Room" [ref=e1012]
+            - button [ref=e1014]:
+              - img [ref=e1015]
+            - button [ref=e1017]:
+              - img [ref=e1018]
+          - generic [ref=e1020]:
+            - heading "Quadruple Room" [level=3] [ref=e1021]
+            - generic [ref=e1022]:
+              - generic [ref=e1023]:
+                - img [ref=e1024]
+                - generic [ref=e1026]: 2 bedrooms
+              - generic [ref=e1027]:
+                - img [ref=e1028]
+                - generic [ref=e1033]: Sleeps 4
+              - generic [ref=e1034]:
+                - img [ref=e1035]
+                - generic [ref=e1038]: 2 Queen Beds
+            - separator [ref=e1039]
+            - generic [ref=e1040]:
+              - generic [ref=e1041]:
+                - generic [ref=e1042]: Cancellation policy
+                - generic [ref=e1043]: per person, per night
+              - generic [ref=e1044]:
+                - generic [ref=e1049] [cursor=pointer]: Non-refundable
+                - generic [ref=e1050] [cursor=pointer]:
+                  - generic [ref=e1053]: Free cancellation
+                  - generic [ref=e1054]: + 25€
+            - separator [ref=e1055]
+            - generic [ref=e1056]:
+              - generic [ref=e1057]:
+                - generic [ref=e1058]: Extras
+                - generic [ref=e1059]: per person, per night
+              - generic [ref=e1060]:
+                - generic [ref=e1065] [cursor=pointer]: Room only
+                - generic [ref=e1066] [cursor=pointer]:
+                  - generic [ref=e1069]: Breakfast
+                  - generic [ref=e1070]: + 15€
+                - generic [ref=e1071] [cursor=pointer]:
+                  - generic [ref=e1074]: Half board
+                  - generic [ref=e1075]: + 45€
+            - generic [ref=e1076]:
+              - generic [ref=e1077]: 200€ per person, per night
+              - generic [ref=e1078]: "Total for 7 nights: 1400€"
+              - button "Select" [ref=e1079]
+    - generic [ref=e1080]:
+      - heading "Hotel information" [level=2] [ref=e1081]
+      - generic [ref=e1083]:
+        - generic [ref=e1084]:
+          - generic [ref=e1085]:
+            - img [ref=e1086]
+            - heading "About the hotel" [level=3] [ref=e1088]
+          - paragraph [ref=e1089]: Tropical gardens, rice-paddy views and Balinese hospitality — Green Paradise Resort captures exactly what makes Bali unforgettable.
+          - paragraph [ref=e1090]: Wake to birdsong, cool off in a private villa pool, and let the spa melt away every care. The hotel sits between Seminyak's buzzing restaurants and quiet temple roads.
+          - button "Read more about the hotel" [ref=e1091]
+          - heading "Highlights" [level=3] [ref=e1093]
+          - generic [ref=e1094]:
+            - generic [ref=e1095]:
+              - img [ref=e1096]
+              - generic [ref=e1098]: Pet friendly
+            - generic [ref=e1099]:
+              - img [ref=e1100]
+              - generic [ref=e1104]: Free Wifi
+            - generic [ref=e1105]:
+              - img [ref=e1106]
+              - generic [ref=e1110]: Indoor pool
+        - generic [ref=e1111]:
+          - heading "Location" [level=3] [ref=e1112]
+          - generic [ref=e1113]:
+            - generic [ref=e1114]:
+              - button [ref=e1115] [cursor=pointer]
+              - generic:
+                - generic [ref=e1117]:
+                  - button "Zoom in" [ref=e1118] [cursor=pointer]: +
+                  - button "Zoom out" [ref=e1119] [cursor=pointer]: −
+                - generic [ref=e1120]:
+                  - link "Leaflet" [ref=e1121] [cursor=pointer]:
+                    - /url: https://leafletjs.com
+                    - img [ref=e1122]
+                    - text: Leaflet
+                  - text: "| ©"
+                  - link "OpenStreetMap" [ref=e1126] [cursor=pointer]:
+                    - /url: https://www.openstreetmap.org/copyright
+                  - text: contributors
+            - button "Show on map" [ref=e1127]:
+              - img [ref=e1128]
+              - text: Show on map
+          - heading "Getting around" [level=3] [ref=e1132]
+          - generic [ref=e1133]:
+            - generic [ref=e1134]:
+              - img [ref=e1135]
+              - generic [ref=e1138]: Kuta Beach
+              - generic [ref=e1139]: · 10 min
+            - generic [ref=e1140]:
+              - img [ref=e1141]
+              - generic [ref=e1144]: Seminyak Square
+              - generic [ref=e1145]: · 5 min
+            - generic [ref=e1146]:
+              - img [ref=e1147]
+              - generic [ref=e1150]: Tanah Lot Temple
+              - generic [ref=e1151]: · 35 min
+            - generic [ref=e1152]:
+              - img [ref=e1153]
+              - generic [ref=e1156]: Ngurah Rai Airport
+              - generic [ref=e1157]: · 20 min
+    - generic [ref=e1158]:
+      - heading "Policies" [level=2] [ref=e1159]
+      - generic [ref=e1160]:
+        - generic [ref=e1161]:
+          - generic [ref=e1162]:
+            - generic [ref=e1163]:
+              - img [ref=e1165]
+              - generic [ref=e1168]: Check-in
+            - list [ref=e1169]:
+              - listitem [ref=e1170]: From 3:00 PM — anytime after
+              - listitem [ref=e1171]: "Minimum check-in age: 18"
+          - generic [ref=e1172]:
+            - generic [ref=e1173]:
+              - img [ref=e1175]
+              - generic [ref=e1178]: Check-out
+            - list [ref=e1179]:
+              - listitem [ref=e1180]: Before 12:00 PM (noon)
+          - generic [ref=e1181]:
+            - generic [ref=e1182]:
+              - img [ref=e1184]
+              - generic [ref=e1186]: Special check-in instructions
+            - list [ref=e1187]:
+              - listitem [ref=e1188]: Front desk staff will greet guests on arrival
+              - listitem [ref=e1189]: Information may be translated using automated tools
+          - generic [ref=e1190]:
+            - generic [ref=e1191]:
+              - img [ref=e1193]
+              - generic [ref=e1196]: Access methods
+            - list [ref=e1197]:
+              - listitem [ref=e1198]: Staffed front desk
+          - generic [ref=e1199]:
+            - generic [ref=e1200]:
+              - img [ref=e1202]
+              - generic [ref=e1206]: Pets
+            - list [ref=e1207]:
+              - listitem [ref=e1208]: Pets not allowed
+              - listitem [ref=e1209]: Service animals are welcome and exempt from fees
+          - generic [ref=e1210]:
+            - generic [ref=e1211]:
+              - img [ref=e1213]
+              - generic [ref=e1216]: Children & extra beds
+            - list [ref=e1217]:
+              - listitem [ref=e1218]: Children are welcome
+              - listitem [ref=e1219]: Rollaway/extra beds are not available
+              - listitem [ref=e1220]: Cribs (infant beds) are not available
+        - generic [ref=e1221]:
+          - generic [ref=e1222]:
+            - img [ref=e1223]
+            - generic [ref=e1225]: Accepted payment methods
+          - generic [ref=e1226]:
+            - generic [ref=e1227]: Visa
+            - generic [ref=e1228]: Mastercard
+            - generic [ref=e1229]: Diners Club
+            - generic [ref=e1230]: JCB
+            - generic [ref=e1231]: PayPal
+    - generic [ref=e1232]:
+      - heading "Guest Reviews" [level=2] [ref=e1233]
+      - generic [ref=e1234]:
+        - generic [ref=e1235]:
+          - generic [ref=e1236]:
+            - generic [ref=e1237]: "8.6"
+            - generic [ref=e1238]:
+              - generic [ref=e1239]: Very Good
+              - generic [ref=e1240]: 367 reviews
+          - button "See all verified reviews" [ref=e1241]
+        - generic [ref=e1242]:
+          - generic [ref=e1243]:
+            - generic [ref=e1244]:
+              - generic [ref=e1245]: 8/10 Good
+              - paragraph [ref=e1246]: The staff were friendly and helpful. Great location.
+              - button "See details" [ref=e1247]
+              - generic [ref=e1248]: Feb 22, 2026
+              - generic [ref=e1249]: Verified review
+            - generic [ref=e1250]:
+              - generic [ref=e1251]: 9/10 Excellent
+              - paragraph [ref=e1252]: Amazing pool and beautiful rooms. Highly recommend!
+              - button "See details" [ref=e1253]
+              - generic [ref=e1254]: Feb 12, 2026
+              - generic [ref=e1255]: Verified review
+            - generic [ref=e1256]:
+              - generic [ref=e1257]: 10/10 Perfect
+              - paragraph [ref=e1258]: Perfect in every way! Will definitely come back.
+              - button "See details" [ref=e1259]
+              - generic [ref=e1260]: Jan 26, 2026
+              - generic [ref=e1261]: Verified review
+            - generic [ref=e1262]:
+              - generic [ref=e1263]: 8/10 Good
+              - paragraph [ref=e1264]: Good size room. Nice breakfast.
+              - button "See details" [ref=e1265]
+              - generic [ref=e1266]: Jan 14, 2026
+              - generic [ref=e1267]: Verified review
+          - button "See all 367 reviews" [ref=e1268]

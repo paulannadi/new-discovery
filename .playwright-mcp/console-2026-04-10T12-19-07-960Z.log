@@ -1,0 +1,3 @@
+[     279ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=99bcc047:5
+[     852ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/favicon.ico:0
+[  153941ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=99bcc047:5

@@ -1,0 +1,208 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - img "Discover the world" [ref=e6]
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - generic [ref=e11]:
+            - generic [ref=e12]: AI Experience
+            - switch [ref=e13]
+          - generic [ref=e14]:
+            - heading "Explore the world's hidden gems" [level=1] [ref=e15]
+            - heading "You dream it. We'll plan it." [level=1]
+        - generic [ref=e16]:
+          - generic [ref=e19]:
+            - generic [ref=e21]:
+              - button "Holidays" [ref=e22]:
+                - img [ref=e24]
+                - generic [ref=e30]: Holidays
+              - button "Hotels" [active] [ref=e31]:
+                - img [ref=e33]
+                - generic [ref=e37]: Hotels
+              - button "Flights" [ref=e38]:
+                - img [ref=e40]
+                - generic [ref=e42]: Flights
+            - generic [ref=e457]:
+              - button "Destination Where are you going?" [ref=e459]:
+                - img [ref=e460]
+                - generic [ref=e463]:
+                  - generic [ref=e464]: Destination
+                  - generic [ref=e465]: Where are you going?
+                - img [ref=e466]
+              - button "Check-in – Check-out Apr 17 – Apr 24, 2026" [ref=e469]:
+                - img [ref=e470]
+                - generic [ref=e472]:
+                  - generic [ref=e473]: Check-in – Check-out
+                  - generic [ref=e474]: Apr 17 – Apr 24, 2026
+                - img [ref=e475]
+              - button "Travellers 2 Guests, 1 Room" [ref=e478]:
+                - img [ref=e479]
+                - generic [ref=e484]:
+                  - generic [ref=e485]: Travellers
+                  - generic [ref=e486]: 2 Guests, 1 Room
+                - img [ref=e487]
+              - button "Search Hotels" [ref=e489]:
+                - img [ref=e490]
+                - text: Search Hotels
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - textbox "Describe your ideal trip — destination, dates, budget, travel style…"
+                - generic:
+                  - button "Attach files":
+                    - img
+                    - generic: Attach files
+                  - button "Plan my trip":
+                    - img
+                    - text: Plan my trip
+            - generic:
+              - generic: "Try asking:"
+              - generic:
+                - button "Find me a beach resort in Bali for next month"
+                - button "Plan a 5-day family trip to Paris"
+                - button "Weekend getaway in the Alps under €500"
+                - button "Luxury honeymoon in the Maldives"
+    - generic [ref=e97]:
+      - generic [ref=e494]:
+        - generic [ref=e495]:
+          - generic [ref=e496]:
+            - img [ref=e497]
+            - heading "Our favourite picks" [level=2] [ref=e499]
+          - paragraph [ref=e500]: Average prices based on current calendar month
+        - generic [ref=e501]:
+          - generic [ref=e502] [cursor=pointer]:
+            - img "Green Paradise Resort" [ref=e503]
+            - generic [ref=e504]:
+              - generic [ref=e505]:
+                - generic [ref=e506]:
+                  - generic [ref=e507]: Green Paradise Resort
+                  - generic [ref=e508]:
+                    - img [ref=e509]
+                    - img [ref=e511]
+                    - img [ref=e513]
+                    - img [ref=e515]
+                    - img [ref=e517]
+                - generic [ref=e519]:
+                  - generic [ref=e520]: "8.6"
+                  - generic [ref=e521]:
+                    - generic [ref=e522]: Very Good
+                    - generic [ref=e523]: 367 reviews
+              - generic [ref=e524]:
+                - img [ref=e525]
+                - text: Bali, Indonesia
+              - generic [ref=e528]:
+                - generic [ref=e529]:
+                  - img [ref=e530]
+                  - text: Pet friendly
+                - generic [ref=e535]:
+                  - img [ref=e536]
+                  - text: Free Wifi
+                - generic [ref=e540]:
+                  - img [ref=e541]
+                  - text: Indoor pool
+              - generic [ref=e545]:
+                - generic [ref=e546]: Per person, per night
+                - generic [ref=e547]: from $125
+          - generic [ref=e548] [cursor=pointer]:
+            - img "Santorini Blue Palace" [ref=e549]
+            - generic [ref=e550]:
+              - generic [ref=e551]:
+                - generic [ref=e552]:
+                  - generic [ref=e553]: Santorini Blue Palace
+                  - generic [ref=e554]:
+                    - img [ref=e555]
+                    - img [ref=e557]
+                    - img [ref=e559]
+                    - img [ref=e561]
+                    - img [ref=e563]
+                - generic [ref=e565]:
+                  - generic [ref=e566]: "9.6"
+                  - generic [ref=e567]:
+                    - generic [ref=e568]: Excellent
+                    - generic [ref=e569]: 892 reviews
+              - generic [ref=e570]:
+                - img [ref=e571]
+                - text: Santorini, Greece
+              - generic [ref=e574]:
+                - generic [ref=e575]:
+                  - img [ref=e576]
+                  - text: Infinity pool
+                - generic [ref=e580]:
+                  - img [ref=e581]
+                  - text: Sea view
+                - generic [ref=e584]:
+                  - img [ref=e585]
+                  - text: Breakfast
+              - generic [ref=e587]:
+                - generic [ref=e588]: Per person, per night
+                - generic [ref=e589]: from $285
+          - generic [ref=e590] [cursor=pointer]:
+            - img "Bangkok Riverside Hotel" [ref=e591]
+            - generic [ref=e592]:
+              - generic [ref=e593]:
+                - generic [ref=e594]:
+                  - generic [ref=e595]: Bangkok Riverside Hotel
+                  - generic [ref=e596]:
+                    - img [ref=e597]
+                    - img [ref=e599]
+                    - img [ref=e601]
+                    - img [ref=e603]
+                    - img [ref=e605]
+                - generic [ref=e607]:
+                  - generic [ref=e608]: "8.2"
+                  - generic [ref=e609]:
+                    - generic [ref=e610]: Very Good
+                    - generic [ref=e611]: 1,204 reviews
+              - generic [ref=e612]:
+                - img [ref=e613]
+                - text: Bangkok, Thailand
+              - generic [ref=e616]:
+                - generic [ref=e617]:
+                  - img [ref=e618]
+                  - text: Gym
+                - generic [ref=e624]:
+                  - img [ref=e625]
+                  - text: Free Wifi
+                - generic [ref=e629]:
+                  - img [ref=e630]
+                  - text: City view
+              - generic [ref=e633]:
+                - generic [ref=e634]: Per person, per night
+                - generic [ref=e635]: from $95
+          - generic [ref=e636] [cursor=pointer]:
+            - img "Marrakech Medina Riad" [ref=e637]
+            - generic [ref=e638]:
+              - generic [ref=e639]:
+                - generic [ref=e640]:
+                  - generic [ref=e641]: Marrakech Medina Riad
+                  - generic [ref=e642]:
+                    - img [ref=e643]
+                    - img [ref=e645]
+                    - img [ref=e647]
+                    - img [ref=e649]
+                    - img [ref=e651]
+                - generic [ref=e653]:
+                  - generic [ref=e654]: "9.2"
+                  - generic [ref=e655]:
+                    - generic [ref=e656]: Excellent
+                    - generic [ref=e657]: 543 reviews
+              - generic [ref=e658]:
+                - img [ref=e659]
+                - text: Marrakech, Morocco
+              - generic [ref=e662]:
+                - generic [ref=e663]:
+                  - img [ref=e664]
+                  - text: Hammam
+                - generic [ref=e666]:
+                  - img [ref=e667]
+                  - text: Rooftop terrace
+                - generic [ref=e671]:
+                  - img [ref=e672]
+                  - text: Breakfast
+              - generic [ref=e674]:
+                - generic [ref=e675]: Per person, per night
+                - generic [ref=e676]: from $180
+        - button "View all hotels (148)" [ref=e678]
+      - paragraph [ref=e456]: © 2026 Nezasa · TripBuilder · Over 500,000 hotels worldwide

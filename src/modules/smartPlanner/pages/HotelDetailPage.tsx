@@ -19,12 +19,23 @@ import {
   Check,
   CalendarDays,
   Search,
-  ArrowRight
+  ArrowRight,
+  Info,
+  MapPinned,
 } from "lucide-react";
+import { Button } from "../../../shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../../../shared/components/ui/dialog";
+import LeafletMap from "../../../shared/components/LeafletMap";
 import { DayPicker } from "react-day-picker";
 import { format, parseISO, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { showToast } from "../../../shared/utils/toast";
+import { hotelDescription, nearbyPOIs, locationCoords } from "../../../shared/utils/hotelUtils";
 import PoliciesSection from "../components/PoliciesSection";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../../../shared/components/ui/tooltip";
 
@@ -189,12 +200,65 @@ const generateRoomsForHotel = (hotel: Hotel, basePrice: number): Room[] => {
   return rooms.sort((a, b) => a.basePrice - b.basePrice);
 };
 
+// Comprehensive amenities shown in the "See all" modal, grouped by category.
+// These are static mock amenities typical of a full-service hotel.
+const HOTEL_AMENITY_GROUPS = [
+  {
+    label: "Pool & Beach",
+    items: ["Outdoor pool", "Indoor pool", "Heated pool", "Pool bar", "Private beach access", "Beach towels", "Water sports"],
+  },
+  {
+    label: "Food & Drink",
+    items: ["On-site restaurant", "Breakfast included", "Room service (24hr)", "Bar & lounge", "Poolside bar", "Coffee shop", "Minibar"],
+  },
+  {
+    label: "Wellness & Fitness",
+    items: ["Full-service spa", "Gym / Fitness centre", "Sauna", "Steam room", "Yoga classes", "Massage treatments"],
+  },
+  {
+    label: "Room",
+    items: ["Air conditioning", "Flat-screen TV", "Free WiFi", "In-room safe", "Blackout curtains", "Coffee machine", "Bathtub", "Walk-in shower"],
+  },
+  {
+    label: "Services",
+    items: ["24-hr front desk", "Concierge", "Luggage storage", "Laundry service", "Dry cleaning", "Airport shuttle", "Car rental", "Tour desk"],
+  },
+  {
+    label: "Family",
+    items: ["Kids' club", "Babysitting", "Children's pool", "Family rooms", "Playground", "High chairs available"],
+  },
+  {
+    label: "Accessibility",
+    items: ["Wheelchair accessible", "Elevator / lift", "Accessible bathroom", "Accessible parking"],
+  },
+  {
+    label: "Parking & Transport",
+    items: ["Free parking", "Valet parking", "Electric vehicle charging", "Bicycle rental"],
+  },
+  {
+    label: "Other",
+    items: ["Pet friendly", "Non-smoking rooms", "Rooftop terrace", "Business centre", "Meeting rooms", "Gift shop", "ATM on-site"],
+  },
+];
+
 const HOTEL_MOCK_REVIEWS = [
   { score: "8/10", label: "Good",      text: "The staff were friendly and helpful. Great location.",                             date: "Feb 22, 2026" },
   { score: "9/10", label: "Excellent", text: "Amazing pool and beautiful rooms. Highly recommend!",                              date: "Feb 12, 2026" },
   { score: "10/10", label: "Perfect",  text: "Perfect in every way! Will definitely come back.",                                 date: "Jan 26, 2026" },
   { score: "8/10", label: "Good",      text: "Good size room. Nice breakfast.",                                                  date: "Jan 14, 2026" },
 ];
+
+// --- Utility Functions ---
+
+// Converts a hotel rating (0–10) to a label like "Excellent"
+function ratingLabel(score: number): string {
+  if (score >= 9) return "Exceptional";
+  if (score >= 8.5) return "Outstanding";
+  if (score >= 8) return "Excellent";
+  if (score >= 7.5) return "Very good";
+  return "Good";
+}
+
 
 // --- Components ---
 
@@ -447,6 +511,24 @@ export default function HotelDetailPage({
   // Controls the "All reviews" modal
   const [reviewsOpen, setReviewsOpen] = useState(false);
 
+  // Controls the "All photos" modal
+  const [photosOpen, setPhotosOpen] = useState(false);
+
+  // Controls the "Read more about the hotel" description modal
+  const [descriptionOpen, setDescriptionOpen] = useState(false);
+
+  // Controls the "See all amenities" modal
+  const [amenitiesOpen, setAmenitiesOpen] = useState(false);
+
+  // Controls the "Show on map" modal
+  const [showMapModal, setShowMapModal] = useState(false);
+
+  // Hotel description text and nearby POIs — derived from the hotel's location
+  // useMemo means these only recalculate when the hotel changes, not on every render
+  const desc = useMemo(() => hotelDescription(hotel.name, hotel.location), [hotel.name, hotel.location]);
+  const pois = useMemo(() => nearbyPOIs(hotel.location), [hotel.location]);
+  const coords = useMemo(() => locationCoords(hotel.location), [hotel.location]);
+
   // Tracks which panel popup is open — "checkIn", "checkOut", "guests", or null (closed)
   const [openSearchPanel, setOpenSearchPanel] = useState<"checkIn" | "checkOut" | "guests" | null>(null);
 
@@ -557,10 +639,15 @@ export default function HotelDetailPage({
               info row padding below — matches PackageDetailPage exactly.
               Grid switches to [3fr_2fr] at md breakpoint (same as reference).
           ─────────────────────────────────────────────────────────────────── */}
-          <div className="relative mx-4 sm:mx-6 md:mx-10 mb-2">
+          {/* The `relative` wrapper lets us absolutely-position the "See all photos"
+              button in the bottom-right corner, exactly like PackageDetailPage does. */}
+          <div className="relative mx-4 sm:mx-6 md:mx-10">
             <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[280px] md:h-[402px] gap-2">
-              {/* Left: Main hero image */}
-              <div className="relative overflow-hidden rounded-xl group">
+              {/* Left: Main hero image — clicking it also opens the photos modal */}
+              <div
+                className="relative overflow-hidden rounded-xl group cursor-pointer"
+                onClick={() => setPhotosOpen(true)}
+              >
                 <img
                   src={hotel.image}
                   className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
@@ -569,39 +656,63 @@ export default function HotelDetailPage({
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-transparent pointer-events-none" />
               </div>
 
-              {/* Right: 2×2 thumbnail grid — hidden on mobile, visible on md+ */}
+              {/* Right: 2×2 thumbnail grid — 4 hotel photos, no map here.
+                  Each thumbnail is also clickable to open the photos modal. */}
               <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-2">
-                <div className="overflow-hidden rounded-xl">
+                <div
+                  className="overflow-hidden rounded-xl cursor-pointer group"
+                  onClick={() => setPhotosOpen(true)}
+                >
                   <img
                     src="https://images.unsplash.com/photo-1763207291832-819499e261dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJlc3RhdXJhbnQlMjBicmVha2Zhc3QlMjBidWZmZXR8ZW58MXx8fHwxNzY5NzgxMzM2fDA&ixlib=rb-4.1.0&q=80&w=1080"
-                    className="w-full h-full object-cover"
-                    alt="Interior"
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                    alt="Breakfast"
                   />
                 </div>
-                <div className="overflow-hidden rounded-xl">
+                <div
+                  className="overflow-hidden rounded-xl cursor-pointer group"
+                  onClick={() => setPhotosOpen(true)}
+                >
                   <img
                     src="https://images.unsplash.com/photo-1729605411476-defbdab14c54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMGJhbGklMjBwb29sJTIwaW5maW5pdHl8ZW58MXx8fHwxNzY5NzgxMzM2fDA&ixlib=rb-4.1.0&q=80&w=1080"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
                     alt="Pool"
                   />
                 </div>
-                {/* Map thumbnail */}
-                <div className="overflow-hidden rounded-xl relative border border-border">
+                {/* Slot 3 — room interior (was map, now a real hotel photo) */}
+                <div
+                  className="overflow-hidden rounded-xl cursor-pointer group"
+                  onClick={() => setPhotosOpen(true)}
+                >
                   <img
-                    src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.1.0&auto=format&fit=crop&w=600&q=80"
-                    className="w-full h-full object-cover"
-                    alt="Map"
+                    src={ROOM_IMAGES[0]}
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                    alt="Room"
                   />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white p-2 rounded-full shadow-lg">
-                      <MapPin size={22} className="text-primary" />
-                    </div>
-                  </div>
                 </div>
-                {/* 4th slot — empty filler to complete the 2×2 grid */}
-                <div className="overflow-hidden rounded-xl bg-grey-light" />
+                {/* Slot 4 — another hotel photo (was an empty grey filler) */}
+                <div
+                  className="overflow-hidden rounded-xl cursor-pointer group"
+                  onClick={() => setPhotosOpen(true)}
+                >
+                  <img
+                    src={ROOM_IMAGES[1]}
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                    alt="Lounge"
+                  />
+                </div>
               </div>
             </div>
+
+            {/* "See all photos" button — overlaid at the bottom-right of the grid.
+                Uses the secondary Button variant matching PackageDetailPage's pattern. */}
+            <Button
+              variant="secondary"
+              onClick={() => setPhotosOpen(true)}
+              className="absolute bottom-4 right-4"
+            >
+              ⊞ See all photos
+            </Button>
           </div>
 
           {/* ── HOTEL INFO + ACTION ROW ───────────────────────────────────────
@@ -615,8 +726,17 @@ export default function HotelDetailPage({
             {/* LEFT: Hotel identity */}
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                {/* Rating badge row */}
-                <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
+                {/* Rating badge row — RatingBlock on the left, "X reviews" link on the right.
+                    Clicking the link opens the full reviews modal (same pattern as PackageDetailPage). */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
+                  <button
+                    onClick={() => setReviewsOpen(true)}
+                    className="text-sm text-foreground underline hover:no-underline"
+                  >
+                    {hotel.reviewCount.toLocaleString()} reviews
+                  </button>
+                </div>
 
                 {/* Hotel name + stars */}
                 <div className="flex items-start gap-2 flex-wrap">
@@ -630,30 +750,42 @@ export default function HotelDetailPage({
                 </div>
               </div>
 
-              {/* Address */}
-              <div className="flex items-center gap-1.5 text-foreground flex-wrap">
-                <MapPin size={15} className="shrink-0" aria-hidden="true" />
-                <span className="text-base">{hotel.location}</span>
+              {/* Address + "Show on map" link — same row, same pattern as PackageDetailPage */}
+              <div className="flex items-center gap-4 text-foreground flex-wrap">
+                <div className="flex items-center gap-1.5">
+                  <MapPin size={15} className="shrink-0" aria-hidden="true" />
+                  <span className="text-base">{hotel.location}</span>
+                </div>
+                <button
+                  onClick={() => setShowMapModal(true)}
+                  className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                >
+                  <MapPinned size={14} aria-hidden="true" />
+                  Show on map
+                </button>
               </div>
 
               {/* Amenities heading */}
               <h3 className="text-lg font-bold text-foreground">Hotel amenities and facilities</h3>
 
-              {/* Amenities list */}
-              <div className="flex flex-row flex-wrap gap-x-6 gap-y-2">
+              {/* Amenities list — 16px text, always followed by a "See all" link */}
+              <div className="flex flex-row flex-wrap gap-x-6 gap-y-2 items-center">
                 {hotel.amenities.slice(0, 4).map((amenity, i) => (
                   <div key={i} className="flex items-center gap-1.5">
-                    {amenity === "Pet friendly" && <Dog size={15} className="text-foreground" aria-hidden="true" />}
-                    {amenity === "Free Wifi" && <Wifi size={15} className="text-foreground" aria-hidden="true" />}
-                    {amenity === "Indoor pool" && <Waves size={15} className="text-foreground" aria-hidden="true" />}
-                    {amenity === "Gym" && <Dumbbell size={15} className="text-foreground" aria-hidden="true" />}
-                    {["Pet friendly", "Free Wifi", "Indoor pool", "Gym"].indexOf(amenity) === -1 && <Check size={15} className="text-foreground" aria-hidden="true" />}
-                    <span className="text-sm text-foreground font-medium">{amenity}</span>
+                    {amenity === "Pet friendly" && <Dog size={16} className="text-foreground" aria-hidden="true" />}
+                    {amenity === "Free Wifi" && <Wifi size={16} className="text-foreground" aria-hidden="true" />}
+                    {amenity === "Indoor pool" && <Waves size={16} className="text-foreground" aria-hidden="true" />}
+                    {amenity === "Gym" && <Dumbbell size={16} className="text-foreground" aria-hidden="true" />}
+                    {["Pet friendly", "Free Wifi", "Indoor pool", "Gym"].indexOf(amenity) === -1 && <Check size={16} className="text-foreground" aria-hidden="true" />}
+                    <span className="text-base text-foreground font-medium">{amenity}</span>
                   </div>
                 ))}
-                {hotel.amenities.length > 4 && (
-                  <button className="text-primary font-bold text-sm">See all</button>
-                )}
+                <button
+                  onClick={() => setAmenitiesOpen(true)}
+                  className="text-primary font-bold text-base hover:underline"
+                >
+                  See all
+                </button>
               </div>
             </div>
 
@@ -1042,9 +1174,113 @@ export default function HotelDetailPage({
           )}
       </div>
 
-      {/* Hotel Policies Section */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
+      {/* ── HOTEL INFORMATION SECTION ──────────────────────────────────────────
+          Two-column layout adapted from PackageDetailPage:
+          LEFT  — "About the hotel" description + highlight pills
+          RIGHT — Location map image + "Getting around" POI pills
+          This section sits above Policies, which is the operational info block.
+      ─────────────────────────────────────────────────────────────────────── */}
+      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 pt-8 pb-2 flex flex-col gap-4">
         <h2 className="text-2xl font-bold text-foreground">Hotel information</h2>
+
+        {/* One big card wrapping both columns — same outer treatment as PoliciesSection */}
+        <div className="bg-card rounded-xl shadow-sm p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+
+          {/* ── LEFT: About tile + Highlights ────────────────────────────────── */}
+          <div className="flex flex-col gap-4">
+
+            {/* About the hotel — styled exactly like a policy card (same border, padding,
+                radius) and fixed to h-[200px] to match the map height on the right.
+                Text overflows hidden; "Read more" at the bottom opens the full modal. */}
+            <div className="flex flex-col gap-2 p-4 rounded-xl bg-card border border-border h-[200px] overflow-hidden">
+              <div className="flex items-center gap-2 text-foreground">
+                <Info size={18} className="shrink-0" aria-hidden="true" />
+                <span className="font-bold text-sm">About the hotel</span>
+              </div>
+              <p className="text-sm text-foreground leading-normal flex-1 overflow-hidden">
+                {desc.short} {desc.long}
+              </p>
+              <button
+                onClick={() => setDescriptionOpen(true)}
+                className="text-xs font-semibold text-primary hover:underline self-start shrink-0"
+              >
+                Read more about the hotel
+              </button>
+            </div>
+
+            {/* Highlights — amenity pills, no divider needed */}
+            <div>
+              <h3 className="text-sm font-bold text-foreground mb-3">Highlights</h3>
+              <div className="flex flex-wrap gap-2">
+                {(hotel.amenities.length > 0
+                  ? hotel.amenities.slice(0, 6)
+                  : ["Beachfront", "Outdoor pool", "Spa", "All-day dining", "Free WiFi", "Kids club"]
+                ).map((amenity) => (
+                  <div
+                    key={amenity}
+                    className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3.5 py-2"
+                  >
+                    {amenity === "Free Wifi" || amenity === "Free WiFi"
+                      ? <Wifi size={14} className="text-primary shrink-0" aria-hidden="true" />
+                      : amenity === "Indoor pool" || amenity === "Outdoor pool" || amenity === "Beachfront"
+                      ? <Waves size={14} className="text-primary shrink-0" aria-hidden="true" />
+                      : amenity === "Gym"
+                      ? <Dumbbell size={14} className="text-primary shrink-0" aria-hidden="true" />
+                      : <Check size={14} className="text-primary shrink-0" aria-hidden="true" />
+                    }
+                    <span className="text-sm text-foreground font-medium">{amenity}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ── RIGHT: Map + Getting around ──────────────────────────────────── */}
+          <div className="flex flex-col gap-4">
+
+            {/* Interactive map — h-[200px] matches the About tile height on the left */}
+            <div className="rounded-xl overflow-hidden h-[200px] relative border border-border">
+              <LeafletMap
+                center={coords}
+                zoom={13}
+                markers={[{ id: hotel.id, lat: coords[0], lng: coords[1], label: hotel.name }]}
+                className="w-full h-full"
+              />
+              <button
+                onClick={() => setShowMapModal(true)}
+                className="absolute top-2 right-2 z-[400] bg-card/95 backdrop-blur-sm rounded-md px-2.5 py-1.5 text-xs font-semibold text-primary flex items-center gap-1.5 shadow-sm hover:bg-card transition-colors"
+              >
+                <MapPinned size={12} aria-hidden="true" />
+                Show on map
+              </button>
+            </div>
+
+            {/* Getting around — no divider needed */}
+            <div>
+              <h3 className="text-sm font-bold text-foreground mb-3">Getting around</h3>
+              <div className="flex flex-wrap gap-2">
+                {pois.map((poi) => (
+                  <span
+                    key={poi.label}
+                    className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3.5 py-2 text-sm"
+                  >
+                    <MapPin size={12} className="text-primary shrink-0" aria-hidden="true" />
+                    <span className="font-medium text-foreground">{poi.label}</span>
+                    <span className="text-grey">· {poi.distance}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+        </div>
+        </div>
+      </div>
+
+      {/* Hotel Policies Section — renamed from "Hotel information" to "Policies" */}
+      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
+        <h2 className="text-2xl font-bold text-foreground">Policies</h2>
 
         <PoliciesSection />
       </div>
@@ -1088,7 +1324,11 @@ export default function HotelDetailPage({
               ))}
             </div>
 
-            <button className="text-base font-bold text-primary hover:underline text-left">
+            {/* Same modal as the link next to the score — consistent entry point */}
+            <button
+              onClick={() => setReviewsOpen(true)}
+              className="text-base font-bold text-primary hover:underline text-left"
+            >
               See all {hotel.reviewCount.toLocaleString()} reviews
             </button>
           </div>
@@ -1231,6 +1471,147 @@ export default function HotelDetailPage({
           </div>
         </div>
       )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          MODALS
+      ══════════════════════════════════════════════════════════════════════ */}
+
+      {/* All amenities modal — grouped by category */}
+      <Dialog open={amenitiesOpen} onOpenChange={setAmenitiesOpen}>
+        <DialogContent className="max-w-[640px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Hotel amenities and facilities</DialogTitle>
+          </DialogHeader>
+          <div className="mt-2 flex flex-col gap-6">
+            {HOTEL_AMENITY_GROUPS.map((group) => (
+              <div key={group.label}>
+                <div className="text-xs font-bold uppercase tracking-wider text-grey mb-3">
+                  {group.label}
+                </div>
+                <div className="grid grid-cols-2 gap-y-2 gap-x-4">
+                  {group.items.map((item) => (
+                    <div key={item} className="flex items-center gap-2 text-sm text-foreground">
+                      <Check size={14} className="text-primary shrink-0" aria-hidden="true" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* About the hotel modal — full description text */}
+      <Dialog open={descriptionOpen} onOpenChange={setDescriptionOpen}>
+        <DialogContent className="max-w-[640px]">
+          <DialogHeader>
+            <DialogTitle>About {hotel.name}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 mt-2 text-base text-foreground leading-normal">
+            <p>{desc.short} {desc.long}</p>
+            <p>
+              {hotel.name} is a {hotel.stars}-star property in {hotel.location}, with a guest rating of{" "}
+              {hotel.rating.toFixed(1)}/10 based on {hotel.reviewCount.toLocaleString()} reviews.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Show on map modal — interactive LeafletMap centred on the hotel's coordinates */}
+      <Dialog open={showMapModal} onOpenChange={setShowMapModal}>
+        <DialogContent className="max-w-[800px] p-0 overflow-hidden">
+          <DialogHeader className="px-5 pt-5 pb-3">
+            <DialogTitle className="flex items-center gap-2">
+              <MapPin size={16} className="text-primary shrink-0" aria-hidden="true" />
+              {hotel.name} — {hotel.location}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="h-[480px]">
+            <LeafletMap
+              center={coords}
+              zoom={13}
+              markers={[{ id: hotel.id, lat: coords[0], lng: coords[1], label: hotel.name }]}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* All photos modal — shows the main hotel image + ROOM_IMAGES gallery.
+          Same two-column mosaic layout as PackageDetailPage. */}
+      <Dialog open={photosOpen} onOpenChange={setPhotosOpen}>
+        <DialogContent className="max-w-[1040px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{hotel.name} — All photos</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            {/* Full-width hero at the top */}
+            <div className="col-span-2">
+              <img
+                src={hotel.image}
+                alt={hotel.name}
+                className="w-full aspect-[16/7] object-cover rounded-xl"
+              />
+            </div>
+            {/* Room photos fill the remaining grid cells */}
+            {ROOM_IMAGES.map((url, i) => (
+              <img
+                key={url}
+                src={url}
+                alt={`Hotel photo ${i + 2}`}
+                className="w-full aspect-[4/3] object-cover rounded-xl"
+              />
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* All reviews modal — score summary + grid of review cards.
+          Same layout as PackageDetailPage's reviews modal. */}
+      <Dialog open={reviewsOpen} onOpenChange={setReviewsOpen}>
+        <DialogContent className="max-w-[880px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Guest reviews</DialogTitle>
+          </DialogHeader>
+          <div className="mt-2">
+            {/* Score summary row at the top */}
+            <div className="flex items-center gap-5 pb-5 border-b border-border mb-5">
+              <div className="text-5xl font-bold text-foreground leading-none">
+                {hotel.rating.toFixed(1)}
+              </div>
+              <div>
+                <div className="text-xl font-bold text-foreground">
+                  {ratingLabel(hotel.rating)}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  Based on {hotel.reviewCount.toLocaleString()} verified reviews
+                </div>
+              </div>
+            </div>
+            {/* Review cards in a 2-column grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {HOTEL_MOCK_REVIEWS.map((review, i) => (
+                <div
+                  key={i}
+                  className="border border-border rounded-lg p-4 flex flex-col gap-3"
+                >
+                  <div className="text-sm font-bold text-foreground">
+                    {review.score} {review.label}
+                  </div>
+                  <p className="text-sm text-foreground leading-normal flex-1">
+                    {review.text}
+                  </p>
+                  <div className="flex items-center justify-between pt-1 border-t border-border">
+                    <span className="text-xs text-foreground">{review.date}</span>
+                    <span className="text-xs text-muted-foreground">Verified review</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
