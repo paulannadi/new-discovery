@@ -118,6 +118,44 @@ const TOUR_CARDS = [
 // Tours by destination (Section 2)
 const DESTINATION_FILTERS = ["Thailand", "Indonesia", "Peru", "Japan", "Morocco"];
 
+// The maximum number of destination tabs the user can have active at once
+const MAX_DESTINATIONS = 5;
+
+// Full list of destinations available to choose from in the "More destinations" modal.
+// Each entry has the country name and a flag emoji (rendered natively in the browser).
+const ALL_DESTINATIONS = [
+  { name: "Thailand",     flag: "🇹🇭" },
+  { name: "Indonesia",    flag: "🇮🇩" },
+  { name: "Peru",         flag: "🇵🇪" },
+  { name: "Japan",        flag: "🇯🇵" },
+  { name: "Morocco",      flag: "🇲🇦" },
+  { name: "Greece",       flag: "🇬🇷" },
+  { name: "Maldives",     flag: "🇲🇻" },
+  { name: "Mexico",       flag: "🇲🇽" },
+  { name: "UAE",          flag: "🇦🇪" },
+  { name: "Italy",        flag: "🇮🇹" },
+  { name: "Spain",        flag: "🇪🇸" },
+  { name: "Portugal",     flag: "🇵🇹" },
+  { name: "France",       flag: "🇫🇷" },
+  { name: "Vietnam",      flag: "🇻🇳" },
+  { name: "India",        flag: "🇮🇳" },
+  { name: "Sri Lanka",    flag: "🇱🇰" },
+  { name: "Tanzania",     flag: "🇹🇿" },
+  { name: "Kenya",        flag: "🇰🇪" },
+  { name: "Colombia",     flag: "🇨🇴" },
+  { name: "Brazil",       flag: "🇧🇷" },
+  { name: "Australia",    flag: "🇦🇺" },
+  { name: "New Zealand",  flag: "🇳🇿" },
+  { name: "Iceland",      flag: "🇮🇸" },
+  { name: "Norway",       flag: "🇳🇴" },
+  { name: "Croatia",      flag: "🇭🇷" },
+  { name: "Turkey",       flag: "🇹🇷" },
+  { name: "Egypt",        flag: "🇪🇬" },
+  { name: "South Africa", flag: "🇿🇦" },
+  { name: "Jordan",       flag: "🇯🇴" },
+  { name: "Cambodia",     flag: "🇰🇭" },
+];
+
 // Three sample cards per destination — same local images reused with different metadata
 const TOURS_BY_COUNTRY: Record<string, typeof TOUR_CARDS> = {
   Thailand: [
@@ -341,6 +379,45 @@ export default function DiscoveryPage({
   }, [aiExperienceMode]);
   const [activeTourStyle, setActiveTourStyle] = useState("Culture & history");
   const [activeCountry, setActiveCountry] = useState("Thailand");
+
+  // Destination picker modal state.
+  // `selectedDestinations` is the live list shown in the tabs (starts as the default 5).
+  // `draftDestinations` holds the in-progress selection while the modal is open —
+  // only committed to `selectedDestinations` when the user clicks "Apply".
+  const [destinationModalOpen, setDestinationModalOpen] = useState(false);
+  const [selectedDestinations, setSelectedDestinations] = useState<string[]>([...DESTINATION_FILTERS]);
+  const [draftDestinations, setDraftDestinations] = useState<string[]>([...DESTINATION_FILTERS]);
+
+  // Toggle a destination inside the modal. Rules:
+  // - If already selected → deselect it (always allowed, as long as ≥1 stays selected)
+  // - If not selected → only add it if we haven't hit the MAX_DESTINATIONS limit yet
+  const toggleDraftDestination = (name: string) => {
+    setDraftDestinations((prev) => {
+      if (prev.includes(name)) {
+        // Keep at least 1 destination selected at all times
+        return prev.length > 1 ? prev.filter((d) => d !== name) : prev;
+      }
+      // Don't go beyond the maximum allowed
+      if (prev.length >= MAX_DESTINATIONS) return prev;
+      return [...prev, name];
+    });
+  };
+
+  // Open the modal — copy current selections into the draft so edits are non-destructive
+  const openDestinationModal = () => {
+    setDraftDestinations([...selectedDestinations]);
+    setDestinationModalOpen(true);
+  };
+
+  // Apply the draft and close — also reset activeCountry if it was removed
+  const applyDestinations = () => {
+    setSelectedDestinations(draftDestinations);
+    if (!draftDestinations.includes(activeCountry)) {
+      setActiveCountry(draftDestinations[0]);
+    }
+    setDestinationModalOpen(false);
+  };
+
   // Trip type tab for the "Browse by trip type" showcase on the Holidays landing
   const [activeTripType, setActiveTripType] = useState<TripTypeId>("hotel-flight");
 
@@ -1776,7 +1853,8 @@ export default function DiscoveryPage({
             </div>
 
             <div ref={countryTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] md:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto">
-              {DESTINATION_FILTERS.map((country) => (
+              {/* Render only the user's selected destinations as tabs */}
+              {selectedDestinations.map((country) => (
                 <button
                   key={country}
                   ref={(el) => { countryTabRefs.current[country] = el; }}
@@ -1790,7 +1868,11 @@ export default function DiscoveryPage({
                   {country}
                 </button>
               ))}
-              <button className="shrink-0 ml-auto px-5 py-3 text-base font-bold text-primary flex items-center gap-1.5">
+              {/* "More destinations" opens the picker modal */}
+              <button
+                onClick={openDestinationModal}
+                className="shrink-0 ml-auto px-5 py-3 text-base font-bold text-primary flex items-center gap-1.5"
+              >
                 More destinations
                 <ChevronDown size={16} />
               </button>
@@ -1965,27 +2047,6 @@ export default function DiscoveryPage({
 
           </section>
 
-          <hr className="border-border mx-4 md:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
-
-          {/* ── Section 5: Why book with us ───────────────────────────────── */}
-          <section className="py-10 md:py-16">
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))]">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                {[
-                  { icon: <Sun size={22} className="text-primary" />, title: "Buy together & save", desc: "Bundle your flights and hotel for the best combined price." },
-                  { icon: <Heart size={22} className="text-primary" />, title: "Tailor your holiday", desc: "Mix and match hotels, room types, and board options." },
-                  { icon: <Plane size={22} className="text-primary" />, title: "Flexible dates", desc: "See prices across different dates to find the best deal." },
-                  { icon: <Users size={22} className="text-primary" />, title: "24 / 7 support", desc: "Our travel experts are here before, during, and after your trip." },
-                ].map(({ icon, title, desc }) => (
-                  <div key={title} className="flex flex-col gap-2">
-                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">{icon}</div>
-                    <div className="text-sm font-bold text-foreground">{title}</div>
-                    <div className="text-xs text-muted-foreground leading-relaxed">{desc}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
 
         </>
       )}
@@ -1997,6 +2058,101 @@ export default function DiscoveryPage({
         </p>
       </div>
       </motion.div>{/* end below-hero content */}
+
+      {/* ── Destination Picker Modal ── */}
+      {/* We render a custom modal here rather than using shadcn Dialog so we have
+          full control over the layout without extra wrapper complexity. */}
+      {destinationModalOpen && (
+        // Backdrop — clicking outside the card closes without saving
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+          onClick={() => setDestinationModalOpen(false)}
+        >
+          {/* Card — stopPropagation prevents clicks inside from closing the modal */}
+          <div
+            className="bg-card rounded-2xl shadow-2xl w-full max-w-lg h-[584px] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 pt-6 pb-4">
+              <h2 className="text-xl font-bold text-foreground">Choose destinations</h2>
+              <button
+                onClick={() => setDestinationModalOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-grey-lightest transition-colors text-muted-foreground"
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Scrollable grid of all destinations */}
+            <div className="overflow-y-auto px-6 pb-4 flex-1">
+              <div className="grid grid-cols-2 gap-2">
+                {ALL_DESTINATIONS.map((dest) => {
+                  const isSelected = draftDestinations.includes(dest.name);
+                  // If this destination is NOT selected and we're already at max,
+                  // the button still renders but clicking it has no effect.
+                  const isAtMax = !isSelected && draftDestinations.length >= MAX_DESTINATIONS;
+
+                  return (
+                    <button
+                      key={dest.name}
+                      onClick={() => toggleDraftDestination(dest.name)}
+                      className={cn(
+                        "flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all duration-150",
+                        isSelected
+                          // Selected state: brand border + subtle blue tint background
+                          ? "border-primary bg-primary/5"
+                          : isAtMax
+                          // At max and not selected: show as visually disabled
+                          ? "border-border bg-grey-lightest opacity-40 cursor-not-allowed"
+                          // Normal unselected state
+                          : "border-border hover:border-primary/40 hover:bg-grey-lightest cursor-pointer"
+                      )}
+                    >
+                      {/* Flag emoji in a circle container */}
+                      <span className="text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full bg-grey-lightest shrink-0">
+                        {dest.flag}
+                      </span>
+                      <span className={cn(
+                        "text-sm font-semibold leading-snug",
+                        isSelected ? "text-primary" : "text-foreground"
+                      )}>
+                        {dest.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer — hint on the left, action buttons on the right */}
+            <div className="px-6 py-4 border-t border-border flex items-center gap-3">
+              {/* Hint text lives here permanently so the footer height never changes.
+                  The message swaps between a soft prompt and the "deselect first" tip
+                  without anything above shifting up or down. */}
+              <p className="text-xs text-muted-foreground flex-1 leading-snug">
+                {draftDestinations.length < MAX_DESTINATIONS
+                  ? `Select up to ${MAX_DESTINATIONS} destinations · ${MAX_DESTINATIONS - draftDestinations.length} slot${MAX_DESTINATIONS - draftDestinations.length === 1 ? "" : "s"} remaining`
+                  : "All 5 slots filled · deselect one to swap it for another"}
+              </p>
+              <button
+                onClick={() => setDestinationModalOpen(false)}
+                className="shrink-0 px-5 py-2.5 text-sm font-bold text-foreground border border-border rounded-lg hover:bg-grey-lightest transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={applyDestinations}
+                className="shrink-0 px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

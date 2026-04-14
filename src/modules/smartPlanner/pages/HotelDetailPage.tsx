@@ -425,18 +425,15 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
           <div className="text-right text-sm font-bold text-foreground">
             Total for {nights} night{nights !== 1 ? 's' : ''}: {totalPrice * nights}€
           </div>
-          <button
+          {/* default = main action, secondary = already-selected confirmation state */}
+          <Button
             onClick={handleBookClick}
-            className={cn(
-              "w-full font-bold h-[40px] rounded-lg transition-colors flex items-center justify-center gap-2 text-base",
-              isSelected
-                ? "bg-grey-light text-foreground"
-                : "bg-primary hover:brightness-85 text-white"
-            )}
+            variant={isSelected ? "secondary" : "default"}
+            className="w-full"
           >
             {isSelected && <Check size={16} />}
             {isSelected ? "Selected" : "Select"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -730,12 +727,14 @@ export default function HotelDetailPage({
                     Clicking the link opens the full reviews modal (same pattern as PackageDetailPage). */}
                 <div className="flex items-center gap-2 flex-wrap">
                   <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
-                  <button
+                  {/* link variant = navigation/browse action, no bg, underline on hover */}
+                  <Button
+                    variant="link"
                     onClick={() => setReviewsOpen(true)}
-                    className="text-sm text-foreground underline hover:no-underline"
+                    className="text-sm text-foreground h-auto p-0"
                   >
                     {hotel.reviewCount.toLocaleString()} reviews
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Hotel name + stars */}
@@ -756,13 +755,15 @@ export default function HotelDetailPage({
                   <MapPin size={15} className="shrink-0" aria-hidden="true" />
                   <span className="text-base">{hotel.location}</span>
                 </div>
-                <button
+                {/* link variant = navigation action */}
+                <Button
+                  variant="link"
                   onClick={() => setShowMapModal(true)}
-                  className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                  className="flex items-center gap-1.5 text-sm font-semibold text-primary h-auto p-0"
                 >
                   <MapPinned size={14} aria-hidden="true" />
                   Show on map
-                </button>
+                </Button>
               </div>
 
               {/* Amenities heading */}
@@ -780,23 +781,28 @@ export default function HotelDetailPage({
                     <span className="text-base text-foreground font-medium">{amenity}</span>
                   </div>
                 ))}
-                <button
+                {/* link variant = browse action ("Go to all [items]" pattern) */}
+                <Button
+                  variant="link"
                   onClick={() => setAmenitiesOpen(true)}
-                  className="text-primary font-bold text-base hover:underline"
+                  className="text-primary font-bold text-base h-auto p-0"
                 >
                   See all
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* RIGHT: Share + Book actions */}
             <div className="flex flex-col gap-3 lg:items-end">
               <div className="flex items-center gap-3">
-                <button className="w-[40px] h-[40px] flex items-center justify-center border border-border rounded-lg text-foreground hover:bg-grey-light">
+                {/* ghost + icon size = contextual icon-only action; border keeps it visually grounded next to the primary CTA */}
+                <Button variant="ghost" size="icon" className="border border-border" aria-label="Share">
                   <Share size={20} aria-hidden="true" />
-                </button>
-                <button
-                  className="bg-primary hover:brightness-85 text-white font-bold px-6 py-4 rounded-lg text-base transition-colors"
+                </Button>
+                {/* default = the main action on this screen (scroll to room selection or confirm booking) */}
+                <Button
+                  variant="default"
+                  className="px-6 py-4 text-base font-bold"
                   onClick={() => {
                     if (!allRoomsSelected) {
                       document.getElementById('room-selection')?.scrollIntoView({ behavior: 'smooth' });
@@ -806,7 +812,7 @@ export default function HotelDetailPage({
                   {allRoomsSelected
                     ? `Book for ${totalPrice * nights}€`
                     : localRoomConfig.length > 1 ? 'Select rooms' : 'Select room'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -951,13 +957,15 @@ export default function HotelDetailPage({
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-bold text-foreground">Room {index + 1}</span>
                         {/* Remove button — only shown when there's more than 1 room */}
+                        {/* ghost variant + text-danger = low-emphasis destructive action; also fixes the hardcoded text-red-500 to the design token */}
                         {localRoomConfig.length > 1 && (
-                          <button
+                          <Button
+                            variant="ghost"
                             onClick={() => setLocalRoomConfig(prev => prev.filter(r => r.id !== config.id))}
-                            className="text-xs text-red-500 font-bold hover:underline"
+                            className="text-xs text-danger font-bold h-auto p-0 hover:bg-transparent hover:underline"
                           >
                             Remove
-                          </button>
+                          </Button>
                         )}
                       </div>
 
@@ -1019,30 +1027,33 @@ export default function HotelDetailPage({
                   ))}
 
                   {/* Add room button — max 6 rooms */}
+                  {/* outline variant = low-emphasis addition action; dashed border signals "add" affordance */}
                   {localRoomConfig.length < 6 && (
-                    <button
+                    <Button
+                      variant="outline"
                       onClick={() => {
                         const newId = Math.max(...localRoomConfig.map(r => r.id)) + 1;
                         setLocalRoomConfig(prev => [...prev, { id: newId, adults: 2, children: 0 }]);
                       }}
-                      className="w-full h-[36px] rounded-lg border border-dashed border-primary text-primary font-bold text-sm hover:bg-primary/10 transition-colors"
+                      className="w-full h-[36px] border-dashed border-primary text-primary hover:bg-primary/10"
                     >
                       + Add another room
-                    </button>
+                    </Button>
                   )}
                 </div>
               )}
             </div>
 
             {/* ── Update Search button — matches PackageSearchForm's search button style ── */}
-            {/* w-full on mobile so it fills the stacked column; lg:w-auto so it shrinks to content on wide screens */}
-            <button
+            {/* default variant = main search action; w-full on mobile, auto-width on large screens */}
+            <Button
+              variant="default"
               onClick={() => { setOpenSearchPanel(null); handleSearchUpdate(); }}
-              className="w-full lg:w-auto shrink-0 bg-primary hover:brightness-85 text-white font-bold text-sm h-[48px] px-5 rounded-lg transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
+              className="w-full lg:w-auto shrink-0 h-[48px] px-5 whitespace-nowrap"
             >
               <Search size={16} aria-hidden="true" />
               {isSearching ? 'Searching...' : 'Update Search'}
-            </button>
+            </Button>
           </div>
 
           {/* Tabs for Multiple Rooms */}
@@ -1201,12 +1212,14 @@ export default function HotelDetailPage({
               <p className="text-sm text-foreground leading-normal flex-1 overflow-hidden">
                 {desc.short} {desc.long}
               </p>
-              <button
+              {/* link variant = navigation/expand action */}
+              <Button
+                variant="link"
                 onClick={() => setDescriptionOpen(true)}
-                className="text-xs font-semibold text-primary hover:underline self-start shrink-0"
+                className="text-xs font-semibold h-auto p-0 self-start shrink-0"
               >
                 Read more about the hotel
-              </button>
+              </Button>
             </div>
 
             {/* Highlights — amenity pills, no divider needed */}
@@ -1247,13 +1260,16 @@ export default function HotelDetailPage({
                 markers={[{ id: hotel.id, lat: coords[0], lng: coords[1], label: hotel.name }]}
                 className="w-full h-full"
               />
-              <button
+              {/* ghost + sm = contextual overlay action; custom bg/backdrop keeps it legible over the map */}
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setShowMapModal(true)}
-                className="absolute top-2 right-2 z-[400] bg-card/95 backdrop-blur-sm rounded-md px-2.5 py-1.5 text-xs font-semibold text-primary flex items-center gap-1.5 shadow-sm hover:bg-card transition-colors"
+                className="absolute top-2 right-2 z-[400] bg-card/95 backdrop-blur-sm shadow-sm text-primary hover:bg-card"
               >
                 <MapPinned size={12} aria-hidden="true" />
                 Show on map
-              </button>
+              </Button>
             </div>
 
             {/* Getting around — no divider needed */}
@@ -1294,9 +1310,10 @@ export default function HotelDetailPage({
           {/* Left column — score + label + review count. Row on mobile, column on desktop. */}
           <div className="flex flex-row md:flex-col items-center md:items-start gap-3 md:gap-1 md:shrink-0 md:w-[100px]">
             <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
-            <button onClick={() => setReviewsOpen(true)} className="text-xs text-foreground underline hover:no-underline text-left mt-1">
+            {/* link variant = browse action */}
+            <Button variant="link" onClick={() => setReviewsOpen(true)} className="text-xs text-foreground h-auto p-0 text-left mt-1 justify-start">
               See all verified reviews
-            </button>
+            </Button>
           </div>
 
           {/* Right column — scrollable cards + "See all" link */}
@@ -1315,9 +1332,10 @@ export default function HotelDetailPage({
                   <p className="text-base text-foreground leading-normal flex-1 overflow-hidden">
                     {review.text}
                   </p>
-                  <button className="text-xs font-bold text-primary hover:underline text-left mt-2 mb-1">
+                  {/* link variant = navigation action */}
+                  <Button variant="link" className="text-xs font-bold h-auto p-0 text-left mt-2 mb-1 justify-start">
                     See details
-                  </button>
+                  </Button>
                   <div className="text-base text-foreground">{review.date}</div>
                   <div className="text-xs text-grey">Verified review</div>
                 </div>
@@ -1325,12 +1343,14 @@ export default function HotelDetailPage({
             </div>
 
             {/* Same modal as the link next to the score — consistent entry point */}
-            <button
+            {/* link variant = browse action ("Go to all [items]" pattern) */}
+            <Button
+              variant="link"
               onClick={() => setReviewsOpen(true)}
-              className="text-base font-bold text-primary hover:underline text-left"
+              className="text-base font-bold h-auto p-0 justify-start"
             >
               See all {hotel.reviewCount.toLocaleString()} reviews
-            </button>
+            </Button>
           </div>
 
         </div>
