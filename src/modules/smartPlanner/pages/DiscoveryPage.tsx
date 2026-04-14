@@ -97,12 +97,52 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
 
 // Tours by travel style (Section 1)
 
+// Default 5 styles shown in the tab bar on first load
 const TOUR_STYLE_FILTERS = [
-  "Culture & history",
-  "Sun & beach",
+  "Culture & History",
+  "Sun & Beach",
   "Safari",
-  "Sustainable travel",
-  "Spa & wellness",
+  "Sustainable Travel",
+  "Spa & Wellness",
+];
+
+// Maximum tabs for travel styles (same limit as destinations)
+const MAX_STYLES = 5;
+
+// Full catalogue of travel styles — emoji gives each one a visual identity
+// in the picker modal without needing images.
+const ALL_STYLES = [
+  { name: "Adventure",                    emoji: "🧗" },
+  { name: "Aerial Tours",                 emoji: "🚁" },
+  { name: "Art",                          emoji: "🎨" },
+  { name: "Boat Tours",                   emoji: "⛵" },
+  { name: "Christmas & New Year",         emoji: "🎄" },
+  { name: "City Life",                    emoji: "🏙️" },
+  { name: "Classes",                      emoji: "📚" },
+  { name: "Cuisine",                      emoji: "🍽️" },
+  { name: "Culture & History",            emoji: "🏛️" },
+  { name: "Cycling & Mountain Biking",    emoji: "🚵" },
+  { name: "Day Trips & Excursions",       emoji: "🗺️" },
+  { name: "Events & Tickets",             emoji: "🎟️" },
+  { name: "Festival",                     emoji: "🎉" },
+  { name: "Golf",                         emoji: "⛳" },
+  { name: "Hiking & Walking",             emoji: "🥾" },
+  { name: "Island Hopping",               emoji: "🏝️" },
+  { name: "Landscapes & Sceneries",       emoji: "🏔️" },
+  { name: "Luxury",                       emoji: "💎" },
+  { name: "Multi-Country",                emoji: "🌍" },
+  { name: "Nature and Wildlife",          emoji: "🦁" },
+  { name: "Outdoor Activities and Sports",emoji: "🏄" },
+  { name: "Photography",                  emoji: "📷" },
+  { name: "Pilgrimage",                   emoji: "🕌" },
+  { name: "Safari",                       emoji: "🦒" },
+  { name: "Spa & Wellness",               emoji: "🧖" },
+  { name: "Sun & Beach",                  emoji: "🏖️" },
+  { name: "Sustainable Travel",           emoji: "🌿" },
+  { name: "Theme Parks",                  emoji: "🎢" },
+  { name: "Transportation",               emoji: "🚂" },
+  { name: "VIP & Exclusive",              emoji: "⭐" },
+  { name: "Winter Wonderland",            emoji: "❄️" },
 ];
 
 // Same cards shown regardless of which style filter is active (would be server-filtered in production).
@@ -377,8 +417,32 @@ export default function DiscoveryPage({
       transition: { duration: 0.4, ease: "easeOut" },
     });
   }, [aiExperienceMode]);
-  const [activeTourStyle, setActiveTourStyle] = useState("Culture & history");
+  const [activeTourStyle, setActiveTourStyle] = useState("Culture & History");
   const [activeCountry, setActiveCountry] = useState("Thailand");
+
+  // Style picker modal state — mirrors the same pattern as the destination picker
+  const [styleModalOpen, setStyleModalOpen] = useState(false);
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([...TOUR_STYLE_FILTERS]);
+  const [draftStyles, setDraftStyles] = useState<string[]>([...TOUR_STYLE_FILTERS]);
+
+  const toggleDraftStyle = (name: string) => {
+    setDraftStyles((prev) => {
+      if (prev.includes(name)) return prev.length > 1 ? prev.filter((s) => s !== name) : prev;
+      if (prev.length >= MAX_STYLES) return prev;
+      return [...prev, name];
+    });
+  };
+
+  const openStyleModal = () => {
+    setDraftStyles([...selectedStyles]);
+    setStyleModalOpen(true);
+  };
+
+  const applyStyles = () => {
+    setSelectedStyles(draftStyles);
+    if (!draftStyles.includes(activeTourStyle)) setActiveTourStyle(draftStyles[0]);
+    setStyleModalOpen(false);
+  };
 
   // Destination picker modal state.
   // `selectedDestinations` is the live list shown in the tabs (starts as the default 5).
@@ -1777,7 +1841,7 @@ export default function DiscoveryPage({
             </div>
 
             <div ref={styleTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] md:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto">
-              {TOUR_STYLE_FILTERS.map((style) => (
+              {selectedStyles.map((style) => (
                 <button
                   key={style}
                   ref={(el) => { styleTabRefs.current[style] = el; }}
@@ -1791,8 +1855,11 @@ export default function DiscoveryPage({
                   {style}
                 </button>
               ))}
-              <button className="shrink-0 ml-auto px-5 py-3 text-base font-bold text-primary flex items-center gap-1.5">
-                Other styles
+              <button
+                onClick={openStyleModal}
+                className="shrink-0 ml-auto px-5 py-3 text-base font-bold text-primary flex items-center gap-1.5"
+              >
+                More styles
                 <ChevronDown size={16} />
               </button>
               <div
@@ -2058,6 +2125,86 @@ export default function DiscoveryPage({
         </p>
       </div>
       </motion.div>{/* end below-hero content */}
+
+      {/* ── Style Picker Modal ── */}
+      {styleModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+          onClick={() => setStyleModalOpen(false)}
+        >
+          <div
+            className="bg-card rounded-2xl shadow-2xl w-full max-w-lg h-[584px] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 pt-6 pb-4">
+              <h2 className="text-xl font-bold text-foreground">Choose styles</h2>
+              <button
+                onClick={() => setStyleModalOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-grey-lightest transition-colors text-muted-foreground"
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Scrollable grid */}
+            <div className="overflow-y-auto px-6 pb-4 flex-1">
+              <div className="grid grid-cols-2 gap-2">
+                {ALL_STYLES.map((style) => {
+                  const isSelected = draftStyles.includes(style.name);
+                  const isAtMax = !isSelected && draftStyles.length >= MAX_STYLES;
+                  return (
+                    <button
+                      key={style.name}
+                      onClick={() => toggleDraftStyle(style.name)}
+                      className={cn(
+                        "flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all duration-150",
+                        isSelected
+                          ? "border-primary bg-primary/5"
+                          : isAtMax
+                          ? "border-border bg-grey-lightest opacity-40 cursor-not-allowed"
+                          : "border-border hover:border-primary/40 hover:bg-grey-lightest cursor-pointer"
+                      )}
+                    >
+                      <span className="text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full bg-grey-lightest shrink-0">
+                        {style.emoji}
+                      </span>
+                      <span className={cn(
+                        "text-sm font-semibold leading-snug",
+                        isSelected ? "text-primary" : "text-foreground"
+                      )}>
+                        {style.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-border flex items-center gap-3">
+              <p className="text-xs text-muted-foreground flex-1 leading-snug">
+                {draftStyles.length < MAX_STYLES
+                  ? `Select up to ${MAX_STYLES} styles · ${MAX_STYLES - draftStyles.length} slot${MAX_STYLES - draftStyles.length === 1 ? "" : "s"} remaining`
+                  : "All 5 slots filled · deselect one to swap it for another"}
+              </p>
+              <button
+                onClick={() => setStyleModalOpen(false)}
+                className="shrink-0 px-5 py-2.5 text-sm font-bold text-foreground border border-border rounded-lg hover:bg-grey-lightest transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={applyStyles}
+                className="shrink-0 px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Destination Picker Modal ── */}
       {/* We render a custom modal here rather than using shadcn Dialog so we have
