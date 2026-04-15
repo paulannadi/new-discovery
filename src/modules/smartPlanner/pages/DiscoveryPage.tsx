@@ -5,7 +5,7 @@ import { cn } from "../../../shared/components/ui/utils";
 import AccommodationStar from "../../../shared/components/AccommodationStar";
 import RatingBlock from "../../../shared/components/RatingBlock";
 import PackageSearchForm from "../components/PackageSearchForm";
-import heroBg from "../../../../assets/hero-background-45ee0a.png";
+import heroBg from "../../../../assets/discovery-background.jpg";
 import tourCard1 from "../../../../assets/tour-card-1-4c2e30.png";
 import tourCard2 from "../../../../assets/tour-card-2-462e55.png";
 import tourCard3 from "../../../../assets/tour-card-3-716657.png";
@@ -1766,14 +1766,14 @@ export default function DiscoveryPage({
                   <div className="p-4 flex flex-col gap-3">
                     <div className="flex items-center gap-1.5 text-foreground text-base font-bold">
                       <img
-                        src={`https://flagcdn.com/w40/${route.fromFlag}.png`}
+                        src={`https://flagcdn.com/w160/${route.fromFlag}.png`}
                         alt={route.from}
                         className="w-5 h-3.5 rounded-sm object-cover"
                       />
                       {route.from}
                       <ArrowRight size={14} className="text-grey mx-0.5" />
                       <img
-                        src={`https://flagcdn.com/w40/${route.toFlag}.png`}
+                        src={`https://flagcdn.com/w160/${route.toFlag}.png`}
                         alt={route.to}
                         className="w-5 h-3.5 rounded-sm object-cover"
                       />
@@ -2071,16 +2071,16 @@ export default function DiscoveryPage({
                           {TRIP_TYPES.find((t) => t.id === activeTripType)?.label}
                         </span>
                       </div>
-                      <div className="p-4 flex flex-col gap-2">
-                        <div className="text-xs text-muted-foreground">{card.destination}</div>
-                        <div className="text-sm font-bold text-foreground leading-snug">{card.title}</div>
-                        <div className="flex items-end justify-between mt-1">
+                      <div className="p-4 flex flex-col gap-3">
+                        <div className="text-xs text-foreground">{card.destination}</div>
+                        <div className="text-base font-bold text-foreground leading-snug">{card.title}</div>
+                        <div className="flex items-end justify-between pt-4 border-t border-muted">
                           <div className="flex items-center gap-1.5 text-xs text-foreground">
                             <Clock size={14} />
                             {card.duration}
                           </div>
                           <div className="text-right">
-                            <div className="text-xs text-muted-foreground">Per person</div>
+                            <div className="text-xs text-foreground">Per person</div>
                             <div className="text-xl font-bold text-foreground">{card.price}</div>
                           </div>
                         </div>
@@ -2366,29 +2366,29 @@ function TourCard({ tour, onSelect }: { tour: TourCardData; onSelect?: () => voi
         alt={tour.title}
         className="w-full h-[200px] object-cover"
       />
-      <div className="p-4 flex flex-col gap-2">
+      <div className="p-4 flex flex-col gap-3">
         <div className="flex items-center gap-1.5 text-xs text-foreground">
           <img
-            src={`https://flagcdn.com/w40/${tour.flag}.png`}
+            src={`https://flagcdn.com/w160/${tour.flag}.png`}
             alt={tour.country}
-            className="w-5 h-3.5 rounded-sm object-cover"
+            className="w-5 h-5 rounded-full object-cover"
           />
           {tour.country}
         </div>
-        <div className="text-sm font-bold text-foreground leading-snug">
+        <div className="text-base font-bold text-foreground leading-snug">
           {tour.title}
         </div>
-        <div className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+        <div className="text-sm text-foreground leading-relaxed line-clamp-2">
           {tour.desc}
         </div>
-        <div className="flex items-end justify-between mt-1">
+        <div className="flex items-end justify-between pt-4 border-t border-muted">
           <div className="flex items-center gap-1.5 text-xs text-foreground">
             <Clock size={14} />
             {tour.duration}
           </div>
           <div className="text-right">
             <div className="text-xs text-foreground">Per person</div>
-            <div className="text-2xl font-bold text-foreground">{tour.price}</div>
+            <div className="text-xl font-bold text-foreground">{tour.price}</div>
           </div>
         </div>
       </div>
@@ -2427,20 +2427,20 @@ function HolidayCard({
         className="w-full h-[200px] object-cover"
       />
 
-      <div className="p-4 flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-lg font-bold text-foreground leading-snug">
+      <div className="p-4 flex flex-col gap-3">
+        <div className="flex items-center gap-1.5 text-base font-bold text-foreground leading-snug">
           <img
-            src={`https://flagcdn.com/w40/${dest.flag}.png`}
+            src={`https://flagcdn.com/w160/${dest.flag}.png`}
             alt={dest.country}
-            className="w-6 h-4 rounded-sm object-cover shrink-0"
+            className="w-5 h-5 rounded-full object-cover shrink-0"
           />
           {dest.destination}
         </div>
-        <div className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+        <div className="text-sm text-foreground leading-relaxed line-clamp-2">
           {dest.desc}
         </div>
-        <div className="flex items-end justify-between mt-1 pt-2 border-t border-muted">
-          <div className="flex flex-col gap-1">
+        <div className="flex items-end justify-between pt-4 border-t border-muted">
+          <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-1.5 text-xs text-foreground">
               <RotateCcw size={14} />
               Return flights
@@ -2452,7 +2452,7 @@ function HolidayCard({
           </div>
           <div className="text-right">
             <div className="text-xs text-foreground">Per person</div>
-            <div className="text-2xl font-bold text-foreground">{dest.price}</div>
+            <div className="text-xl font-bold text-foreground">{dest.price}</div>
           </div>
         </div>
       </div>

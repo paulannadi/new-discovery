@@ -833,14 +833,18 @@ export default function HolidayListPage({
                     isHighlighted: d.code === searchCriteria.to,
                   }));
 
+            // The centerKey tells the map "this is a new context — please refit".
+            // We use two distinct keys per destination:
+            //   "DXB-dest"   → no hotel pins yet, fit to the destination overview
+            //   "DXB-hotels" → real hotel pins arrived, fit tightly around them
+            // Once both stages have fired, the user can freely pan and zoom.
+            const centerKey = `${searchCriteria.to}-${hotelMarkers.length > 0 ? "hotels" : "dest"}`;
+
             return (
               <LeafletMap
                 center={mapCenter}
                 zoom={mapZoom}
-                // centerKey changes whenever the destination changes.
-                // The map fits to hotel bounds once per unique key, then
-                // leaves the user's pan/zoom alone.
-                centerKey={searchCriteria.to}
+                centerKey={centerKey}
                 markers={markers}
                 // Clicking a pin highlights + scrolls to the matching card
                 onMarkerClick={handleMarkerClick}

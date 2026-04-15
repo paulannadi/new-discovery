@@ -20,11 +20,11 @@
 //   • Right sidebar: rounded-[16px], border + shadow, rate calendar
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { format } from "date-fns";
 import {
   MapPin,
-  MapPinned,
+  MapPinned, // used for the "Show on map" overlay button on the inline map
   Plane,
   Star,
   Wifi,
@@ -59,7 +59,7 @@ import {
 import { DayPicker } from "react-day-picker";
 import { cn } from "../../../shared/components/ui/utils";
 import LeafletMap from "../../../shared/components/LeafletMap";
-import { hotelDescription, nearbyPOIs } from "../../../shared/utils/hotelUtils";
+import { hotelDescription, nearbyPOIs, locationCoords } from "../../../shared/utils/hotelUtils";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -531,6 +531,10 @@ export default function PackageDetailPage({
   const hotelImages = hotelImageSet(pkg.hotel.location, hotelSlug);
   const desc = hotelDescription(pkg.hotel.name, pkg.hotel.location);
 
+  // Convert the hotel's location string into [lat, lng] coordinates for Leaflet.
+  // useMemo means this only recalculates when the hotel changes, not on every render.
+  const coords = useMemo(() => locationCoords(pkg.hotel.location), [pkg.hotel.location]);
+
   // Rating in European decimal format (e.g. "4,3") — matches Figma
   const ratingEU = formatRatingEU(pkg.hotel.trustYou.rating);
 
@@ -906,22 +910,17 @@ export default function PackageDetailPage({
               {/* Location map */}
               <div className="p-5 pb-4">
                 <h3 className="text-sm font-bold text-foreground mb-3">Location</h3>
-                <div className="rounded-lg overflow-hidden h-[220px] relative mb-4 cursor-pointer group">
-                  <img
-                    src={hotelImages.area}
-                    alt="Hotel area map"
-                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                {/* Interactive Leaflet map — replaces the old static image placeholder.
+                    The map is centred on the hotel's real coordinates (from locationCoords).
+                    The "Show on map" button overlaid top-right opens the full modal. */}
+                <div className="rounded-lg overflow-hidden h-[220px] relative mb-4 border border-border">
+                  <LeafletMap
+                    center={coords}
+                    zoom={13}
+                    markers={[{ id: pkg.hotel.giataId, lat: coords[0], lng: coords[1], label: pkg.hotel.name }]}
+                    className="w-full h-full"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-transparent pointer-events-none" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-card rounded-full p-2.5 shadow-lg">
-                      <MapPin size={22} className="text-primary" aria-hidden="true" />
-                    </div>
-                  </div>
-                  <div className="absolute bottom-3 left-3 bg-card/95 backdrop-blur-sm rounded-md px-3 py-1.5 text-sm font-semibold text-foreground flex items-center gap-1.5 shadow-sm">
-                    <MapPin size={12} className="text-primary shrink-0" aria-hidden="true" />
-                    {pkg.hotel.location}
-                  </div>
+
                 </div>
 
                 {/* Getting around — POI pills with MapPin instead of emoji */}
@@ -1407,6 +1406,25 @@ export default function PackageDetailPage({
                 </div>
               )
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Show on map modal — full-size interactive LeafletMap centred on the hotel */}
+      <Dialog open={showMapModal} onOpenChange={setShowMapModal}>
+        <DialogContent className="max-w-[800px] p-0 overflow-hidden">
+          <DialogHeader className="px-5 pt-5 pb-3">
+            <DialogTitle className="flex items-center gap-2">
+              <MapPin size={16} className="text-primary shrink-0" aria-hidden="true" />
+              {pkg.hotel.name} — {pkg.hotel.location}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="h-[480px]">
+            <LeafletMap
+              center={coords}
+              zoom={13}
+              markers={[{ id: pkg.hotel.giataId, lat: coords[0], lng: coords[1], label: pkg.hotel.name }]}
+            />
           </div>
         </DialogContent>
       </Dialog>
