@@ -362,31 +362,31 @@ const TRIP_TYPES: { id: TripTypeId; label: string; icon: React.ReactNode }[] = [
 ];
 
 // Reuses the same tour card images already imported — no extra assets needed.
-const TRIP_TYPE_CARDS: Record<TripTypeId, { id: number; title: string; destination: string; image: string; duration: string; price: string }[]> = {
+const TRIP_TYPE_CARDS: Record<TripTypeId, { id: number; title: string; destination: string; flag: string; desc: string; image: string; duration: string; price: string }[]> = {
   "hotel-flight": [
-    { id: 1, title: "Cancún All-Inclusive Escape",     destination: "Cancún, Mexico",   image: tourCard1, duration: "7 nights", price: "from £849" },
-    { id: 2, title: "Maldives Overwater Villa",         destination: "Maldives",         image: tourCard2, duration: "7 nights", price: "from £1,899" },
-    { id: 3, title: "Dubai Luxury Getaway",             destination: "Dubai, UAE",       image: tourCard3, duration: "7 nights", price: "from £999" },
+    { id: 1, title: "Cancún All-Inclusive Escape",     destination: "Cancún, Mexico",   flag: "mx", desc: "Powdery white sands, turquoise Caribbean water, and all-inclusive resort luxury.",        image: tourCard1, duration: "7 nights", price: "from £849" },
+    { id: 2, title: "Maldives Overwater Villa",         destination: "Maldives",         flag: "mv", desc: "Stilted villas above crystal lagoons, world-class diving, and pure tropical seclusion.",  image: tourCard2, duration: "7 nights", price: "from £1,899" },
+    { id: 3, title: "Dubai Luxury Getaway",             destination: "Dubai, UAE",       flag: "ae", desc: "Desert skylines, rooftop pools, and non-stop shopping in the city of the future.",        image: tourCard3, duration: "7 nights", price: "from £999" },
   ],
   "group-tour": [
-    { id: 4, title: "Classic Peru Group Adventure",    destination: "Peru",             image: tourCard3, duration: "8 days",   price: "from £1,980" },
-    { id: 5, title: "Japan Group Highlights Tour",     destination: "Japan",            image: tourCard4, duration: "11 days",  price: "from £2,890" },
-    { id: 6, title: "Morocco Imperial Cities Group",   destination: "Morocco",          image: tourCard5, duration: "9 days",   price: "from £1,540" },
+    { id: 4, title: "Classic Peru Group Adventure",    destination: "Peru",             flag: "pe", desc: "Explore ancient Incan ruins, the Amazon rainforest, and vibrant Andean culture.",          image: tourCard3, duration: "8 days",   price: "from £1,980" },
+    { id: 5, title: "Japan Group Highlights Tour",     destination: "Japan",            flag: "jp", desc: "Cherry blossoms, samurai history, and neon-lit cities on a classic group adventure.",      image: tourCard4, duration: "11 days",  price: "from £2,890" },
+    { id: 6, title: "Morocco Imperial Cities Group",   destination: "Morocco",          flag: "ma", desc: "Wander medinas, souks, and palaces across Morocco's most iconic imperial cities.",         image: tourCard5, duration: "9 days",   price: "from £1,540" },
   ],
   "individual-tour": [
-    { id: 7, title: "Bali Cultural Discovery",         destination: "Bali, Indonesia",  image: tourCard2, duration: "8 days",   price: "from £1,980" },
-    { id: 8, title: "Kyoto Self-Guided Journey",       destination: "Japan",            image: tourCard6, duration: "8 days",   price: "from £2,200" },
-    { id: 9, title: "Thai Island Hopping",             destination: "Thailand",         image: tourCard1, duration: "10 days",  price: "from £1,650" },
+    { id: 7, title: "Bali Cultural Discovery",         destination: "Bali, Indonesia",  flag: "id", desc: "Sacred temples, lush rice terraces, and world-class surf on the Island of the Gods.",     image: tourCard2, duration: "8 days",   price: "from £1,980" },
+    { id: 8, title: "Kyoto Self-Guided Journey",       destination: "Japan",            flag: "jp", desc: "Wander ancient streets and zen gardens across Japan's most serene cultural capital.",      image: tourCard6, duration: "8 days",   price: "from £2,200" },
+    { id: 9, title: "Thai Island Hopping",             destination: "Thailand",         flag: "th", desc: "Hop between paradise islands, turquoise waters, and vibrant beach towns at your pace.",   image: tourCard1, duration: "10 days",  price: "from £1,650" },
   ],
   "round-trip": [
-    { id: 10, title: "Japan Rail Circle Route",        destination: "Japan",            image: tourCard4, duration: "14 days",  price: "from £3,400" },
-    { id: 11, title: "Moroccan Imperial Loop",         destination: "Morocco",          image: tourCard5, duration: "9 days",   price: "from £1,540" },
-    { id: 12, title: "Peru Amazon & Andes Circuit",    destination: "Peru",             image: tourCard6, duration: "12 days",  price: "from £2,400" },
+    { id: 10, title: "Japan Rail Circle Route",        destination: "Japan",            flag: "jp", desc: "Circle Japan by bullet train, connecting Tokyo, Kyoto, Hiroshima, and beyond.",           image: tourCard4, duration: "14 days",  price: "from £3,400" },
+    { id: 11, title: "Moroccan Imperial Loop",         destination: "Morocco",          flag: "ma", desc: "A loop through ancient medinas, Saharan dunes, and Atlas Mountain kasbahs.",              image: tourCard5, duration: "9 days",   price: "from £1,540" },
+    { id: 12, title: "Peru Amazon & Andes Circuit",    destination: "Peru",             flag: "pe", desc: "From Lima to the Amazon, Cusco to Machu Picchu — Peru's greatest circular route.",        image: tourCard6, duration: "12 days",  price: "from £2,400" },
   ],
   "last-minute": [
-    { id: 13, title: "Santorini Getaway",              destination: "Greece",           image: tourCard2, duration: "7 nights", price: "from £749" },
-    { id: 14, title: "Bangkok Long Weekend",           destination: "Thailand",         image: tourCard3, duration: "5 nights", price: "from £599" },
-    { id: 15, title: "Cancún Quick Escape",            destination: "Mexico",           image: tourCard1, duration: "7 nights", price: "from £819" },
+    { id: 13, title: "Santorini Getaway",              destination: "Greece",           flag: "gr", desc: "Whitewashed cliffs, volcanic beaches, and legendary sunsets over the caldera.",           image: tourCard2, duration: "7 nights", price: "from £749" },
+    { id: 14, title: "Bangkok Long Weekend",           destination: "Thailand",         flag: "th", desc: "Street food, rooftop bars, golden temples, and buzzing night markets await.",             image: tourCard3, duration: "5 nights", price: "from £599" },
+    { id: 15, title: "Cancún Quick Escape",            destination: "Mexico",           flag: "mx", desc: "Last-minute Caribbean sun, all-inclusive deals, and white-sand beaches for less.",        image: tourCard1, duration: "7 nights", price: "from £819" },
   ],
 };
 
@@ -2061,19 +2061,23 @@ export default function DiscoveryPage({
                     >
                       <div className="relative">
                         <img src={card.image} alt={card.title} className="w-full h-[180px] object-cover" />
-                        <span className={cn("absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold",
-                          activeTripType === "group-tour"      ? "bg-purple-100 text-purple-700" :
-                          activeTripType === "individual-tour" ? "bg-green-100 text-green-700" :
-                          activeTripType === "round-trip"      ? "bg-amber-100 text-amber-700" :
-                                                                 "bg-red-100 text-red-700"
-                        )}>
+                        <span className="absolute top-3 left-3 flex items-center gap-1 bg-white text-foreground text-xs font-semibold px-2.5 py-1 rounded-full">
                           {TRIP_TYPES.find((t) => t.id === activeTripType)?.icon}
                           {TRIP_TYPES.find((t) => t.id === activeTripType)?.label}
                         </span>
                       </div>
                       <div className="p-4 flex flex-col gap-3">
-                        <div className="text-xs text-foreground">{card.destination}</div>
-                        <div className="text-base font-bold text-foreground leading-snug">{card.title}</div>
+                        {/* Flag + destination name — mirrors HolidayCard */}
+                        <div className="flex items-center gap-1.5 text-base font-bold text-foreground leading-snug">
+                          <img
+                            src={`https://flagcdn.com/w160/${card.flag}.png`}
+                            alt={card.destination}
+                            className="w-5 h-5 rounded-full object-cover shrink-0"
+                          />
+                          {card.destination}
+                        </div>
+                        {/* Short description */}
+                        <div className="text-sm text-foreground leading-relaxed line-clamp-2">{card.desc}</div>
                         <div className="flex items-end justify-between pt-4 border-t border-muted">
                           <div className="flex items-center gap-1.5 text-xs text-foreground">
                             <Clock size={14} />
