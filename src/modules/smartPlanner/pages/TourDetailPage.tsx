@@ -155,7 +155,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
           </div>
 
           {/* ── Photo grid — 402px, 3fr / 2fr, same as PackageDetailPage ── */}
-          <div className="relative mx-4 sm:mx-6 md:mx-10 mb-2">
+          <div className="relative mx-4 sm:mx-6 md:mx-10">
             <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[200px] sm:h-[240px] md:h-[402px] gap-2">
 
               {/* Main image with play button overlay */}
@@ -194,14 +194,14 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
             {/* "See all photos" button — overlaid bottom-right, same as PackageDetailPage */}
             <button
               onClick={() => setPhotosOpen(true)}
-              className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm border border-border rounded-sm px-4 py-2 text-sm font-semibold text-primary flex items-center gap-2 hover:bg-white transition-colors shadow-sm"
+              className="absolute bottom-4 right-4 bg-white border border-primary text-primary text-sm font-semibold px-4 py-2 rounded-sm flex items-center gap-2 hover:bg-primary hover:text-white transition-colors shadow-sm"
             >
               ⊞ See all photos
             </button>
           </div>
 
           {/* ── Tour title + quick facts — full width, no widget ── */}
-          <div className="px-4 sm:px-6 md:px-10 py-6 md:py-8 flex flex-col gap-4">
+          <div className="px-4 sm:px-6 md:px-10 pt-8 pb-5 md:pb-8 flex flex-col gap-4">
 
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground leading-tight tracking-tight">
               {tour.title}
@@ -242,9 +242,9 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
       {/* ══════════════════════════════════════════════════════════════════════
           PAGE BODY — two-column grid, same as PackageDetailPage body
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="max-w-[1280px] mx-auto px-3 md:px-4 py-5 md:py-8">
+      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8">
 
-        <h2 className="text-3xl font-extrabold text-foreground mb-6">
+        <h2 className="text-3xl font-bold text-foreground mb-6">
           Tour highlights & itinerary
         </h2>
 
@@ -330,8 +330,8 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
             <div className="bg-card border border-border rounded-xl shadow-md">
 
               {/* ── Price summary ── */}
-              <div className="p-5">
-                <div className="flex flex-col">
+              <div className="px-5 pt-5 pb-5 border-b border-border">
+                <div className="flex flex-col items-end text-right">
                   {/* Small grey label: per-person rate + tour length */}
                   <span className="text-grey text-xs">{currency}{tour.price.perPerson.toLocaleString()} per person · {tour.duration}-day guided tour</span>
                   {/* Big bold total — same as hotel page */}
@@ -343,7 +343,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               {/* All three fields follow the same pattern as PackageSearchForm:
                   a clickable field div that toggles a panel, with bg-card
                   as the default background (not grey) */}
-              <div ref={bookingRef} className="border-t border-border p-5 flex flex-col gap-3">
+              <div ref={bookingRef} className="p-5 flex flex-col gap-3">
 
                 <p className="text-xs font-bold text-grey uppercase tracking-wide mb-1">
                   Customise your trip
@@ -586,7 +586,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 // ─────────────────────────────────────────────────────────────────────────────
 
 function DayCard({ day, slug }: { day: TourDay; slug: string }) {
-  const [expanded, setExpanded] = useState(day.dayNumber <= 2);
+  const [expanded, setExpanded] = useState(day.dayNumber === 1);
 
   const dayImage = day.image ?? `https://picsum.photos/seed/${slug}-day${day.dayNumber}/400/280`;
 
@@ -598,7 +598,8 @@ function DayCard({ day, slug }: { day: TourDay; slug: string }) {
         className="w-full flex items-center gap-4 px-5 py-4 text-left"
         onClick={() => setExpanded(!expanded)}
       >
-        <span className="text-xs font-bold text-white bg-primary px-2.5 py-1 rounded-full shrink-0 uppercase tracking-wide whitespace-nowrap">
+        {/* Day pill — white background, blue border, blue text */}
+        <span className="text-xs font-bold text-primary bg-white border border-primary px-2.5 py-1 rounded-full shrink-0 uppercase tracking-wide whitespace-nowrap">
           Day {day.dayNumber}
         </span>
         <span className="flex-1 text-base font-bold text-foreground">{day.title}</span>
@@ -612,7 +613,18 @@ function DayCard({ day, slug }: { day: TourDay; slug: string }) {
       {expanded && (
         <div className="flex flex-col md:flex-row border-t border-border">
 
-          {/* Items list */}
+          {/* Day photo — now on the LEFT; padded + rounded to sit inside the card */}
+          <div className="md:w-[200px] shrink-0 p-4 md:pr-0">
+            <div className="rounded-xl overflow-hidden h-[140px] md:h-full">
+              <img
+                src={dayImage}
+                alt={`Day ${day.dayNumber}: ${day.title}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          {/* Items list — now on the RIGHT */}
           <div className="flex-1 px-5 py-4 flex flex-col gap-3">
             {day.items.map((item, i) => (
               <div key={i} className="flex items-start gap-3">
@@ -627,16 +639,6 @@ function DayCard({ day, slug }: { day: TourDay; slug: string }) {
             ))}
           </div>
 
-          {/* Day photo — padded + rounded to sit inside the card */}
-          <div className="md:w-[200px] shrink-0 p-4 md:pl-0">
-            <div className="rounded-xl overflow-hidden h-[140px] md:h-full">
-              <img
-                src={dayImage}
-                alt={`Day ${day.dayNumber}: ${day.title}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
         </div>
       )}
     </div>

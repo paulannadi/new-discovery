@@ -205,9 +205,14 @@ export function useUnifiedSearch(criteria: HolidaySearchCriteria): UnifiedSearch
     // that's what PackageSearchForm stores. We need to look up the *code* (e.g.
     // "CANCUN") to match against the destinationCode field on each package.
     const destCode = DESTINATIONS.find(d => d.label === criteria.to)?.code ?? criteria.to;
-    const cachedForDest = CACHED_PACKAGES.filter(p => p.destinationCode === destCode);
-    const liveForDest   = LIVE_PACKAGES.filter(p => p.destinationCode === destCode);
-    const nonCachedForDest = NON_CACHED_PACKAGES_BY_DESTINATION[destCode] ?? [];
+
+    // "Anywhere" means no specific destination — show everything across all destinations.
+    const isAnywhere = criteria.to === "Anywhere" || criteria.to === "";
+    const cachedForDest = isAnywhere ? CACHED_PACKAGES : CACHED_PACKAGES.filter(p => p.destinationCode === destCode);
+    const liveForDest   = isAnywhere ? LIVE_PACKAGES   : LIVE_PACKAGES.filter(p => p.destinationCode === destCode);
+    const nonCachedForDest = isAnywhere
+      ? Object.values(NON_CACHED_PACKAGES_BY_DESTINATION).flat()
+      : NON_CACHED_PACKAGES_BY_DESTINATION[destCode] ?? [];
 
     // ── Step 1 — Cached results (t=200ms) ───────────────────────────────────
     // For cached destinations: show cached packages immediately, then start

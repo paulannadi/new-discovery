@@ -352,7 +352,10 @@ export default function HolidayListPage({
   // ── Tours filtered to the searched destination ────────────────────────────
   // searchCriteria.to is the display label ("Cancún, Mexico"), so we look up
   // the code ("CANCUN") to match against tour.destinationCodes.
+  // If "Anywhere" is selected, show all tours regardless of destination.
   const toursForDest = (() => {
+    const isAnywhere = searchCriteria.to === "Anywhere" || searchCriteria.to === "";
+    if (isAnywhere) return ALL_TOURS;
     const destCode = DESTINATIONS.find(d => d.label === searchCriteria.to)?.code ?? searchCriteria.to;
     return ALL_TOURS.filter(t => !t.destinationCodes || t.destinationCodes.length === 0 || t.destinationCodes.includes(destCode));
   })();
@@ -676,9 +679,9 @@ export default function HolidayListPage({
               {/* While non-cached search is running, show a searching state */}
               {isNonCachedLoading
                 ? "Searching for holidays…"
-                : packages.length === 0 && !isLiveLoading
+                : packages.length === 0 && toursForDest.length === 0 && !isLiveLoading
                   ? "No holidays found"
-                  : `${filteredAndSorted.length} holiday${filteredAndSorted.length !== 1 ? "s" : ""} found`}
+                  : `${filteredAndSorted.length + toursForDest.length} holiday${filteredAndSorted.length + toursForDest.length !== 1 ? "s" : ""} found`}
             </h2>
 
             {/* Progress bar — fills over 5s for non-cached destinations, then fades out.
@@ -728,12 +731,14 @@ export default function HolidayListPage({
             </div>
           )}
 
-          {/* Package card list */}
-          {filteredAndSorted.length > 0 && (
+          {/* Results list — tour cards + package cards.
+              Tour cards are always shown when available (not gated by package results),
+              so "Anywhere" searches still surface tours even before packages load. */}
+          {(toursForDest.length > 0 || filteredAndSorted.length > 0) && (
             <div className="flex flex-col gap-4 pb-4">
               {/* ── Tour cards — filtered to the searched destination.
-                  Only tours with a matching destinationCode (or no destinationCodes
-                  set) are shown, so Bali shows Bali tours, Dubai shows Dubai tours, etc. */}
+                  When "Anywhere" is selected, all tours are shown.
+                  Otherwise only tours matching the destination code are shown. */}
               {toursForDest.map((tour) => (
                 <TourCard
                   key={tour.tourId}
@@ -774,7 +779,7 @@ export default function HolidayListPage({
           )}
 
           {/* Banner shown when we have packages but live is still loading */}
-          {isLiveLoading && filteredAndSorted.length === 0 && packages.length === 0 && (
+          {isLiveLoading && filteredAndSorted.length === 0 && packages.length === 0 && toursForDest.length === 0 && (
             <LiveSearchProgressBanner progress={liveProgress} />
           )}
 

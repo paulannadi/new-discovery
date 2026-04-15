@@ -47,7 +47,6 @@ import {
 import { UnifiedPackage } from "../../../types";
 import type { HolidaySearchCriteria } from "../../../App";
 import { BackButton } from "../../../shared/components/BackButton";
-import { Button } from "../../../shared/components/ui/button";
 import AccommodationStar from "../../../shared/components/AccommodationStar";
 import RatingBlock from "../../../shared/components/RatingBlock";
 import { RateCalendarPanel } from "../components/RateCalendarPanel";
@@ -604,13 +603,12 @@ export default function PackageDetailPage({
 
             {/* "See all photos" secondary button — overlaid bottom-right.
                 Figma: Type=Secondary, text "See all photos", primary text */}
-            <Button
-              variant="secondary"
+            <button
               onClick={() => setPhotosOpen(true)}
-              className="absolute bottom-4 right-4"
+              className="absolute bottom-4 right-4 bg-white border border-primary text-primary text-sm font-semibold px-4 py-2 rounded-sm flex items-center gap-2 hover:bg-primary hover:text-white transition-colors shadow-sm"
             >
               ⊞ See all photos
-            </Button>
+            </button>
           </div>
 
           {/* ── HOTEL INFO + PRICE ROW ─────────────────────────────────────────
@@ -704,7 +702,7 @@ export default function PackageDetailPage({
                           + "Total for 2 adults: £1,656" + CTA button
                 CTA: primary background, rounded-lg, white text
             ──────────────────────────────────────────────────────────────── */}
-            <div className="flex flex-col gap-3 lg:min-w-[280px] lg:items-end">
+            <div className="flex flex-col gap-3 lg:min-w-[280px] lg:items-end lg:justify-end">
 
               {/* Price block */}
               <div className="flex flex-col items-end text-right">
@@ -1087,7 +1085,7 @@ export default function PackageDetailPage({
             <div className="bg-card border border-border rounded-lg shadow-md">
 
               {/* ── Price summary block ──────────────────────────────────── */}
-              <div className="px-5 pt-5 pb-0">
+              <div className="px-5 pt-5 pb-5 border-b border-border">
                 <div className="flex flex-col items-end text-right">
                   {/* Small grey label: per-person rate + package details */}
                   <span className="text-grey text-xs">{currSym}{activePrice.toLocaleString()} per person · Flight + hotel · {nights} nights</span>
@@ -1112,7 +1110,7 @@ export default function PackageDetailPage({
                   </div>
                 ) : (
                   <div>
-                    <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                    <p className="text-xs text-grey mb-3 leading-relaxed">
                       This price is for a specific departure. Pick a different
                       date to request an updated quote.
                     </p>
@@ -1156,19 +1154,19 @@ export default function PackageDetailPage({
                     {/* Compact room/board summary */}
                     <div className="mt-3 bg-card border border-border rounded-lg p-3 flex flex-col gap-2">
                       <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Room</span>
+                        <span className="text-grey">Room</span>
                         <span className="font-medium text-foreground text-right max-w-[55%]">
                           {pkg.room.roomType}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Board</span>
+                        <span className="text-grey">Board</span>
                         <span className="font-medium text-foreground">
                           {pkg.room.boardType}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Cancellation</span>
+                        <span className="text-grey">Cancellation</span>
                         <span className="font-medium text-success">
                           Free until 14 days
                         </span>

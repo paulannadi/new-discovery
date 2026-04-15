@@ -1689,7 +1689,7 @@ export const MALDIVES_ISLAND_TOUR: Tour = {
   locationsLabel: "Malé · North Malé Atoll · Baa Atoll",
   highlights: [
     "Overwater bungalow stays",
-    "Manta ray snorkelling at Hanifaru Bay",
+    "Manta ray snorkelling",
     "Sunset dolphin cruise",
     "Coral reef PADI dive",
   ],
@@ -1831,7 +1831,7 @@ export const TENERIFE_TOUR: Tour = {
     "Whale & dolphin watching cruise",
     "Masca gorge hike",
   ],
-  mainImage: "https://images.unsplash.com/photo-1607604276583-eef5d176d184?w=800&q=80",
+  mainImage: "https://picsum.photos/seed/tenerife-teide/800/600",
   price: { perPerson: 1099, total: 2198, currency: "GBP", paidBefore: 549, paidAtDestination: 550 },
   startDate: "Apr 11, 2026",
   endDate: "Apr 19, 2026",
@@ -1843,7 +1843,7 @@ export const TENERIFE_TOUR: Tour = {
     { iconKey: "calendar-check",  label: "Age 12+" },
   ],
   gallery: [
-    "https://images.unsplash.com/photo-1607604276583-eef5d176d184?w=800&q=80",
+    "https://picsum.photos/seed/tenerife-teide/800/600",
     "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80",
     "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
@@ -1866,7 +1866,7 @@ export const TENERIFE_TOUR: Tour = {
         { type: "highlight", label: "Roques de García lava field walk", description: "Guided walk through the otherworldly volcanic landscape." },
         { type: "hotel", label: "Bahía del Duque or similar" },
       ],
-      image: "https://images.unsplash.com/photo-1607604276583-eef5d176d184?w=800&q=80",
+      image: "https://picsum.photos/seed/tenerife-teide/800/600",
     },
     {
       dayNumber: 4,

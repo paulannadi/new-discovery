@@ -82,11 +82,12 @@ export function TourCard({ tour, onSelect, onHover, isHovered }: TourCardProps) 
     >
       {/* ── Image ───────────────────────────────────────────────────────── */}
       {/* Below 680px: full width on top. At 680px+: fixed 260px on the left. */}
-      <div className="relative shrink-0 @[680px]:w-[260px]">
+      {/* self-start stops the image column from stretching to the card height */}
+      <div className="relative shrink-0 @[680px]:w-[260px] @[680px]:self-start">
         <img
           src={tour.mainImage}
           alt={tour.title}
-          className="w-full h-[200px] @[680px]:h-full object-cover"
+          className="w-full h-[200px] object-cover"
         />
 
         <span className="absolute top-2 left-2 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-normal bg-white text-foreground">
