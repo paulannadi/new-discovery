@@ -55,6 +55,7 @@ export const SWISS_WINTER_TOUR: Tour = {
     {
       dayNumber: 1,
       title: "Arrival in Lucerne",
+      location: "Lucerne",
       items: [
         {
           type: "highlight",
@@ -72,6 +73,7 @@ export const SWISS_WINTER_TOUR: Tour = {
     {
       dayNumber: 2,
       title: "Luzern-Interlaken Express",
+      location: "Lucerne → Interlaken",
       items: [
         {
           type: "highlight",
@@ -94,6 +96,7 @@ export const SWISS_WINTER_TOUR: Tour = {
     {
       dayNumber: 3,
       title: "Free day in Interlaken",
+      location: "Interlaken",
       items: [
         {
           type: "highlight",
@@ -111,6 +114,7 @@ export const SWISS_WINTER_TOUR: Tour = {
     {
       dayNumber: 4,
       title: "Travel to Brig",
+      location: "Interlaken → Brig",
       items: [
         {
           type: "highlight",
@@ -133,6 +137,7 @@ export const SWISS_WINTER_TOUR: Tour = {
     {
       dayNumber: 5,
       title: "Day excursion to Zermatt",
+      location: "Brig → Zermatt",
       items: [
         {
           type: "highlight",
@@ -155,6 +160,7 @@ export const SWISS_WINTER_TOUR: Tour = {
     {
       dayNumber: 6,
       title: "Glacier Express to Chur",
+      location: "Brig → Chur",
       items: [
         {
           type: "highlight",
@@ -177,6 +183,7 @@ export const SWISS_WINTER_TOUR: Tour = {
     {
       dayNumber: 7,
       title: "Bernina Express to Poschiavo",
+      location: "Chur → Poschiavo",
       items: [
         {
           type: "highlight",
@@ -199,6 +206,7 @@ export const SWISS_WINTER_TOUR: Tour = {
     {
       dayNumber: 8,
       title: "Departure day",
+      location: "Chur",
       items: [
         {
           type: "highlight",
@@ -362,6 +370,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
     {
       dayNumber: 1,
       title: "Arrive in Bangkok",
+      location: "Bangkok",
       items: [
         { type: "highlight", label: "Welcome to Bangkok", description: "Arrive at Suvarnabhumi Airport. Transfer to your hotel in the heart of the city. Evening welcome dinner with the group." },
         { type: "hotel",    label: "Chatrium Hotel Riverside ****" },
@@ -371,6 +380,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
     {
       dayNumber: 2,
       title: "Bangkok Temples & Markets",
+      location: "Bangkok",
       items: [
         { type: "highlight",  label: "Grand Palace & Wat Pho", description: "Morning guided tour of the Grand Palace complex and the reclining Buddha at Wat Pho." },
         { type: "highlight",  label: "Chao Phraya River cruise", description: "Afternoon boat ride past golden temples and wooden stilt houses." },
@@ -382,6 +392,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
     {
       dayNumber: 3,
       title: "Floating Markets & Flight North",
+      location: "Bangkok → Chiang Mai",
       items: [
         { type: "highlight",  label: "Damnoen Saduak Floating Market", description: "Early morning canal boat tour through the iconic floating market." },
         { type: "transport",  label: "Bangkok → Chiang Mai (flight)", description: "1 hour 15 min · Domestic flight included" },
@@ -392,6 +403,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
     {
       dayNumber: 4,
       title: "Elephant Sanctuary",
+      location: "Chiang Mai",
       items: [
         { type: "highlight",  label: "Elephant Nature Park", description: "Full day at an ethical elephant sanctuary — feed, bathe, and walk alongside rescued elephants in the jungle." },
         { type: "hotel",      label: "Anantara Chiang Mai Resort *****" },
@@ -401,6 +413,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
     {
       dayNumber: 5,
       title: "Chiang Mai Old City",
+      location: "Chiang Mai",
       items: [
         { type: "highlight",  label: "Doi Suthep Temple", description: "Morning hike up 309 steps to Wat Phra That Doi Suthep for panoramic city views." },
         { type: "highlight",  label: "Night Bazaar", description: "Evening at the famous Chiang Mai Night Bazaar — handcrafts, silk, and street food." },
@@ -411,6 +424,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
     {
       dayNumber: 6,
       title: "Fly to Koh Samui",
+      location: "Chiang Mai → Koh Samui",
       items: [
         { type: "transport",  label: "Chiang Mai → Koh Samui (flight)", description: "Approx. 2 hours · Domestic flight included" },
         { type: "highlight",  label: "Chaweng Beach afternoon", description: "Check in and spend the afternoon on the powdery white sand of Chaweng Beach." },
@@ -421,6 +435,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
     {
       dayNumber: 7,
       title: "Island & Snorkelling",
+      location: "Koh Samui",
       items: [
         { type: "highlight",  label: "Angthong Marine Park boat trip", description: "Full-day speedboat excursion to the 42 uninhabited islands of Angthong National Marine Park. Snorkelling, kayaking, and a lagoon swim included." },
         { type: "hotel",      label: "Samui Palm Beach Resort ****" },
@@ -430,6 +445,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
     {
       dayNumber: 8,
       title: "Departure Day",
+      location: "Koh Samui",
       items: [
         { type: "highlight", label: "Check out & farewell", description: "Final morning on the beach before transferring to Koh Samui Airport for onward flights." },
       ],
@@ -556,6 +572,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
     {
       dayNumber: 1,
       title: "Arrive in Ubud",
+      location: "Denpasar → Ubud",
       items: [
         { type: "highlight", label: "Arrive at Ngurah Rai Airport", description: "Transfer north to Ubud, Bali's cultural and artistic heart. Evening welcome dinner at a traditional warung." },
         { type: "hotel",    label: "Komaneka at Bisma ***** or similar" },
@@ -565,6 +582,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
     {
       dayNumber: 2,
       title: "Ubud Temples & Art",
+      location: "Ubud",
       items: [
         { type: "highlight", label: "Tirta Empul Holy Spring Temple", description: "Watch or participate in a traditional Balinese purification ritual at this 10th-century sacred spring." },
         { type: "highlight", label: "Ubud Art Market & Monkey Forest", description: "Browse handmade textiles, silver jewellery, and woodcarvings before walking through the Sacred Monkey Forest Sanctuary." },
@@ -575,6 +593,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
     {
       dayNumber: 3,
       title: "Rice Terraces & Crafts",
+      location: "Ubud",
       items: [
         { type: "highlight", label: "Tegallalang Rice Terraces", description: "Morning walk through the UNESCO-listed terraced rice paddies, carved into the hillside over centuries." },
         { type: "highlight", label: "Silver & batik workshops", description: "Afternoon visits to artisan workshops in Celuk (silver) and Batuan (batik painting)." },
@@ -585,6 +604,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
     {
       dayNumber: 4,
       title: "Bedugul Lake & Temple",
+      location: "Bedugul",
       items: [
         { type: "highlight", label: "Pura Ulun Danu Bratan", description: "Drive north to the iconic water temple dramatically perched on the edge of volcanic Lake Bratan." },
         { type: "highlight", label: "Jatiluwih UNESCO Rice Terraces", description: "A vast panorama of UNESCO-listed terraces — quieter and more dramatic than Tegallalang." },
@@ -595,6 +615,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
     {
       dayNumber: 5,
       title: "Tanah Lot & Move to Seminyak",
+      location: "Ubud → Seminyak",
       items: [
         { type: "highlight", label: "Tanah Lot Temple at sunset", description: "Bali's most photographed sight — a sea temple perched on a rocky outcrop, best seen as the sun dips below the horizon." },
         { type: "transport", label: "Transfer to Seminyak", description: "Approx. 45 minutes south to the coast" },
@@ -605,6 +626,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
     {
       dayNumber: 6,
       title: "Seminyak Beach Day",
+      location: "Seminyak",
       items: [
         { type: "highlight", label: "Seminyak Beach free day", description: "A full free day to relax, surf, swim, or browse the boutiques and beach clubs of Seminyak and Petitenget." },
         { type: "hotel",    label: "The Layar *****" },
@@ -614,6 +636,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
     {
       dayNumber: 7,
       title: "Uluwatu Cliff Temple",
+      location: "Seminyak → Uluwatu",
       items: [
         { type: "highlight", label: "Uluwatu Temple & Kecak Fire Dance", description: "Clifftop temple 70m above the Indian Ocean. Evening Kecak fire dance performed at sunset on the clifftop stage — one of Bali's most memorable experiences." },
         { type: "hotel",    label: "The Layar *****" },
@@ -623,6 +646,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
     {
       dayNumber: 8,
       title: "Departure Day",
+      location: "Seminyak → Denpasar",
       items: [
         { type: "highlight", label: "Check out & farewell", description: "Final morning in Seminyak before transferring to Ngurah Rai Airport. Ubud is just 90 minutes away — ideal for a last coffee stop." },
       ],

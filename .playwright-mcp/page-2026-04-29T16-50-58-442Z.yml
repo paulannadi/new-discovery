@@ -1,0 +1,158 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e422]:
+    - button "Back to tours" [ref=e425]:
+      - img [ref=e426]
+      - text: Back to tours
+    - generic [ref=e431]:
+      - generic [ref=e432]:
+        - generic [ref=e433]:
+          - generic [ref=e434]:
+            - generic [ref=e435] [cursor=pointer]:
+              - img "Cultural Bali Discovery" [ref=e436]
+              - img [ref=e440]
+            - generic [ref=e442]:
+              - img "Tour photo 2" [ref=e444] [cursor=pointer]
+              - img "Tour photo 3" [ref=e446] [cursor=pointer]
+              - img "Tour photo 4" [ref=e448] [cursor=pointer]
+              - img "Tour photo 5" [ref=e450] [cursor=pointer]
+          - button "⊞ See all photos" [ref=e451]
+        - generic [ref=e452]:
+          - heading "Cultural Bali Discovery" [level=1] [ref=e453]
+          - generic [ref=e454]:
+            - generic [ref=e455]:
+              - img [ref=e456]
+              - generic [ref=e459]: 8 days
+            - generic [ref=e460]: "|"
+            - generic [ref=e461]:
+              - img [ref=e462]
+              - generic [ref=e465]: Ubud · Bedugul · Seminyak
+            - button "Show on map" [ref=e466]:
+              - img [ref=e467]
+              - text: Show on map
+        - generic [ref=e471]:
+          - heading "Quick facts" [level=3] [ref=e472]
+          - generic [ref=e473]:
+            - generic [ref=e474]:
+              - button "Overview" [ref=e475]:
+                - img [ref=e476]
+                - text: Overview
+              - button "Highlights" [ref=e478]:
+                - img [ref=e479]
+                - text: Highlights
+              - button "Included" [ref=e481]:
+                - img [ref=e482]
+                - text: Included
+              - button "Excluded" [ref=e484]:
+                - img [ref=e485]
+                - text: Excluded
+            - generic [ref=e488]:
+              - paragraph [ref=e489]: Tour details
+              - generic [ref=e490]:
+                - generic [ref=e491]:
+                  - img [ref=e492]
+                  - generic [ref=e497]: Individual tour
+                - generic [ref=e498]:
+                  - img [ref=e499]
+                  - generic [ref=e503]: Guided in English
+                - generic [ref=e504]:
+                  - img [ref=e505]
+                  - generic [ref=e507]: All levels
+                - generic [ref=e508]:
+                  - img [ref=e509]
+                  - generic [ref=e512]: Age 16+
+        - generic [ref=e514]:
+          - heading "Day by day adventures" [level=3] [ref=e515]
+          - generic [ref=e516]:
+            - generic [ref=e517]:
+              - button "Day 1 Arrive in Ubud Denpasar → Ubud" [ref=e518]:
+                - generic [ref=e519]: Day 1
+                - generic [ref=e520]: Arrive in Ubud
+                - generic [ref=e521]: Denpasar → Ubud
+              - generic [ref=e522]:
+                - 'img "Day 1: Arrive in Ubud" [ref=e525]'
+                - generic [ref=e526]:
+                  - generic [ref=e527]:
+                    - img [ref=e528]
+                    - generic [ref=e532]:
+                      - paragraph [ref=e533]: Arrive at Ngurah Rai Airport
+                      - paragraph [ref=e534]: Transfer north to Ubud, Bali's cultural and artistic heart. Evening welcome dinner at a traditional warung.
+                  - generic [ref=e535]:
+                    - img [ref=e536]
+                    - paragraph [ref=e540]: Komaneka at Bisma ***** or similar
+            - button "Day 2 Ubud Temples & Art Ubud" [ref=e542]:
+              - generic [ref=e543]: Day 2
+              - generic [ref=e544]: Ubud Temples & Art
+              - generic [ref=e545]: Ubud
+            - button "Day 3 Rice Terraces & Crafts Ubud" [ref=e547]:
+              - generic [ref=e548]: Day 3
+              - generic [ref=e549]: Rice Terraces & Crafts
+              - generic [ref=e550]: Ubud
+            - button "Day 4 Bedugul Lake & Temple Bedugul" [ref=e552]:
+              - generic [ref=e553]: Day 4
+              - generic [ref=e554]: Bedugul Lake & Temple
+              - generic [ref=e555]: Bedugul
+            - button "Day 5 Tanah Lot & Move to Seminyak Ubud → Seminyak" [ref=e557]:
+              - generic [ref=e558]: Day 5
+              - generic [ref=e559]: Tanah Lot & Move to Seminyak
+              - generic [ref=e560]: Ubud → Seminyak
+            - button "Day 6 Seminyak Beach Day Seminyak" [ref=e562]:
+              - generic [ref=e563]: Day 6
+              - generic [ref=e564]: Seminyak Beach Day
+              - generic [ref=e565]: Seminyak
+            - button "Day 7 Uluwatu Cliff Temple Seminyak → Uluwatu" [ref=e567]:
+              - generic [ref=e568]: Day 7
+              - generic [ref=e569]: Uluwatu Cliff Temple
+              - generic [ref=e570]: Seminyak → Uluwatu
+            - button "Day 8 Departure Day Seminyak → Denpasar" [ref=e572]:
+              - generic [ref=e573]: Day 8
+              - generic [ref=e574]: Departure Day
+              - generic [ref=e575]: Seminyak → Denpasar
+        - generic [ref=e577]:
+          - heading "Tour route" [level=3] [ref=e578]
+          - generic [ref=e581]:
+            - generic:
+              - generic:
+                - img
+              - generic:
+                - button "1" [ref=e583] [cursor=pointer]:
+                  - generic [ref=e584]: "1"
+                - button "2" [ref=e585] [cursor=pointer]:
+                  - generic [ref=e586]: "2"
+            - generic:
+              - generic [ref=e587]:
+                - button "Zoom in" [ref=e588] [cursor=pointer]: +
+                - button "Zoom out" [ref=e589] [cursor=pointer]: −
+              - generic [ref=e590]:
+                - link "Leaflet" [ref=e591] [cursor=pointer]:
+                  - /url: https://leafletjs.com
+                  - img [ref=e592]
+                  - text: Leaflet
+                - text: "| ©"
+                - link "OpenStreetMap" [ref=e596] [cursor=pointer]:
+                  - /url: https://www.openstreetmap.org/copyright
+      - generic [ref=e598]:
+        - generic [ref=e600]:
+          - generic [ref=e601]: $1,980 per person · 8-day guided tour
+          - generic [ref=e602]: "Total for 2 adults: $3,960"
+        - generic [ref=e603]:
+          - paragraph [ref=e604]: Customise your trip
+          - button "Travel date Sep 14, 2026" [ref=e606]:
+            - img [ref=e607]
+            - generic [ref=e609]:
+              - generic [ref=e610]: Travel date
+              - generic [ref=e611]: Sep 14, 2026
+            - img [ref=e612]
+          - button "Travellers 2 Adults" [ref=e615]:
+            - img [ref=e616]
+            - generic [ref=e621]:
+              - generic [ref=e622]: Travellers
+              - generic [ref=e623]: 2 Adults
+            - img [ref=e624]
+          - button "Hotel preference Standard" [ref=e627]:
+            - img [ref=e628]
+            - generic [ref=e631]:
+              - generic [ref=e632]: Hotel preference
+              - generic [ref=e633]: Standard
+            - img [ref=e634]
+        - button "Start planning" [ref=e637]

@@ -1,0 +1,17 @@
+[     250ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=a8282b66:5
+[  235436ms] ReferenceError: DayByDaySection is not defined
+    at TourDetailPage (http://localhost:5173/new-discovery/src/modules/smartPlanner/pages/TourDetailPage.tsx?t=1777475849971:367:38)
+    at Object.react_stack_bottom_frame (http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=a8282b66:6:394334)
+    at renderWithHooks (http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=a8282b66:4:182819)
+    at updateFunctionComponent (http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=a8282b66:6:5625)
+    at beginWork (http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=a8282b66:6:52667)
+    at runWithFiberInDEV (http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=a8282b66:4:20381)
+    at performUnitOfWork (http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=a8282b66:6:190802)
+    at workLoopSync (http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=a8282b66:6:186747)
+    at renderRootSync (http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=a8282b66:6:186242)
+    at performWorkOnRoot (http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=a8282b66:6:166199)
+[  235435ms] [WARNING] %s
+
+%s
+ An error occurred in the <TourDetailPage> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries. @ http://localhost:5173/new-discovery/@fs/tmp/vite-cache/deps/react-dom_client.js?v=a8282b66:3

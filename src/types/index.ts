@@ -151,6 +151,7 @@ export interface TourDayItem {
 export interface TourDay {
   dayNumber: number;
   title: string;        // e.g. "Arrival in Lucerne"
+  location?: string;    // e.g. "Ubud" — shown right-aligned in the day header
   items: TourDayItem[];
   image?: string;       // Optional day photo
 }

@@ -1,0 +1,162 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e422]:
+    - generic [ref=e424]:
+      - button "Back to tours" [ref=e426]:
+        - img [ref=e427]
+        - text: Back to tours
+      - generic [ref=e429]:
+        - generic [ref=e430]:
+          - generic [ref=e431]:
+            - generic [ref=e432]:
+              - generic [ref=e433] [cursor=pointer]:
+                - img "Classic Thailand Explorer" [ref=e434]
+                - img [ref=e438]
+              - generic [ref=e440]:
+                - img "Tour photo 2" [ref=e442] [cursor=pointer]
+                - img "Tour photo 3" [ref=e444] [cursor=pointer]
+                - img "Tour photo 4" [ref=e446] [cursor=pointer]
+                - img "Tour photo 5" [ref=e448] [cursor=pointer]
+            - button "⊞ See all photos" [ref=e449]
+          - generic [ref=e450]:
+            - heading "Classic Thailand Explorer" [level=1] [ref=e451]
+            - generic [ref=e452]:
+              - generic [ref=e453]:
+                - img [ref=e454]
+                - generic [ref=e457]: 8 days
+              - generic [ref=e458]: "|"
+              - generic [ref=e459]:
+                - img [ref=e460]
+                - generic [ref=e463]: Bangkok · Chiang Mai · Koh Samui
+              - button "Show on map" [ref=e464]:
+                - img [ref=e465]
+                - text: Show on map
+        - generic [ref=e470]:
+          - generic [ref=e472]:
+            - generic [ref=e473]: $1,650 per person · 8-day guided tour
+            - generic [ref=e474]: "Total for 2 adults: $3,300"
+          - generic [ref=e475]:
+            - paragraph [ref=e476]: Customise your trip
+            - button "Travel date Oct 05, 2026" [ref=e478]:
+              - img [ref=e479]
+              - generic [ref=e481]:
+                - generic [ref=e482]: Travel date
+                - generic [ref=e483]: Oct 05, 2026
+              - img [ref=e484]
+            - button "Travellers 2 Adults" [ref=e487]:
+              - img [ref=e488]
+              - generic [ref=e493]:
+                - generic [ref=e494]: Travellers
+                - generic [ref=e495]: 2 Adults
+              - img [ref=e496]
+            - button "Hotel preference Standard" [ref=e499]:
+              - img [ref=e500]
+              - generic [ref=e503]:
+                - generic [ref=e504]: Hotel preference
+                - generic [ref=e505]: Standard
+              - img [ref=e506]
+          - button "Start planning" [ref=e509]
+    - generic [ref=e511]:
+      - generic [ref=e512]:
+        - heading "Quick facts" [level=3] [ref=e513]
+        - generic [ref=e514]:
+          - generic [ref=e515]:
+            - button "Overview" [ref=e516]:
+              - img [ref=e517]
+              - text: Overview
+            - button "Highlights" [ref=e519]:
+              - img [ref=e520]
+              - text: Highlights
+            - button "Included" [ref=e522]:
+              - img [ref=e523]
+              - text: Included
+            - button "Excluded" [ref=e525]:
+              - img [ref=e526]
+              - text: Excluded
+          - generic [ref=e529]:
+            - paragraph [ref=e530]: Tour details
+            - generic [ref=e531]:
+              - generic [ref=e532]:
+                - img [ref=e533]
+                - generic [ref=e538]: Group tour (max 16)
+              - generic [ref=e539]:
+                - img [ref=e540]
+                - generic [ref=e544]: Guided in English
+              - generic [ref=e545]:
+                - img [ref=e546]
+                - generic [ref=e548]: Easy to moderate
+              - generic [ref=e549]:
+                - img [ref=e550]
+                - generic [ref=e553]: Age 18+
+      - generic [ref=e554]:
+        - heading "Day by day adventures" [level=3] [ref=e555]
+        - generic [ref=e556]:
+          - generic [ref=e557]:
+            - button "Day 1 Arrive in Bangkok Bangkok" [ref=e558]:
+              - generic [ref=e559]: Day 1
+              - generic [ref=e560]: Arrive in Bangkok
+              - generic [ref=e561]: Bangkok
+            - generic [ref=e562]:
+              - 'img "Day 1: Arrive in Bangkok" [ref=e565]'
+              - generic [ref=e566]:
+                - generic [ref=e567]:
+                  - img [ref=e568]
+                  - generic [ref=e572]:
+                    - paragraph [ref=e573]: Welcome to Bangkok
+                    - paragraph [ref=e574]: Arrive at Suvarnabhumi Airport. Transfer to your hotel in the heart of the city. Evening welcome dinner with the group.
+                - generic [ref=e575]:
+                  - img [ref=e576]
+                  - paragraph [ref=e580]: Chatrium Hotel Riverside ****
+          - button "Day 2 Bangkok Temples & Markets Bangkok" [ref=e582]:
+            - generic [ref=e583]: Day 2
+            - generic [ref=e584]: Bangkok Temples & Markets
+            - generic [ref=e585]: Bangkok
+          - button "Day 3 Floating Markets & Flight North Bangkok → Chiang Mai" [ref=e587]:
+            - generic [ref=e588]: Day 3
+            - generic [ref=e589]: Floating Markets & Flight North
+            - generic [ref=e590]: Bangkok → Chiang Mai
+          - button "Day 4 Elephant Sanctuary Chiang Mai" [ref=e592]:
+            - generic [ref=e593]: Day 4
+            - generic [ref=e594]: Elephant Sanctuary
+            - generic [ref=e595]: Chiang Mai
+          - button "Day 5 Chiang Mai Old City Chiang Mai" [ref=e597]:
+            - generic [ref=e598]: Day 5
+            - generic [ref=e599]: Chiang Mai Old City
+            - generic [ref=e600]: Chiang Mai
+          - button "Day 6 Fly to Koh Samui Chiang Mai → Koh Samui" [ref=e602]:
+            - generic [ref=e603]: Day 6
+            - generic [ref=e604]: Fly to Koh Samui
+            - generic [ref=e605]: Chiang Mai → Koh Samui
+          - button "Day 7 Island & Snorkelling Koh Samui" [ref=e607]:
+            - generic [ref=e608]: Day 7
+            - generic [ref=e609]: Island & Snorkelling
+            - generic [ref=e610]: Koh Samui
+          - button "Day 8 Departure Day Koh Samui" [ref=e612]:
+            - generic [ref=e613]: Day 8
+            - generic [ref=e614]: Departure Day
+            - generic [ref=e615]: Koh Samui
+      - generic [ref=e616]:
+        - heading "Tour route" [level=3] [ref=e617]
+        - generic [ref=e620]:
+          - generic:
+            - generic:
+              - img
+            - generic:
+              - button "1" [ref=e622] [cursor=pointer]:
+                - generic [ref=e623]: "1"
+              - button "2" [ref=e624] [cursor=pointer]:
+                - generic [ref=e625]: "2"
+              - button "3" [ref=e626] [cursor=pointer]:
+                - generic [ref=e627]: "3"
+          - generic:
+            - generic [ref=e628]:
+              - button "Zoom in" [ref=e629] [cursor=pointer]: +
+              - button "Zoom out" [ref=e630] [cursor=pointer]: −
+            - generic [ref=e631]:
+              - link "Leaflet" [ref=e632] [cursor=pointer]:
+                - /url: https://leafletjs.com
+                - img [ref=e633]
+                - text: Leaflet
+              - text: "| ©"
+              - link "OpenStreetMap" [ref=e637] [cursor=pointer]:
+                - /url: https://www.openstreetmap.org/copyright

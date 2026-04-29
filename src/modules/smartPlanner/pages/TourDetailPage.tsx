@@ -11,7 +11,7 @@
 //   • Mobile sticky footer with price + CTA
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   MapPin,
   Clock,
@@ -27,7 +27,6 @@ import {
   Hotel,
   Bus,
   ChevronDown,
-  ChevronUp,
   Play,
   Plus,
   Minus,
@@ -43,7 +42,10 @@ import {
   DialogTitle,
 } from "../../../shared/components/ui/dialog";
 import { cn } from "../../../shared/components/ui/utils";
-import type { Tour, TourAttribute, TourDay, TourDayItem } from "../../../types";
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import type { Tour, TourAttribute, TourDay, TourDayItem, TourStop } from "../../../types";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -62,9 +64,9 @@ function AttributeIcon({ iconKey }: { iconKey: TourAttribute["iconKey"] }) {
 }
 
 function DayItemIcon({ type }: { type: TourDayItem["type"] }) {
-  if (type === "highlight") return <MapPinned size={15} className="text-grey shrink-0 mt-0.5" aria-hidden="true" />;
-  if (type === "hotel")     return <Hotel     size={15} className="text-grey shrink-0 mt-0.5" aria-hidden="true" />;
-  if (type === "transport") return <Bus       size={15} className="text-grey shrink-0 mt-0.5" aria-hidden="true" />;
+  if (type === "highlight") return <MapPinned size={15} className="text-foreground shrink-0 mt-0.5" aria-hidden="true" />;
+  if (type === "hotel")     return <Hotel     size={15} className="text-foreground shrink-0 mt-0.5" aria-hidden="true" />;
+  if (type === "transport") return <Bus       size={15} className="text-foreground shrink-0 mt-0.5" aria-hidden="true" />;
   return null;
 }
 
@@ -78,7 +80,7 @@ interface TourDetailPageProps {
   backLabel?: string;
 }
 
-type InfoTab = "highlights" | "included" | "excluded";
+type InfoTab = "overview" | "highlights" | "included" | "excluded";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Component
@@ -115,7 +117,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
   const travelDate  = selectedDate ? format(selectedDate, "MMM d, yyyy") : tour.startDate;
 
   // Info tabs
-  const [activeTab, setActiveTab] = useState<InfoTab>("highlights");
+  const [activeTab, setActiveTab] = useState<InfoTab>("overview");
 
   const currency = sym(tour.price.currency);
   const totalPrice = tour.price.perPerson * adults;
@@ -142,284 +144,185 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;900&display=swap');`}</style>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          TOP WHITE CARD — back button + photo grid + tour title/facts
-          Same structure as PackageDetailPage's main info card.
-          The booking widget is NOT here — it lives in the right sidebar below.
+          Back button — full-width white background
       ══════════════════════════════════════════════════════════════════════ */}
       <div className="bg-card">
-        <div className="max-w-[1280px] mx-auto">
-
-          {/* Back button */}
-          <div className="px-4 sm:px-6 md:px-10 pt-5 pb-5">
-            <BackButton label={backLabel} onClick={onBack} />
-          </div>
-
-          {/* ── Photo grid — 402px, 3fr / 2fr, same as PackageDetailPage ── */}
-          <div className="relative mx-4 sm:mx-6 md:mx-10">
-            <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[200px] sm:h-[240px] md:h-[402px] gap-2">
-
-              {/* Main image with play button overlay */}
-              <div className="relative overflow-hidden rounded-xl group cursor-pointer">
-                <img
-                  src={galleryImages[0]}
-                  alt={tour.title}
-                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 via-transparent to-transparent" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                    <Play size={20} className="text-[#1a1a1a] ml-1" fill="#1a1a1a" aria-hidden="true" />
-                  </div>
-                </div>
-              </div>
-
-              {/* 2×2 thumbnail grid — desktop only, clicking opens the modal */}
-              <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-2">
-                {galleryImages.slice(1, 5).map((url, i) => (
-                  <div
-                    key={url}
-                    className="overflow-hidden rounded-xl cursor-pointer group"
-                    onClick={() => setPhotosOpen(true)}
-                  >
-                    <img
-                      src={url}
-                      alt={`Tour photo ${i + 2}`}
-                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* "See all photos" button — overlaid bottom-right, same as PackageDetailPage */}
-            <button
-              onClick={() => setPhotosOpen(true)}
-              className="absolute bottom-4 right-4 bg-white border border-primary text-primary text-sm font-semibold px-4 py-2 rounded-sm flex items-center gap-2 hover:bg-primary hover:text-white transition-colors shadow-sm"
-            >
-              ⊞ See all photos
-            </button>
-          </div>
-
-          {/* ── Tour title + quick facts — full width, no widget ── */}
-          <div className="px-4 sm:px-6 md:px-10 pt-8 pb-5 md:pb-8 flex flex-col gap-4">
-
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground leading-tight tracking-tight">
-              {tour.title}
-            </h1>
-
-            {/* Duration + locations — same row style as PackageDetailPage */}
-            <div className="flex items-center gap-4 text-base text-foreground flex-wrap">
-              <div className="flex items-center gap-1.5">
-                <Clock size={15} className="text-foreground shrink-0" aria-hidden="true" />
-                <span>{tour.duration} days</span>
-              </div>
-              <span className="text-border hidden md:block">|</span>
-              <div className="flex items-center gap-1.5">
-                <MapPin size={15} className="text-foreground shrink-0" aria-hidden="true" />
-                <span>{tour.locationsLabel}</span>
-              </div>
-              <button className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
-                <MapPinned size={14} aria-hidden="true" />
-                Show on map
-              </button>
-            </div>
-
-            {/* Tour details — same pattern as "Package details" in PackageDetailPage:
-                plain icon + text rows, no chip borders or backgrounds */}
-            <h3 className="text-lg font-bold text-foreground">Tour details</h3>
-            <div className="flex flex-row flex-wrap gap-x-6 gap-y-2">
-              {tour.attributes.map((attr) => (
-                <div key={attr.label} className="flex items-center gap-2 text-base text-foreground">
-                  <AttributeIcon iconKey={attr.iconKey} />
-                  <span>{attr.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 md:px-10 pt-5 pb-5">
+          <BackButton label={backLabel} onClick={onBack} />
         </div>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          PAGE BODY — two-column grid, same as PackageDetailPage body
+          MAIN GRID — spans from gallery (white bg) through content (grey bg).
+          The white background is a full-width band behind the gallery/title
+          using a wrapper with relative positioning + a bg-card pseudo-element.
+          The booking widget starts next to the gallery and sticks as you scroll.
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8">
+      <div className="relative">
+        {/* Full-width white background band — covers only the gallery+title height.
+            The ref measures the gallery area and sets the height dynamically,
+            but a simpler approach: use a fixed-height white band behind the top. */}
+        <div className="absolute inset-x-0 top-0 h-[540px] bg-card" aria-hidden="true" />
 
-        <h2 className="text-3xl font-bold text-foreground mb-6">
-          Tour highlights & itinerary
-        </h2>
+        <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6 md:px-10 pb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 lg:gap-10 items-start">
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 lg:gap-10 items-start">
+          {/* ── Left column ── */}
+          <div className="flex flex-col min-w-0">
 
-          {/* ╔═══════════════════════════════════════════════════════════════
-              LEFT COLUMN — gallery, day-by-day, info tabs
-          ═══════════════════════════════════════════════════════════════╗ */}
-          <div className="flex flex-col gap-6 min-w-0">
+            {/* Gallery */}
+            <div className="relative">
+              <div className="grid grid-cols-1 md:grid-cols-[3fr_1fr] h-[200px] sm:h-[240px] md:h-[402px] gap-2">
+                <div className="relative overflow-hidden rounded-xl group cursor-pointer">
+                  <img src={galleryImages[0]} alt={tour.title} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 via-transparent to-transparent" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                      <Play size={20} className="text-[#1a1a1a] ml-1" fill="#1a1a1a" aria-hidden="true" />
+                    </div>
+                  </div>
+                </div>
+                <div className="hidden md:grid grid-rows-2 gap-2">
+                  {galleryImages.slice(1, 3).map((url, i) => (
+                    <div key={url} className="overflow-hidden rounded-xl cursor-pointer group" onClick={() => setPhotosOpen(true)}>
+                      <img src={url} alt={`Tour photo ${i + 2}`} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <button onClick={() => setPhotosOpen(true)} className="absolute bottom-4 right-4 bg-white border border-primary text-primary text-sm font-semibold px-4 py-2 rounded-sm flex items-center gap-2 hover:bg-primary hover:text-white transition-colors shadow-sm">
+                ⊞ See all photos
+              </button>
+            </div>
 
-            {/* ── Day-by-day ──────────────────────────────────────────────── */}
-            <div>
-              <h3 className="text-xl font-bold text-foreground mb-4">
-                Day by day adventures
-              </h3>
-              <div className="flex flex-col gap-3">
-                {tour.days.map((day) => (
-                  <DayCard key={day.dayNumber} day={day} slug={slug} />
-                ))}
+            {/* Title + details */}
+            <div className="pt-8 pb-4 flex flex-col gap-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground leading-tight tracking-tight">{tour.title}</h1>
+              <div className="flex items-center gap-4 text-base text-foreground flex-wrap">
+                <div className="flex items-center gap-1.5">
+                  <Clock size={15} className="text-foreground shrink-0" aria-hidden="true" />
+                  <span>{tour.duration} days</span>
+                </div>
+                <span className="text-border hidden md:block">|</span>
+                <div className="flex items-center gap-1.5">
+                  <MapPin size={15} className="text-foreground shrink-0" aria-hidden="true" />
+                  <span>{tour.locationsLabel}</span>
+                </div>
+                <button className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                  <MapPinned size={14} aria-hidden="true" />
+                  Show on map
+                </button>
               </div>
             </div>
 
-            {/* ── Info tabs ───────────────────────────────────────────────── */}
-            <div>
-              <h3 className="text-xl font-bold text-foreground mb-4">
-                Don't forget to remember
-              </h3>
+            {/* Quick facts */}
+            <div className="mt-5">
+              <h3 className="text-xl font-bold text-foreground mb-4">Quick facts</h3>
               <div className="bg-card rounded-xl shadow-sm overflow-hidden">
-
-                {/* Tab bar */}
                 <div className="flex border-b border-border">
-                  {(["highlights", "included", "excluded"] as InfoTab[]).map((tab) => {
+                  {(["overview", "highlights", "included", "excluded"] as InfoTab[]).map((tab) => {
                     const isActive = activeTab === tab;
-                    const config = {
+                    const config: Record<InfoTab, { label: string; icon: React.ReactNode }> = {
+                      overview:   { label: "Overview",   icon: <Info     size={15} aria-hidden="true" /> },
                       highlights: { label: "Highlights", icon: <Sparkles size={15} aria-hidden="true" /> },
                       included:   { label: "Included",   icon: <Check    size={15} aria-hidden="true" /> },
                       excluded:   { label: "Excluded",   icon: <Info     size={15} aria-hidden="true" /> },
-                    }[tab];
+                    };
+                    const { label, icon } = config[tab];
                     return (
                       <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
                         className={cn(
                           "flex items-center gap-2 px-6 py-4 font-bold text-sm border-b-2 transition-colors",
-                          isActive
-                            ? "border-primary text-primary"
-                            : "border-transparent text-grey hover:text-foreground"
+                          isActive ? "border-primary text-primary" : "border-transparent text-grey hover:text-foreground"
                         )}
                       >
-                        {config.icon}
-                        {config.label}
+                        {icon}
+                        {label}
                       </button>
                     );
                   })}
                 </div>
-
-                {/* Tab content */}
                 <div className="p-5">
-                  {activeTab === "highlights" && (
-                    <InfoList title="Tour highlights" items={tour.highlights} variant="highlight" />
+                  {activeTab === "overview" && (
+                    <div className="flex flex-col gap-4">
+                      <p className="text-base font-bold text-foreground">Tour details</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+                        {tour.attributes.map((attr) => (
+                          <div key={attr.label} className="flex items-center gap-3">
+                            <AttributeIcon iconKey={attr.iconKey} />
+                            <span className="text-sm text-foreground">{attr.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
-                  {activeTab === "included" && (
-                    <InfoList title="What's included" items={tour.included} variant="check" />
-                  )}
-                  {activeTab === "excluded" && (
-                    <InfoList title="Not included" items={tour.excluded} variant="cross" />
-                  )}
+                  {activeTab === "highlights" && <InfoList title="Tour highlights" items={tour.highlights} variant="highlight" />}
+                  {activeTab === "included" && <InfoList title="What's included" items={tour.included} variant="check" />}
+                  {activeTab === "excluded" && <InfoList title="Not included" items={tour.excluded} variant="cross" />}
                 </div>
               </div>
             </div>
 
-          </div>
-          {/* ╚═══════════════════════ END LEFT COLUMN ════════════════════╝ */}
+            {/* Day-by-day */}
+            <div className="mt-6">
+              <DayByDaySection days={tour.days} slug={slug} />
+            </div>
 
-          {/* ╔═══════════════════════════════════════════════════════════════
-              RIGHT COLUMN — STICKY BOOKING WIDGET SIDEBAR
-              Identical container to the rate calendar sidebar in PackageDetailPage:
-                bg-card, border border-border, rounded-xl,
-                shadow-md, overflow-hidden
-              Sits at sticky top-[64px], hidden on mobile (has footer instead).
-          ═══════════════════════════════════════════════════════════════╗ */}
-          <div className="hidden lg:block sticky top-[64px] pt-2">
+            {/* Tour route map */}
+            <div className="mt-6">
+              <TourRouteMap stops={tour.stops} />
+            </div>
+
+          </div>
+
+          {/* ── Right column: sticky booking widget ── */}
+          <div className="hidden lg:block sticky top-[56px]">
             <div className="bg-card border border-border rounded-xl shadow-md">
 
-              {/* ── Price summary ── */}
               <div className="px-5 pt-5 pb-5 border-b border-border">
                 <div className="flex flex-col items-end text-right">
-                  {/* Small grey label: per-person rate + tour length */}
                   <span className="text-grey text-xs">{currency}{tour.price.perPerson.toLocaleString()} per person · {tour.duration}-day guided tour</span>
-                  {/* Big bold total — same as hotel page */}
                   <span className="text-foreground font-bold text-2xl">Total for {adults} {adults === 1 ? "adult" : "adults"}: {currency}{totalPrice.toLocaleString()}</span>
                 </div>
               </div>
 
-              {/* ── Booking fields ── */}
-              {/* All three fields follow the same pattern as PackageSearchForm:
-                  a clickable field div that toggles a panel, with bg-card
-                  as the default background (not grey) */}
               <div ref={bookingRef} className="p-5 flex flex-col gap-3">
+                <p className="text-xs font-bold text-grey uppercase tracking-wide mb-1">Customise your trip</p>
 
-                <p className="text-xs font-bold text-grey uppercase tracking-wide mb-1">
-                  Customise your trip
-                </p>
-
-                {/* ── Travel date — DayPicker panel (same as PackageSearchForm) ── */}
+                {/* Travel date */}
                 <div className="relative">
-                  <button
-                    onClick={() => setOpenPanel(openPanel === "date" ? null : "date")}
-                    className={cn(
-                      "h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left",
-                      openPanel === "date"
-                        ? "border-primary ring-2 ring-primary/20 bg-card"
-                        : "border-border bg-card hover:border-primary"
-                    )}
-                  >
+                  <button onClick={() => setOpenPanel(openPanel === "date" ? null : "date")} className={cn("h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left", openPanel === "date" ? "border-primary ring-2 ring-primary/20 bg-card" : "border-border bg-card hover:border-primary")}>
                     <Calendar size={16} className="text-primary shrink-0" aria-hidden="true" />
                     <div className="flex flex-col flex-1 min-w-0">
-                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
-                        Travel date
-                      </span>
-                      <span className="text-xs font-semibold text-foreground truncate">
-                        {travelDate}
-                      </span>
+                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Travel date</span>
+                      <span className="text-xs font-semibold text-foreground truncate">{travelDate}</span>
                     </div>
                     <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "date" && "rotate-180")} aria-hidden="true" />
                   </button>
-
-                  {/* DayPicker panel — same style as PackageSearchForm / HotelDetailPage */}
                   {openPanel === "date" && (
                     <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-150">
                       <style>{`.rdp-root { --rdp-accent-color: hsl(var(--primary)); --rdp-accent-background-color: hsl(var(--primary) / 0.10); --rdp-day_button-border-radius: 6px; margin: 0; }`}</style>
-                      <DayPicker
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={(date) => {
-                          if (!date) return;
-                          setSelectedDate(date);
-                          setOpenPanel(null); // close after selecting
-                        }}
-                        disabled={{ before: new Date() }}
-                        numberOfMonths={1}
-                      />
+                      <DayPicker mode="single" selected={selectedDate} onSelect={(date) => { if (!date) return; setSelectedDate(date); setOpenPanel(null); }} disabled={{ before: new Date() }} numberOfMonths={1} />
                     </div>
                   )}
                 </div>
 
-                {/* ── Travellers — panel with Adults/Children counter + Done ── */}
+                {/* Travellers */}
                 <div className="relative">
-                  <button
-                    onClick={() => setOpenPanel(openPanel === "guests" ? null : "guests")}
-                    className={cn(
-                      "h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left",
-                      openPanel === "guests"
-                        ? "border-primary ring-2 ring-primary/20 bg-card"
-                        : "border-border bg-card hover:border-primary"
-                    )}
-                  >
+                  <button onClick={() => setOpenPanel(openPanel === "guests" ? null : "guests")} className={cn("h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left", openPanel === "guests" ? "border-primary ring-2 ring-primary/20 bg-card" : "border-border bg-card hover:border-primary")}>
                     <Users size={16} className="text-primary shrink-0" aria-hidden="true" />
                     <div className="flex flex-col flex-1 min-w-0">
-                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
-                        Travellers
-                      </span>
-                      <span className="text-xs font-semibold text-foreground">
-                        {adults} Adult{adults !== 1 ? "s" : ""}
-                        {children > 0 ? ` · ${children} Child${children !== 1 ? "ren" : ""}` : ""}
-                      </span>
+                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Travellers</span>
+                      <span className="text-xs font-semibold text-foreground">{adults} Adult{adults !== 1 ? "s" : ""}{children > 0 ? ` · ${children} Child${children !== 1 ? "ren" : ""}` : ""}</span>
                     </div>
                     <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "guests" && "rotate-180")} aria-hidden="true" />
                   </button>
-
-                  {/* Guest counter panel — same layout as PackageSearchForm */}
                   {openPanel === "guests" && (
                     <div className="absolute top-[calc(100%+8px)] left-0 right-0 z-50 bg-card rounded-xl shadow-lg border border-border p-5 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150">
                       {[
-                        { label: "Adults",   sub: "Age 12+",  value: adults,   min: 1, set: setAdults   },
+                        { label: "Adults", sub: "Age 12+", value: adults, min: 1, set: setAdults },
                         { label: "Children", sub: "Age 2–11", value: children, min: 0, set: setChildren },
                       ].map(({ label, sub, value, min, set }) => (
                         <div key={label} className="flex items-center justify-between">
@@ -428,51 +331,23 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                             <div className="text-xs text-grey">{sub}</div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => set(Math.max(min, value - 1))}
-                              disabled={value <= min}
-                              className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-30"
-                              aria-hidden="true"
-                            >
-                              <Minus size={14} />
-                            </button>
+                            <button onClick={() => set(Math.max(min, value - 1))} disabled={value <= min} className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-30" aria-hidden="true"><Minus size={14} /></button>
                             <span className="text-base font-bold text-foreground w-4 text-center">{value}</span>
-                            <button
-                              onClick={() => set(Math.min(9, value + 1))}
-                              className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors"
-                              aria-hidden="true"
-                            >
-                              <Plus size={14} />
-                            </button>
+                            <button onClick={() => set(Math.min(9, value + 1))} className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors" aria-hidden="true"><Plus size={14} /></button>
                           </div>
                         </div>
                       ))}
-                      <button
-                        onClick={() => setOpenPanel(null)}
-                        className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-colors"
-                      >
-                        Done
-                      </button>
+                      <button onClick={() => setOpenPanel(null)} className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-colors">Done</button>
                     </div>
                   )}
                 </div>
 
-                {/* ── Hotel preference — dropdown ── */}
+                {/* Hotel preference */}
                 <div className="relative">
-                  <button
-                    onClick={() => setOpenPanel(openPanel === "hotel" ? null : "hotel")}
-                    className={cn(
-                      "h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left",
-                      openPanel === "hotel"
-                        ? "border-primary ring-2 ring-primary/20 bg-card"
-                        : "border-border bg-card hover:border-primary"
-                    )}
-                  >
+                  <button onClick={() => setOpenPanel(openPanel === "hotel" ? null : "hotel")} className={cn("h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left", openPanel === "hotel" ? "border-primary ring-2 ring-primary/20 bg-card" : "border-border bg-card hover:border-primary")}>
                     <Hotel size={16} className="text-primary shrink-0" aria-hidden="true" />
                     <div className="flex flex-col flex-1 min-w-0">
-                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
-                        Hotel preference
-                      </span>
+                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Hotel preference</span>
                       <span className="text-xs font-semibold text-foreground">{hotelPreference}</span>
                     </div>
                     <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "hotel" && "rotate-180")} aria-hidden="true" />
@@ -480,14 +355,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   {openPanel === "hotel" && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-sm shadow-md z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                       {["Standard", "Superior", "Deluxe", "Luxury"].map((opt) => (
-                        <button
-                          key={opt}
-                          onClick={() => { setHotelPreference(opt); setOpenPanel(null); }}
-                          className={cn(
-                            "w-full text-left px-4 py-2.5 text-xs font-semibold hover:bg-primary/10 transition-colors flex items-center justify-between",
-                            hotelPreference === opt ? "text-primary bg-primary/10" : "text-foreground"
-                          )}
-                        >
+                        <button key={opt} onClick={() => { setHotelPreference(opt); setOpenPanel(null); }} className={cn("w-full text-left px-4 py-2.5 text-xs font-semibold hover:bg-primary/10 transition-colors flex items-center justify-between", hotelPreference === opt ? "text-primary bg-primary/10" : "text-foreground")}>
                           {opt}
                           {hotelPreference === opt && <Check size={14} className="text-primary" aria-hidden="true" />}
                         </button>
@@ -495,24 +363,19 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                     </div>
                   )}
                 </div>
-
               </div>
 
-              {/* ── CTA button — same as PackageDetailPage sidebar CTA ── */}
               <div className="px-5 pb-5">
-                <button
-                  onClick={() => onBook(tour, travelDate, adults, hotelPreference)}
-                  className="w-full bg-primary hover:brightness-85 text-white font-bold text-base py-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-                >
+                <button onClick={() => onBook(tour, travelDate, adults, hotelPreference)} className="w-full bg-primary hover:brightness-85 text-white font-bold text-base py-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                   Start planning
                 </button>
               </div>
 
             </div>
           </div>
-          {/* ╚═══════════════════════ END RIGHT COLUMN ═══════════════════╝ */}
 
         </div>
+      </div>
       </div>
 
       {/* Spacer so the mobile footer doesn't overlap last content */}
@@ -582,38 +445,188 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DayCard — collapsible day block matching the white card section pattern
+// TourRouteMap — interactive map showing numbered day pins connected by a route
 // ─────────────────────────────────────────────────────────────────────────────
 
-function DayCard({ day, slug }: { day: TourDay; slug: string }) {
-  const [expanded, setExpanded] = useState(day.dayNumber === 1);
+// Creates a circular numbered pin (e.g. "1", "2") for each stop on the map.
+// Blue circle with white number — visually ties back to the day pills.
+function createDayPinIcon(dayNumber: number) {
+  const html = `
+    <div style="
+      width: 28px; height: 28px;
+      background: #2681FF;
+      color: white;
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      font-size: 12px;
+      font-weight: 700;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    ">${dayNumber}</div>
+  `;
+  return L.divIcon({ html, className: "", iconSize: [28, 28], iconAnchor: [14, 14] });
+}
 
+// Fits the map to the stop bounds once on mount
+function MapFitter({ positions }: { positions: [number, number][] }) {
+  const map = useMap();
+  const fitted = useRef(false);
+  useEffect(() => {
+    if (fitted.current || positions.length === 0) return;
+    const bounds = L.latLngBounds(positions);
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 10 });
+    fitted.current = true;
+  }, [positions, map]);
+  return null;
+}
+
+function TourRouteMap({ stops }: { stops: TourStop[] }) {
+  // Only use stops that have coordinates
+  const stopsWithCoords = stops.filter(
+    (s): s is TourStop & { lat: number; lng: number } =>
+      s.lat != null && s.lng != null
+  );
+
+  if (stopsWithCoords.length === 0) return null;
+
+  // Build the route line coordinates — in stop order
+  const routePositions: [number, number][] = stopsWithCoords.map((s) => [s.lat, s.lng]);
+
+  // Fallback center from the first stop
+  const center: [number, number] = [stopsWithCoords[0].lat, stopsWithCoords[0].lng];
+
+  return (
+    <div>
+      <h3 className="text-xl font-bold text-foreground mb-4">Tour route</h3>
+      <div className="bg-card rounded-xl shadow-sm overflow-hidden border border-border">
+        <div className="h-[300px]">
+          <MapContainer
+            center={center}
+            zoom={6}
+            className="w-full h-full"
+            style={{ height: "100%", width: "100%" }}
+            scrollWheelZoom={true}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            />
+            <MapFitter positions={routePositions} />
+
+            {/* Route line connecting all stops in order */}
+            <Polyline
+              positions={routePositions}
+              pathOptions={{ color: "#2681FF", weight: 3, opacity: 0.7, dashArray: "8 6" }}
+            />
+
+            {/* Numbered day pins for each stop */}
+            {stopsWithCoords.map((stop, i) => (
+              <Marker
+                key={stop.destinationName}
+                position={[stop.lat, stop.lng]}
+                icon={createDayPinIcon(i + 1)}
+              >
+                <Popup>
+                  <div className="text-sm">
+                    <div className="font-bold text-foreground">{stop.destinationName}</div>
+                    <div className="text-muted-foreground text-xs mt-0.5">
+                      {stop.nights} {stop.nights === 1 ? "night" : "nights"} · {stop.dateRange}
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DayByDaySection — manages which day is active (only one at a time)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function DayByDaySection({ days, slug }: { days: TourDay[]; slug: string }) {
+  // Only one day can be active/expanded at a time — default to day 1
+  const [activeDayNumber, setActiveDayNumber] = useState(1);
+
+  return (
+    <div>
+      <h3 className="text-xl font-bold text-foreground mb-4">
+        Day by day adventures
+      </h3>
+      <div className="flex flex-col gap-3">
+        {days.map((day) => (
+          <DayCard
+            key={day.dayNumber}
+            day={day}
+            slug={slug}
+            isActive={day.dayNumber === activeDayNumber}
+            onSelect={() => setActiveDayNumber(day.dayNumber)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DayCard — single day row; only the active day shows expanded content
+// ─────────────────────────────────────────────────────────────────────────────
+
+function DayCard({
+  day,
+  slug,
+  isActive,
+  onSelect,
+}: {
+  day: TourDay;
+  slug: string;
+  isActive: boolean;
+  onSelect: () => void;
+}) {
   const dayImage = day.image ?? `https://picsum.photos/seed/${slug}-day${day.dayNumber}/400/280`;
 
   return (
-    <div className="bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+    <div className={cn(
+      "bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow",
+      // Active day gets a solid blue border all around
+      isActive ? "border border-primary" : ""
+    )}>
 
-      {/* Header — always visible */}
+      {/* Header row — day pill, title, location */}
       <button
-        className="w-full flex items-center gap-4 px-5 py-4 text-left"
-        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center gap-3 px-5 py-3.5 text-left"
+        onClick={onSelect}
       >
-        {/* Day pill — white background, blue border, blue text */}
-        <span className="text-xs font-bold text-primary bg-white border border-primary px-2.5 py-1 rounded-full shrink-0 uppercase tracking-wide whitespace-nowrap">
+        {/* Day pill — light blue fill, matches holiday list card chips */}
+        <span className="bg-primary/10 text-primary text-xs font-bold px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap capitalize">
           Day {day.dayNumber}
         </span>
-        <span className="flex-1 text-base font-bold text-foreground">{day.title}</span>
-        {expanded
-          ? <ChevronUp   size={18} className="text-grey shrink-0" aria-hidden="true" />
-          : <ChevronDown size={18} className="text-grey shrink-0" aria-hidden="true" />
-        }
+        {/* Day title — bold when active, medium weight when collapsed */}
+        <span className={cn(
+          "flex-1 text-sm text-foreground",
+          isActive ? "font-bold" : "font-medium"
+        )}>
+          {day.title}
+        </span>
+        {/* Location — right-aligned */}
+        {day.location && (
+          <span className="text-xs text-muted-foreground shrink-0">
+            {day.location}
+          </span>
+        )}
       </button>
 
-      {/* Expanded content */}
-      {expanded && (
-        <div className="flex flex-col md:flex-row border-t border-border">
+      {/* Expanded content — only shown for the active day, no divider */}
+      {isActive && (
+        <div className="flex flex-col md:flex-row">
 
-          {/* Day photo — now on the LEFT; padded + rounded to sit inside the card */}
+          {/* Day photo on the left */}
           <div className="md:w-[200px] shrink-0 p-4 md:pr-0">
             <div className="rounded-xl overflow-hidden h-[140px] md:h-full">
               <img
@@ -624,7 +637,7 @@ function DayCard({ day, slug }: { day: TourDay; slug: string }) {
             </div>
           </div>
 
-          {/* Items list — now on the RIGHT */}
+          {/* Items list on the right */}
           <div className="flex-1 px-5 py-4 flex flex-col gap-3">
             {day.items.map((item, i) => (
               <div key={i} className="flex items-start gap-3">
@@ -632,7 +645,7 @@ function DayCard({ day, slug }: { day: TourDay; slug: string }) {
                 <div>
                   <p className="text-sm font-semibold text-foreground">{item.label}</p>
                   {item.description && (
-                    <p className="text-xs text-grey mt-0.5">{item.description}</p>
+                    <p className="text-xs text-foreground mt-0.5">{item.description}</p>
                   )}
                 </div>
               </div>
