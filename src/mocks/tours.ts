@@ -343,7 +343,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
     "Floating markets",
     "Island beach time",
   ],
-  mainImage: "https://picsum.photos/seed/thailand-hero/800/600",
+  mainImage: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80",
   price: {
     perPerson: 1650,
     total: 3300,
@@ -361,10 +361,10 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
     { iconKey: "calendar-check",  title: "Min age",     value: "18+" },
   ],
   gallery: [
-    "https://picsum.photos/seed/thailand-g1/800/600",
-    "https://picsum.photos/seed/thailand-g2/800/600",
-    "https://picsum.photos/seed/thailand-g3/800/600",
-    "https://picsum.photos/seed/thailand-g4/800/600",
+    "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&q=80",
+    "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=800&q=80",
+    "https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=800&q=80",
+    "https://images.unsplash.com/photo-1506665531195-3566af2b4dfa?w=800&q=80",
   ],
   days: [
     {
@@ -375,7 +375,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
         { type: "highlight", label: "Welcome to Bangkok", description: "Arrive at Suvarnabhumi Airport. Transfer to your hotel in the heart of the city. Evening welcome dinner with the group." },
         { type: "hotel",    label: "Chatrium Hotel Riverside ****" },
       ],
-      image: "https://picsum.photos/seed/thailand-day1/400/280",
+      image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400&q=80",
     },
     {
       dayNumber: 2,
@@ -387,7 +387,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
         { type: "highlight",  label: "Chatuchak Weekend Market", description: "Explore one of the world's largest outdoor markets — 15,000 stalls." },
         { type: "hotel",      label: "Chatrium Hotel Riverside ****" },
       ],
-      image: "https://picsum.photos/seed/thailand-day2/400/280",
+      image: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=400&q=80",
     },
     {
       dayNumber: 3,
@@ -398,7 +398,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
         { type: "transport",  label: "Bangkok → Chiang Mai (flight)", description: "1 hour 15 min · Domestic flight included" },
         { type: "hotel",      label: "Anantara Chiang Mai Resort *****" },
       ],
-      image: "https://picsum.photos/seed/thailand-day3/400/280",
+      image: "https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=400&q=80",
     },
     {
       dayNumber: 4,
@@ -408,7 +408,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
         { type: "highlight",  label: "Elephant Nature Park", description: "Full day at an ethical elephant sanctuary — feed, bathe, and walk alongside rescued elephants in the jungle." },
         { type: "hotel",      label: "Anantara Chiang Mai Resort *****" },
       ],
-      image: "https://picsum.photos/seed/thailand-day4/400/280",
+      image: "https://images.unsplash.com/photo-1551524559-8af4e6624178?w=400&q=80",
     },
     {
       dayNumber: 5,
@@ -419,7 +419,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
         { type: "highlight",  label: "Night Bazaar", description: "Evening at the famous Chiang Mai Night Bazaar — handcrafts, silk, and street food." },
         { type: "hotel",      label: "Anantara Chiang Mai Resort *****" },
       ],
-      image: "https://picsum.photos/seed/thailand-day5/400/280",
+      image: "https://images.unsplash.com/photo-1506665531195-3566af2b4dfa?w=400&q=80",
     },
     {
       dayNumber: 6,
@@ -430,7 +430,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
         { type: "highlight",  label: "Chaweng Beach afternoon", description: "Check in and spend the afternoon on the powdery white sand of Chaweng Beach." },
         { type: "hotel",      label: "Samui Palm Beach Resort ****" },
       ],
-      image: "https://picsum.photos/seed/thailand-day6/400/280",
+      image: "https://images.unsplash.com/photo-1537956965359-7573183d1f57?w=400&q=80",
     },
     {
       dayNumber: 7,
@@ -440,7 +440,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
         { type: "highlight",  label: "Angthong Marine Park boat trip", description: "Full-day speedboat excursion to the 42 uninhabited islands of Angthong National Marine Park. Snorkelling, kayaking, and a lagoon swim included." },
         { type: "hotel",      label: "Samui Palm Beach Resort ****" },
       ],
-      image: "https://picsum.photos/seed/thailand-day7/400/280",
+      image: "https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?w=400&q=80",
     },
     {
       dayNumber: 8,
@@ -479,7 +479,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
       accommodation: {
         hotelName: "Chatrium Hotel Riverside",
         stars: 4,
-        image: "https://picsum.photos/seed/bkk-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
         checkIn: "Oct 05", checkOut: "Oct 07",
         checkInISO: "2026-10-05", checkOutISO: "2026-10-07",
         roomType: "Superior Room", boardType: "Buffet breakfast",
@@ -495,7 +495,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
       accommodation: {
         hotelName: "Anantara Chiang Mai Resort",
         stars: 5,
-        image: "https://picsum.photos/seed/cnx-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&q=80",
         checkIn: "Oct 07", checkOut: "Oct 10",
         checkInISO: "2026-10-07", checkOutISO: "2026-10-10",
         roomType: "Deluxe Room", boardType: "Buffet breakfast",
@@ -511,7 +511,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
       accommodation: {
         hotelName: "Samui Palm Beach Resort",
         stars: 4,
-        image: "https://picsum.photos/seed/usm-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80",
         checkIn: "Oct 10", checkOut: "Oct 12",
         checkInISO: "2026-10-10", checkOutISO: "2026-10-12",
         roomType: "Pool View Room", boardType: "Buffet breakfast",
@@ -545,7 +545,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
     "Sacred temples & ceremonies",
     "Seminyak beach sunsets",
   ],
-  mainImage: "https://picsum.photos/seed/bali-hero/800/600",
+  mainImage: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
   price: {
     perPerson: 1980,
     total: 3960,
@@ -563,10 +563,10 @@ export const BALI_DISCOVERY_TOUR: Tour = {
     { iconKey: "calendar-check",  title: "Min age",     value: "16+" },
   ],
   gallery: [
-    "https://picsum.photos/seed/bali-g1/800/600",
-    "https://picsum.photos/seed/bali-g2/800/600",
-    "https://picsum.photos/seed/bali-g3/800/600",
-    "https://picsum.photos/seed/bali-g4/800/600",
+    "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&q=80",
+    "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=800&q=80",
+    "https://images.unsplash.com/photo-1573790387438-4da905039392?w=800&q=80",
+    "https://images.unsplash.com/photo-1604999333679-b86d54738315?w=800&q=80",
   ],
   days: [
     {
@@ -577,7 +577,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
         { type: "highlight", label: "Arrive at Ngurah Rai Airport", description: "Transfer north to Ubud, Bali's cultural and artistic heart. Evening welcome dinner at a traditional warung." },
         { type: "hotel",    label: "Komaneka at Bisma ***** or similar" },
       ],
-      image: "https://picsum.photos/seed/bali-day1/400/280",
+      image: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=400&q=80",
     },
     {
       dayNumber: 2,
@@ -588,7 +588,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
         { type: "highlight", label: "Ubud Art Market & Monkey Forest", description: "Browse handmade textiles, silver jewellery, and woodcarvings before walking through the Sacred Monkey Forest Sanctuary." },
         { type: "hotel",    label: "Komaneka at Bisma *****" },
       ],
-      image: "https://picsum.photos/seed/bali-day2/400/280",
+      image: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=400&q=80",
     },
     {
       dayNumber: 3,
@@ -599,7 +599,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
         { type: "highlight", label: "Silver & batik workshops", description: "Afternoon visits to artisan workshops in Celuk (silver) and Batuan (batik painting)." },
         { type: "hotel",    label: "Komaneka at Bisma *****" },
       ],
-      image: "https://picsum.photos/seed/bali-day3/400/280",
+      image: "https://images.unsplash.com/photo-1573790387438-4da905039392?w=400&q=80",
     },
     {
       dayNumber: 4,
@@ -610,7 +610,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
         { type: "highlight", label: "Jatiluwih UNESCO Rice Terraces", description: "A vast panorama of UNESCO-listed terraces — quieter and more dramatic than Tegallalang." },
         { type: "hotel",    label: "Komaneka at Bisma *****" },
       ],
-      image: "https://picsum.photos/seed/bali-day4/400/280",
+      image: "https://images.unsplash.com/photo-1604999333679-b86d54738315?w=400&q=80",
     },
     {
       dayNumber: 5,
@@ -621,7 +621,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
         { type: "transport", label: "Transfer to Seminyak", description: "Approx. 45 minutes south to the coast" },
         { type: "hotel",    label: "The Layar *****" },
       ],
-      image: "https://picsum.photos/seed/bali-day5/400/280",
+      image: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=400&q=80",
     },
     {
       dayNumber: 6,
@@ -631,7 +631,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
         { type: "highlight", label: "Seminyak Beach free day", description: "A full free day to relax, surf, swim, or browse the boutiques and beach clubs of Seminyak and Petitenget." },
         { type: "hotel",    label: "The Layar *****" },
       ],
-      image: "https://picsum.photos/seed/bali-day6/400/280",
+      image: "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=400&q=80",
     },
     {
       dayNumber: 7,
@@ -641,7 +641,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
         { type: "highlight", label: "Uluwatu Temple & Kecak Fire Dance", description: "Clifftop temple 70m above the Indian Ocean. Evening Kecak fire dance performed at sunset on the clifftop stage — one of Bali's most memorable experiences." },
         { type: "hotel",    label: "The Layar *****" },
       ],
-      image: "https://picsum.photos/seed/bali-day7/400/280",
+      image: "https://images.unsplash.com/photo-1539367628448-4bc5c9d171c8?w=400&q=80",
     },
     {
       dayNumber: 8,
@@ -680,7 +680,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
       accommodation: {
         hotelName: "Komaneka at Bisma",
         stars: 5,
-        image: "https://picsum.photos/seed/ubud-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&q=80",
         checkIn: "Sep 14", checkOut: "Sep 18",
         checkInISO: "2026-09-14", checkOutISO: "2026-09-18",
         roomType: "Forest Villa", boardType: "Buffet breakfast",
@@ -696,7 +696,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
       accommodation: {
         hotelName: "The Layar",
         stars: 5,
-        image: "https://picsum.photos/seed/seminyak-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80",
         checkIn: "Sep 18", checkOut: "Sep 21",
         checkInISO: "2026-09-18", checkOutISO: "2026-09-21",
         roomType: "1-Bedroom Private Pool Villa", boardType: "Buffet breakfast",
@@ -729,7 +729,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
     "Cusco colonial architecture",
     "Peru Rail scenic train",
   ],
-  mainImage: "https://picsum.photos/seed/peru-hero/800/600",
+  mainImage: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80",
   price: {
     perPerson: 1980,
     total: 3960,
@@ -747,10 +747,10 @@ export const PERU_ADVENTURE_TOUR: Tour = {
     { iconKey: "calendar-check",  title: "Min age",     value: "14+" },
   ],
   gallery: [
-    "https://picsum.photos/seed/peru-g1/800/600",
-    "https://picsum.photos/seed/peru-g2/800/600",
-    "https://picsum.photos/seed/peru-g3/800/600",
-    "https://picsum.photos/seed/peru-g4/800/600",
+    "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=800&q=80",
+    "https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?w=800&q=80",
+    "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80",
+    "https://images.unsplash.com/photo-1591266752934-9cb8c1a3804b?w=800&q=80",
   ],
   days: [
     {
@@ -760,7 +760,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
         { type: "highlight", label: "Welcome to Lima", description: "Arrive at Jorge Chávez International Airport. Transfer to the upscale Miraflores district. Welcome dinner at a celebrated cevichería." },
         { type: "hotel",    label: "JW Marriott Lima *****" },
       ],
-      image: "https://picsum.photos/seed/peru-day1/400/280",
+      image: "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=400&q=80",
     },
     {
       dayNumber: 2,
@@ -770,7 +770,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
         { type: "transport", label: "Lima → Cusco (flight)", description: "1 hour 20 min · Domestic flight included. Arrive at 3,400m — afternoon rest recommended." },
         { type: "hotel",    label: "Palacio del Inca *****" },
       ],
-      image: "https://picsum.photos/seed/peru-day2/400/280",
+      image: "https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?w=400&q=80",
     },
     {
       dayNumber: 3,
@@ -780,7 +780,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
         { type: "highlight", label: "San Pedro Market", description: "Taste local produce, chicherón, and fresh juices in Cusco's vibrant covered market." },
         { type: "hotel",    label: "Palacio del Inca *****" },
       ],
-      image: "https://picsum.photos/seed/peru-day3/400/280",
+      image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=400&q=80",
     },
     {
       dayNumber: 4,
@@ -790,7 +790,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
         { type: "highlight", label: "Ollantaytambo fortress", description: "Afternoon at the largest still-functioning Inca town — massive military terraces and a working water channel system." },
         { type: "hotel",    label: "Inkaterra Hacienda Urubamba *****" },
       ],
-      image: "https://picsum.photos/seed/peru-day4/400/280",
+      image: "https://images.unsplash.com/photo-1591266752934-9cb8c1a3804b?w=400&q=80",
     },
     {
       dayNumber: 5,
@@ -800,7 +800,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
         { type: "highlight", label: "Machu Picchu guided tour", description: "A full morning exploring the citadel with your expert guide — Sun Gate, Temple of the Sun, Intihuatana stone, and more." },
         { type: "hotel",    label: "Sumaq Machu Picchu Hotel *****" },
       ],
-      image: "https://picsum.photos/seed/peru-day5/400/280",
+      image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=400&q=80",
     },
     {
       dayNumber: 6,
@@ -810,7 +810,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
         { type: "transport", label: "Aguas Calientes → Cusco (train + transfer)", description: "Return journey included" },
         { type: "hotel",    label: "Palacio del Inca *****" },
       ],
-      image: "https://picsum.photos/seed/peru-day6/400/280",
+      image: "https://images.unsplash.com/photo-1569575834128-ab65dce4b2d7?w=400&q=80",
     },
     {
       dayNumber: 7,
@@ -820,7 +820,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
         { type: "transport", label: "Cusco → Lima (evening flight)", description: "1h 20m · Domestic flight included" },
         { type: "hotel",    label: "JW Marriott Lima *****" },
       ],
-      image: "https://picsum.photos/seed/peru-day7/400/280",
+      image: "https://images.unsplash.com/photo-1504457047772-27faf794c6c8?w=400&q=80",
     },
     {
       dayNumber: 8,
@@ -858,7 +858,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
       accommodation: {
         hotelName: "JW Marriott Lima",
         stars: 5,
-        image: "https://picsum.photos/seed/lima-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
         checkIn: "Jul 06", checkOut: "Jul 07",
         checkInISO: "2026-07-06", checkOutISO: "2026-07-07",
         roomType: "Ocean View Room", boardType: "Buffet breakfast",
@@ -874,7 +874,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
       accommodation: {
         hotelName: "Palacio del Inca",
         stars: 5,
-        image: "https://picsum.photos/seed/cusco-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&q=80",
         checkIn: "Jul 07", checkOut: "Jul 10",
         checkInISO: "2026-07-07", checkOutISO: "2026-07-10",
         roomType: "Deluxe Room", boardType: "Buffet breakfast",
@@ -890,7 +890,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
       accommodation: {
         hotelName: "Inkaterra Hacienda Urubamba",
         stars: 5,
-        image: "https://picsum.photos/seed/valley-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80",
         checkIn: "Jul 10", checkOut: "Jul 11",
         checkInISO: "2026-07-10", checkOutISO: "2026-07-11",
         roomType: "Hacienda Suite", boardType: "Full board",
@@ -906,7 +906,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
       accommodation: {
         hotelName: "Sumaq Machu Picchu Hotel",
         stars: 5,
-        image: "https://picsum.photos/seed/machupichu-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=400&q=80",
         checkIn: "Jul 11", checkOut: "Jul 13",
         checkInISO: "2026-07-11", checkOutISO: "2026-07-13",
         roomType: "Deluxe Andean Room", boardType: "Buffet breakfast",
@@ -941,7 +941,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
     "Mt Fuji views from Hakone",
     "Hiroshima Peace Memorial",
   ],
-  mainImage: "https://picsum.photos/seed/japan-hero/800/600",
+  mainImage: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80",
   price: {
     perPerson: 2890,
     total: 5780,
@@ -959,10 +959,10 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
     { iconKey: "calendar-check",  title: "Min age",     value: "All ages" },
   ],
   gallery: [
-    "https://picsum.photos/seed/japan-g1/800/600",
-    "https://picsum.photos/seed/japan-g2/800/600",
-    "https://picsum.photos/seed/japan-g3/800/600",
-    "https://picsum.photos/seed/japan-g4/800/600",
+    "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",
+    "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",
+    "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80",
+    "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=800&q=80",
   ],
   days: [
     {
@@ -972,7 +972,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Welcome to Tokyo", description: "Transfer from Narita or Haneda to your hotel in Shinjuku. Evening walk through the neon-lit streets of Kabukicho." },
         { type: "hotel",    label: "Park Hyatt Tokyo *****" },
       ],
-      image: "https://picsum.photos/seed/japan-day1/400/280",
+      image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=80",
     },
     {
       dayNumber: 2,
@@ -982,7 +982,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Shibuya Crossing & Meiji Shrine", description: "Afternoon: the world's busiest pedestrian crossing, then a peaceful forest walk to the Shinto Meiji Jingu shrine." },
         { type: "hotel",    label: "Park Hyatt Tokyo *****" },
       ],
-      image: "https://picsum.photos/seed/japan-day2/400/280",
+      image: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400&q=80",
     },
     {
       dayNumber: 3,
@@ -992,7 +992,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "teamLab Borderless digital art museum", description: "Immersive digital art environment — one of Tokyo's most unique experiences." },
         { type: "hotel",    label: "Park Hyatt Tokyo *****" },
       ],
-      image: "https://picsum.photos/seed/japan-day3/400/280",
+      image: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&q=80",
     },
     {
       dayNumber: 4,
@@ -1002,7 +1002,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Hakone Open-Air Museum & Ropeway", description: "Art installations against mountain backdrop, then a gondola ride across Lake Ashi for classic Fuji views (weather permitting)." },
         { type: "hotel",    label: "Hakone Kowakien Ten-yu *****" },
       ],
-      image: "https://picsum.photos/seed/japan-day4/400/280",
+      image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&q=80",
     },
     {
       dayNumber: 5,
@@ -1012,7 +1012,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Gion Evening Walk", description: "Stroll through Kyoto's historic geisha district at dusk — you may spot a maiko on her way to an appointment." },
         { type: "hotel",    label: "Hyatt Regency Kyoto *****" },
       ],
-      image: "https://picsum.photos/seed/japan-day5/400/280",
+      image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&q=80",
     },
     {
       dayNumber: 6,
@@ -1022,7 +1022,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Kinkaku-ji Golden Pavilion", description: "Kyoto's most iconic sight — a Zen temple covered in gold leaf reflected on a mirror pond." },
         { type: "hotel",    label: "Hyatt Regency Kyoto *****" },
       ],
-      image: "https://picsum.photos/seed/japan-day6/400/280",
+      image: "https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=400&q=80",
     },
     {
       dayNumber: 7,
@@ -1032,7 +1032,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Tenryu-ji Garden", description: "UNESCO World Heritage Zen garden with a pond designed to frame the mountains beyond." },
         { type: "hotel",    label: "Hyatt Regency Kyoto *****" },
       ],
-      image: "https://picsum.photos/seed/japan-day7/400/280",
+      image: "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?w=400&q=80",
     },
     {
       dayNumber: 8,
@@ -1043,7 +1043,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Miyajima Island & Floating Torii", description: "Ferry to the sacred island and the iconic floating torii gate of Itsukushima Shrine." },
         { type: "hotel",    label: "Hyatt Regency Kyoto *****" },
       ],
-      image: "https://picsum.photos/seed/japan-day8/400/280",
+      image: "https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=400&q=80",
     },
     {
       dayNumber: 9,
@@ -1054,7 +1054,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Dotonbori Street Food Walk", description: "Evening in Osaka's famous dining strip — takoyaki, ramen, kushikatsu, and neon signs everywhere." },
         { type: "hotel",    label: "Conrad Osaka *****" },
       ],
-      image: "https://picsum.photos/seed/japan-day9/400/280",
+      image: "https://images.unsplash.com/photo-1590559899731-a382839e5549?w=400&q=80",
     },
     {
       dayNumber: 10,
@@ -1064,7 +1064,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Day trip to Nara (optional)", description: "45 min by train — roam freely with 1,200 semi-tame deer in Nara Park and visit the giant bronze Buddha at Todai-ji." },
         { type: "hotel",    label: "Conrad Osaka *****" },
       ],
-      image: "https://picsum.photos/seed/japan-day10/400/280",
+      image: "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=400&q=80",
     },
     {
       dayNumber: 11,
@@ -1103,7 +1103,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
       accommodation: {
         hotelName: "Park Hyatt Tokyo",
         stars: 5,
-        image: "https://picsum.photos/seed/tokyo-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
         checkIn: "Apr 02", checkOut: "Apr 05",
         checkInISO: "2027-04-02", checkOutISO: "2027-04-05",
         roomType: "Park Room", boardType: "Buffet breakfast",
@@ -1119,7 +1119,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
       accommodation: {
         hotelName: "Hakone Kowakien Ten-yu",
         stars: 5,
-        image: "https://picsum.photos/seed/hakone-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&q=80",
         checkIn: "Apr 05", checkOut: "Apr 06",
         checkInISO: "2027-04-05", checkOutISO: "2027-04-06",
         roomType: "Mountain View Room", boardType: "Full board (kaiseki)",
@@ -1135,7 +1135,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
       accommodation: {
         hotelName: "Hyatt Regency Kyoto",
         stars: 5,
-        image: "https://picsum.photos/seed/kyoto-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80",
         checkIn: "Apr 06", checkOut: "Apr 09",
         checkInISO: "2027-04-06", checkOutISO: "2027-04-09",
         roomType: "Regency King Room", boardType: "Buffet breakfast",
@@ -1151,7 +1151,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
       accommodation: {
         hotelName: "Conrad Osaka",
         stars: 5,
-        image: "https://picsum.photos/seed/osaka-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=400&q=80",
         checkIn: "Apr 10", checkOut: "Apr 12",
         checkInISO: "2027-04-10", checkOutISO: "2027-04-12",
         roomType: "Corner Suite", boardType: "Buffet breakfast",
@@ -1186,7 +1186,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
     "Marrakech souks & Djemaa el-Fna",
     "Blue city of Chefchaouen",
   ],
-  mainImage: "https://picsum.photos/seed/morocco-hero/800/600",
+  mainImage: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=800&q=80",
   price: {
     perPerson: 1540,
     total: 3080,
@@ -1204,10 +1204,10 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
     { iconKey: "calendar-check",  title: "Min age",     value: "16+" },
   ],
   gallery: [
-    "https://picsum.photos/seed/morocco-g1/800/600",
-    "https://picsum.photos/seed/morocco-g2/800/600",
-    "https://picsum.photos/seed/morocco-g3/800/600",
-    "https://picsum.photos/seed/morocco-g4/800/600",
+    "https://images.unsplash.com/photo-1548018560-c7196e4f3e46?w=800&q=80",
+    "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80",
+    "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=800&q=80",
+    "https://images.unsplash.com/photo-1545601445-4d6a29737163?w=800&q=80",
   ],
   days: [
     {
@@ -1217,7 +1217,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
         { type: "highlight", label: "Hassan II Mosque", description: "Arrive at Mohammed V Airport. Transfer to Casablanca. Visit the spectacular Hassan II Mosque — the world's third largest, partly built over the Atlantic Ocean." },
         { type: "hotel",    label: "Four Seasons Casablanca *****" },
       ],
-      image: "https://picsum.photos/seed/morocco-day1/400/280",
+      image: "https://images.unsplash.com/photo-1548018560-c7196e4f3e46?w=400&q=80",
     },
     {
       dayNumber: 2,
@@ -1227,7 +1227,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
         { type: "highlight", label: "Chefchaouen Blue City walk", description: "Wander the labyrinthine alleys of this photogenic mountain town — every surface washed in vivid shades of blue." },
         { type: "hotel",    label: "Riad Lina & Spa ****" },
       ],
-      image: "https://picsum.photos/seed/morocco-day2/400/280",
+      image: "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=400&q=80",
     },
     {
       dayNumber: 3,
@@ -1237,7 +1237,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
         { type: "highlight", label: "Fes el-Bali medina guided tour", description: "The world's largest medieval city on foot — the Chouara tanneries, Bou Inania madrasa, and the blue gate of Bab Bou Jeloud." },
         { type: "hotel",    label: "Riad Fes ***** or similar" },
       ],
-      image: "https://picsum.photos/seed/morocco-day3/400/280",
+      image: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=400&q=80",
     },
     {
       dayNumber: 4,
@@ -1247,7 +1247,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
         { type: "highlight", label: "Pottery & zellige tile workshop visit", description: "Watch master craftsmen paint intricate Fassi geometric patterns by hand." },
         { type: "hotel",    label: "Riad Fes *****" },
       ],
-      image: "https://picsum.photos/seed/morocco-day4/400/280",
+      image: "https://images.unsplash.com/photo-1545601445-4d6a29737163?w=400&q=80",
     },
     {
       dayNumber: 5,
@@ -1257,7 +1257,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
         { type: "highlight", label: "Erg Chebbi sand dunes", description: "Arrive at dusk as the great orange dunes of Erg Chebbi glow in the last light." },
         { type: "hotel",    label: "Kasbah Mohayut Desert Camp *****" },
       ],
-      image: "https://picsum.photos/seed/morocco-day5/400/280",
+      image: "https://images.unsplash.com/photo-1504541525549-86a5f5b7b4e5?w=400&q=80",
     },
     {
       dayNumber: 6,
@@ -1267,7 +1267,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
         { type: "highlight", label: "Sunrise on the dunes", description: "Early morning hike to a high dune to watch the sun rise over thousands of kilometres of empty desert." },
         { type: "hotel",    label: "Kasbah Mohayut Desert Camp *****" },
       ],
-      image: "https://picsum.photos/seed/morocco-day6/400/280",
+      image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=80",
     },
     {
       dayNumber: 7,
@@ -1277,7 +1277,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
         { type: "highlight", label: "Aït Benhaddou UNESCO kasbah", description: "A fortified ksar of mud-brick towers — one of Morocco's most spectacular sights and a famous film location." },
         { type: "hotel",    label: "Berber Palace Ouarzazate ****" },
       ],
-      image: "https://picsum.photos/seed/morocco-day7/400/280",
+      image: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=400&q=80",
     },
     {
       dayNumber: 8,
@@ -1287,7 +1287,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
         { type: "highlight", label: "Djemaa el-Fna square", description: "Arrive in Marrakech and dive straight into the world's greatest open-air theatre — snake charmers, storytellers, and food stalls under the stars." },
         { type: "hotel",    label: "Royal Mansour Marrakech *****" },
       ],
-      image: "https://picsum.photos/seed/morocco-day8/400/280",
+      image: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=400&q=80",
     },
     {
       dayNumber: 9,
@@ -1325,7 +1325,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
       accommodation: {
         hotelName: "Four Seasons Casablanca",
         stars: 5,
-        image: "https://picsum.photos/seed/casa-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
         checkIn: "Nov 09", checkOut: "Nov 10",
         checkInISO: "2026-11-09", checkOutISO: "2026-11-10",
         roomType: "Ocean View Room", boardType: "Buffet breakfast",
@@ -1341,7 +1341,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
       accommodation: {
         hotelName: "Riad Fes",
         stars: 5,
-        image: "https://picsum.photos/seed/fes-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&q=80",
         checkIn: "Nov 10", checkOut: "Nov 12",
         checkInISO: "2026-11-10", checkOutISO: "2026-11-12",
         roomType: "Luxury Riad Room", boardType: "Buffet breakfast",
@@ -1357,7 +1357,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
       accommodation: {
         hotelName: "Kasbah Mohayut Desert Camp",
         stars: 5,
-        image: "https://picsum.photos/seed/sahara-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80",
         checkIn: "Nov 12", checkOut: "Nov 14",
         checkInISO: "2026-11-12", checkOutISO: "2026-11-14",
         roomType: "Desert Suite", boardType: "Full board",
@@ -1373,7 +1373,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
       accommodation: {
         hotelName: "Royal Mansour Marrakech",
         stars: 5,
-        image: "https://picsum.photos/seed/marrakech-hotel/400/300",
+        image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=400&q=80",
         checkIn: "Nov 15", checkOut: "Nov 17",
         checkInISO: "2026-11-15", checkOutISO: "2026-11-17",
         roomType: "Private Riad", boardType: "Buffet breakfast",
@@ -1855,7 +1855,7 @@ export const TENERIFE_TOUR: Tour = {
     "Whale & dolphin watching cruise",
     "Masca gorge hike",
   ],
-  mainImage: "https://picsum.photos/seed/tenerife-teide/800/600",
+  mainImage: "https://images.unsplash.com/photo-1500320576215-ac78814dfe80?w=800&q=80",
   price: { perPerson: 1099, total: 2198, currency: "GBP", paidBefore: 549, paidAtDestination: 550 },
   startDate: "Apr 11, 2026",
   endDate: "Apr 19, 2026",
@@ -1867,7 +1867,7 @@ export const TENERIFE_TOUR: Tour = {
     { iconKey: "calendar-check",  title: "Min age",     value: "12+" },
   ],
   gallery: [
-    "https://picsum.photos/seed/tenerife-teide/800/600",
+    "https://images.unsplash.com/photo-1500320576215-ac78814dfe80?w=800&q=80",
     "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80",
     "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
@@ -1890,7 +1890,7 @@ export const TENERIFE_TOUR: Tour = {
         { type: "highlight", label: "Roques de García lava field walk", description: "Guided walk through the otherworldly volcanic landscape." },
         { type: "hotel", label: "Bahía del Duque or similar" },
       ],
-      image: "https://picsum.photos/seed/tenerife-teide/800/600",
+      image: "https://images.unsplash.com/photo-1500320576215-ac78814dfe80?w=800&q=80",
     },
     {
       dayNumber: 4,

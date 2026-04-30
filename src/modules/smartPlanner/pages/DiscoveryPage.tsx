@@ -6,12 +6,8 @@ import AccommodationStar from "../../../shared/components/AccommodationStar";
 import RatingBlock from "../../../shared/components/RatingBlock";
 import PackageSearchForm from "../components/PackageSearchForm";
 import heroBg from "../../../../assets/discovery-background.jpg";
-import tourCard1 from "../../../../assets/tour-card-1-4c2e30.png";
-import tourCard2 from "../../../../assets/tour-card-2-462e55.png";
-import tourCard3 from "../../../../assets/tour-card-3-716657.png";
-import tourCard4 from "../../../../assets/tour-card-4-5e611c.png";
-import tourCard5 from "../../../../assets/tour-card-5-5e611c.png";
-import tourCard6 from "../../../../assets/tour-card-6-397980.png";
+// Real tour images from mock data — each card now shows the actual destination photo
+import { DISCOVERY_TOUR_MAP } from "../../../mocks/tours";
 import {
   Building2,
   Plane,
@@ -145,14 +141,17 @@ const ALL_STYLES = [
   { name: "Winter Wonderland",            emoji: "❄️" },
 ];
 
+// Helper: pulls the real mainImage from the tour mock data so each card shows its actual destination photo
+const tourImg = (id: number) => DISCOVERY_TOUR_MAP[id]?.mainImage ?? "";
+
 // Same cards shown regardless of which style filter is active (would be server-filtered in production).
 const TOUR_CARDS = [
-  { id: 1, country: "Thailand", flag: "th", title: "Classic Thailand Explorer", desc: "Perfect introduction to Thailand with Bangkok temples, cultural experiences, and island hopping.", duration: "8 days", price: "from $1,650", image: tourCard1 },
-  { id: 2, country: "Indonesia", flag: "id", title: "Cultural Bali Discovery", desc: "Immerse yourself in Balinese culture with traditional villages, temples, and artisan workshops.", duration: "8 days", price: "from $1,980", image: tourCard2 },
-  { id: 3, country: "Peru", flag: "pe", title: "Classic Peru Adventure", desc: "The ultimate Peru experience with Machu Picchu, Sacred Valley, and Lima exploration.", duration: "8 days", price: "from $1,980", image: tourCard3 },
-  { id: 4, country: "Thailand", flag: "th", title: "Island Paradise", desc: "Focus on Thailand's stunning islands with beach time, snorkeling, and tropical adventures.", duration: "8 days", price: "from $3,910", image: tourCard4 },
-  { id: 5, country: "Peru", flag: "pe", title: "Inca Trail Adventure", desc: "For the adventurous traveler: trek the classic Inca Trail to Machu Picchu.", duration: "8 days", price: "from $1,980", image: tourCard5 },
-  { id: 6, country: "Peru", flag: "pe", title: "Amazon & Andes", desc: "Experience Peru's diverse landscapes from Amazon rainforest to high-altitude lakes.", duration: "8 days", price: "from $1,980", image: tourCard6 },
+  { id: 1, country: "Thailand", flag: "th", title: "Classic Thailand Explorer", desc: "Perfect introduction to Thailand with Bangkok temples, cultural experiences, and island hopping.", duration: "8 days", price: "from $1,650", image: tourImg(1) },
+  { id: 2, country: "Indonesia", flag: "id", title: "Cultural Bali Discovery", desc: "Immerse yourself in Balinese culture with traditional villages, temples, and artisan workshops.", duration: "8 days", price: "from $1,980", image: tourImg(2) },
+  { id: 3, country: "Peru", flag: "pe", title: "Classic Peru Adventure", desc: "The ultimate Peru experience with Machu Picchu, Sacred Valley, and Lima exploration.", duration: "8 days", price: "from $1,980", image: tourImg(3) },
+  { id: 4, country: "Thailand", flag: "th", title: "Island Paradise", desc: "Focus on Thailand's stunning islands with beach time, snorkeling, and tropical adventures.", duration: "9 days", price: "from $1,790", image: tourImg(4) },
+  { id: 5, country: "Peru", flag: "pe", title: "Inca Trail Adventure", desc: "For the adventurous traveler: trek the classic Inca Trail to Machu Picchu.", duration: "8 days", price: "from $2,450", image: tourImg(5) },
+  { id: 6, country: "Peru", flag: "pe", title: "Amazon & Andes", desc: "Experience Peru's diverse landscapes from Amazon rainforest to high-altitude lakes.", duration: "10 days", price: "from $2,180", image: tourImg(6) },
 ];
 
 // Tours by destination (Section 2)
@@ -196,32 +195,32 @@ const ALL_DESTINATIONS = [
   { name: "Cambodia",     flag: "🇰🇭" },
 ];
 
-// Three sample cards per destination — same local images reused with different metadata
+// Three sample cards per destination — each pulls its real photo from the tour mock data
 const TOURS_BY_COUNTRY: Record<string, typeof TOUR_CARDS> = {
   Thailand: [
-    { id: 7, country: "Thailand", flag: "th", title: "Bangkok & Beyond", desc: "Discover the energy of Bangkok alongside peaceful temples and floating markets.", duration: "10 days", price: "from $2,100", image: tourCard3 },
-    { id: 8, country: "Thailand", flag: "th", title: "Northern Thailand Highlights", desc: "Chiang Mai hill tribes, elephant sanctuaries, and lush mountain scenery.", duration: "7 days", price: "from $1,450", image: tourCard5 },
-    { id: 9, country: "Thailand", flag: "th", title: "Phuket & the Islands", desc: "Sun, sea, and stunning scenery across Thailand's most beautiful southern islands.", duration: "9 days", price: "from $2,780", image: tourCard6 },
+    { id: 7, country: "Thailand", flag: "th", title: "Bangkok & Beyond", desc: "Discover the energy of Bangkok alongside peaceful temples and floating markets.", duration: "10 days", price: "from $1,480", image: tourImg(7) },
+    { id: 8, country: "Thailand", flag: "th", title: "Northern Thailand Highlights", desc: "Chiang Mai hill tribes, elephant sanctuaries, and lush mountain scenery.", duration: "7 days", price: "from $1,250", image: tourImg(8) },
+    { id: 9, country: "Thailand", flag: "th", title: "Phuket & the Islands", desc: "Sun, sea, and stunning scenery across Thailand's most beautiful southern islands.", duration: "9 days", price: "from $1,890", image: tourImg(9) },
   ],
   Indonesia: [
-    { id: 10, country: "Indonesia", flag: "id", title: "Bali Bliss", desc: "Sacred temples, rice terraces, and sunset beach bars in Bali's most beloved spots.", duration: "9 days", price: "from $1,750", image: tourCard2 },
-    { id: 11, country: "Indonesia", flag: "id", title: "Java & Bali Explorer", desc: "Ancient kingdoms, active volcanoes, and vibrant art scenes across two islands.", duration: "12 days", price: "from $2,350", image: tourCard1 },
-    { id: 12, country: "Indonesia", flag: "id", title: "Lombok & the Gilis", desc: "Pristine beaches, world-class diving, and the quiet beauty of the Gili Islands.", duration: "8 days", price: "from $1,620", image: tourCard4 },
+    { id: 10, country: "Indonesia", flag: "id", title: "Bali Bliss", desc: "Sacred temples, rice terraces, and sunset beach bars in Bali's most beloved spots.", duration: "9 days", price: "from $2,350", image: tourImg(10) },
+    { id: 11, country: "Indonesia", flag: "id", title: "Java & Bali Explorer", desc: "Ancient kingdoms, active volcanoes, and vibrant art scenes across two islands.", duration: "12 days", price: "from $2,280", image: tourImg(11) },
+    { id: 12, country: "Indonesia", flag: "id", title: "Lombok & the Gilis", desc: "Pristine beaches, world-class diving, and the quiet beauty of the Gili Islands.", duration: "8 days", price: "from $1,650", image: tourImg(12) },
   ],
   Peru: [
-    { id: 13, country: "Peru", flag: "pe", title: "Classic Peru Adventure", desc: "The ultimate Peru experience with Machu Picchu, Sacred Valley, and Lima exploration.", duration: "8 days", price: "from $1,980", image: tourCard3 },
-    { id: 14, country: "Peru", flag: "pe", title: "Inca Trail Adventure", desc: "Trek the classic Inca Trail to Machu Picchu.", duration: "8 days", price: "from $1,980", image: tourCard5 },
-    { id: 15, country: "Peru", flag: "pe", title: "Amazon & Andes", desc: "From Amazon rainforest to high-altitude Andean lakes.", duration: "8 days", price: "from $1,980", image: tourCard6 },
+    { id: 13, country: "Peru", flag: "pe", title: "Classic Peru Adventure", desc: "The ultimate Peru experience with Machu Picchu, Sacred Valley, and Lima exploration.", duration: "8 days", price: "from $1,980", image: tourImg(13) },
+    { id: 14, country: "Peru", flag: "pe", title: "Inca Trail Adventure", desc: "Trek the classic Inca Trail to Machu Picchu.", duration: "8 days", price: "from $2,450", image: tourImg(14) },
+    { id: 15, country: "Peru", flag: "pe", title: "Amazon & Andes", desc: "From Amazon rainforest to high-altitude Andean lakes.", duration: "10 days", price: "from $2,180", image: tourImg(15) },
   ],
   Japan: [
-    { id: 16, country: "Japan", flag: "jp", title: "Japan Highlights", desc: "Tokyo skyscrapers, Kyoto temples, and Osaka street food in one unforgettable journey.", duration: "11 days", price: "from $2,890", image: tourCard1 },
-    { id: 17, country: "Japan", flag: "jp", title: "Kyoto & Beyond", desc: "Deep dive into Japan's ancient capital with day trips to Nara and Hiroshima.", duration: "8 days", price: "from $2,200", image: tourCard2 },
-    { id: 18, country: "Japan", flag: "jp", title: "Japan Rail Adventure", desc: "Ride the Shinkansen from Tokyo to Kyoto to the peaceful island of Miyajima.", duration: "14 days", price: "from $3,400", image: tourCard3 },
+    { id: 16, country: "Japan", flag: "jp", title: "Japan Highlights", desc: "Tokyo skyscrapers, Kyoto temples, and Osaka street food in one unforgettable journey.", duration: "11 days", price: "from $2,890", image: tourImg(16) },
+    { id: 17, country: "Japan", flag: "jp", title: "Kyoto & Beyond", desc: "Deep dive into Japan's ancient capital with day trips to Nara and Hiroshima.", duration: "8 days", price: "from $2,490", image: tourImg(17) },
+    { id: 18, country: "Japan", flag: "jp", title: "Japan Rail Adventure", desc: "Ride the Shinkansen from Tokyo to Kyoto to the peaceful island of Miyajima.", duration: "14 days", price: "from $3,690", image: tourImg(18) },
   ],
   Morocco: [
-    { id: 19, country: "Morocco", flag: "ma", title: "Imperial Cities of Morocco", desc: "Fes, Marrakech, Meknes, and Rabat — the four royal cities in one loop.", duration: "9 days", price: "from $1,540", image: tourCard4 },
-    { id: 20, country: "Morocco", flag: "ma", title: "Sahara & Kasbahs", desc: "Camel rides at sunset, ancient mud-brick kasbahs, and a sky full of desert stars.", duration: "7 days", price: "from $1,200", image: tourCard5 },
-    { id: 21, country: "Morocco", flag: "ma", title: "Coastal Morocco", desc: "Atlantic fishing towns, blue-washed Chefchaouen, and the surf town of Taghazout.", duration: "8 days", price: "from $1,350", image: tourCard6 },
+    { id: 19, country: "Morocco", flag: "ma", title: "Imperial Cities of Morocco", desc: "Fes, Marrakech, Meknes, and Rabat — the four royal cities in one loop.", duration: "9 days", price: "from $1,540", image: tourImg(19) },
+    { id: 20, country: "Morocco", flag: "ma", title: "Sahara & Kasbahs", desc: "Camel rides at sunset, ancient mud-brick kasbahs, and a sky full of desert stars.", duration: "7 days", price: "from $1,320", image: tourImg(20) },
+    { id: 21, country: "Morocco", flag: "ma", title: "Coastal Morocco", desc: "Atlantic fishing towns, blue-washed Chefchaouen, and the surf town of Taghazout.", duration: "8 days", price: "from $1,410", image: tourImg(21) },
   ],
 };
 
@@ -361,32 +360,32 @@ const TRIP_TYPES: { id: TripTypeId; label: string; icon: React.ReactNode }[] = [
   { id: "last-minute",     label: "Last Minute",     icon: <Zap size={15} /> },
 ];
 
-// Reuses the same tour card images already imported — no extra assets needed.
+// Trip-type cards — each uses a real destination photo
 const TRIP_TYPE_CARDS: Record<TripTypeId, { id: number; title: string; destination: string; flag: string; desc: string; image: string; duration: string; price: string }[]> = {
   "hotel-flight": [
-    { id: 1, title: "Cancún All-Inclusive Escape",     destination: "Cancún, Mexico",   flag: "mx", desc: "Powdery white sands, turquoise Caribbean water, and all-inclusive resort luxury.",        image: tourCard1, duration: "7 nights", price: "from £849" },
-    { id: 2, title: "Maldives Overwater Villa",         destination: "Maldives",         flag: "mv", desc: "Stilted villas above crystal lagoons, world-class diving, and pure tropical seclusion.",  image: tourCard2, duration: "7 nights", price: "from £1,899" },
-    { id: 3, title: "Dubai Luxury Getaway",             destination: "Dubai, UAE",       flag: "ae", desc: "Desert skylines, rooftop pools, and non-stop shopping in the city of the future.",        image: tourCard3, duration: "7 nights", price: "from £999" },
+    { id: 1, title: "Cancún All-Inclusive Escape",     destination: "Cancún, Mexico",   flag: "mx", desc: "Powdery white sands, turquoise Caribbean water, and all-inclusive resort luxury.",        image: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80", duration: "7 nights", price: "from £849" },
+    { id: 2, title: "Maldives Overwater Villa",         destination: "Maldives",         flag: "mv", desc: "Stilted villas above crystal lagoons, world-class diving, and pure tropical seclusion.",  image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80", duration: "7 nights", price: "from £1,899" },
+    { id: 3, title: "Dubai Luxury Getaway",             destination: "Dubai, UAE",       flag: "ae", desc: "Desert skylines, rooftop pools, and non-stop shopping in the city of the future.",        image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80", duration: "7 nights", price: "from £999" },
   ],
   "group-tour": [
-    { id: 4, title: "Classic Peru Group Adventure",    destination: "Peru",             flag: "pe", desc: "Explore ancient Incan ruins, the Amazon rainforest, and vibrant Andean culture.",          image: tourCard3, duration: "8 days",   price: "from £1,980" },
-    { id: 5, title: "Japan Group Highlights Tour",     destination: "Japan",            flag: "jp", desc: "Cherry blossoms, samurai history, and neon-lit cities on a classic group adventure.",      image: tourCard4, duration: "11 days",  price: "from £2,890" },
-    { id: 6, title: "Morocco Imperial Cities Group",   destination: "Morocco",          flag: "ma", desc: "Wander medinas, souks, and palaces across Morocco's most iconic imperial cities.",         image: tourCard5, duration: "9 days",   price: "from £1,540" },
+    { id: 4, title: "Classic Peru Group Adventure",    destination: "Peru",             flag: "pe", desc: "Explore ancient Incan ruins, the Amazon rainforest, and vibrant Andean culture.",          image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80", duration: "8 days",   price: "from £1,980" },
+    { id: 5, title: "Japan Group Highlights Tour",     destination: "Japan",            flag: "jp", desc: "Cherry blossoms, samurai history, and neon-lit cities on a classic group adventure.",      image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80", duration: "11 days",  price: "from £2,890" },
+    { id: 6, title: "Morocco Imperial Cities Group",   destination: "Morocco",          flag: "ma", desc: "Wander medinas, souks, and palaces across Morocco's most iconic imperial cities.",         image: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=800&q=80", duration: "9 days",   price: "from £1,540" },
   ],
   "individual-tour": [
-    { id: 7, title: "Bali Cultural Discovery",         destination: "Bali, Indonesia",  flag: "id", desc: "Sacred temples, lush rice terraces, and world-class surf on the Island of the Gods.",     image: tourCard2, duration: "8 days",   price: "from £1,980" },
-    { id: 8, title: "Kyoto Self-Guided Journey",       destination: "Japan",            flag: "jp", desc: "Wander ancient streets and zen gardens across Japan's most serene cultural capital.",      image: tourCard6, duration: "8 days",   price: "from £2,200" },
-    { id: 9, title: "Thai Island Hopping",             destination: "Thailand",         flag: "th", desc: "Hop between paradise islands, turquoise waters, and vibrant beach towns at your pace.",   image: tourCard1, duration: "10 days",  price: "from £1,650" },
+    { id: 7, title: "Bali Cultural Discovery",         destination: "Bali, Indonesia",  flag: "id", desc: "Sacred temples, lush rice terraces, and world-class surf on the Island of the Gods.",     image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80", duration: "8 days",   price: "from £1,980" },
+    { id: 8, title: "Kyoto Self-Guided Journey",       destination: "Japan",            flag: "jp", desc: "Wander ancient streets and zen gardens across Japan's most serene cultural capital.",      image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80", duration: "8 days",   price: "from £2,200" },
+    { id: 9, title: "Thai Island Hopping",             destination: "Thailand",         flag: "th", desc: "Hop between paradise islands, turquoise waters, and vibrant beach towns at your pace.",   image: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=800&q=80", duration: "10 days",  price: "from £1,650" },
   ],
   "round-trip": [
-    { id: 10, title: "Japan Rail Circle Route",        destination: "Japan",            flag: "jp", desc: "Circle Japan by bullet train, connecting Tokyo, Kyoto, Hiroshima, and beyond.",           image: tourCard4, duration: "14 days",  price: "from £3,400" },
-    { id: 11, title: "Moroccan Imperial Loop",         destination: "Morocco",          flag: "ma", desc: "A loop through ancient medinas, Saharan dunes, and Atlas Mountain kasbahs.",              image: tourCard5, duration: "9 days",   price: "from £1,540" },
-    { id: 12, title: "Peru Amazon & Andes Circuit",    destination: "Peru",             flag: "pe", desc: "From Lima to the Amazon, Cusco to Machu Picchu — Peru's greatest circular route.",        image: tourCard6, duration: "12 days",  price: "from £2,400" },
+    { id: 10, title: "Japan Rail Circle Route",        destination: "Japan",            flag: "jp", desc: "Circle Japan by bullet train, connecting Tokyo, Kyoto, Hiroshima, and beyond.",           image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80", duration: "14 days",  price: "from £3,400" },
+    { id: 11, title: "Moroccan Imperial Loop",         destination: "Morocco",          flag: "ma", desc: "A loop through ancient medinas, Saharan dunes, and Atlas Mountain kasbahs.",              image: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80", duration: "9 days",   price: "from £1,540" },
+    { id: 12, title: "Peru Amazon & Andes Circuit",    destination: "Peru",             flag: "pe", desc: "From Lima to the Amazon, Cusco to Machu Picchu — Peru's greatest circular route.",        image: "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=800&q=80", duration: "12 days",  price: "from £2,400" },
   ],
   "last-minute": [
-    { id: 13, title: "Santorini Getaway",              destination: "Greece",           flag: "gr", desc: "Whitewashed cliffs, volcanic beaches, and legendary sunsets over the caldera.",           image: tourCard2, duration: "7 nights", price: "from £749" },
-    { id: 14, title: "Bangkok Long Weekend",           destination: "Thailand",         flag: "th", desc: "Street food, rooftop bars, golden temples, and buzzing night markets await.",             image: tourCard3, duration: "5 nights", price: "from £599" },
-    { id: 15, title: "Cancún Quick Escape",            destination: "Mexico",           flag: "mx", desc: "Last-minute Caribbean sun, all-inclusive deals, and white-sand beaches for less.",        image: tourCard1, duration: "7 nights", price: "from £819" },
+    { id: 13, title: "Santorini Getaway",              destination: "Greece",           flag: "gr", desc: "Whitewashed cliffs, volcanic beaches, and legendary sunsets over the caldera.",           image: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=800&q=80", duration: "7 nights", price: "from £749" },
+    { id: 14, title: "Bangkok Long Weekend",           destination: "Thailand",         flag: "th", desc: "Street food, rooftop bars, golden temples, and buzzing night markets await.",             image: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80", duration: "5 nights", price: "from £599" },
+    { id: 15, title: "Cancún Quick Escape",            destination: "Mexico",           flag: "mx", desc: "Last-minute Caribbean sun, all-inclusive deals, and white-sand beaches for less.",        image: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80", duration: "7 nights", price: "from £819" },
   ],
 };
 
