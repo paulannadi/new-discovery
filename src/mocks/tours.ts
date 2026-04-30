@@ -32,6 +32,7 @@ export const SWISS_WINTER_TOUR: Tour = {
   endDate: "Apr 07, 2026",
   adults: 2,
   destinationCodes: ["SWITZERLAND"],
+  videoUrl: "https://videos.pexels.com/video-files/35790907/15174089_3840_2160_30fps.mp4",
 
   // ── Quick-fact attribute chips ────────────────────────────────────────────
   attributes: [
@@ -525,6 +526,7 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
     { from: "Chiang Mai", to: "Koh Samui", date: "Oct 10, flight", mode: "Domestic flight", description: "Approx. 2h domestic flight" },
   ],
   destinationCodes: ["PHUKET"],
+  videoUrl: "https://videos.pexels.com/video-files/36249379/15373082_3840_2160_30fps.mp4",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -709,6 +711,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
     { from: "Ubud", to: "Seminyak", date: "Sep 18, transfer", mode: "Private car", description: "Approx. 45 min private transfer" },
   ],
   destinationCodes: ["BALI"],
+  videoUrl: "https://videos.pexels.com/video-files/29781865/12797151_3840_2160_30fps.mp4",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -921,6 +924,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
     { from: "Sacred Valley", to: "Machu Picchu", date: "Jul 11, Peru Rail", mode: "Scenic train", description: "1h 40m scenic valley train from Ollantaytambo" },
   ],
   destinationCodes: ["COSTARICA"],
+  videoUrl: "https://videos.pexels.com/video-files/29604781/12740990_3840_2160_30fps.mp4",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1166,6 +1170,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
     { from: "Kyoto", to: "Osaka", date: "Apr 10, Shinkansen", mode: "Bullet train", description: "15 min · JR Pass covered" },
   ],
   destinationCodes: ["HOCHIMINH"],
+  videoUrl: "https://videos.pexels.com/video-files/31424703/13404667_3840_2160_30fps.mp4",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1388,6 +1393,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
     { from: "Merzouga", to: "Marrakech (via Ouarzazate)", date: "Nov 14–15, coach", mode: "Private coach", description: "Via Aït Benhaddou and Tizi n'Tichka mountain pass" },
   ],
   destinationCodes: ["MARRAKECH"],
+  videoUrl: "https://videos.pexels.com/video-files/18446139/18446139-hd_1920_1080_25fps.mp4",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1567,6 +1573,7 @@ export const DUBAI_HIGHLIGHTS_TOUR: Tour = {
     { from: "Desert Camp", to: "Palm Jumeirah", date: "Apr 18, private transfer", mode: "Private car", description: "Approx. 1h 45m back to the coast" },
   ],
   destinationCodes: ["DUBAI"],
+  videoUrl: "https://videos.pexels.com/video-files/34312419/14535952_3840_2160_60fps.mp4",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1698,6 +1705,7 @@ export const CANCUN_RIVIERA_TOUR: Tour = {
     { from: "Cancún", to: "Tulum", date: "May 02, coach", mode: "Private coach", description: "Approx. 2h with Playa del Carmen stop" },
   ],
   destinationCodes: ["CANCUN"],
+  videoUrl: "https://videos.pexels.com/video-files/4645384/4645384-hd_1920_1080_30fps.mp4",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1836,6 +1844,7 @@ export const MALDIVES_ISLAND_TOUR: Tour = {
     { from: "North Malé Atoll", to: "Baa Atoll", date: "Apr 23, seaplane", mode: "Seaplane", description: "30 min scenic flight over the atolls" },
   ],
   destinationCodes: ["MALDIVES"],
+  videoUrl: "https://videos.pexels.com/video-files/32192415/13728757_3840_2160_30fps.mp4",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1974,6 +1983,7 @@ export const TENERIFE_TOUR: Tour = {
     { from: "Costa Adeje", to: "Los Cristianos", date: "Apr 15, taxi", mode: "Private car", description: "Approx. 10 min coastal transfer" },
   ],
   destinationCodes: ["TENERIFE"],
+  videoUrl: "https://videos.pexels.com/video-files/15954517/15954517-hd_1920_1080_50fps.mp4",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2006,6 +2016,7 @@ export const THAILAND_ISLANDS_TOUR: Tour = {
   endDate: "Nov 18, 2026",
   adults: 2,
   destinationCodes: ["PHUKET"],
+  videoUrl: "https://videos.pexels.com/video-files/35874590/15214298_3840_2160_30fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Max 14 travellers" },
     { iconKey: "activity",       title: "Activity",   value: "Easy to moderate" },
@@ -2213,6 +2224,7 @@ export const THAILAND_BANGKOK_TOUR: Tour = {
   endDate: "Jan 24, 2027",
   adults: 2,
   destinationCodes: ["PHUKET"],
+  videoUrl: "https://videos.pexels.com/video-files/29744566/12786107_3840_2160_25fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Max 16 travellers" },
     { iconKey: "activity",       title: "Activity",   value: "Easy to moderate" },
@@ -2434,6 +2446,7 @@ export const THAILAND_NORTH_TOUR: Tour = {
   endDate: "Dec 07, 2026",
   adults: 2,
   destinationCodes: ["PHUKET"],
+  videoUrl: "https://videos.pexels.com/video-files/35073418/14857306_1920_1080_30fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Max 12 travellers" },
     { iconKey: "activity",       title: "Activity",   value: "Moderate" },
@@ -2621,6 +2634,7 @@ export const THAILAND_PHUKET_TOUR: Tour = {
   endDate: "Feb 20, 2027",
   adults: 2,
   destinationCodes: ["PHUKET"],
+  videoUrl: "https://videos.pexels.com/video-files/35875154/15214443_3840_2160_30fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Individual tour" },
     { iconKey: "activity",       title: "Activity",   value: "Easy to moderate" },
@@ -2812,6 +2826,7 @@ export const BALI_BLISS_TOUR: Tour = {
   endDate: "Oct 28, 2026",
   adults: 2,
   destinationCodes: ["BALI"],
+  videoUrl: "https://videos.pexels.com/video-files/34845201/14770127_2560_1440_60fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Individual tour" },
     { iconKey: "activity",       title: "Activity",   value: "Easy — relaxation focus" },
@@ -3021,6 +3036,7 @@ export const JAVA_BALI_TOUR: Tour = {
   endDate: "Aug 21, 2026",
   adults: 2,
   destinationCodes: ["BALI"],
+  videoUrl: "https://videos.pexels.com/video-files/17154253/17154253-hd_1920_1080_30fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Max 14 travellers" },
     { iconKey: "activity",       title: "Activity",   value: "Moderate" },
@@ -3279,6 +3295,7 @@ export const LOMBOK_GILIS_TOUR: Tour = {
   endDate: "Sep 12, 2026",
   adults: 2,
   destinationCodes: ["BALI"],
+  videoUrl: "https://videos.pexels.com/video-files/17487720/17487720-hd_1920_1080_30fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Individual tour" },
     { iconKey: "activity",       title: "Activity",   value: "Easy to moderate" },
@@ -3476,6 +3493,7 @@ export const PERU_INCA_TRAIL_TOUR: Tour = {
   endDate: "Jun 22, 2026",
   adults: 2,
   destinationCodes: ["COSTARICA"],
+  videoUrl: "https://videos.pexels.com/video-files/29604766/12740960_3840_2160_30fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Max 16 trekkers" },
     { iconKey: "activity",       title: "Activity",   value: "Challenging" },
@@ -3675,6 +3693,7 @@ export const PERU_AMAZON_TOUR: Tour = {
   endDate: "Jul 29, 2026",
   adults: 2,
   destinationCodes: ["COSTARICA"],
+  videoUrl: "https://videos.pexels.com/video-files/32339980/13795748_1920_1080_60fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Max 12 travellers" },
     { iconKey: "activity",       title: "Activity",   value: "Moderate" },
@@ -3898,6 +3917,7 @@ export const JAPAN_KYOTO_TOUR: Tour = {
   endDate: "Apr 17, 2027",
   adults: 2,
   destinationCodes: ["HOCHIMINH"],
+  videoUrl: "https://videos.pexels.com/video-files/31385022/13392218_1920_1080_30fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Max 12 travellers" },
     { iconKey: "activity",       title: "Activity",   value: "Easy" },
@@ -4084,6 +4104,7 @@ export const JAPAN_RAIL_TOUR: Tour = {
   endDate: "Apr 07, 2027",
   adults: 2,
   destinationCodes: ["HOCHIMINH"],
+  videoUrl: "https://videos.pexels.com/video-files/30355204/13011527_3840_2160_25fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Max 14 travellers" },
     { iconKey: "activity",       title: "Activity",   value: "Easy" },
@@ -4397,6 +4418,7 @@ export const MOROCCO_SAHARA_TOUR: Tour = {
   endDate: "Oct 30, 2026",
   adults: 2,
   destinationCodes: ["MARRAKECH"],
+  videoUrl: "https://videos.pexels.com/video-files/5442766/5442766-hd_1920_1080_25fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Max 12 travellers" },
     { iconKey: "activity",       title: "Activity",   value: "Easy to moderate" },
@@ -4601,6 +4623,7 @@ export const MOROCCO_COASTAL_TOUR: Tour = {
   endDate: "Nov 08, 2026",
   adults: 2,
   destinationCodes: ["MARRAKECH"],
+  videoUrl: "https://videos.pexels.com/video-files/34726231/14720588_3840_2160_60fps.mp4",
   attributes: [
     { iconKey: "users",          title: "Group size", value: "Max 14 travellers" },
     { iconKey: "activity",       title: "Activity",   value: "Easy" },

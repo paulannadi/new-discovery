@@ -25,7 +25,7 @@ import {
   Hotel,
   Bus,
   ChevronDown,
-  Play,
+
   Plus,
   Minus,
   X,
@@ -89,6 +89,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
   // Photos modal
   const [photosOpen, setPhotosOpen] = useState(false);
+
 
   // Booking widget state — lives in the sidebar (desktop) and bottom sheet (mobile)
   // openPanel controls which dropdown is visible at any time (only one at once)
@@ -183,21 +184,35 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
           {/* ── Photo grid — 402px, 3fr / 2fr, same as PackageDetailPage ── */}
           <div className="relative mx-4 sm:mx-6 md:mx-10">
-            <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[200px] sm:h-[240px] md:h-[402px] gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] grid-rows-1 h-[200px] sm:h-[240px] md:h-[402px] gap-2">
 
-              {/* Main image with play button overlay */}
-              <div className="relative overflow-hidden rounded-xl group cursor-pointer">
-                <img
-                  src={galleryImages[0]}
-                  alt={tour.title}
-                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 via-transparent to-transparent" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                    <Play size={20} className="text-[#1a1a1a] ml-1" fill="#1a1a1a" aria-hidden="true" />
-                  </div>
-                </div>
+              {/* Main hero — auto-playing looping video if available, otherwise static image.
+                  The video is muted (required by browsers for autoplay) and loops endlessly
+                  to create an immersive first impression when you land on the page.
+                  Video elements have intrinsic dimensions that can override grid sizing,
+                  so we use absolute positioning inside a sized container to guarantee
+                  the hero never exceeds the grid's fixed height. */}
+              <div className="relative overflow-hidden rounded-xl">
+                {tour.videoUrl ? (
+                  <video
+                    src={tour.videoUrl}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    poster={galleryImages[0]}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    aria-label={`Tour video for ${tour.title}`}
+                  />
+                ) : (
+                  <img
+                    src={galleryImages[0]}
+                    alt={tour.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                )}
+                {/* Subtle gradient at the bottom so the video blends nicely */}
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent pointer-events-none" />
               </div>
 
               {/* 2×2 thumbnail grid — desktop only, clicking opens the modal */}
@@ -860,6 +875,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
           </div>
         </DialogContent>
       </Dialog>
+
 
     </div>
   );
