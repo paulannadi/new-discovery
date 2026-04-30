@@ -201,4 +201,8 @@ export interface Tour {
   // Used to filter tours in HolidayListPage when the user searches a specific destination.
   // If empty or undefined, the tour is shown for all destinations.
   destinationCodes?: string[];
+
+  // Optional hero video shown on the detail page (Pexels-sourced).
+  // Plays when the user taps the play button on the main image.
+  videoUrl?: string;
 }
