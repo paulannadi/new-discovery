@@ -54,7 +54,7 @@ function sym(currency: string): string {
 }
 
 function AttributeIcon({ iconKey, size = 15 }: { iconKey: TourAttribute["iconKey"]; size?: number }) {
-  const cls = "text-muted-foreground shrink-0";
+  const cls = "text-primary shrink-0";
   if (iconKey === "users")          return <Users size={size} className={cls} aria-hidden="true" />;
   if (iconKey === "languages")      return <Languages size={size} className={cls} aria-hidden="true" />;
   if (iconKey === "activity")       return <Activity size={size} className={cls} aria-hidden="true" />;
@@ -305,50 +305,59 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
             {/* ── Tab content panels ─────────────────────────────────────── */}
 
-            {/* Overview — quick facts, tour route with stops + map */}
+            {/* Overview — highlights pills, tour route with stops + map */}
             {activeTab === "overview" && (
               <div className="flex flex-col gap-6">
 
-                {/* Quick facts — horizontal card row matching the screenshot design:
-                    icon + title label on top, bold value below, vertical dividers between */}
-                <div className="bg-card rounded-xl shadow-sm p-5">
-                  <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border">
-                    {tour.attributes.map((attr) => (
-                      <div key={attr.title} className="flex flex-col gap-2 px-4 first:pl-0 last:pr-0 py-2">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <AttributeIcon iconKey={attr.iconKey} size={16} />
-                          <span className="text-sm">{attr.title}</span>
+                {/* ── Single card: Tour details pills + divider + Tour route ── */}
+                <div className="bg-card rounded-xl shadow-sm overflow-visible">
+
+                  {/* Tour details — pill badges */}
+                  <div className="p-5">
+                    <p className="text-sm font-bold text-foreground mb-3">Tour details</p>
+                    <div className="flex flex-wrap gap-2">
+                      {tour.attributes.map((attr) => (
+                        <div
+                          key={attr.title}
+                          className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3.5 py-2"
+                        >
+                          <AttributeIcon iconKey={attr.iconKey} size={15} />
+                          <span className="text-sm text-foreground font-medium">{attr.value}</span>
                         </div>
-                        <p className="text-sm font-semibold text-foreground">{attr.value}</p>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                {/* Tour route — stops list on the left, map on the right */}
-                <div className="bg-card rounded-xl shadow-sm overflow-hidden">
-                  <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr]">
+                  {/* Divider */}
+                  <div className="border-t border-border mx-5" />
 
-                    {/* Map — takes up 2/3 of the card.
-                        "relative z-0" creates a stacking context so Leaflet's
-                        internal z-indices (400–800) don't overlap the mobile footer. */}
-                    <div className="h-[280px] md:h-auto md:min-h-[320px] relative z-0">
+                  {/* Tour route — map + stops side by side */}
+                  <div className="p-5 pb-0">
+                    <p className="text-sm font-bold text-foreground mb-4">Tour route</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr]">
+
+                    {/* Map */}
+                    <div className="h-[260px] md:h-[300px] relative z-0 m-5 mt-0 rounded-xl overflow-hidden border border-border">
                       <TourRouteMapInline stops={tour.stops} />
                     </div>
 
-                    {/* Stops list */}
-                    <div className="p-5 md:border-l border-border">
-                      <p className="text-base font-bold text-foreground mb-4">Tour stops</p>
+                    {/* Destinations list */}
+                    <div className="px-5 pb-5 md:pl-0">
+                      <p className="text-xs font-bold text-grey uppercase tracking-wide mb-3">Destinations</p>
                       <div className="flex flex-col gap-3">
                         {tour.stops.map((stop, i) => (
-                          <div key={stop.destinationName} className="flex items-center gap-3">
-                            <span className="bg-primary/10 text-primary text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shrink-0">
+                          <div key={stop.destinationName} className="flex items-start gap-3">
+                            <span className="mt-0.5 w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0">
                               {i + 1}
                             </span>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-foreground">{stop.destinationName}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {stop.nights} {stop.nights === 1 ? "night" : "nights"} · {stop.dateRange}
+                              <p className="text-sm font-semibold text-foreground">
+                                {stop.destinationName}
+                                <span className="font-normal text-muted-foreground"> · {stop.nights} {stop.nights === 1 ? "night" : "nights"}</span>
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {stop.dateRange}
                               </p>
                             </div>
                           </div>
