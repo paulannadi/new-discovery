@@ -1,0 +1,133 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e422]:
+    - generic [ref=e424]:
+      - button "Back to tours" [ref=e426]:
+        - img [ref=e427]
+        - text: Back to tours
+      - generic [ref=e429]:
+        - generic [ref=e430]:
+          - generic [ref=e431] [cursor=pointer]:
+            - img "Classic Thailand Explorer" [ref=e432]
+            - img [ref=e436]
+          - generic [ref=e438]:
+            - img "Tour photo 2" [ref=e440] [cursor=pointer]
+            - img "Tour photo 3" [ref=e442] [cursor=pointer]
+            - img "Tour photo 4" [ref=e444] [cursor=pointer]
+            - img "Tour photo 5" [ref=e446] [cursor=pointer]
+        - button "⊞ See all photos" [ref=e447]
+      - generic [ref=e448]:
+        - heading "Classic Thailand Explorer" [level=1] [ref=e449]
+        - generic [ref=e450]:
+          - generic [ref=e451]:
+            - img [ref=e452]
+            - generic [ref=e455]: 8 days
+          - generic [ref=e456]: "|"
+          - generic [ref=e457]:
+            - img [ref=e458]
+            - generic [ref=e461]: Bangkok · Chiang Mai · Koh Samui
+          - button "Show on map" [ref=e462]:
+            - img [ref=e463]
+            - text: Show on map
+    - generic [ref=e468]:
+      - generic [ref=e469]:
+        - generic [ref=e470]:
+          - button "Overview" [ref=e471]
+          - button "Itinerary" [ref=e472]
+          - button "Highlights" [ref=e473]
+          - button "Included" [ref=e474]
+          - button "Excluded" [ref=e475]
+        - generic [ref=e477]:
+          - generic [ref=e479]:
+            - generic [ref=e480]:
+              - generic [ref=e481]:
+                - img [ref=e482]
+                - generic [ref=e484]: Duration
+              - paragraph [ref=e485]: 8 days
+            - generic [ref=e486]:
+              - generic [ref=e487]:
+                - img [ref=e488]
+                - generic [ref=e493]: Group size
+              - paragraph [ref=e494]: Max 16 travellers
+            - generic [ref=e495]:
+              - generic [ref=e496]:
+                - img [ref=e497]
+                - generic [ref=e499]: Activity
+              - paragraph [ref=e500]: Easy to moderate
+            - generic [ref=e501]:
+              - generic [ref=e502]:
+                - img [ref=e503]
+                - generic [ref=e507]: Language
+              - paragraph [ref=e508]: English
+            - generic [ref=e509]:
+              - generic [ref=e510]:
+                - img [ref=e511]
+                - generic [ref=e514]: Min age
+              - paragraph [ref=e515]: 18+
+          - generic [ref=e517]:
+            - generic [ref=e518]:
+              - paragraph [ref=e519]: Tour stops
+              - generic [ref=e520]:
+                - generic [ref=e521]:
+                  - generic [ref=e522]: "1"
+                  - generic [ref=e523]:
+                    - paragraph [ref=e524]: Bangkok
+                    - paragraph [ref=e525]: 2 nights · Oct 05 – 07
+                - generic [ref=e526]:
+                  - generic [ref=e527]: "2"
+                  - generic [ref=e528]:
+                    - paragraph [ref=e529]: Chiang Mai
+                    - paragraph [ref=e530]: 3 nights · Oct 07 – 10
+                - generic [ref=e531]:
+                  - generic [ref=e532]: "3"
+                  - generic [ref=e533]:
+                    - paragraph [ref=e534]: Koh Samui
+                    - paragraph [ref=e535]: 2 nights · Oct 10 – 12
+            - generic [ref=e537]:
+              - generic:
+                - generic:
+                  - img
+                - generic:
+                  - button "1" [ref=e539] [cursor=pointer]:
+                    - generic [ref=e540]: "1"
+                  - button "2" [ref=e541] [cursor=pointer]:
+                    - generic [ref=e542]: "2"
+                  - button "3" [ref=e543] [cursor=pointer]:
+                    - generic [ref=e544]: "3"
+              - generic:
+                - generic [ref=e545]:
+                  - button "Zoom in" [ref=e546] [cursor=pointer]: +
+                  - button "Zoom out" [ref=e547] [cursor=pointer]: −
+                - generic [ref=e548]:
+                  - link "Leaflet" [ref=e549] [cursor=pointer]:
+                    - /url: https://leafletjs.com
+                    - img [ref=e550]
+                    - text: Leaflet
+                  - text: "| ©"
+                  - link "OpenStreetMap" [ref=e554] [cursor=pointer]:
+                    - /url: https://www.openstreetmap.org/copyright
+      - generic [ref=e556]:
+        - generic [ref=e558]:
+          - generic [ref=e559]: $1,650 per person · 8-day guided tour
+          - generic [ref=e560]: "Total for 2 adults: $3,300"
+        - generic [ref=e561]:
+          - paragraph [ref=e562]: Customise your trip
+          - button "Travel date Oct 05, 2026" [ref=e564]:
+            - img [ref=e565]
+            - generic [ref=e567]:
+              - generic [ref=e568]: Travel date
+              - generic [ref=e569]: Oct 05, 2026
+            - img [ref=e570]
+          - button "Travellers 2 Adults" [ref=e573]:
+            - img [ref=e574]
+            - generic [ref=e579]:
+              - generic [ref=e580]: Travellers
+              - generic [ref=e581]: 2 Adults
+            - img [ref=e582]
+          - button "Hotel preference Standard" [ref=e585]:
+            - img [ref=e586]
+            - generic [ref=e589]:
+              - generic [ref=e590]: Hotel preference
+              - generic [ref=e591]: Standard
+            - img [ref=e592]
+        - button "Start planning" [ref=e595]

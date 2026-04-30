@@ -1,0 +1,123 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e422]:
+    - generic [ref=e424]:
+      - button "Back to tours" [ref=e426]:
+        - img [ref=e427]
+        - text: Back to tours
+      - generic [ref=e429]:
+        - generic [ref=e430]:
+          - generic [ref=e431] [cursor=pointer]:
+            - img "Classic Thailand Explorer" [ref=e432]
+            - img [ref=e436]
+          - generic [ref=e438]:
+            - img "Tour photo 2" [ref=e440] [cursor=pointer]
+            - img "Tour photo 3" [ref=e442] [cursor=pointer]
+            - img "Tour photo 4" [ref=e444] [cursor=pointer]
+            - img "Tour photo 5" [ref=e446] [cursor=pointer]
+        - button "⊞ See all photos" [ref=e447]
+      - generic [ref=e448]:
+        - heading "Classic Thailand Explorer" [level=1] [ref=e449]
+        - generic [ref=e450]:
+          - generic [ref=e451]:
+            - img [ref=e452]
+            - generic [ref=e455]: 8 days
+          - generic [ref=e456]: "|"
+          - generic [ref=e457]:
+            - img [ref=e458]
+            - generic [ref=e461]: Bangkok · Chiang Mai · Koh Samui
+          - button "Show on map" [ref=e462]:
+            - img [ref=e463]
+            - text: Show on map
+    - generic [ref=e468]:
+      - generic [ref=e469]:
+        - generic [ref=e470]:
+          - button "Overview" [ref=e471]
+          - button "Itinerary" [ref=e472]
+          - button "Highlights" [ref=e473]
+          - button "Included" [ref=e474]
+          - button "Excluded" [ref=e475]
+        - generic [ref=e477]:
+          - generic [ref=e478]:
+            - paragraph [ref=e479]: Tour details
+            - generic [ref=e480]:
+              - generic [ref=e481]:
+                - img [ref=e482]
+                - generic [ref=e487]: Group tour (max 16)
+              - generic [ref=e488]:
+                - img [ref=e489]
+                - generic [ref=e493]: Guided in English
+              - generic [ref=e494]:
+                - img [ref=e495]
+                - generic [ref=e497]: Easy to moderate
+              - generic [ref=e498]:
+                - img [ref=e499]
+                - generic [ref=e502]: Age 18+
+          - generic [ref=e503]:
+            - paragraph [ref=e504]: Tour stops
+            - generic [ref=e505]:
+              - generic [ref=e506]:
+                - generic [ref=e507]: "1"
+                - generic [ref=e508]:
+                  - text: Bangkok
+                  - generic [ref=e509]: 2 nights · Oct 05 – 07
+              - generic [ref=e510]:
+                - generic [ref=e511]: "2"
+                - generic [ref=e512]:
+                  - text: Chiang Mai
+                  - generic [ref=e513]: 3 nights · Oct 07 – 10
+              - generic [ref=e514]:
+                - generic [ref=e515]: "3"
+                - generic [ref=e516]:
+                  - text: Koh Samui
+                  - generic [ref=e517]: 2 nights · Oct 10 – 12
+          - generic [ref=e518]:
+            - heading "Tour route" [level=3] [ref=e519]
+            - generic [ref=e522]:
+              - generic:
+                - generic:
+                  - img
+                - generic:
+                  - button "1" [ref=e524] [cursor=pointer]:
+                    - generic [ref=e525]: "1"
+                  - button "2" [ref=e526] [cursor=pointer]:
+                    - generic [ref=e527]: "2"
+                  - button "3" [ref=e528] [cursor=pointer]:
+                    - generic [ref=e529]: "3"
+              - generic:
+                - generic [ref=e530]:
+                  - button "Zoom in" [ref=e531] [cursor=pointer]: +
+                  - button "Zoom out" [ref=e532] [cursor=pointer]: −
+                - generic [ref=e533]:
+                  - link "Leaflet" [ref=e534] [cursor=pointer]:
+                    - /url: https://leafletjs.com
+                    - img [ref=e535]
+                    - text: Leaflet
+                  - text: "| ©"
+                  - link "OpenStreetMap" [ref=e539] [cursor=pointer]:
+                    - /url: https://www.openstreetmap.org/copyright
+      - generic [ref=e541]:
+        - generic [ref=e543]:
+          - generic [ref=e544]: $1,650 per person · 8-day guided tour
+          - generic [ref=e545]: "Total for 2 adults: $3,300"
+        - generic [ref=e546]:
+          - paragraph [ref=e547]: Customise your trip
+          - button "Travel date Oct 05, 2026" [ref=e549]:
+            - img [ref=e550]
+            - generic [ref=e552]:
+              - generic [ref=e553]: Travel date
+              - generic [ref=e554]: Oct 05, 2026
+            - img [ref=e555]
+          - button "Travellers 2 Adults" [ref=e558]:
+            - img [ref=e559]
+            - generic [ref=e564]:
+              - generic [ref=e565]: Travellers
+              - generic [ref=e566]: 2 Adults
+            - img [ref=e567]
+          - button "Hotel preference Standard" [ref=e570]:
+            - img [ref=e571]
+            - generic [ref=e574]:
+              - generic [ref=e575]: Hotel preference
+              - generic [ref=e576]: Standard
+            - img [ref=e577]
+        - button "Start planning" [ref=e580]

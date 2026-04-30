@@ -35,10 +35,10 @@ export const SWISS_WINTER_TOUR: Tour = {
 
   // ── Quick-fact attribute chips ────────────────────────────────────────────
   attributes: [
-    { iconKey: "users",           label: "Individual tour" },
-    { iconKey: "languages",       label: "Guided in English" },
-    { iconKey: "activity",        label: "All levels" },
-    { iconKey: "calendar-check",  label: "Age 18+" },
+    { iconKey: "users",           title: "Group size",  value: "Individual tour" },
+    { iconKey: "activity",        title: "Activity",    value: "All levels" },
+    { iconKey: "languages",       title: "Language",    value: "English" },
+    { iconKey: "calendar-check",  title: "Min age",     value: "18+" },
   ],
 
   // ── Photo gallery ─────────────────────────────────────────────────────────
@@ -355,10 +355,10 @@ export const THAILAND_EXPLORER_TOUR: Tour = {
   endDate: "Oct 12, 2026",
   adults: 2,
   attributes: [
-    { iconKey: "users",           label: "Group tour (max 16)" },
-    { iconKey: "languages",       label: "Guided in English" },
-    { iconKey: "activity",        label: "Easy to moderate" },
-    { iconKey: "calendar-check",  label: "Age 18+" },
+    { iconKey: "users",           title: "Group size",  value: "Max 16 travellers" },
+    { iconKey: "activity",        title: "Activity",    value: "Easy to moderate" },
+    { iconKey: "languages",       title: "Language",    value: "English" },
+    { iconKey: "calendar-check",  title: "Min age",     value: "18+" },
   ],
   gallery: [
     "https://picsum.photos/seed/thailand-g1/800/600",
@@ -557,10 +557,10 @@ export const BALI_DISCOVERY_TOUR: Tour = {
   endDate: "Sep 21, 2026",
   adults: 2,
   attributes: [
-    { iconKey: "users",           label: "Individual tour" },
-    { iconKey: "languages",       label: "Guided in English" },
-    { iconKey: "activity",        label: "All levels" },
-    { iconKey: "calendar-check",  label: "Age 16+" },
+    { iconKey: "users",           title: "Group size",  value: "Individual tour" },
+    { iconKey: "activity",        title: "Activity",    value: "All levels" },
+    { iconKey: "languages",       title: "Language",    value: "English" },
+    { iconKey: "calendar-check",  title: "Min age",     value: "16+" },
   ],
   gallery: [
     "https://picsum.photos/seed/bali-g1/800/600",
@@ -741,10 +741,10 @@ export const PERU_ADVENTURE_TOUR: Tour = {
   endDate: "Jul 13, 2026",
   adults: 2,
   attributes: [
-    { iconKey: "users",           label: "Group tour (max 12)" },
-    { iconKey: "languages",       label: "Guided in English & Spanish" },
-    { iconKey: "activity",        label: "Moderate (some walking at altitude)" },
-    { iconKey: "calendar-check",  label: "Age 14+" },
+    { iconKey: "users",           title: "Group size",  value: "Max 12 travellers" },
+    { iconKey: "activity",        title: "Activity",    value: "Moderate" },
+    { iconKey: "languages",       title: "Language",    value: "English & Spanish" },
+    { iconKey: "calendar-check",  title: "Min age",     value: "14+" },
   ],
   gallery: [
     "https://picsum.photos/seed/peru-g1/800/600",
@@ -953,10 +953,10 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
   endDate: "Apr 12, 2027",
   adults: 2,
   attributes: [
-    { iconKey: "users",           label: "Group tour (max 14)" },
-    { iconKey: "languages",       label: "Guided in English" },
-    { iconKey: "activity",        label: "Easy — mostly flat walking" },
-    { iconKey: "calendar-check",  label: "All ages welcome" },
+    { iconKey: "users",           title: "Group size",  value: "Max 14 travellers" },
+    { iconKey: "activity",        title: "Activity",    value: "Easy" },
+    { iconKey: "languages",       title: "Language",    value: "English" },
+    { iconKey: "calendar-check",  title: "Min age",     value: "All ages" },
   ],
   gallery: [
     "https://picsum.photos/seed/japan-g1/800/600",
@@ -1198,10 +1198,10 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
   endDate: "Nov 17, 2026",
   adults: 2,
   attributes: [
-    { iconKey: "users",           label: "Group tour (max 14)" },
-    { iconKey: "languages",       label: "Guided in English & French" },
-    { iconKey: "activity",        label: "Easy to moderate" },
-    { iconKey: "calendar-check",  label: "Age 16+" },
+    { iconKey: "users",           title: "Group size",  value: "Max 14 travellers" },
+    { iconKey: "activity",        title: "Activity",    value: "Easy to moderate" },
+    { iconKey: "languages",       title: "Language",    value: "English & French" },
+    { iconKey: "calendar-check",  title: "Min age",     value: "16+" },
   ],
   gallery: [
     "https://picsum.photos/seed/morocco-g1/800/600",
@@ -1413,10 +1413,10 @@ export const DUBAI_HIGHLIGHTS_TOUR: Tour = {
   endDate: "Apr 21, 2026",
   adults: 2,
   attributes: [
-    { iconKey: "users",           label: "Individual tour" },
-    { iconKey: "languages",       label: "Guided in English" },
-    { iconKey: "activity",        label: "All levels" },
-    { iconKey: "calendar-check",  label: "Age 12+" },
+    { iconKey: "users",           title: "Group size",  value: "Individual tour" },
+    { iconKey: "activity",        title: "Activity",    value: "All levels" },
+    { iconKey: "languages",       title: "Language",    value: "English" },
+    { iconKey: "calendar-check",  title: "Min age",     value: "12+" },
   ],
   gallery: [
     "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80",
@@ -1592,10 +1592,10 @@ export const CANCUN_RIVIERA_TOUR: Tour = {
   endDate: "May 08, 2026",
   adults: 2,
   attributes: [
-    { iconKey: "users",           label: "Group tour" },
-    { iconKey: "languages",       label: "Guided in English & Spanish" },
-    { iconKey: "activity",        label: "Moderate fitness" },
-    { iconKey: "calendar-check",  label: "Age 16+" },
+    { iconKey: "users",           title: "Group size",  value: "Group tour" },
+    { iconKey: "activity",        title: "Activity",    value: "Moderate" },
+    { iconKey: "languages",       title: "Language",    value: "English & Spanish" },
+    { iconKey: "calendar-check",  title: "Min age",     value: "16+" },
   ],
   gallery: [
     "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80",
@@ -1723,10 +1723,10 @@ export const MALDIVES_ISLAND_TOUR: Tour = {
   endDate: "Apr 28, 2026",
   adults: 2,
   attributes: [
-    { iconKey: "users",           label: "Individual tour" },
-    { iconKey: "languages",       label: "English-speaking guides" },
-    { iconKey: "activity",        label: "All levels" },
-    { iconKey: "calendar-check",  label: "Age 16+" },
+    { iconKey: "users",           title: "Group size",  value: "Individual tour" },
+    { iconKey: "activity",        title: "Activity",    value: "All levels" },
+    { iconKey: "languages",       title: "Language",    value: "English" },
+    { iconKey: "calendar-check",  title: "Min age",     value: "16+" },
   ],
   gallery: [
     "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80",
@@ -1861,10 +1861,10 @@ export const TENERIFE_TOUR: Tour = {
   endDate: "Apr 19, 2026",
   adults: 2,
   attributes: [
-    { iconKey: "users",           label: "Individual tour" },
-    { iconKey: "languages",       label: "Guided in English" },
-    { iconKey: "activity",        label: "Moderate fitness required" },
-    { iconKey: "calendar-check",  label: "Age 12+" },
+    { iconKey: "users",           title: "Group size",  value: "Individual tour" },
+    { iconKey: "activity",        title: "Activity",    value: "Moderate" },
+    { iconKey: "languages",       title: "Language",    value: "English" },
+    { iconKey: "calendar-check",  title: "Min age",     value: "12+" },
   ],
   gallery: [
     "https://picsum.photos/seed/tenerife-teide/800/600",
@@ -1977,16 +1977,2824 @@ export const TENERIFE_TOUR: Tour = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Thailand — "Island Paradise" (Koh Phi Phi, Krabi, Railay)
+// Maps to Discovery card id 4
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const THAILAND_ISLANDS_TOUR: Tour = {
+  tourId: "thailand-island-paradise",
+  title: "Island Paradise Thailand",
+  subtitle: "Turquoise lagoons, limestone cliffs, and pristine beaches — island-hop through Thailand's Andaman coast.",
+  tripType: "group-tour",
+  duration: 9,
+  locationsLabel: "Phuket · Krabi · Koh Phi Phi",
+  highlights: [
+    "Phi Phi Islands speedboat tour",
+    "Railay Beach rock climbing",
+    "Maya Bay sunset swim",
+    "Four Islands snorkelling",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=800&q=80",
+  price: {
+    perPerson: 1790,
+    total: 3580,
+    currency: "USD",
+    paidBefore: 920,
+    paidAtDestination: 870,
+  },
+  startDate: "Nov 10, 2026",
+  endDate: "Nov 18, 2026",
+  adults: 2,
+  destinationCodes: ["PHUKET"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Max 14 travellers" },
+    { iconKey: "activity",       title: "Activity",   value: "Easy to moderate" },
+    { iconKey: "languages",      title: "Language",    value: "English" },
+    { iconKey: "calendar-check", title: "Min age",     value: "18+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=800&q=80",
+    "https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?w=800&q=80",
+    "https://images.unsplash.com/photo-1506665531195-3566af2b4dfa?w=800&q=80",
+    "https://images.unsplash.com/photo-1537956965359-7573183d1f57?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrive in Phuket",
+      location: "Phuket",
+      items: [
+        { type: "highlight", label: "Welcome to Phuket", description: "Arrive at Phuket International Airport. Transfer to Patong Beach for welcome drinks at sunset." },
+        { type: "hotel", label: "The Shore at Katathani *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Phuket Old Town & Beaches",
+      location: "Phuket",
+      items: [
+        { type: "highlight", label: "Phuket Old Town walking tour", description: "Stroll through colourful Sino-Portuguese shophouses, street art, and local cafés." },
+        { type: "highlight", label: "Kata Noi Beach afternoon", description: "Relax on one of Phuket's most beautiful and less crowded beaches." },
+        { type: "hotel", label: "The Shore at Katathani *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1537956965359-7573183d1f57?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Phi Phi Islands Day Trip",
+      location: "Phuket → Phi Phi → Phuket",
+      items: [
+        { type: "highlight", label: "Phi Phi Islands speedboat tour", description: "Full-day tour: Maya Bay, Pileh Lagoon, Monkey Beach, and snorkelling at Shark Point." },
+        { type: "hotel", label: "The Shore at Katathani *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Transfer to Krabi",
+      location: "Phuket → Krabi",
+      items: [
+        { type: "transport", label: "Ferry to Krabi", description: "2h scenic ferry across Phang Nga Bay" },
+        { type: "highlight", label: "Ao Nang Beach sunset", description: "Settle in and watch the sun set over the Andaman Sea from Ao Nang promenade." },
+        { type: "hotel", label: "Centara Grand Beach Resort ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Railay Beach & Rock Climbing",
+      location: "Krabi",
+      items: [
+        { type: "highlight", label: "Railay Beach longtail boat trip", description: "Longtail boat to the stunning peninsula accessible only by sea — dramatic limestone cliffs and crystal-clear water." },
+        { type: "highlight", label: "Beginner rock climbing session", description: "Optional half-day rock climbing on Railay's world-famous limestone karsts with certified guides." },
+        { type: "hotel", label: "Centara Grand Beach Resort ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1506665531195-3566af2b4dfa?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Four Islands Tour",
+      location: "Krabi",
+      items: [
+        { type: "highlight", label: "Four Islands snorkelling tour", description: "Full-day longtail boat trip: Koh Tub, Koh Mor, Koh Poda, and Phra Nang Cave Beach." },
+        { type: "hotel", label: "Centara Grand Beach Resort ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1537956965359-7573183d1f57?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Transfer to Koh Phi Phi",
+      location: "Krabi → Koh Phi Phi",
+      items: [
+        { type: "transport", label: "Speedboat to Koh Phi Phi", description: "45 min speedboat transfer" },
+        { type: "highlight", label: "Phi Phi Viewpoint hike", description: "Climb to the famous double-bay viewpoint for sunset — one of Thailand's most iconic views." },
+        { type: "hotel", label: "Zeavola Resort *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Koh Phi Phi Free Day",
+      location: "Koh Phi Phi",
+      items: [
+        { type: "highlight", label: "Beach & snorkelling at leisure", description: "Free day to snorkel, kayak, or simply relax on Long Beach." },
+        { type: "hotel", label: "Zeavola Resort *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?w=800&q=80",
+    },
+    {
+      dayNumber: 9,
+      title: "Departure Day",
+      location: "Koh Phi Phi → Phuket",
+      items: [
+        { type: "highlight", label: "Ferry back to Phuket & farewell", description: "Morning ferry to Phuket for onward flights home." },
+      ],
+    },
+  ],
+  included: [
+    "8 nights accommodation (4–5 star throughout)",
+    "Daily breakfast + 2 group dinners",
+    "Phi Phi Islands full-day speedboat tour",
+    "Four Islands snorkelling trip",
+    "Railay Beach longtail boat excursion",
+    "All ferry & speedboat transfers between islands",
+    "English-speaking group guide throughout",
+    "All airport transfers",
+  ],
+  excluded: [
+    "International flights to/from Thailand",
+    "Travel insurance",
+    "Lunches and non-group dinners",
+    "Optional rock climbing session",
+    "Personal expenses & tips",
+    "Thai visa (if applicable)",
+  ],
+  stops: [
+    {
+      destinationName: "Phuket",
+      dateRange: "Nov 10 – 13",
+      nights: 3,
+      description: "Thailand's largest island — golden beaches, vibrant nightlife, and Sino-Portuguese old town charm.",
+      accommodation: {
+        hotelName: "The Shore at Katathani",
+        stars: 5,
+        checkIn: "Nov 10", checkOut: "Nov 13",
+        checkInISO: "2026-11-10", checkOutISO: "2026-11-13",
+        roomType: "Pool Villa", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 7.8804, lng: 98.3923,
+    },
+    {
+      destinationName: "Krabi",
+      dateRange: "Nov 13 – 16",
+      nights: 3,
+      description: "Dramatic limestone karsts, emerald waters, and world-class rock climbing on the Andaman coast.",
+      accommodation: {
+        hotelName: "Centara Grand Beach Resort",
+        stars: 4,
+        checkIn: "Nov 13", checkOut: "Nov 16",
+        checkInISO: "2026-11-13", checkOutISO: "2026-11-16",
+        roomType: "Deluxe Ocean Facing", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 8.0863, lng: 98.9063,
+    },
+    {
+      destinationName: "Koh Phi Phi",
+      dateRange: "Nov 16 – 18",
+      nights: 2,
+      description: "Iconic twin-bay island made famous by 'The Beach' — turquoise water and jungle-clad cliffs.",
+      accommodation: {
+        hotelName: "Zeavola Resort",
+        stars: 5,
+        checkIn: "Nov 16", checkOut: "Nov 18",
+        checkInISO: "2026-11-16", checkOutISO: "2026-11-18",
+        roomType: "Garden Suite", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 7.7407, lng: 98.7784,
+    },
+  ],
+  transfers: [
+    { from: "Phuket", to: "Krabi", date: "Nov 13, ferry", mode: "Ferry", description: "2h scenic ferry across Phang Nga Bay" },
+    { from: "Krabi", to: "Koh Phi Phi", date: "Nov 16, speedboat", mode: "Speedboat", description: "45 min speedboat transfer" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Thailand — "Bangkok & Beyond"
+// Maps to Discovery card id 7
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const THAILAND_BANGKOK_TOUR: Tour = {
+  tourId: "thailand-bangkok-beyond",
+  title: "Bangkok & Beyond",
+  subtitle: "Dive deep into Bangkok's electric street life, then journey west to ancient Ayutthaya and the River Kwai.",
+  tripType: "group-tour",
+  duration: 10,
+  locationsLabel: "Bangkok · Ayutthaya · Kanchanaburi",
+  highlights: [
+    "Ayutthaya UNESCO ruins",
+    "Bridge over River Kwai",
+    "Erawan waterfall trek",
+    "Bangkok street food tour",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&q=80",
+  price: {
+    perPerson: 1480,
+    total: 2960,
+    currency: "USD",
+    paidBefore: 780,
+    paidAtDestination: 700,
+  },
+  startDate: "Jan 15, 2027",
+  endDate: "Jan 24, 2027",
+  adults: 2,
+  destinationCodes: ["PHUKET"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Max 16 travellers" },
+    { iconKey: "activity",       title: "Activity",   value: "Easy to moderate" },
+    { iconKey: "languages",      title: "Language",    value: "English" },
+    { iconKey: "calendar-check", title: "Min age",     value: "16+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&q=80",
+    "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=800&q=80",
+    "https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80",
+    "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrive in Bangkok",
+      location: "Bangkok",
+      items: [
+        { type: "highlight", label: "Welcome to Bangkok", description: "Transfer from Suvarnabhumi Airport to your riverside hotel. Evening tuk-tuk food tour through Chinatown." },
+        { type: "hotel", label: "Mandarin Oriental Bangkok *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Bangkok Temples & Street Food",
+      location: "Bangkok",
+      items: [
+        { type: "highlight", label: "Wat Arun & Wat Pho", description: "Morning visit to the Temple of Dawn and the reclining Buddha — two of Bangkok's most sacred sites." },
+        { type: "highlight", label: "Khao San Road & street food crawl", description: "Afternoon guided street food tour — pad thai, mango sticky rice, and boat noodles." },
+        { type: "hotel", label: "Mandarin Oriental Bangkok *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Bangkok Canals & Markets",
+      location: "Bangkok",
+      items: [
+        { type: "highlight", label: "Klong boat tour", description: "Longtail boat through Bangkok's hidden canals — wooden stilt houses and secret temples." },
+        { type: "highlight", label: "Chatuchak Market", description: "Explore 15,000 stalls at one of the world's largest weekend markets." },
+        { type: "hotel", label: "Mandarin Oriental Bangkok *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Day Trip to Ayutthaya",
+      location: "Bangkok → Ayutthaya → Bangkok",
+      items: [
+        { type: "transport", label: "Van to Ayutthaya", description: "1h 30m north of Bangkok" },
+        { type: "highlight", label: "Ayutthaya Historical Park", description: "UNESCO World Heritage Site — explore the crumbling temples and Buddha statues of the ancient Siamese capital, destroyed in 1767." },
+        { type: "highlight", label: "Wat Mahathat — Buddha head in tree roots", description: "The iconic Buddha face entwined in the roots of a banyan tree." },
+        { type: "hotel", label: "Mandarin Oriental Bangkok *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Transfer to Kanchanaburi",
+      location: "Bangkok → Kanchanaburi",
+      items: [
+        { type: "transport", label: "Coach to Kanchanaburi", description: "Approx. 2h 30m west of Bangkok" },
+        { type: "highlight", label: "Bridge over the River Kwai", description: "Walk across the historic bridge and visit the WWII museum and war cemetery." },
+        { type: "hotel", label: "River Kwai Jungle Rafts ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Erawan National Park",
+      location: "Kanchanaburi",
+      items: [
+        { type: "highlight", label: "Erawan Waterfall trek", description: "Hike through seven tiers of emerald-green waterfalls in the jungle — swimming pools at each level." },
+        { type: "hotel", label: "River Kwai Jungle Rafts ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Hellfire Pass & Death Railway",
+      location: "Kanchanaburi",
+      items: [
+        { type: "highlight", label: "Hellfire Pass Memorial Museum", description: "Walk through the mountain cutting carved by WWII POWs — a powerful and moving experience." },
+        { type: "highlight", label: "Death Railway scenic train ride", description: "Ride along the original wartime railway over the dramatic Wampo Viaduct clinging to the cliff face." },
+        { type: "hotel", label: "River Kwai Jungle Rafts ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Return to Bangkok",
+      location: "Kanchanaburi → Bangkok",
+      items: [
+        { type: "transport", label: "Return to Bangkok", description: "2h 30m coach transfer" },
+        { type: "highlight", label: "Jim Thompson House Museum", description: "Tour the silk merchant's beautiful Thai teak house and garden — a hidden gem in central Bangkok." },
+        { type: "hotel", label: "Mandarin Oriental Bangkok *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&q=80",
+    },
+    {
+      dayNumber: 9,
+      title: "Bangkok Free Day",
+      location: "Bangkok",
+      items: [
+        { type: "highlight", label: "Free day to explore", description: "Spa, shopping at Siam Paragon, or a Muay Thai show — your choice." },
+        { type: "hotel", label: "Mandarin Oriental Bangkok *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80",
+    },
+    {
+      dayNumber: 10,
+      title: "Departure Day",
+      location: "Bangkok",
+      items: [
+        { type: "highlight", label: "Check out & farewell", description: "Transfer to Suvarnabhumi Airport for onward flights." },
+      ],
+    },
+  ],
+  included: [
+    "9 nights accommodation (4–5 star)",
+    "Daily breakfast + 3 group dinners",
+    "Ayutthaya Historical Park guided tour",
+    "Bridge over River Kwai & WWII museum",
+    "Erawan Waterfall National Park entry",
+    "Hellfire Pass museum + Death Railway train ride",
+    "Bangkok street food guided tour",
+    "English-speaking guide throughout",
+    "All transfers & airport pickups",
+  ],
+  excluded: [
+    "International flights to/from Thailand",
+    "Travel insurance",
+    "Lunches and non-group dinners",
+    "Optional Muay Thai show tickets",
+    "Personal expenses & tips",
+    "Thai visa (if applicable)",
+  ],
+  stops: [
+    {
+      destinationName: "Bangkok",
+      dateRange: "Jan 15 – 19",
+      nights: 4,
+      description: "Thailand's dazzling capital — temples, canals, tuk-tuks, and the world's best street food.",
+      accommodation: {
+        hotelName: "Mandarin Oriental Bangkok",
+        stars: 5,
+        checkIn: "Jan 15", checkOut: "Jan 19",
+        checkInISO: "2027-01-15", checkOutISO: "2027-01-19",
+        roomType: "Deluxe Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 13.7563, lng: 100.5018,
+    },
+    {
+      destinationName: "Kanchanaburi",
+      dateRange: "Jan 19 – 22",
+      nights: 3,
+      description: "Jungle rivers, WWII history, and dramatic waterfalls west of Bangkok.",
+      accommodation: {
+        hotelName: "River Kwai Jungle Rafts",
+        stars: 4,
+        checkIn: "Jan 19", checkOut: "Jan 22",
+        checkInISO: "2027-01-19", checkOutISO: "2027-01-22",
+        roomType: "Floating Raft Room", boardType: "Full board",
+      },
+      activities: [],
+      lat: 14.0223, lng: 99.5328,
+    },
+    {
+      destinationName: "Bangkok (return)",
+      dateRange: "Jan 22 – 24",
+      nights: 2,
+      description: "Final days in Bangkok — spa, shopping, and last-chance street food.",
+      accommodation: {
+        hotelName: "Mandarin Oriental Bangkok",
+        stars: 5,
+        checkIn: "Jan 22", checkOut: "Jan 24",
+        checkInISO: "2027-01-22", checkOutISO: "2027-01-24",
+        roomType: "Deluxe Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 13.7563, lng: 100.5018,
+    },
+  ],
+  transfers: [
+    { from: "Bangkok", to: "Kanchanaburi", date: "Jan 19, coach", mode: "Private coach", description: "Approx. 2h 30m west of Bangkok" },
+    { from: "Kanchanaburi", to: "Bangkok", date: "Jan 22, coach", mode: "Private coach", description: "Approx. 2h 30m return" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Thailand — "Northern Thailand Highlights"
+// Maps to Discovery card id 8
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const THAILAND_NORTH_TOUR: Tour = {
+  tourId: "thailand-northern-highlights",
+  title: "Northern Thailand Highlights",
+  subtitle: "Hill tribes, misty mountains, and the cultural soul of Thailand — from Chiang Mai to Chiang Rai and the laid-back town of Pai.",
+  tripType: "group-tour",
+  duration: 7,
+  locationsLabel: "Chiang Mai · Chiang Rai · Pai",
+  highlights: [
+    "White Temple (Wat Rong Khun)",
+    "Hill tribe village trek",
+    "Pai Canyon sunset",
+    "Night Safari Chiang Mai",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1598935898639-81586f7d2129?w=800&q=80",
+  price: {
+    perPerson: 1250,
+    total: 2500,
+    currency: "USD",
+    paidBefore: 650,
+    paidAtDestination: 600,
+  },
+  startDate: "Dec 01, 2026",
+  endDate: "Dec 07, 2026",
+  adults: 2,
+  destinationCodes: ["PHUKET"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Max 12 travellers" },
+    { iconKey: "activity",       title: "Activity",   value: "Moderate" },
+    { iconKey: "languages",      title: "Language",    value: "English" },
+    { iconKey: "calendar-check", title: "Min age",     value: "16+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1598935898639-81586f7d2129?w=800&q=80",
+    "https://images.unsplash.com/photo-1512100356356-de1b84283e18?w=800&q=80",
+    "https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?w=800&q=80",
+    "https://images.unsplash.com/photo-1600807840746-c6ac89a24520?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrive in Chiang Mai",
+      location: "Chiang Mai",
+      items: [
+        { type: "highlight", label: "Welcome to Chiang Mai", description: "Arrive at Chiang Mai International Airport. Transfer to your boutique hotel in the Old City. Evening visit to the Sunday Walking Street market." },
+        { type: "hotel", label: "137 Pillars House *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1598935898639-81586f7d2129?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Chiang Mai Temples & Night Safari",
+      location: "Chiang Mai",
+      items: [
+        { type: "highlight", label: "Doi Suthep Temple morning hike", description: "Climb 309 steps to Chiang Mai's most sacred hilltop temple for panoramic city views." },
+        { type: "highlight", label: "Night Safari Chiang Mai", description: "Evening tram ride through the open zoo — spot deer, giraffes, and predators under the stars." },
+        { type: "hotel", label: "137 Pillars House *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1512100356356-de1b84283e18?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Drive to Chiang Rai",
+      location: "Chiang Mai → Chiang Rai",
+      items: [
+        { type: "transport", label: "Coach to Chiang Rai", description: "3h through misty mountain roads" },
+        { type: "highlight", label: "White Temple (Wat Rong Khun)", description: "Thailand's most unusual temple — a dazzling, surreal masterpiece of white plaster and mirrors by artist Chalermchai Kositpipat." },
+        { type: "highlight", label: "Blue Temple & Black House", description: "Afternoon visits to two more extraordinary Chiang Rai art-temples." },
+        { type: "hotel", label: "Le Méridien Chiang Rai ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Hill Tribe Trek & Golden Triangle",
+      location: "Chiang Rai",
+      items: [
+        { type: "highlight", label: "Hill tribe village trek", description: "Half-day guided trek through Akha and Lahu hill tribe villages — meet locals, see traditional bamboo houses, and learn about their culture." },
+        { type: "highlight", label: "Golden Triangle viewpoint", description: "Stand at the point where Thailand, Laos, and Myanmar meet at the confluence of the Mekong and Ruak rivers." },
+        { type: "hotel", label: "Le Méridien Chiang Rai ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1600807840746-c6ac89a24520?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Transfer to Pai",
+      location: "Chiang Rai → Pai",
+      items: [
+        { type: "transport", label: "Van to Pai via Chiang Mai", description: "Approx. 5h with a stop in Chiang Mai" },
+        { type: "highlight", label: "Pai Walking Street", description: "Explore this bohemian mountain town's night market — handmade crafts, live music, and Thai crêpes." },
+        { type: "hotel", label: "Pai Village Boutique Resort ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1598935898639-81586f7d2129?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Pai Exploration",
+      location: "Pai",
+      items: [
+        { type: "highlight", label: "Pai Canyon sunrise hike", description: "Walk the narrow ridgeline at dawn for 360° views of the Pai valley — dramatic and unforgettable." },
+        { type: "highlight", label: "Pam Bok Waterfall & hot springs", description: "Morning swim under a jungle waterfall, then soak in natural hot springs surrounded by forest." },
+        { type: "hotel", label: "Pai Village Boutique Resort ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1512100356356-de1b84283e18?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Departure Day",
+      location: "Pai → Chiang Mai",
+      items: [
+        { type: "highlight", label: "Return to Chiang Mai & farewell", description: "3h scenic drive back through 762 mountain curves to Chiang Mai Airport." },
+      ],
+    },
+  ],
+  included: [
+    "6 nights accommodation (4–5 star)",
+    "Daily breakfast + 2 group dinners",
+    "White Temple, Blue Temple & Black House entries",
+    "Hill tribe village guided trek",
+    "Night Safari Chiang Mai entry",
+    "All coach & van transfers",
+    "English-speaking guide throughout",
+  ],
+  excluded: [
+    "International flights to/from Thailand",
+    "Travel insurance",
+    "Lunches and non-group dinners",
+    "Optional motorbike rental in Pai",
+    "Personal expenses & tips",
+  ],
+  stops: [
+    {
+      destinationName: "Chiang Mai",
+      dateRange: "Dec 01 – 03",
+      nights: 2,
+      description: "Northern Thailand's cultural heart — moated old city, 300+ temples, and legendary street food.",
+      accommodation: {
+        hotelName: "137 Pillars House",
+        stars: 5,
+        checkIn: "Dec 01", checkOut: "Dec 03",
+        checkInISO: "2026-12-01", checkOutISO: "2026-12-03",
+        roomType: "Rajah Brooke Suite", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 18.7883, lng: 98.9853,
+    },
+    {
+      destinationName: "Chiang Rai",
+      dateRange: "Dec 03 – 05",
+      nights: 2,
+      description: "Thailand's northernmost province — the White Temple, hill tribes, and the Golden Triangle.",
+      accommodation: {
+        hotelName: "Le Méridien Chiang Rai",
+        stars: 4,
+        checkIn: "Dec 03", checkOut: "Dec 05",
+        checkInISO: "2026-12-03", checkOutISO: "2026-12-05",
+        roomType: "Deluxe Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 19.9105, lng: 99.8406,
+    },
+    {
+      destinationName: "Pai",
+      dateRange: "Dec 05 – 07",
+      nights: 2,
+      description: "Bohemian mountain town in a misty valley — canyon hikes, hot springs, and laid-back vibes.",
+      accommodation: {
+        hotelName: "Pai Village Boutique Resort",
+        stars: 4,
+        checkIn: "Dec 05", checkOut: "Dec 07",
+        checkInISO: "2026-12-05", checkOutISO: "2026-12-07",
+        roomType: "Garden Bungalow", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 19.3622, lng: 98.4408,
+    },
+  ],
+  transfers: [
+    { from: "Chiang Mai", to: "Chiang Rai", date: "Dec 03, coach", mode: "Private coach", description: "3h through mountain roads" },
+    { from: "Chiang Rai", to: "Pai", date: "Dec 05, van", mode: "Minivan", description: "Approx. 5h via Chiang Mai" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Thailand — "Phuket & the Islands"
+// Maps to Discovery card id 9
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const THAILAND_PHUKET_TOUR: Tour = {
+  tourId: "thailand-phuket-islands",
+  title: "Phuket & the Islands",
+  subtitle: "Sun-soaked beaches, James Bond Island, Similan diving, and Phuket's legendary nightlife in one beach-lover's dream.",
+  tripType: "individual-tour",
+  duration: 9,
+  locationsLabel: "Phuket · James Bond Island · Similan Islands",
+  highlights: [
+    "James Bond Island kayak tour",
+    "Similan Islands diving",
+    "Big Buddha viewpoint",
+    "Phang Nga Bay longtail",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=800&q=80",
+  price: {
+    perPerson: 1890,
+    total: 3780,
+    currency: "USD",
+    paidBefore: 990,
+    paidAtDestination: 900,
+  },
+  startDate: "Feb 12, 2027",
+  endDate: "Feb 20, 2027",
+  adults: 2,
+  destinationCodes: ["PHUKET"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Individual tour" },
+    { iconKey: "activity",       title: "Activity",   value: "Easy to moderate" },
+    { iconKey: "languages",      title: "Language",    value: "English" },
+    { iconKey: "calendar-check", title: "Min age",     value: "12+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=800&q=80",
+    "https://images.unsplash.com/photo-1537956965359-7573183d1f57?w=800&q=80",
+    "https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=800&q=80",
+    "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrive in Phuket",
+      location: "Phuket",
+      items: [
+        { type: "highlight", label: "Welcome to Phuket", description: "Arrive at Phuket International Airport. Transfer to your beachfront resort in Kata." },
+        { type: "hotel", label: "Kata Rocks *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Phuket Beaches & Big Buddha",
+      location: "Phuket",
+      items: [
+        { type: "highlight", label: "Big Buddha viewpoint", description: "Visit the 45m marble Buddha statue on Nakkerd Hill with panoramic views over southern Phuket." },
+        { type: "highlight", label: "Kata & Karon Beach afternoon", description: "Relax on two of Phuket's best beaches — golden sand and turquoise Andaman water." },
+        { type: "hotel", label: "Kata Rocks *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1537956965359-7573183d1f57?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Phang Nga Bay & James Bond Island",
+      location: "Phuket",
+      items: [
+        { type: "highlight", label: "Phang Nga Bay longtail tour", description: "Full-day longtail boat tour through towering limestone karsts and mangrove caves." },
+        { type: "highlight", label: "James Bond Island (Ko Tapu)", description: "See the iconic leaning limestone needle made famous by 'The Man with the Golden Gun'." },
+        { type: "hotel", label: "Kata Rocks *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Similan Islands Dive Day",
+      location: "Phuket → Similan Islands → Phuket",
+      items: [
+        { type: "transport", label: "Speedboat to Similan Islands", description: "1h 30m from Phuket" },
+        { type: "highlight", label: "Similan Islands snorkel & dive", description: "Crystal-clear visibility, manta rays, and pristine coral — one of the world's top 10 dive sites." },
+        { type: "hotel", label: "Kata Rocks *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Phuket Old Town",
+      location: "Phuket",
+      items: [
+        { type: "highlight", label: "Phuket Old Town heritage walk", description: "Sino-Portuguese architecture, street art murals, local coffee shops, and the Thalang Road market." },
+        { type: "highlight", label: "Thai cooking class", description: "Afternoon hands-on cooking class — green curry, tom kha gai, and mango sticky rice." },
+        { type: "hotel", label: "Kata Rocks *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Free Beach Day",
+      location: "Phuket",
+      items: [
+        { type: "highlight", label: "Free day at leisure", description: "Relax by the infinity pool, book a Thai massage, or explore Freedom Beach by longtail boat." },
+        { type: "hotel", label: "Kata Rocks *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1537956965359-7573183d1f57?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Koh Racha Day Trip",
+      location: "Phuket → Koh Racha → Phuket",
+      items: [
+        { type: "highlight", label: "Koh Racha Yai island trip", description: "Speedboat to the 'Maldives of Thailand' — powdery white sand, gin-clear water, and amazing snorkelling." },
+        { type: "hotel", label: "Kata Rocks *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Sunset Dinner Cruise",
+      location: "Phuket",
+      items: [
+        { type: "highlight", label: "Sunset dinner cruise", description: "Sail along Phuket's west coast at golden hour with a Thai seafood dinner onboard a traditional junk boat." },
+        { type: "hotel", label: "Kata Rocks *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=800&q=80",
+    },
+    {
+      dayNumber: 9,
+      title: "Departure Day",
+      location: "Phuket",
+      items: [
+        { type: "highlight", label: "Check out & farewell", description: "Final morning by the pool before transferring to Phuket Airport." },
+      ],
+    },
+  ],
+  included: [
+    "8 nights accommodation at 5-star beachfront resort",
+    "Daily breakfast",
+    "Phang Nga Bay & James Bond Island full-day tour",
+    "Similan Islands snorkel/dive day trip",
+    "Koh Racha island day trip",
+    "Sunset dinner cruise with Thai seafood",
+    "Thai cooking class",
+    "All transfers & airport pickup",
+  ],
+  excluded: [
+    "International flights to/from Thailand",
+    "Travel insurance",
+    "Lunches and non-included dinners",
+    "Optional PADI dive certification",
+    "Personal expenses & tips",
+    "Thai visa (if applicable)",
+  ],
+  stops: [
+    {
+      destinationName: "Phuket (Kata Beach)",
+      dateRange: "Feb 12 – 16",
+      nights: 4,
+      description: "Phuket's stunning west coast — dramatic cliffs, golden beaches, and world-class dining.",
+      accommodation: {
+        hotelName: "Kata Rocks",
+        stars: 5,
+        checkIn: "Feb 12", checkOut: "Feb 16",
+        checkInISO: "2027-02-12", checkOutISO: "2027-02-16",
+        roomType: "Sky Pool Villa", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 7.8184, lng: 98.2983,
+    },
+    {
+      destinationName: "Phuket (Patong)",
+      dateRange: "Feb 16 – 20",
+      nights: 4,
+      description: "Phuket's vibrant heart — Bangla Road nightlife, beach bars, and endless energy.",
+      accommodation: {
+        hotelName: "Kata Rocks",
+        stars: 5,
+        checkIn: "Feb 16", checkOut: "Feb 20",
+        checkInISO: "2027-02-16", checkOutISO: "2027-02-20",
+        roomType: "Sky Pool Villa", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 7.8953, lng: 98.2961,
+    },
+  ],
+  transfers: [
+    { from: "Phuket Airport", to: "Kata Beach", date: "Feb 12, private car", mode: "Private car", description: "45 min airport transfer" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bali — "Bali Bliss" (Relaxation-focused)
+// Maps to Discovery card id 10
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const BALI_BLISS_TOUR: Tour = {
+  tourId: "bali-bliss",
+  title: "Bali Bliss",
+  subtitle: "A wellness escape through Bali's most tranquil corners — spa retreats, yoga sessions, and serene beach sunsets.",
+  tripType: "individual-tour",
+  duration: 9,
+  locationsLabel: "Nusa Dua · Jimbaran · Ubud",
+  highlights: [
+    "Luxury spa & wellness retreat",
+    "Jimbaran seafood beach dinner",
+    "Ubud yoga & meditation",
+    "Private pool villa stay",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+  price: {
+    perPerson: 2350,
+    total: 4700,
+    currency: "USD",
+    paidBefore: 1250,
+    paidAtDestination: 1100,
+  },
+  startDate: "Oct 20, 2026",
+  endDate: "Oct 28, 2026",
+  adults: 2,
+  destinationCodes: ["BALI"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Individual tour" },
+    { iconKey: "activity",       title: "Activity",   value: "Easy — relaxation focus" },
+    { iconKey: "languages",      title: "Language",    value: "English" },
+    { iconKey: "calendar-check", title: "Min age",     value: "16+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+    "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+    "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrive in Nusa Dua",
+      location: "Nusa Dua",
+      items: [
+        { type: "highlight", label: "Welcome to Bali", description: "Arrive at Ngurah Rai Airport. Transfer to your luxury beachfront resort in Nusa Dua. Welcome flower bath ritual and evening cocktail." },
+        { type: "hotel", label: "The Mulia *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Nusa Dua Beach & Spa",
+      location: "Nusa Dua",
+      items: [
+        { type: "highlight", label: "Morning beach walk", description: "Stroll along the manicured white-sand beach of Nusa Dua — calm, warm, crystal-clear water." },
+        { type: "highlight", label: "Balinese spa experience", description: "2-hour traditional Balinese massage, body scrub, and flower bath at the resort spa." },
+        { type: "hotel", label: "The Mulia *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Water Blow & Water Sports",
+      location: "Nusa Dua",
+      items: [
+        { type: "highlight", label: "Water Blow cliff walk", description: "Watch ocean waves crash dramatically against limestone cliffs at Nusa Dua's natural blowhole." },
+        { type: "highlight", label: "Stand-up paddleboarding", description: "Gentle SUP session on the calm waters of Nusa Dua's protected bay." },
+        { type: "hotel", label: "The Mulia *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Transfer to Jimbaran",
+      location: "Nusa Dua → Jimbaran",
+      items: [
+        { type: "transport", label: "Transfer to Jimbaran", description: "20 min coastal drive" },
+        { type: "highlight", label: "Jimbaran seafood dinner on the beach", description: "Choose your fresh fish at the beachside grill — dine with your toes in the sand as the sun sets over the Indian Ocean." },
+        { type: "hotel", label: "Four Seasons Jimbaran Bay *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Jimbaran & Uluwatu",
+      location: "Jimbaran",
+      items: [
+        { type: "highlight", label: "Morning at Jimbaran Fish Market", description: "Walk through the colourful fish market where fishermen bring in their morning catch." },
+        { type: "highlight", label: "Uluwatu Temple & Kecak Dance", description: "Evening at the cliffside temple perched 70m above the ocean, followed by a mesmerising Kecak fire dance at sunset." },
+        { type: "hotel", label: "Four Seasons Jimbaran Bay *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Transfer to Ubud",
+      location: "Jimbaran → Ubud",
+      items: [
+        { type: "transport", label: "Transfer to Ubud", description: "1h 30m north to the rice terraces" },
+        { type: "highlight", label: "Tegallalang Rice Terraces walk", description: "Afternoon stroll through the iconic cascading rice paddies carved into the hillside." },
+        { type: "hotel", label: "Viceroy Bali *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Ubud Yoga & Meditation",
+      location: "Ubud",
+      items: [
+        { type: "highlight", label: "Sunrise yoga session", description: "Morning yoga overlooking the Ayung River valley — led by a Balinese yoga teacher." },
+        { type: "highlight", label: "Tirta Empul purification ritual", description: "Participate in a traditional Balinese water purification ceremony at the sacred spring temple." },
+        { type: "hotel", label: "Viceroy Bali *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Ubud Free Day",
+      location: "Ubud",
+      items: [
+        { type: "highlight", label: "Free day in Ubud", description: "Book a Balinese cooking class, visit the Monkey Forest, or simply relax by your private pool surrounded by jungle." },
+        { type: "hotel", label: "Viceroy Bali *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&q=80",
+    },
+    {
+      dayNumber: 9,
+      title: "Departure Day",
+      location: "Ubud → Denpasar",
+      items: [
+        { type: "highlight", label: "Final morning & farewell", description: "One last yoga session or pool moment before transferring to Ngurah Rai Airport." },
+      ],
+    },
+  ],
+  included: [
+    "8 nights luxury accommodation (5-star throughout)",
+    "Daily breakfast + 2 special dinners",
+    "Balinese spa treatment (2 hours)",
+    "Jimbaran beach seafood dinner",
+    "Uluwatu Temple entry + Kecak Dance",
+    "Yoga & meditation sessions in Ubud",
+    "Private driver-guide throughout",
+    "All transfers & airport pickup",
+  ],
+  excluded: [
+    "International flights to/from Bali",
+    "Travel insurance",
+    "Lunches and non-included dinners",
+    "Optional cooking class",
+    "Personal expenses & tips",
+    "Visa on arrival (if applicable)",
+  ],
+  stops: [
+    {
+      destinationName: "Nusa Dua",
+      dateRange: "Oct 20 – 23",
+      nights: 3,
+      description: "Bali's most exclusive resort enclave — pristine beaches, calm waters, and manicured gardens.",
+      accommodation: {
+        hotelName: "The Mulia",
+        stars: 5,
+        checkIn: "Oct 20", checkOut: "Oct 23",
+        checkInISO: "2026-10-20", checkOutISO: "2026-10-23",
+        roomType: "The Earl Suite", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: -8.8028, lng: 115.2314,
+    },
+    {
+      destinationName: "Jimbaran",
+      dateRange: "Oct 23 – 25",
+      nights: 2,
+      description: "A charming fishing village known for its golden sand beach and sunset seafood grills.",
+      accommodation: {
+        hotelName: "Four Seasons Jimbaran Bay",
+        stars: 5,
+        checkIn: "Oct 23", checkOut: "Oct 25",
+        checkInISO: "2026-10-23", checkOutISO: "2026-10-25",
+        roomType: "Garden Villa", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: -8.7652, lng: 115.1629,
+    },
+    {
+      destinationName: "Ubud",
+      dateRange: "Oct 25 – 28",
+      nights: 3,
+      description: "Bali's spiritual heart — jungle-clad valleys, rice terraces, and world-class wellness retreats.",
+      accommodation: {
+        hotelName: "Viceroy Bali",
+        stars: 5,
+        checkIn: "Oct 25", checkOut: "Oct 28",
+        checkInISO: "2026-10-25", checkOutISO: "2026-10-28",
+        roomType: "Deluxe Terrace Villa", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: -8.5069, lng: 115.2625,
+    },
+  ],
+  transfers: [
+    { from: "Nusa Dua", to: "Jimbaran", date: "Oct 23, car", mode: "Private car", description: "20 min coastal drive" },
+    { from: "Jimbaran", to: "Ubud", date: "Oct 25, car", mode: "Private car", description: "1h 30m north through rice paddies" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Java & Bali — "Java & Bali Explorer"
+// Maps to Discovery card id 11
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const JAVA_BALI_TOUR: Tour = {
+  tourId: "java-bali-explorer",
+  title: "Java & Bali Explorer",
+  subtitle: "Ancient temples, volcanic sunrises, and emerald rice terraces — discover the best of Indonesia's two most iconic islands.",
+  tripType: "group-tour",
+  duration: 12,
+  locationsLabel: "Yogyakarta · Borobudur · Mt Bromo · Bali",
+  highlights: [
+    "Borobudur sunrise",
+    "Mt Bromo volcanic crater",
+    "Prambanan temple at sunset",
+    "Ubud rice terraces",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=800&q=80",
+  price: {
+    perPerson: 2280,
+    total: 4560,
+    currency: "USD",
+    paidBefore: 1200,
+    paidAtDestination: 1080,
+  },
+  startDate: "Aug 10, 2026",
+  endDate: "Aug 21, 2026",
+  adults: 2,
+  destinationCodes: ["BALI"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Max 14 travellers" },
+    { iconKey: "activity",       title: "Activity",   value: "Moderate" },
+    { iconKey: "languages",      title: "Language",    value: "English" },
+    { iconKey: "calendar-check", title: "Min age",     value: "14+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=800&q=80",
+    "https://images.unsplash.com/photo-1596402184320-417e7178b2cd?w=800&q=80",
+    "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&q=80",
+    "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrive in Yogyakarta",
+      location: "Yogyakarta",
+      items: [
+        { type: "highlight", label: "Welcome to Java", description: "Arrive at Adisucipto Airport. Transfer to your hotel in the cultural heart of Java. Evening walk through Malioboro Street." },
+        { type: "hotel", label: "The Phoenix Hotel Yogyakarta *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Borobudur Sunrise",
+      location: "Yogyakarta",
+      items: [
+        { type: "highlight", label: "Borobudur Temple at sunrise", description: "4am start for an unforgettable sunrise over the world's largest Buddhist temple — 2,672 relief panels and 504 Buddha statues emerging from the morning mist." },
+        { type: "highlight", label: "Kraton Palace & Taman Sari", description: "Afternoon visit to the Sultan's Palace and the hidden Water Castle gardens." },
+        { type: "hotel", label: "The Phoenix Hotel Yogyakarta *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1596402184320-417e7178b2cd?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Prambanan & Batik",
+      location: "Yogyakarta",
+      items: [
+        { type: "highlight", label: "Prambanan Temple at sunset", description: "The largest Hindu temple in Southeast Asia — 47m tall and adorned with Ramayana reliefs." },
+        { type: "highlight", label: "Batik workshop", description: "Morning hands-on workshop learning traditional Javanese batik wax-resist dyeing." },
+        { type: "hotel", label: "The Phoenix Hotel Yogyakarta *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Train to Surabaya",
+      location: "Yogyakarta → Surabaya",
+      items: [
+        { type: "transport", label: "Scenic train to Surabaya", description: "6h through Javanese rice paddies and volcanic landscape" },
+        { type: "hotel", label: "Bumi Surabaya City Resort ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1596402184320-417e7178b2cd?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Mt Bromo Sunrise",
+      location: "Surabaya → Mt Bromo",
+      items: [
+        { type: "transport", label: "4x4 Jeep to Mt Bromo", description: "3h pre-dawn drive to the volcanic crater" },
+        { type: "highlight", label: "Mt Bromo sunrise & crater walk", description: "Stand on the rim of an active volcano as the sun rises over the Sea of Sand — one of Indonesia's most breathtaking sights." },
+        { type: "hotel", label: "Jiwa Jawa Resort Bromo ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Bromo & Ijen Overview",
+      location: "Mt Bromo",
+      items: [
+        { type: "highlight", label: "Tengger Caldera exploration", description: "Full day exploring the vast volcanic caldera — ride horses across the Sea of Sand and hike to Bromo's steaming crater." },
+        { type: "hotel", label: "Jiwa Jawa Resort Bromo ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Ferry to Bali",
+      location: "Mt Bromo → Bali",
+      items: [
+        { type: "transport", label: "Drive & ferry to Bali", description: "5h drive to Ketapang Port + 45 min ferry to Gilimanuk, Bali" },
+        { type: "highlight", label: "Arrive in north Bali", description: "Check in to your resort by Lovina Beach — black volcanic sand and calm seas." },
+        { type: "hotel", label: "Lovina Beach Resort ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Lovina Dolphins & Temples",
+      location: "Bali (North)",
+      items: [
+        { type: "highlight", label: "Lovina dolphin watching", description: "Sunrise outrigger boat trip to see pods of wild dolphins off the north Bali coast." },
+        { type: "highlight", label: "Ulun Danu Bratan Temple", description: "Visit the iconic lake temple on volcanic Lake Bratan." },
+        { type: "hotel", label: "Lovina Beach Resort ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&q=80",
+    },
+    {
+      dayNumber: 9,
+      title: "Transfer to Ubud",
+      location: "Lovina → Ubud",
+      items: [
+        { type: "transport", label: "Drive south to Ubud", description: "2h 30m through mountain roads" },
+        { type: "highlight", label: "Tegallalang Rice Terraces", description: "Walk through Bali's most famous cascading rice paddies." },
+        { type: "hotel", label: "Komaneka at Bisma *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+    },
+    {
+      dayNumber: 10,
+      title: "Ubud Art & Culture",
+      location: "Ubud",
+      items: [
+        { type: "highlight", label: "Monkey Forest Sanctuary", description: "Morning walk through the Sacred Monkey Forest — moss-covered temples and playful macaques." },
+        { type: "highlight", label: "Ubud Art Market", description: "Browse handmade crafts, paintings, and silver jewellery in Ubud's famous market." },
+        { type: "hotel", label: "Komaneka at Bisma *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+    },
+    {
+      dayNumber: 11,
+      title: "Ubud Free Day",
+      location: "Ubud",
+      items: [
+        { type: "highlight", label: "Free day", description: "Spa day, cooking class, or cycle through the rice paddies — your choice." },
+        { type: "hotel", label: "Komaneka at Bisma *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+    },
+    {
+      dayNumber: 12,
+      title: "Departure Day",
+      location: "Ubud → Denpasar",
+      items: [
+        { type: "highlight", label: "Check out & farewell", description: "Transfer to Ngurah Rai Airport for onward flights." },
+      ],
+    },
+  ],
+  included: [
+    "11 nights accommodation (4–5 star)",
+    "Daily breakfast + 3 group dinners",
+    "Borobudur sunrise guided tour",
+    "Prambanan temple entry & guide",
+    "Mt Bromo 4x4 jeep sunrise tour",
+    "Lovina dolphin boat trip",
+    "All overland transfers, train & ferry",
+    "English-speaking guide throughout",
+    "Airport transfers both ends",
+  ],
+  excluded: [
+    "International flights to/from Indonesia",
+    "Travel insurance",
+    "Lunches and non-group dinners",
+    "Optional Ijen blue fire trek",
+    "Personal expenses & tips",
+    "Visa on arrival (if applicable)",
+  ],
+  stops: [
+    {
+      destinationName: "Yogyakarta",
+      dateRange: "Aug 10 – 13",
+      nights: 3,
+      description: "Java's cultural capital — ancient temples, sultans' palaces, and the world's largest Buddhist monument.",
+      accommodation: {
+        hotelName: "The Phoenix Hotel Yogyakarta",
+        stars: 5,
+        checkIn: "Aug 10", checkOut: "Aug 13",
+        checkInISO: "2026-08-10", checkOutISO: "2026-08-13",
+        roomType: "Heritage Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: -7.7956, lng: 110.3695,
+    },
+    {
+      destinationName: "Mt Bromo",
+      dateRange: "Aug 14 – 16",
+      nights: 2,
+      description: "An active volcanic crater in a vast caldera — sunrise here is one of Indonesia's most iconic experiences.",
+      accommodation: {
+        hotelName: "Jiwa Jawa Resort Bromo",
+        stars: 4,
+        checkIn: "Aug 14", checkOut: "Aug 16",
+        checkInISO: "2026-08-14", checkOutISO: "2026-08-16",
+        roomType: "Mountain View Room", boardType: "Full board",
+      },
+      activities: [],
+      lat: -7.9425, lng: 112.9530,
+    },
+    {
+      destinationName: "Lovina (North Bali)",
+      dateRange: "Aug 16 – 18",
+      nights: 2,
+      description: "Black sand beaches and calm seas on Bali's quiet northern coast — dolphins at dawn.",
+      accommodation: {
+        hotelName: "Lovina Beach Resort",
+        stars: 4,
+        checkIn: "Aug 16", checkOut: "Aug 18",
+        checkInISO: "2026-08-16", checkOutISO: "2026-08-18",
+        roomType: "Beach Bungalow", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: -8.1558, lng: 115.0253,
+    },
+    {
+      destinationName: "Ubud",
+      dateRange: "Aug 18 – 21",
+      nights: 3,
+      description: "Bali's spiritual and artistic heart — rice terraces, temples, and a world-class food scene.",
+      accommodation: {
+        hotelName: "Komaneka at Bisma",
+        stars: 5,
+        checkIn: "Aug 18", checkOut: "Aug 21",
+        checkInISO: "2026-08-18", checkOutISO: "2026-08-21",
+        roomType: "Forest Villa", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: -8.5069, lng: 115.2625,
+    },
+  ],
+  transfers: [
+    { from: "Yogyakarta", to: "Surabaya", date: "Aug 13, train", mode: "Scenic train", description: "6h through Javanese countryside" },
+    { from: "Surabaya", to: "Mt Bromo", date: "Aug 14, 4x4 jeep", mode: "4x4 Jeep", description: "3h pre-dawn drive" },
+    { from: "Mt Bromo", to: "Lovina (Bali)", date: "Aug 16, drive + ferry", mode: "Coach + Ferry", description: "5h drive + 45 min ferry crossing" },
+    { from: "Lovina", to: "Ubud", date: "Aug 18, car", mode: "Private car", description: "2h 30m through mountain roads" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Lombok & the Gilis
+// Maps to Discovery card id 12
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const LOMBOK_GILIS_TOUR: Tour = {
+  tourId: "lombok-gili-islands",
+  title: "Lombok & the Gili Islands",
+  subtitle: "Untouched beaches, turquoise coral reefs, and laid-back island life just east of Bali.",
+  tripType: "individual-tour",
+  duration: 8,
+  locationsLabel: "Lombok · Gili Trawangan · Gili Air",
+  highlights: [
+    "Gili Trawangan snorkelling",
+    "Mt Rinjani viewpoint trek",
+    "Gili Air beach cycling",
+    "Turtle sanctuary visit",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+  price: {
+    perPerson: 1650,
+    total: 3300,
+    currency: "USD",
+    paidBefore: 870,
+    paidAtDestination: 780,
+  },
+  startDate: "Sep 05, 2026",
+  endDate: "Sep 12, 2026",
+  adults: 2,
+  destinationCodes: ["BALI"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Individual tour" },
+    { iconKey: "activity",       title: "Activity",   value: "Easy to moderate" },
+    { iconKey: "languages",      title: "Language",    value: "English" },
+    { iconKey: "calendar-check", title: "Min age",     value: "12+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+    "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&q=80",
+    "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrive in Lombok",
+      location: "Lombok",
+      items: [
+        { type: "highlight", label: "Welcome to Lombok", description: "Arrive at Lombok International Airport. Transfer to Senggigi Beach on the west coast." },
+        { type: "hotel", label: "Qunci Villas *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "South Lombok Beaches",
+      location: "Lombok",
+      items: [
+        { type: "highlight", label: "Tanjung Aan & Kuta Lombok", description: "Visit the twin crescent bays of Tanjung Aan — turquoise water and powdery white sand. Then explore Kuta Lombok's surf beaches." },
+        { type: "highlight", label: "Selong Belanak sunset", description: "Golden hour at one of Lombok's most beautiful beaches." },
+        { type: "hotel", label: "Qunci Villas *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Rinjani Foothills Trek",
+      location: "Lombok",
+      items: [
+        { type: "highlight", label: "Mt Rinjani viewpoint trek", description: "Half-day guided trek through the foothills of Indonesia's second-highest volcano — waterfalls, monkey sightings, and dramatic volcanic views." },
+        { type: "hotel", label: "Qunci Villas *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Fast Boat to Gili Trawangan",
+      location: "Lombok → Gili Trawangan",
+      items: [
+        { type: "transport", label: "Fast boat to Gili Trawangan", description: "15 min from Bangsal Harbour" },
+        { type: "highlight", label: "Sunset swings & beach bars", description: "Settle in and watch the sunset from Gili T's famous ocean swings — Bali's Mt Agung silhouetted on the horizon." },
+        { type: "hotel", label: "Pondok Santi Estate ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Gili Trawangan Snorkelling",
+      location: "Gili Trawangan",
+      items: [
+        { type: "highlight", label: "Three-island snorkel trip", description: "Boat tour visiting all three Gili Islands — swim with sea turtles, reef sharks, and colourful coral." },
+        { type: "highlight", label: "Turtle sanctuary visit", description: "Visit the Gili Trawangan turtle hatchery and release baby turtles into the sea." },
+        { type: "hotel", label: "Pondok Santi Estate ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Transfer to Gili Air",
+      location: "Gili Trawangan → Gili Air",
+      items: [
+        { type: "transport", label: "Public boat to Gili Air", description: "10 min island-hop by boat" },
+        { type: "highlight", label: "Gili Air cycling tour", description: "Cycle the entire island in 90 minutes — no cars, no motorbikes, just bicycles and horse carts." },
+        { type: "hotel", label: "Slow Villas & Spa *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Gili Air Free Day",
+      location: "Gili Air",
+      items: [
+        { type: "highlight", label: "Free day on Gili Air", description: "Snorkel off the beach, take a freediving lesson, or read a book in a hammock over the water." },
+        { type: "hotel", label: "Slow Villas & Spa *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Departure Day",
+      location: "Gili Air → Lombok",
+      items: [
+        { type: "highlight", label: "Farewell & transfer", description: "Fast boat back to Lombok and transfer to the airport for onward flights." },
+      ],
+    },
+  ],
+  included: [
+    "7 nights accommodation (4–5 star)",
+    "Daily breakfast",
+    "Mt Rinjani foothills guided trek",
+    "Three-island snorkel boat trip",
+    "Turtle sanctuary visit",
+    "All fast boat & ferry transfers between islands",
+    "Private driver on Lombok",
+    "Airport transfers",
+  ],
+  excluded: [
+    "International flights to/from Lombok",
+    "Travel insurance",
+    "Lunches and dinners",
+    "Optional PADI dive courses",
+    "Personal expenses & tips",
+    "Visa on arrival (if applicable)",
+  ],
+  stops: [
+    {
+      destinationName: "Lombok",
+      dateRange: "Sep 05 – 08",
+      nights: 3,
+      description: "Bali's quieter neighbour — dramatic beaches, a towering volcano, and authentic Sasak culture.",
+      accommodation: {
+        hotelName: "Qunci Villas",
+        stars: 5,
+        checkIn: "Sep 05", checkOut: "Sep 08",
+        checkInISO: "2026-09-05", checkOutISO: "2026-09-08",
+        roomType: "Pool Villa", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: -8.4875, lng: 116.0750,
+    },
+    {
+      destinationName: "Gili Trawangan",
+      dateRange: "Sep 08 – 10",
+      nights: 2,
+      description: "The party island of the Gilis — famous sunset swings, beach bars, and world-class snorkelling.",
+      accommodation: {
+        hotelName: "Pondok Santi Estate",
+        stars: 4,
+        checkIn: "Sep 08", checkOut: "Sep 10",
+        checkInISO: "2026-09-08", checkOutISO: "2026-09-10",
+        roomType: "Garden Suite", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: -8.3508, lng: 116.0341,
+    },
+    {
+      destinationName: "Gili Air",
+      dateRange: "Sep 10 – 12",
+      nights: 2,
+      description: "The quiet, romantic Gili — crystal water, car-free paths, and a blissful pace of life.",
+      accommodation: {
+        hotelName: "Slow Villas & Spa",
+        stars: 5,
+        checkIn: "Sep 10", checkOut: "Sep 12",
+        checkInISO: "2026-09-10", checkOutISO: "2026-09-12",
+        roomType: "Beachfront Villa", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: -8.3570, lng: 116.0810,
+    },
+  ],
+  transfers: [
+    { from: "Lombok", to: "Gili Trawangan", date: "Sep 08, fast boat", mode: "Fast boat", description: "15 min from Bangsal Harbour" },
+    { from: "Gili Trawangan", to: "Gili Air", date: "Sep 10, boat", mode: "Public boat", description: "10 min island hop" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Peru — "Inca Trail Adventure"
+// Maps to Discovery card ids 5 and 14
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const PERU_INCA_TRAIL_TOUR: Tour = {
+  tourId: "peru-inca-trail",
+  title: "Inca Trail Adventure",
+  subtitle: "Trek the legendary 4-day Inca Trail through cloud forests and mountain passes to arrive at Machu Picchu at sunrise.",
+  tripType: "group-tour",
+  duration: 8,
+  locationsLabel: "Cusco · Inca Trail · Machu Picchu",
+  highlights: [
+    "Classic 4-day Inca Trail trek",
+    "Dead Woman's Pass (4,215m)",
+    "Sun Gate sunrise at Machu Picchu",
+    "Cusco acclimatisation walks",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80",
+  price: {
+    perPerson: 2450,
+    total: 4900,
+    currency: "USD",
+    paidBefore: 1300,
+    paidAtDestination: 1150,
+  },
+  startDate: "Jun 15, 2026",
+  endDate: "Jun 22, 2026",
+  adults: 2,
+  destinationCodes: ["COSTARICA"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Max 16 trekkers" },
+    { iconKey: "activity",       title: "Activity",   value: "Challenging" },
+    { iconKey: "languages",      title: "Language",    value: "English & Spanish" },
+    { iconKey: "calendar-check", title: "Min age",     value: "16+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80",
+    "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=800&q=80",
+    "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80",
+    "https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrive in Cusco",
+      location: "Cusco",
+      items: [
+        { type: "highlight", label: "Arrive & acclimatise", description: "Arrive in Cusco at 3,400m. Gentle walking tour and coca tea to help with altitude. Equipment check and trek briefing." },
+        { type: "hotel", label: "Palacio del Inca *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Cusco & Sacred Valley",
+      location: "Cusco → Sacred Valley",
+      items: [
+        { type: "highlight", label: "Sacsayhuamán Inca fortress", description: "Morning visit to the massive Inca stone walls overlooking Cusco — some stones weigh over 100 tonnes." },
+        { type: "transport", label: "Transfer to Ollantaytambo", description: "1h 30m drive to the Sacred Valley" },
+        { type: "hotel", label: "Sol y Luna Lodge *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Inca Trail Day 1: KM 82 to Wayllabamba",
+      location: "Inca Trail",
+      items: [
+        { type: "highlight", label: "Start the Inca Trail at KM 82", description: "Cross the Urubamba River and begin the trek — 12km through eucalyptus groves and Inca ruins at Patallacta." },
+        { type: "hotel", label: "Camping at Wayllabamba (3,000m)" },
+      ],
+      image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Inca Trail Day 2: Dead Woman's Pass",
+      location: "Inca Trail",
+      items: [
+        { type: "highlight", label: "Climb to Dead Woman's Pass (4,215m)", description: "The highest and hardest day — a long steep climb through cloud forest to the pass, then descend to camp." },
+        { type: "hotel", label: "Camping at Pacaymayo (3,600m)" },
+      ],
+      image: "https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Inca Trail Day 3: Cloud Forest Ruins",
+      location: "Inca Trail",
+      items: [
+        { type: "highlight", label: "Runkurakay & Sayacmarca ruins", description: "Pass through two more mountain passes with stunning Inca ruins clinging to the ridgeline." },
+        { type: "highlight", label: "Wiñay Wayna terraces", description: "Arrive at the beautiful cascading agricultural terraces — the last campsite before Machu Picchu." },
+        { type: "hotel", label: "Camping at Wiñay Wayna (2,700m)" },
+      ],
+      image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Inca Trail Day 4: Sun Gate & Machu Picchu",
+      location: "Inca Trail → Machu Picchu",
+      items: [
+        { type: "highlight", label: "Sun Gate (Intipunku) at sunrise", description: "4am start for the final push to the Sun Gate — your first unforgettable view of Machu Picchu emerging from the mist below." },
+        { type: "highlight", label: "Machu Picchu guided tour", description: "Full guided tour of the citadel — temples, terraces, and the Intihuatana stone." },
+        { type: "hotel", label: "Sumaq Machu Picchu Hotel *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Return to Cusco",
+      location: "Machu Picchu → Cusco",
+      items: [
+        { type: "transport", label: "Peru Rail: Aguas Calientes → Cusco", description: "Scenic train return via Ollantaytambo" },
+        { type: "highlight", label: "Farewell dinner in Cusco", description: "Celebrate completing the Inca Trail with a group dinner in Cusco's Plaza de Armas." },
+        { type: "hotel", label: "Palacio del Inca *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Departure Day",
+      location: "Cusco",
+      items: [
+        { type: "highlight", label: "Check out & farewell", description: "Transfer to Cusco Airport for onward flights." },
+      ],
+    },
+  ],
+  included: [
+    "7 nights (4 camping + 3 hotel, 5-star)",
+    "All meals on the Inca Trail (3 lunches, 3 dinners, 4 breakfasts)",
+    "Inca Trail permit & Machu Picchu entry",
+    "Professional porters & camping equipment",
+    "Experienced bilingual trekking guide",
+    "Peru Rail scenic train return",
+    "Cusco walking tour",
+    "Sacred Valley transfer",
+    "All airport transfers",
+  ],
+  excluded: [
+    "International flights to/from Peru",
+    "Travel insurance (mandatory for trek)",
+    "Sleeping bag rental (optional)",
+    "Optional Huayna Picchu permit",
+    "Personal trekking gear",
+    "Tips for porters & guide",
+    "Hotel meals in Cusco (except breakfast)",
+  ],
+  stops: [
+    {
+      destinationName: "Cusco",
+      dateRange: "Jun 15 – 17",
+      nights: 2,
+      description: "The ancient Inca capital — acclimatise at 3,400m before the trek.",
+      accommodation: {
+        hotelName: "Palacio del Inca",
+        stars: 5,
+        checkIn: "Jun 15", checkOut: "Jun 17",
+        checkInISO: "2026-06-15", checkOutISO: "2026-06-17",
+        roomType: "Deluxe Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: -13.5319, lng: -71.9675,
+    },
+    {
+      destinationName: "Inca Trail",
+      dateRange: "Jun 17 – 20",
+      nights: 3,
+      description: "The legendary 43km trail through the Andes — cloud forests, mountain passes, and ancient Inca ruins.",
+      accommodation: {
+        hotelName: "Trek Camping",
+        stars: 3,
+        checkIn: "Jun 17", checkOut: "Jun 20",
+        checkInISO: "2026-06-17", checkOutISO: "2026-06-20",
+        roomType: "2-person tent", boardType: "Full board (camp meals)",
+      },
+      activities: [],
+      lat: -13.2263, lng: -72.4973,
+    },
+    {
+      destinationName: "Machu Picchu",
+      dateRange: "Jun 20 – 21",
+      nights: 1,
+      description: "The 15th-century Inca citadel — one of the New Seven Wonders of the World.",
+      accommodation: {
+        hotelName: "Sumaq Machu Picchu Hotel",
+        stars: 5,
+        checkIn: "Jun 20", checkOut: "Jun 21",
+        checkInISO: "2026-06-20", checkOutISO: "2026-06-21",
+        roomType: "Deluxe Andean Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: -13.1631, lng: -72.5450,
+    },
+  ],
+  transfers: [
+    { from: "Cusco", to: "Sacred Valley (Ollantaytambo)", date: "Jun 16, coach", mode: "Private coach", description: "1h 30m drive to the Sacred Valley" },
+    { from: "Machu Picchu", to: "Cusco", date: "Jun 21, train", mode: "Peru Rail", description: "Scenic train via Ollantaytambo" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Peru — "Amazon & Andes"
+// Maps to Discovery card ids 6 and 15
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const PERU_AMAZON_TOUR: Tour = {
+  tourId: "peru-amazon-andes",
+  title: "Amazon & Andes",
+  subtitle: "From the Amazon rainforest canopy to the shores of Lake Titicaca — Peru's most dramatic natural contrasts in one journey.",
+  tripType: "group-tour",
+  duration: 10,
+  locationsLabel: "Puerto Maldonado · Cusco · Lake Titicaca",
+  highlights: [
+    "Amazon jungle canopy walk",
+    "Uros floating islands",
+    "Lake Titicaca boat crossing",
+    "Macaw clay lick sunrise",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=800&q=80",
+  price: {
+    perPerson: 2180,
+    total: 4360,
+    currency: "USD",
+    paidBefore: 1150,
+    paidAtDestination: 1030,
+  },
+  startDate: "Jul 20, 2026",
+  endDate: "Jul 29, 2026",
+  adults: 2,
+  destinationCodes: ["COSTARICA"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Max 12 travellers" },
+    { iconKey: "activity",       title: "Activity",   value: "Moderate" },
+    { iconKey: "languages",      title: "Language",    value: "English & Spanish" },
+    { iconKey: "calendar-check", title: "Min age",     value: "14+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=800&q=80",
+    "https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?w=800&q=80",
+    "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80",
+    "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrive in Puerto Maldonado",
+      location: "Puerto Maldonado",
+      items: [
+        { type: "highlight", label: "Fly into the Amazon", description: "Arrive at Puerto Maldonado Airport. Boat ride up the Madre de Dios River to your eco-lodge deep in the rainforest." },
+        { type: "hotel", label: "Inkaterra Reserva Amazónica *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Amazon Canopy Walkway",
+      location: "Amazon Rainforest",
+      items: [
+        { type: "highlight", label: "Canopy walkway at sunrise", description: "Walk 30m above the forest floor on a network of hanging bridges — toucans, monkeys, and sloths at eye level." },
+        { type: "highlight", label: "Night jungle walk", description: "Guided torchlight hike through the rainforest after dark — tarantulas, tree frogs, and glowing fungi." },
+        { type: "hotel", label: "Inkaterra Reserva Amazónica *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Macaw Clay Lick & Oxbow Lake",
+      location: "Amazon Rainforest",
+      items: [
+        { type: "highlight", label: "Macaw clay lick at dawn", description: "Watch hundreds of colourful macaws and parrots descend on the mineral-rich clay riverbank — a wildlife spectacle." },
+        { type: "highlight", label: "Oxbow lake canoe trip", description: "Paddle a dugout canoe through a jungle lake looking for giant river otters and caimans." },
+        { type: "hotel", label: "Inkaterra Reserva Amazónica *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Fly to Cusco",
+      location: "Amazon → Cusco",
+      items: [
+        { type: "transport", label: "Flight to Cusco", description: "1h flight from Puerto Maldonado to Cusco (3,400m)" },
+        { type: "highlight", label: "Cusco orientation walk", description: "Gentle afternoon walk through the historic centre — Plaza de Armas and the Cathedral." },
+        { type: "hotel", label: "Belmond Hotel Monasterio *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Cusco Temples & Markets",
+      location: "Cusco",
+      items: [
+        { type: "highlight", label: "Qorikancha — Temple of the Sun", description: "The Inca empire's most sacred site — its walls were once lined with 700 solid gold sheets." },
+        { type: "highlight", label: "San Pedro Market lunch", description: "Taste local produce — alpaca steak, giant corn, and fresh fruit juices." },
+        { type: "hotel", label: "Belmond Hotel Monasterio *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Drive to Puno & Lake Titicaca",
+      location: "Cusco → Puno",
+      items: [
+        { type: "transport", label: "Scenic coach to Puno", description: "6h drive via the La Raya pass (4,335m) with stops at Raqchi temple and Andahuaylillas church" },
+        { type: "highlight", label: "Arrive at Lake Titicaca", description: "Check in to your lakefront hotel in Puno — the highest navigable lake in the world at 3,812m." },
+        { type: "hotel", label: "Titilaka Lodge *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Uros Floating Islands",
+      location: "Lake Titicaca",
+      items: [
+        { type: "highlight", label: "Uros Floating Islands visit", description: "Boat to the extraordinary floating islands built entirely from totora reeds by the Uros people — a way of life unchanged for centuries." },
+        { type: "highlight", label: "Taquile Island cultural visit", description: "Visit the island famous for its male knitting tradition (UNESCO Intangible Heritage) and stunning lake views." },
+        { type: "hotel", label: "Titilaka Lodge *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Lake Titicaca Free Day",
+      location: "Lake Titicaca",
+      items: [
+        { type: "highlight", label: "Free day at the lake", description: "Optional kayaking on the lake, visit to Sillustani pre-Inca tombs, or simply enjoy the spectacular Andean views." },
+        { type: "hotel", label: "Titilaka Lodge *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80",
+    },
+    {
+      dayNumber: 9,
+      title: "Return to Lima",
+      location: "Puno → Lima",
+      items: [
+        { type: "transport", label: "Fly Juliaca → Lima", description: "1h 45m flight from Juliaca Airport" },
+        { type: "highlight", label: "Farewell dinner in Miraflores", description: "Final group dinner at a top Lima restaurant overlooking the Pacific." },
+        { type: "hotel", label: "JW Marriott Lima *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=800&q=80",
+    },
+    {
+      dayNumber: 10,
+      title: "Departure Day",
+      location: "Lima",
+      items: [
+        { type: "highlight", label: "Check out & farewell", description: "Transfer to Jorge Chávez International Airport." },
+      ],
+    },
+  ],
+  included: [
+    "9 nights accommodation (5-star eco-lodges & hotels)",
+    "Daily breakfast + all meals in the Amazon (full board)",
+    "All domestic flights (Lima–Puerto Maldonado, PEM–Cusco, Juliaca–Lima)",
+    "Amazon canopy walkway & guided jungle treks",
+    "Macaw clay lick & oxbow lake excursions",
+    "Uros Floating Islands & Taquile Island boat trips",
+    "Scenic Cusco–Puno coach with stops",
+    "English- & Spanish-speaking expert guide",
+    "All transfers & airport pickups",
+  ],
+  excluded: [
+    "International flights to/from Peru",
+    "Travel insurance (mandatory)",
+    "Lunches & dinners outside the Amazon",
+    "Optional Sillustani tombs visit",
+    "Personal expenses & tips",
+    "Peruvian tourist card",
+    "Yellow fever vaccination (recommended for Amazon)",
+  ],
+  stops: [
+    {
+      destinationName: "Amazon Rainforest",
+      dateRange: "Jul 20 – 23",
+      nights: 3,
+      description: "The Tambopata National Reserve — one of the most biodiverse places on Earth.",
+      accommodation: {
+        hotelName: "Inkaterra Reserva Amazónica",
+        stars: 5,
+        checkIn: "Jul 20", checkOut: "Jul 23",
+        checkInISO: "2026-07-20", checkOutISO: "2026-07-23",
+        roomType: "Amazónica Suite", boardType: "Full board",
+      },
+      activities: [],
+      lat: -12.5933, lng: -69.1897,
+    },
+    {
+      destinationName: "Cusco",
+      dateRange: "Jul 23 – 25",
+      nights: 2,
+      description: "The ancient Inca capital — cobbled streets, baroque churches, and Inca stonework.",
+      accommodation: {
+        hotelName: "Belmond Hotel Monasterio",
+        stars: 5,
+        checkIn: "Jul 23", checkOut: "Jul 25",
+        checkInISO: "2026-07-23", checkOutISO: "2026-07-25",
+        roomType: "Deluxe Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: -13.5319, lng: -71.9675,
+    },
+    {
+      destinationName: "Lake Titicaca (Puno)",
+      dateRange: "Jul 25 – 28",
+      nights: 3,
+      description: "The highest navigable lake in the world at 3,812m — floating islands and ancient cultures.",
+      accommodation: {
+        hotelName: "Titilaka Lodge",
+        stars: 5,
+        checkIn: "Jul 25", checkOut: "Jul 28",
+        checkInISO: "2026-07-25", checkOutISO: "2026-07-28",
+        roomType: "Lake View Suite", boardType: "Full board",
+      },
+      activities: [],
+      lat: -15.8402, lng: -70.0219,
+    },
+  ],
+  transfers: [
+    { from: "Puerto Maldonado", to: "Cusco", date: "Jul 23, flight", mode: "Domestic flight", description: "1h flight over the Andes" },
+    { from: "Cusco", to: "Puno", date: "Jul 25, coach", mode: "Scenic coach", description: "6h with stops at Raqchi and La Raya pass" },
+    { from: "Puno", to: "Lima (via Juliaca)", date: "Jul 28, flight", mode: "Domestic flight", description: "1h 45m flight" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Japan — "Kyoto & Beyond"
+// Maps to Discovery card id 17
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const JAPAN_KYOTO_TOUR: Tour = {
+  tourId: "japan-kyoto-beyond",
+  title: "Kyoto & Beyond",
+  subtitle: "Go deeper into Japan's ancient heart — Kyoto's hidden temples, Nara's sacred deer, and Hiroshima's powerful peace story.",
+  tripType: "group-tour",
+  duration: 8,
+  locationsLabel: "Kyoto · Nara · Hiroshima",
+  highlights: [
+    "Fushimi Inari at dawn",
+    "Nara deer park & Todai-ji",
+    "Hiroshima Peace Memorial",
+    "Arashiyama bamboo grove",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80",
+  price: {
+    perPerson: 2490,
+    total: 4980,
+    currency: "USD",
+    paidBefore: 1290,
+    paidAtDestination: 1200,
+  },
+  startDate: "Apr 10, 2027",
+  endDate: "Apr 17, 2027",
+  adults: 2,
+  destinationCodes: ["HOCHIMINH"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Max 12 travellers" },
+    { iconKey: "activity",       title: "Activity",   value: "Easy" },
+    { iconKey: "languages",      title: "Language",    value: "English" },
+    { iconKey: "calendar-check", title: "Min age",     value: "All ages" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80",
+    "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",
+    "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",
+    "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrive in Kyoto",
+      location: "Kyoto",
+      items: [
+        { type: "highlight", label: "Welcome to Kyoto", description: "Arrive at Kansai Airport. Transfer to your ryokan in the Higashiyama district. Evening walk through Gion." },
+        { type: "hotel", label: "Sowaka Kyoto *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Kyoto Temples: East Side",
+      location: "Kyoto",
+      items: [
+        { type: "highlight", label: "Fushimi Inari at dawn", description: "Beat the crowds with an early-morning hike through thousands of vermilion torii gates on Mt Inari." },
+        { type: "highlight", label: "Kiyomizu-dera Temple", description: "Kyoto's most celebrated temple — a wooden stage jutting out over a hillside of cherry trees." },
+        { type: "highlight", label: "Philosopher's Path", description: "Afternoon walk along the canal-side path lined with cherry and maple trees." },
+        { type: "hotel", label: "Sowaka Kyoto *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Arashiyama & Golden Pavilion",
+      location: "Kyoto",
+      items: [
+        { type: "highlight", label: "Arashiyama Bamboo Grove", description: "Walk through soaring bamboo stalks — one of the world's most surreal natural settings." },
+        { type: "highlight", label: "Kinkaku-ji Golden Pavilion", description: "The iconic gold-covered Zen temple reflected perfectly in its mirror pond." },
+        { type: "hotel", label: "Sowaka Kyoto *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Day Trip to Nara",
+      location: "Kyoto → Nara → Kyoto",
+      items: [
+        { type: "transport", label: "Train to Nara", description: "45 min from Kyoto — JR Pass covered" },
+        { type: "highlight", label: "Nara Park & friendly deer", description: "Roam with 1,200 semi-tame deer in the park — they'll bow to you for rice crackers." },
+        { type: "highlight", label: "Todai-ji Temple & Giant Buddha", description: "The world's largest wooden building housing a 15m bronze Buddha — awe-inspiring." },
+        { type: "hotel", label: "Sowaka Kyoto *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Kyoto Craft & Tea",
+      location: "Kyoto",
+      items: [
+        { type: "highlight", label: "Traditional tea ceremony", description: "Participate in a formal Japanese tea ceremony in a historic Kyoto machiya townhouse." },
+        { type: "highlight", label: "Nishiki Market food tour", description: "Taste your way through 'Kyoto's Kitchen' — 130+ vendors selling pickles, wagashi, and Kyoto tofu." },
+        { type: "hotel", label: "Sowaka Kyoto *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Shinkansen to Hiroshima",
+      location: "Kyoto → Hiroshima",
+      items: [
+        { type: "transport", label: "Shinkansen to Hiroshima", description: "1h 40m bullet train — JR Pass covered" },
+        { type: "highlight", label: "Peace Memorial Museum", description: "A deeply moving museum and park — the A-Bomb Dome, paper crane memorial, and peace flame." },
+        { type: "hotel", label: "Sheraton Grand Hiroshima ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Miyajima Island",
+      location: "Hiroshima → Miyajima",
+      items: [
+        { type: "highlight", label: "Itsukushima Shrine floating torii", description: "Ferry to the sacred island and its iconic vermilion torii gate rising from the sea." },
+        { type: "highlight", label: "Mt Misen ropeway", description: "Gondola to the island summit for panoramic views over the Seto Inland Sea." },
+        { type: "hotel", label: "Sheraton Grand Hiroshima ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Departure Day",
+      location: "Hiroshima",
+      items: [
+        { type: "highlight", label: "Farewell & check out", description: "Transfer to Hiroshima Airport or Shinkansen to Osaka/Tokyo for onward connections." },
+      ],
+    },
+  ],
+  included: [
+    "7 nights accommodation (4–5 star)",
+    "Daily breakfast + 2 group dinners",
+    "Japan Rail Pass (7-day) covering Shinkansen",
+    "Fushimi Inari, Kinkaku-ji, Kiyomizu-dera entries",
+    "Nara day trip with guide",
+    "Hiroshima Peace Museum entry",
+    "Miyajima ferry & Mt Misen ropeway",
+    "Traditional tea ceremony experience",
+    "English-speaking guide throughout",
+  ],
+  excluded: [
+    "International flights to/from Japan",
+    "Travel insurance",
+    "Lunches and non-group dinners",
+    "Optional geisha experience (extra)",
+    "Personal expenses & tips",
+    "Japan tourist visa (if applicable)",
+  ],
+  stops: [
+    {
+      destinationName: "Kyoto",
+      dateRange: "Apr 10 – 15",
+      nights: 5,
+      description: "Japan's ancient imperial capital — 1,600 temples, Zen gardens, and the beating heart of Japanese culture.",
+      accommodation: {
+        hotelName: "Sowaka Kyoto",
+        stars: 5,
+        checkIn: "Apr 10", checkOut: "Apr 15",
+        checkInISO: "2027-04-10", checkOutISO: "2027-04-15",
+        roomType: "Deluxe Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 35.0116, lng: 135.7681,
+    },
+    {
+      destinationName: "Hiroshima",
+      dateRange: "Apr 15 – 17",
+      nights: 2,
+      description: "A city reborn from tragedy — powerful peace memorials, vibrant food culture, and gateway to Miyajima.",
+      accommodation: {
+        hotelName: "Sheraton Grand Hiroshima",
+        stars: 4,
+        checkIn: "Apr 15", checkOut: "Apr 17",
+        checkInISO: "2027-04-15", checkOutISO: "2027-04-17",
+        roomType: "Deluxe King Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 34.3853, lng: 132.4553,
+    },
+  ],
+  transfers: [
+    { from: "Kyoto", to: "Hiroshima", date: "Apr 15, Shinkansen", mode: "Bullet train", description: "1h 40m Nozomi Shinkansen" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Japan — "Japan Rail Adventure"
+// Maps to Discovery card id 18
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const JAPAN_RAIL_TOUR: Tour = {
+  tourId: "japan-rail-adventure",
+  title: "Japan Rail Adventure",
+  subtitle: "The ultimate rail journey — ride every iconic train across Japan, from tropical Kyushu to snowy Hokkaido.",
+  tripType: "group-tour",
+  duration: 14,
+  locationsLabel: "Tokyo · Kanazawa · Kyoto · Osaka · Hiroshima · Fukuoka",
+  highlights: [
+    "Nozomi Shinkansen at 300 km/h",
+    "Kanazawa Kenroku-en Garden",
+    "Hiroshima okonomiyaki",
+    "Hakone hot-spring ryokan",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80",
+  price: {
+    perPerson: 3690,
+    total: 7380,
+    currency: "USD",
+    paidBefore: 1890,
+    paidAtDestination: 1800,
+  },
+  startDate: "Mar 25, 2027",
+  endDate: "Apr 07, 2027",
+  adults: 2,
+  destinationCodes: ["HOCHIMINH"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Max 14 travellers" },
+    { iconKey: "activity",       title: "Activity",   value: "Easy" },
+    { iconKey: "languages",      title: "Language",    value: "English" },
+    { iconKey: "calendar-check", title: "Min age",     value: "All ages" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80",
+    "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80",
+    "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",
+    "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrive in Tokyo",
+      location: "Tokyo",
+      items: [
+        { type: "highlight", label: "Welcome to Japan", description: "Arrive at Narita or Haneda. Transfer to Shinjuku. Evening walk through Golden Gai and Omoide Yokocho." },
+        { type: "hotel", label: "Hyatt Regency Tokyo *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Tokyo Highlights",
+      location: "Tokyo",
+      items: [
+        { type: "highlight", label: "Tsukiji Market & Shibuya Crossing", description: "Morning at the outer market, then the world's busiest crossing and Hachiko statue." },
+        { type: "highlight", label: "Akihabara & Harajuku", description: "Afternoon exploring Tokyo's subcultures — anime shops and Takeshita Street fashion." },
+        { type: "hotel", label: "Hyatt Regency Tokyo *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Hakone Day Trip",
+      location: "Tokyo → Hakone → Tokyo",
+      items: [
+        { type: "transport", label: "Romancecar to Hakone", description: "85 min scenic mountain express" },
+        { type: "highlight", label: "Hakone Ropeway & Lake Ashi cruise", description: "Gondola ride for Mt Fuji views (weather permitting), then pirate ship across the lake." },
+        { type: "hotel", label: "Hyatt Regency Tokyo *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Shinkansen to Kanazawa",
+      location: "Tokyo → Kanazawa",
+      items: [
+        { type: "transport", label: "Hokuriku Shinkansen to Kanazawa", description: "2h 30m through the Japan Alps" },
+        { type: "highlight", label: "Kenroku-en Garden", description: "One of Japan's three most beautiful gardens — ponds, bridges, and ancient pines." },
+        { type: "hotel", label: "Hotel Nikko Kanazawa ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Kanazawa Exploration",
+      location: "Kanazawa",
+      items: [
+        { type: "highlight", label: "Higashi Chaya geisha district", description: "Beautifully preserved wooden teahouses — sample gold-leaf ice cream and matcha in a geisha house." },
+        { type: "highlight", label: "21st Century Museum of Contemporary Art", description: "One of Japan's most acclaimed modern art spaces — free areas and rotating exhibitions." },
+        { type: "hotel", label: "Hotel Nikko Kanazawa ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Thunderbird to Kyoto",
+      location: "Kanazawa → Kyoto",
+      items: [
+        { type: "transport", label: "Limited Express Thunderbird to Kyoto", description: "2h 10m through mountain tunnels" },
+        { type: "highlight", label: "Gion evening walk", description: "Stroll Kyoto's famous geisha district at dusk — wooden machiya, lanterns, and traditional restaurants." },
+        { type: "hotel", label: "Ritz-Carlton Kyoto *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Kyoto Temples",
+      location: "Kyoto",
+      items: [
+        { type: "highlight", label: "Fushimi Inari Shrine", description: "Thousands of vermilion torii gates winding up the mountain — mesmerising at sunrise." },
+        { type: "highlight", label: "Kinkaku-ji & Ryoan-ji", description: "Gold Pavilion and Japan's most famous Zen rock garden." },
+        { type: "hotel", label: "Ritz-Carlton Kyoto *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Kyoto Free Day",
+      location: "Kyoto",
+      items: [
+        { type: "highlight", label: "Free day", description: "Arashiyama Bamboo Grove, Nishiki Market, cooking class, or a kimono rental experience — your choice." },
+        { type: "hotel", label: "Ritz-Carlton Kyoto *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",
+    },
+    {
+      dayNumber: 9,
+      title: "Shinkansen to Osaka",
+      location: "Kyoto → Osaka",
+      items: [
+        { type: "transport", label: "Shinkansen to Osaka", description: "15 min — JR Pass covered" },
+        { type: "highlight", label: "Dotonbori & Shinsekai food crawl", description: "Osaka's two legendary eating districts — takoyaki, kushikatsu, and gyoza." },
+        { type: "hotel", label: "W Osaka *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80",
+    },
+    {
+      dayNumber: 10,
+      title: "Osaka Castle & Free Time",
+      location: "Osaka",
+      items: [
+        { type: "highlight", label: "Osaka Castle", description: "The magnificent 16th-century castle surrounded by moats and parkland." },
+        { type: "highlight", label: "Kuromon Market", description: "'Osaka's Kitchen' — fresh seafood, Wagyu, and street snacks." },
+        { type: "hotel", label: "W Osaka *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=800&q=80",
+    },
+    {
+      dayNumber: 11,
+      title: "Shinkansen to Hiroshima",
+      location: "Osaka → Hiroshima",
+      items: [
+        { type: "transport", label: "Shinkansen to Hiroshima", description: "1h 30m — JR Pass covered" },
+        { type: "highlight", label: "Hiroshima Peace Memorial", description: "A-Bomb Dome, Peace Museum, and the cenotaph — essential and deeply moving." },
+        { type: "hotel", label: "Sheraton Grand Hiroshima ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",
+    },
+    {
+      dayNumber: 12,
+      title: "Miyajima & Hiroshima Food",
+      location: "Hiroshima",
+      items: [
+        { type: "highlight", label: "Miyajima Island floating torii", description: "Ferry to the sacred island — the iconic gate, wild deer, and maple leaf pastries." },
+        { type: "highlight", label: "Hiroshima-style okonomiyaki dinner", description: "Try the local layered version of Japan's famous savoury pancake — a must-eat." },
+        { type: "hotel", label: "Sheraton Grand Hiroshima ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80",
+    },
+    {
+      dayNumber: 13,
+      title: "Shinkansen to Fukuoka",
+      location: "Hiroshima → Fukuoka",
+      items: [
+        { type: "transport", label: "Shinkansen to Fukuoka", description: "1h — JR Pass covered" },
+        { type: "highlight", label: "Yatai ramen stalls by the river", description: "Fukuoka's famous outdoor ramen stands along the Naka River — the best tonkotsu ramen in Japan." },
+        { type: "hotel", label: "Hotel Okura Fukuoka ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80",
+    },
+    {
+      dayNumber: 14,
+      title: "Departure Day",
+      location: "Fukuoka",
+      items: [
+        { type: "highlight", label: "Farewell & check out", description: "Transfer to Fukuoka Airport for onward flights." },
+      ],
+    },
+  ],
+  included: [
+    "13 nights accommodation (4–5 star)",
+    "Daily breakfast + 4 group dinners",
+    "Japan Rail Pass (14-day) covering all trains",
+    "Romancecar, Thunderbird, Shinkansen rides",
+    "All guided tours & temple entries",
+    "Miyajima ferry & Mt Misen ropeway",
+    "Hiroshima Peace Museum entry",
+    "English-speaking guide throughout",
+    "All airport transfers",
+  ],
+  excluded: [
+    "International flights to/from Japan",
+    "Travel insurance",
+    "Lunches and non-group dinners",
+    "Optional geisha/kimono experiences",
+    "Personal expenses & tips",
+    "Japan tourist visa (if applicable)",
+  ],
+  stops: [
+    {
+      destinationName: "Tokyo",
+      dateRange: "Mar 25 – 28",
+      nights: 3,
+      description: "The world's largest metropolis — neon, sushi, temples, and cutting-edge technology.",
+      accommodation: {
+        hotelName: "Hyatt Regency Tokyo",
+        stars: 5,
+        checkIn: "Mar 25", checkOut: "Mar 28",
+        checkInISO: "2027-03-25", checkOutISO: "2027-03-28",
+        roomType: "Regency King Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 35.6762, lng: 139.6503,
+    },
+    {
+      destinationName: "Kanazawa",
+      dateRange: "Mar 28 – 30",
+      nights: 2,
+      description: "Japan's best-kept secret — samurai districts, geisha teahouses, and one of the world's finest gardens.",
+      accommodation: {
+        hotelName: "Hotel Nikko Kanazawa",
+        stars: 4,
+        checkIn: "Mar 28", checkOut: "Mar 30",
+        checkInISO: "2027-03-28", checkOutISO: "2027-03-30",
+        roomType: "Superior Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 36.5613, lng: 136.6562,
+    },
+    {
+      destinationName: "Kyoto",
+      dateRange: "Mar 30 – Apr 02",
+      nights: 3,
+      description: "The ancient capital — cherry blossoms in spring, torii gates, and the finest kaiseki cuisine.",
+      accommodation: {
+        hotelName: "Ritz-Carlton Kyoto",
+        stars: 5,
+        checkIn: "Mar 30", checkOut: "Apr 02",
+        checkInISO: "2027-03-30", checkOutISO: "2027-04-02",
+        roomType: "Deluxe Kamogawa Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 35.0116, lng: 135.7681,
+    },
+    {
+      destinationName: "Osaka",
+      dateRange: "Apr 02 – 04",
+      nights: 2,
+      description: "Japan's food capital — Dotonbori neon, Osaka Castle, and the friendliest locals in the country.",
+      accommodation: {
+        hotelName: "W Osaka",
+        stars: 5,
+        checkIn: "Apr 02", checkOut: "Apr 04",
+        checkInISO: "2027-04-02", checkOutISO: "2027-04-04",
+        roomType: "Wonderful King Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 34.6937, lng: 135.5023,
+    },
+    {
+      destinationName: "Hiroshima",
+      dateRange: "Apr 04 – 06",
+      nights: 2,
+      description: "A city of peace and resilience — powerful memorials, Miyajima Island, and incredible okonomiyaki.",
+      accommodation: {
+        hotelName: "Sheraton Grand Hiroshima",
+        stars: 4,
+        checkIn: "Apr 04", checkOut: "Apr 06",
+        checkInISO: "2027-04-04", checkOutISO: "2027-04-06",
+        roomType: "Deluxe King Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 34.3853, lng: 132.4553,
+    },
+    {
+      destinationName: "Fukuoka",
+      dateRange: "Apr 06 – 07",
+      nights: 1,
+      description: "Kyushu's dynamic capital — yatai ramen stalls, canal city, and gateway to southern Japan.",
+      accommodation: {
+        hotelName: "Hotel Okura Fukuoka",
+        stars: 4,
+        checkIn: "Apr 06", checkOut: "Apr 07",
+        checkInISO: "2027-04-06", checkOutISO: "2027-04-07",
+        roomType: "Premium Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 33.5904, lng: 130.4017,
+    },
+  ],
+  transfers: [
+    { from: "Tokyo", to: "Kanazawa", date: "Mar 28, Shinkansen", mode: "Hokuriku Shinkansen", description: "2h 30m through the Japan Alps" },
+    { from: "Kanazawa", to: "Kyoto", date: "Mar 30, Thunderbird", mode: "Limited Express", description: "2h 10m" },
+    { from: "Kyoto", to: "Osaka", date: "Apr 02, Shinkansen", mode: "Bullet train", description: "15 min" },
+    { from: "Osaka", to: "Hiroshima", date: "Apr 04, Shinkansen", mode: "Bullet train", description: "1h 30m" },
+    { from: "Hiroshima", to: "Fukuoka", date: "Apr 06, Shinkansen", mode: "Bullet train", description: "1h" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Morocco — "Sahara & Kasbahs"
+// Maps to Discovery card id 20
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const MOROCCO_SAHARA_TOUR: Tour = {
+  tourId: "morocco-sahara-kasbahs",
+  title: "Sahara & Kasbahs",
+  subtitle: "Camel treks under starlit skies, ancient mud-brick fortresses, and dramatic desert gorges in southern Morocco.",
+  tripType: "group-tour",
+  duration: 7,
+  locationsLabel: "Marrakech · Ouarzazate · Merzouga · Todra Gorge",
+  highlights: [
+    "Erg Chebbi camel sunset trek",
+    "Todra Gorge canyon walk",
+    "Aït Benhaddou UNESCO kasbah",
+    "Berber desert camp stargazing",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80",
+  price: {
+    perPerson: 1320,
+    total: 2640,
+    currency: "USD",
+    paidBefore: 690,
+    paidAtDestination: 630,
+  },
+  startDate: "Oct 24, 2026",
+  endDate: "Oct 30, 2026",
+  adults: 2,
+  destinationCodes: ["MARRAKECH"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Max 12 travellers" },
+    { iconKey: "activity",       title: "Activity",   value: "Easy to moderate" },
+    { iconKey: "languages",      title: "Language",    value: "English & French" },
+    { iconKey: "calendar-check", title: "Min age",     value: "12+" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80",
+    "https://images.unsplash.com/photo-1548820996-c1e4d0e33aa2?w=800&q=80",
+    "https://images.unsplash.com/photo-1531218150217-54595bc2b934?w=800&q=80",
+    "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Depart Marrakech",
+      location: "Marrakech → Ouarzazate",
+      items: [
+        { type: "transport", label: "Cross the High Atlas via Tizi n'Tichka pass", description: "4h dramatic mountain pass at 2,260m — Berber villages and panoramic views" },
+        { type: "highlight", label: "Aït Benhaddou UNESCO kasbah", description: "Explore the stunning fortified ksar — film location for Gladiator, Game of Thrones, and Lawrence of Arabia." },
+        { type: "hotel", label: "Berbère Palace Ouarzazate ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1548820996-c1e4d0e33aa2?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Valley of Roses & Todra Gorge",
+      location: "Ouarzazate → Todra Gorge",
+      items: [
+        { type: "transport", label: "Drive through the Dadès Valley", description: "4h through the Valley of a Thousand Kasbahs and the Valley of Roses" },
+        { type: "highlight", label: "Todra Gorge canyon walk", description: "Walk between 300m-high cliff walls in one of Morocco's most dramatic natural formations — just 10m apart at the narrowest point." },
+        { type: "hotel", label: "Riad Lamane Todra ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1531218150217-54595bc2b934?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Drive to Merzouga",
+      location: "Todra Gorge → Merzouga",
+      items: [
+        { type: "transport", label: "Drive to Merzouga", description: "4h through the Ziz palm valley" },
+        { type: "highlight", label: "First views of Erg Chebbi dunes", description: "Arrive as the great orange dunes glow in the late-afternoon light — up to 150m high." },
+        { type: "hotel", label: "Kasbah Mohayut *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Sahara Camel Trek & Desert Camp",
+      location: "Merzouga (Sahara)",
+      items: [
+        { type: "highlight", label: "Sunset camel trek into the dunes", description: "Ride dromedary camels deep into the Sahara as the sun paints the dunes gold and crimson." },
+        { type: "highlight", label: "Berber desert camp night", description: "Traditional music, drum circle, tagine dinner under a canopy of stars with zero light pollution." },
+        { type: "hotel", label: "Luxury Berber Desert Camp *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Sahara Sunrise & Nomad Visit",
+      location: "Merzouga (Sahara)",
+      items: [
+        { type: "highlight", label: "Dune sunrise hike", description: "Climb a high dune before dawn to watch the sun rise over the endless Sahara — an unforgettable moment." },
+        { type: "highlight", label: "Nomad family visit", description: "Meet a semi-nomadic Berber family living on the desert edge — share mint tea and learn about their way of life." },
+        { type: "hotel", label: "Kasbah Mohayut *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Return to Marrakech",
+      location: "Merzouga → Marrakech",
+      items: [
+        { type: "transport", label: "Full-day drive back to Marrakech", description: "10h with lunch stop and scenic breaks along the Draa Valley" },
+        { type: "highlight", label: "Djemaa el-Fna arrival evening", description: "Arrive in Marrakech and head straight to the world's greatest open-air stage — food stalls, musicians, and snake charmers." },
+        { type: "hotel", label: "La Mamounia *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1548820996-c1e4d0e33aa2?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Departure Day",
+      location: "Marrakech",
+      items: [
+        { type: "highlight", label: "Morning in the souks & farewell", description: "Final morning exploring the Marrakech souks before transfer to Menara Airport." },
+      ],
+    },
+  ],
+  included: [
+    "6 nights accommodation (4–5 star kasbahs & desert camp)",
+    "Daily breakfast + all meals in the desert",
+    "Sahara camel trek & luxury desert camp (1 night)",
+    "Todra Gorge guided walk",
+    "Aït Benhaddou kasbah visit",
+    "All private coach transfers",
+    "English- & French-speaking guide",
+  ],
+  excluded: [
+    "International flights to/from Morocco",
+    "Travel insurance",
+    "Lunches (except desert days)",
+    "Optional quad biking in Merzouga",
+    "Personal shopping & tips",
+  ],
+  stops: [
+    {
+      destinationName: "Ouarzazate",
+      dateRange: "Oct 24 – 25",
+      nights: 1,
+      description: "The 'Hollywood of Africa' — gateway to the Sahara, surrounded by dramatic kasbahs.",
+      accommodation: {
+        hotelName: "Berbère Palace Ouarzazate",
+        stars: 4,
+        checkIn: "Oct 24", checkOut: "Oct 25",
+        checkInISO: "2026-10-24", checkOutISO: "2026-10-25",
+        roomType: "Standard Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 30.9189, lng: -6.8937,
+    },
+    {
+      destinationName: "Todra Gorge",
+      dateRange: "Oct 25 – 26",
+      nights: 1,
+      description: "Towering 300m canyon walls in the eastern High Atlas — one of Morocco's most dramatic natural wonders.",
+      accommodation: {
+        hotelName: "Riad Lamane Todra",
+        stars: 4,
+        checkIn: "Oct 25", checkOut: "Oct 26",
+        checkInISO: "2026-10-25", checkOutISO: "2026-10-26",
+        roomType: "Gorge View Room", boardType: "Half board",
+      },
+      activities: [],
+      lat: 31.5893, lng: -5.5672,
+    },
+    {
+      destinationName: "Merzouga (Sahara)",
+      dateRange: "Oct 26 – 29",
+      nights: 3,
+      description: "The great Erg Chebbi dunes — 150m-high orange sand mountains at the edge of the Sahara.",
+      accommodation: {
+        hotelName: "Kasbah Mohayut",
+        stars: 5,
+        checkIn: "Oct 26", checkOut: "Oct 29",
+        checkInISO: "2026-10-26", checkOutISO: "2026-10-29",
+        roomType: "Desert Suite", boardType: "Full board",
+      },
+      activities: [],
+      lat: 31.1000, lng: -3.9667,
+    },
+    {
+      destinationName: "Marrakech",
+      dateRange: "Oct 29 – 30",
+      nights: 1,
+      description: "The Red City — vibrant souks, Djemaa el-Fna, and the finest riads in the world.",
+      accommodation: {
+        hotelName: "La Mamounia",
+        stars: 5,
+        checkIn: "Oct 29", checkOut: "Oct 30",
+        checkInISO: "2026-10-29", checkOutISO: "2026-10-30",
+        roomType: "Superior Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 31.6295, lng: -7.9811,
+    },
+  ],
+  transfers: [
+    { from: "Marrakech", to: "Ouarzazate", date: "Oct 24, coach", mode: "Private coach", description: "4h via Tizi n'Tichka mountain pass" },
+    { from: "Ouarzazate", to: "Todra Gorge", date: "Oct 25, coach", mode: "Private coach", description: "4h through Dadès Valley" },
+    { from: "Todra Gorge", to: "Merzouga", date: "Oct 26, coach", mode: "Private coach", description: "4h via Ziz valley" },
+    { from: "Merzouga", to: "Marrakech", date: "Oct 29, coach", mode: "Private coach", description: "10h full-day drive with stops" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Morocco — "Coastal Morocco"
+// Maps to Discovery card id 21
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const MOROCCO_COASTAL_TOUR: Tour = {
+  tourId: "morocco-coastal",
+  title: "Coastal Morocco",
+  subtitle: "Wind-swept Atlantic beaches, the blue city, and bohemian Essaouira — Morocco's stunning coastline and mountain towns.",
+  tripType: "group-tour",
+  duration: 8,
+  locationsLabel: "Tangier · Chefchaouen · Essaouira",
+  highlights: [
+    "Chefchaouen blue medina",
+    "Essaouira harbour & ramparts",
+    "Tangier Kasbah & Caves of Hercules",
+    "Atlantic coast surfing",
+  ],
+  mainImage: "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=800&q=80",
+  price: {
+    perPerson: 1410,
+    total: 2820,
+    currency: "USD",
+    paidBefore: 740,
+    paidAtDestination: 670,
+  },
+  startDate: "Nov 01, 2026",
+  endDate: "Nov 08, 2026",
+  adults: 2,
+  destinationCodes: ["MARRAKECH"],
+  attributes: [
+    { iconKey: "users",          title: "Group size", value: "Max 14 travellers" },
+    { iconKey: "activity",       title: "Activity",   value: "Easy" },
+    { iconKey: "languages",      title: "Language",    value: "English & French" },
+    { iconKey: "calendar-check", title: "Min age",     value: "All ages" },
+  ],
+  gallery: [
+    "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=800&q=80",
+    "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=800&q=80",
+    "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=800&q=80",
+    "https://images.unsplash.com/photo-1531218150217-54595bc2b934?w=800&q=80",
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrive in Tangier",
+      location: "Tangier",
+      items: [
+        { type: "highlight", label: "Welcome to Tangier", description: "Arrive at Tangier Ibn Battouta Airport. Transfer to your hotel overlooking the Strait of Gibraltar." },
+        { type: "hotel", label: "El Minzah Hotel *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Tangier Kasbah & Caves",
+      location: "Tangier",
+      items: [
+        { type: "highlight", label: "Tangier Kasbah & Medina", description: "Explore the hilltop kasbah with views across to Spain, then wander the labyrinthine medina." },
+        { type: "highlight", label: "Caves of Hercules", description: "Visit the legendary sea cave where Hercules supposedly rested — the opening frames the Atlantic like a map of Africa." },
+        { type: "hotel", label: "El Minzah Hotel *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Drive to Chefchaouen",
+      location: "Tangier → Chefchaouen",
+      items: [
+        { type: "transport", label: "Coach to Chefchaouen", description: "3h through the Rif Mountains" },
+        { type: "highlight", label: "Chefchaouen blue medina walk", description: "Wander the labyrinthine alleys of Morocco's famous blue city — every surface washed in vivid shades of blue." },
+        { type: "hotel", label: "Lina Ryad & Spa ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Chefchaouen Exploration",
+      location: "Chefchaouen",
+      items: [
+        { type: "highlight", label: "Ras el-Maa waterfall hike", description: "Short hike from the medina to the waterfall where locals gather to wash clothes and socialise." },
+        { type: "highlight", label: "Spanish Mosque sunset", description: "Climb to the abandoned mosque on the hill for the best panoramic sunset view over the blue city." },
+        { type: "hotel", label: "Lina Ryad & Spa ****" },
+      ],
+      image: "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=800&q=80",
+    },
+    {
+      dayNumber: 5,
+      title: "Fly to Essaouira",
+      location: "Chefchaouen → Essaouira",
+      items: [
+        { type: "transport", label: "Coach to Fes + flight to Essaouira", description: "3h coach to Fes, then 1h 15m flight to Essaouira" },
+        { type: "highlight", label: "Arrive at the Atlantic coast", description: "Check in to your riad within the walled medina. Evening walk along the harbour ramparts." },
+        { type: "hotel", label: "Heure Bleue Palais *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1531218150217-54595bc2b934?w=800&q=80",
+    },
+    {
+      dayNumber: 6,
+      title: "Essaouira Harbour & Medina",
+      location: "Essaouira",
+      items: [
+        { type: "highlight", label: "Fishing harbour & seafood lunch", description: "Watch fishermen bring in their catch, then choose your fish to be grilled on the spot at the harbour stalls." },
+        { type: "highlight", label: "Essaouira medina & galleries", description: "Browse the art galleries, thuya woodworking shops, and the 18th-century fortress ramparts where Orson Welles filmed Othello." },
+        { type: "hotel", label: "Heure Bleue Palais *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=800&q=80",
+    },
+    {
+      dayNumber: 7,
+      title: "Beach & Surf Day",
+      location: "Essaouira",
+      items: [
+        { type: "highlight", label: "Atlantic beach & surf lesson", description: "Essaouira is Morocco's wind-sport capital — try a beginner surf or windsurf lesson on the wide sandy beach." },
+        { type: "highlight", label: "Sunset camel ride on the beach", description: "Ride a camel along the shoreline at golden hour — the Atlantic waves crashing beside you." },
+        { type: "hotel", label: "Heure Bleue Palais *****" },
+      ],
+      image: "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Departure Day",
+      location: "Essaouira",
+      items: [
+        { type: "highlight", label: "Farewell & transfer", description: "Final morning in the medina before transfer to Essaouira Mogador Airport or coach to Marrakech." },
+      ],
+    },
+  ],
+  included: [
+    "7 nights accommodation (4–5 star riads & hotels)",
+    "Daily breakfast + 2 group dinners",
+    "Tangier Kasbah & Caves of Hercules guided tour",
+    "Chefchaouen medina walking tour",
+    "Essaouira medina & harbour tour",
+    "Beginner surf lesson in Essaouira",
+    "All coach transfers & domestic flight",
+    "English- & French-speaking guide",
+  ],
+  excluded: [
+    "International flights to/from Morocco",
+    "Travel insurance",
+    "Lunches (except included seafood lunch)",
+    "Optional hammam experience",
+    "Personal shopping & tips",
+    "Moroccan visa (most EU/UK passport holders visa-free)",
+    "Beach camel ride (optional extra)",
+  ],
+  stops: [
+    {
+      destinationName: "Tangier",
+      dateRange: "Nov 01 – 03",
+      nights: 2,
+      description: "Morocco's gateway city — where the Mediterranean meets the Atlantic, and Africa faces Europe.",
+      accommodation: {
+        hotelName: "El Minzah Hotel",
+        stars: 5,
+        checkIn: "Nov 01", checkOut: "Nov 03",
+        checkInISO: "2026-11-01", checkOutISO: "2026-11-03",
+        roomType: "Sea View Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 35.7595, lng: -5.8340,
+    },
+    {
+      destinationName: "Chefchaouen",
+      dateRange: "Nov 03 – 05",
+      nights: 2,
+      description: "The blue pearl of Morocco — a photogenic mountain town where every surface is painted in vivid blue.",
+      accommodation: {
+        hotelName: "Lina Ryad & Spa",
+        stars: 4,
+        checkIn: "Nov 03", checkOut: "Nov 05",
+        checkInISO: "2026-11-03", checkOutISO: "2026-11-05",
+        roomType: "Superior Room", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 35.1688, lng: -5.2636,
+    },
+    {
+      destinationName: "Essaouira",
+      dateRange: "Nov 05 – 08",
+      nights: 3,
+      description: "Wind-swept Atlantic port town — Jimi Hendrix's retreat, with art galleries, fresh seafood, and world-class surfing.",
+      accommodation: {
+        hotelName: "Heure Bleue Palais",
+        stars: 5,
+        checkIn: "Nov 05", checkOut: "Nov 08",
+        checkInISO: "2026-11-05", checkOutISO: "2026-11-08",
+        roomType: "Deluxe Suite", boardType: "Buffet breakfast",
+      },
+      activities: [],
+      lat: 31.5085, lng: -9.7595,
+    },
+  ],
+  transfers: [
+    { from: "Tangier", to: "Chefchaouen", date: "Nov 03, coach", mode: "Private coach", description: "3h through the Rif Mountains" },
+    { from: "Chefchaouen", to: "Essaouira (via Fes)", date: "Nov 05, coach + flight", mode: "Coach + Flight", description: "3h coach to Fes + 1h 15m flight" },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Master lookup — used by App.tsx to find a Tour by tourId
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const ALL_TOURS: Tour[] = [
   SWISS_WINTER_TOUR,
   THAILAND_EXPLORER_TOUR,
+  THAILAND_ISLANDS_TOUR,
+  THAILAND_BANGKOK_TOUR,
+  THAILAND_NORTH_TOUR,
+  THAILAND_PHUKET_TOUR,
   BALI_DISCOVERY_TOUR,
+  BALI_BLISS_TOUR,
+  JAVA_BALI_TOUR,
+  LOMBOK_GILIS_TOUR,
   PERU_ADVENTURE_TOUR,
+  PERU_INCA_TRAIL_TOUR,
+  PERU_AMAZON_TOUR,
   JAPAN_HIGHLIGHTS_TOUR,
+  JAPAN_KYOTO_TOUR,
+  JAPAN_RAIL_TOUR,
   MOROCCO_IMPERIAL_TOUR,
+  MOROCCO_SAHARA_TOUR,
+  MOROCCO_COASTAL_TOUR,
   DUBAI_HIGHLIGHTS_TOUR,
   CANCUN_RIVIERA_TOUR,
   MALDIVES_ISLAND_TOUR,
@@ -1994,27 +4802,27 @@ export const ALL_TOURS: Tour[] = [
 ];
 
 // Maps a Discovery TourCardData.id to a Tour object.
-// Multiple cards can map to the same Tour (e.g. all Thailand cards → THAILAND_EXPLORER_TOUR).
+// Every card now points to its own unique tour (except 13/14/15 which are v2 copies).
 export const DISCOVERY_TOUR_MAP: Record<number, Tour> = {
   1:  THAILAND_EXPLORER_TOUR,   // Classic Thailand Explorer
   2:  BALI_DISCOVERY_TOUR,      // Cultural Bali Discovery
   3:  PERU_ADVENTURE_TOUR,      // Classic Peru Adventure
-  4:  THAILAND_EXPLORER_TOUR,   // Island Paradise (Thailand)
-  5:  PERU_ADVENTURE_TOUR,      // Inca Trail Adventure
-  6:  PERU_ADVENTURE_TOUR,      // Amazon & Andes
-  7:  THAILAND_EXPLORER_TOUR,   // Bangkok & Beyond
-  8:  THAILAND_EXPLORER_TOUR,   // Northern Thailand Highlights
-  9:  THAILAND_EXPLORER_TOUR,   // Phuket & the Islands
-  10: BALI_DISCOVERY_TOUR,      // Bali Bliss
-  11: BALI_DISCOVERY_TOUR,      // Java & Bali Explorer
-  12: BALI_DISCOVERY_TOUR,      // Lombok & the Gilis
-  13: PERU_ADVENTURE_TOUR,      // Classic Peru Adventure (v2)
-  14: PERU_ADVENTURE_TOUR,      // Inca Trail Adventure (v2)
-  15: PERU_ADVENTURE_TOUR,      // Amazon & Andes (v2)
-  16: JAPAN_HIGHLIGHTS_TOUR,    // Japan Highlights
-  17: JAPAN_HIGHLIGHTS_TOUR,    // Kyoto & Beyond
-  18: JAPAN_HIGHLIGHTS_TOUR,    // Japan Rail Adventure
-  19: MOROCCO_IMPERIAL_TOUR,    // Imperial Cities of Morocco
-  20: MOROCCO_IMPERIAL_TOUR,    // Sahara & Kasbahs
-  21: MOROCCO_IMPERIAL_TOUR,    // Coastal Morocco
+  4:  THAILAND_ISLANDS_TOUR,    // Island Paradise (Thailand)
+  5:  PERU_INCA_TRAIL_TOUR,    // Inca Trail Adventure
+  6:  PERU_AMAZON_TOUR,        // Amazon & Andes
+  7:  THAILAND_BANGKOK_TOUR,   // Bangkok & Beyond
+  8:  THAILAND_NORTH_TOUR,     // Northern Thailand Highlights
+  9:  THAILAND_PHUKET_TOUR,    // Phuket & the Islands
+  10: BALI_BLISS_TOUR,         // Bali Bliss
+  11: JAVA_BALI_TOUR,          // Java & Bali Explorer
+  12: LOMBOK_GILIS_TOUR,       // Lombok & the Gilis
+  13: PERU_ADVENTURE_TOUR,     // Classic Peru Adventure (v2 — same as id 3)
+  14: PERU_INCA_TRAIL_TOUR,    // Inca Trail Adventure (v2 — same as id 5)
+  15: PERU_AMAZON_TOUR,        // Amazon & Andes (v2 — same as id 6)
+  16: JAPAN_HIGHLIGHTS_TOUR,   // Japan Highlights
+  17: JAPAN_KYOTO_TOUR,        // Kyoto & Beyond
+  18: JAPAN_RAIL_TOUR,         // Japan Rail Adventure
+  19: MOROCCO_IMPERIAL_TOUR,   // Imperial Cities of Morocco
+  20: MOROCCO_SAHARA_TOUR,     // Sahara & Kasbahs
+  21: MOROCCO_COASTAL_TOUR,    // Coastal Morocco
 };

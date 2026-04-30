@@ -156,10 +156,12 @@ export interface TourDay {
   image?: string;       // Optional day photo
 }
 
-// Quick-fact attribute chip shown below the hero.
+// Quick-fact attribute shown in the Overview tab.
+// title = category label (e.g. "Duration"), value = the actual fact (e.g. "12 days").
 // iconKey maps to a Lucide icon in the component.
 export interface TourAttribute {
-  label: string;
+  title: string;
+  value: string;
   iconKey: "users" | "languages" | "activity" | "calendar-check";
 }
 
