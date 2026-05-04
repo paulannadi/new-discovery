@@ -20,7 +20,7 @@
 //   • Right sidebar: rounded-[16px], border + shadow, rate calendar
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { format } from "date-fns";
 import {
   MapPin,
@@ -32,7 +32,6 @@ import {
   Dumbbell,
   Waves,
   ChevronDown,
-  ChevronUp,
   CalendarDays,
   Pencil,
   Building2,
@@ -43,6 +42,7 @@ import {
   UtensilsCrossed,
   Users,
   Info,
+  X, // close icon for the mobile booking sheet
 } from "lucide-react";
 import { UnifiedPackage } from "../../../types";
 import type { HolidaySearchCriteria } from "../../../App";
@@ -509,11 +509,15 @@ export default function PackageDetailPage({
   // "Show on map" modal
   const [showMapModal, setShowMapModal] = useState(false);
 
-  // Mobile "Explore dates" accordion
-  const [mobileDatesExpanded, setMobileDatesExpanded] = useState(false);
-
-  // Date picker panel (for live/non-cached packages)
+  // Date picker panel — desktop sidebar (live/non-cached packages only)
   const [datePanelOpen, setDatePanelOpen] = useState(false);
+
+  // Mobile booking sheet — collapsed/expanded state, plus its own date panel
+  // so that the mobile and desktop date pickers can never collide on a tablet
+  // resize. The sheet ref is used by the outside-click effect below.
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  const [mobileDatePanelOpen, setMobileDatePanelOpen] = useState(false);
+  const mobileSheetRef = useRef<HTMLDivElement>(null);
 
   // ── Derived values ─────────────────────────────────────────────────────────
   const currSym = currencySymbol(pkg.price.currency);
@@ -537,6 +541,24 @@ export default function PackageDetailPage({
 
   // Rating in European decimal format (e.g. "4,3") — matches Figma
   const ratingEU = formatRatingEU(pkg.hotel.trustYou.rating);
+
+  // ── Outside-click closes the mobile booking sheet ──────────────────────────
+  // Same pattern as TourDetailPage. Only attached while the sheet is open so
+  // the listener doesn't fire on every page click.
+  useEffect(() => {
+    if (!mobileSheetOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (
+        mobileSheetRef.current &&
+        !mobileSheetRef.current.contains(e.target as Node)
+      ) {
+        setMobileSheetOpen(false);
+        setMobileDatePanelOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [mobileSheetOpen]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Render
@@ -1011,65 +1033,9 @@ export default function PackageDetailPage({
 
             </div>
 
-            {/* ── MOBILE: EXPLORE DATES (cached packages only) ──────────────
-                On desktop this lives in the right sticky sidebar.
-                On mobile, surfaced here as an accordion (same as v5). */}
-            {pkg.sourceMode === "cache" && pkg.rateCalendar && (
-              <div className="lg:hidden">
-                <div className="bg-card rounded-lg overflow-hidden shadow-sm">
-                  <button
-                    className="w-full flex items-center justify-between px-5 py-5"
-                    onClick={() =>
-                      setMobileDatesExpanded((prev) => !prev)
-                    }
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <CalendarDays size={16} className="text-primary" aria-hidden="true" />
-                        <span className="text-base font-bold text-foreground">
-                          Explore travel dates
-                        </span>
-                      </div>
-                      {!mobileDatesExpanded && (
-                        <div className="text-sm text-muted-foreground mt-1 ml-[24px]">
-                          {formatDate(selectedDate)} ·{" "}
-                          <span className="font-bold text-foreground">
-                            {currSym}{activePrice.toLocaleString()}/pp
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    {mobileDatesExpanded ? (
-                      <ChevronUp
-                        size={18}
-                        className="text-muted-foreground shrink-0"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <ChevronDown
-                        size={18}
-                        className="text-muted-foreground shrink-0"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </button>
-
-                  {mobileDatesExpanded && (
-                    <div className="px-5 pb-5 border-t border-border">
-                      <div className="pt-5">
-                        <RateCalendarPanel
-                          rateCalendar={pkg.rateCalendar}
-                          selectedDate={selectedDate}
-                          onSelectDate={setSelectedDate}
-                          currency={pkg.price.currency}
-                          nights={nights}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            {/* The old mobile "Explore travel dates" accordion lived here.
+                It's been replaced by the expandable booking sheet at the
+                bottom of the page (search for MOBILE BOOKING SHEET below). */}
 
           </div>
           {/* ╚═══════════════════════ END LEFT COLUMN ════════════════════╝ */}
@@ -1191,26 +1157,182 @@ export default function PackageDetailPage({
         </div>
       </div>
 
-      {/* Spacer so the sticky footer doesn't overlap the last content section on mobile */}
-      <div className="lg:hidden h-20" />
+      {/* Spacer so the sticky sheet doesn't overlap the last content section
+          on mobile. h-28 matches TourDetailPage — same two-line collapsed bar. */}
+      <div className="lg:hidden h-28" />
 
       {/* ══════════════════════════════════════════════════════════════════════
-          MOBILE STICKY FOOTER
-          Fixed bar at the bottom on mobile. Price left, CTA right.
+          MOBILE BOOKING SHEET — two states:
+            • Collapsed: price summary + "Personalise" button (always visible)
+            • Expanded:  slides up to reveal the date picker, then CTA
+
+          Mirrors the pattern in TourDetailPage so both pages feel consistent
+          on mobile. The sheet content branches on pkg.sourceMode:
+            • cache → RateCalendarPanel (scrollable, max-h-[55vh])
+            • non-cache (live) → DayPicker that opens *upward* + room summary
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border px-5 py-3 z-50 flex items-center justify-between gap-3 shadow-lg">
-        <div className="flex flex-col">
-          {/* Small grey label — same as hotel mobile footer */}
-          <span className="text-grey text-xs">{currSym}{activePrice.toLocaleString()} per person · {nights} nights</span>
-          {/* Bold total */}
-          <span className="text-foreground font-bold text-base">Total for {adults} adults: {currSym}{totalPrice.toLocaleString()}</span>
+
+      {/* Backdrop — only when expanded. Tap to close. */}
+      {mobileSheetOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-foreground/30 z-40 animate-in fade-in duration-200"
+          onClick={() => { setMobileSheetOpen(false); setMobileDatePanelOpen(false); }}
+          aria-hidden="true"
+        />
+      )}
+
+      <div
+        ref={mobileSheetRef}
+        className={cn(
+          "lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 shadow-lg transition-all duration-300 ease-out",
+          // Rounded top corners when expanded so it reads as a sheet
+          mobileSheetOpen ? "rounded-t-2xl" : ""
+        )}
+      >
+
+        {/* ── Collapsed bar — always visible ── */}
+        <div className="px-5 py-3 flex items-center justify-between gap-3">
+          <div className="flex flex-col flex-1 min-w-0">
+            {/* Small grey label — per-person rate + nights */}
+            <span className="text-grey text-xs">
+              {currSym}{activePrice.toLocaleString()} per person · {nights} nights
+            </span>
+            {/* Bold total */}
+            <span className="text-foreground font-bold text-base">
+              Total for {adults} adults: {currSym}{totalPrice.toLocaleString()}
+            </span>
+          </div>
+
+          {/* Collapsed: primary "Personalise" CTA opens the sheet */}
+          {!mobileSheetOpen && (
+            <button
+              onClick={() => setMobileSheetOpen(true)}
+              className="flex items-center gap-2 bg-primary hover:brightness-85 text-white font-bold text-sm px-5 py-3 rounded-lg transition-colors shrink-0"
+              aria-expanded={false}
+              aria-label="Open booking options"
+            >
+              Personalise
+            </button>
+          )}
+
+          {/* Expanded: subtle "Close" link in the top-right */}
+          {mobileSheetOpen && (
+            <button
+              onClick={() => { setMobileSheetOpen(false); setMobileDatePanelOpen(false); }}
+              className="flex items-center gap-1 text-primary text-sm font-semibold shrink-0"
+              aria-expanded={true}
+              aria-label="Close booking options"
+            >
+              Close <X size={16} aria-hidden="true" />
+            </button>
+          )}
         </div>
-        <button
-          onClick={() => onBook(pkg, selectedDate)}
-          className="bg-primary hover:brightness-85 text-white font-bold text-sm px-5 py-3 rounded-lg transition-colors whitespace-nowrap"
-        >
-          Personalise
-        </button>
+
+        {/* ── Expanded body — date selection + CTA ── */}
+        {mobileSheetOpen && (<>
+          <div className="px-5 pb-2 flex flex-col gap-3 animate-in slide-in-from-bottom-4 fade-in duration-200">
+
+            <p className="text-xs font-bold text-grey uppercase tracking-wide">
+              Pick your travel date
+            </p>
+
+            {pkg.sourceMode === "cache" && pkg.rateCalendar ? (
+              // ── Cached: scrollable rate calendar ──
+              // max-h keeps the sheet (and its CTA) on screen on small phones.
+              // overflow-y-auto, NOT overflow-hidden, so any tooltip/popover
+              // inside the calendar isn't clipped.
+              <div className="max-h-[55vh] overflow-y-auto">
+                <RateCalendarPanel
+                  rateCalendar={pkg.rateCalendar}
+                  selectedDate={selectedDate}
+                  onSelectDate={setSelectedDate}
+                  currency={pkg.price.currency}
+                  nights={nights}
+                />
+              </div>
+            ) : (
+              // ── Non-cached (live): single date picker + room summary ──
+              <div>
+                <p className="text-xs text-grey mb-3 leading-relaxed">
+                  This price is for a specific departure. Pick a different
+                  date to request an updated quote.
+                </p>
+                <div className="relative">
+                  <button
+                    onClick={() => setMobileDatePanelOpen(o => !o)}
+                    className={cn(
+                      "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                      mobileDatePanelOpen
+                        ? "border-primary ring-2 ring-primary/20 bg-card"
+                        : "border-border bg-card hover:border-primary"
+                    )}
+                  >
+                    <CalendarDays size={16} className="text-primary shrink-0" aria-hidden="true" />
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Travel date</span>
+                      <span className="text-xs font-semibold text-foreground truncate">
+                        {selectedDate ? format(new Date(selectedDate), "EEE, d MMM yyyy") : "Pick a date"}
+                      </span>
+                    </div>
+                    <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", mobileDatePanelOpen && "rotate-180")} aria-hidden="true" />
+                  </button>
+                  {mobileDatePanelOpen && (
+                    // bottom-[calc(100%+8px)] = opens upward so the calendar
+                    // isn't clipped against the bottom of the viewport.
+                    <div className="absolute bottom-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-150">
+                      <style>{`.rdp-root { --rdp-accent-color: hsl(var(--primary)); --rdp-accent-background-color: hsl(var(--primary) / 0.10); --rdp-day_button-border-radius: 6px; margin: 0; }`}</style>
+                      <DayPicker
+                        mode="single"
+                        selected={selectedDate ? new Date(selectedDate) : undefined}
+                        onSelect={(date) => {
+                          if (!date) return;
+                          setSelectedDate(format(date, "yyyy-MM-dd"));
+                          setMobileDatePanelOpen(false);
+                        }}
+                        disabled={{ before: new Date() }}
+                        numberOfMonths={1}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Compact room/board/cancellation summary */}
+                <div className="mt-3 bg-card border border-border rounded-lg p-3 flex flex-col gap-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-grey">Room</span>
+                    <span className="font-medium text-foreground text-right max-w-[55%]">
+                      {pkg.room.roomType}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-grey">Board</span>
+                    <span className="font-medium text-foreground">
+                      {pkg.room.boardType}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-grey">Cancellation</span>
+                    <span className="font-medium text-success">
+                      Free until 14 days
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+
+          {/* ── Primary CTA at the bottom of the expanded sheet ── */}
+          <div className="px-5 pb-4 pt-2">
+            <button
+              onClick={() => onBook(pkg, selectedDate)}
+              className="w-full bg-primary hover:brightness-85 text-white font-bold text-sm py-3.5 rounded-lg transition-colors"
+            >
+              Personalise Your Holiday
+            </button>
+          </div>
+        </>)}
+
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
