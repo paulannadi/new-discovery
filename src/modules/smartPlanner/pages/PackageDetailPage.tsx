@@ -485,6 +485,12 @@ const AMENITY_GROUPS = [
   },
 ];
 
+// Each section on the page has a stable id. The id is what the sticky nav
+// links to (#overview, #hotel-info, #reviews) and what the IntersectionObserver
+// reports back when a section scrolls into the active band.
+type SectionId = "overview" | "hotel-info" | "reviews";
+const SECTION_IDS: SectionId[] = ["overview", "hotel-info", "reviews"];
+
 // ─────────────────────────────────────────────────────────────────────────────
 // PackageDetailPage — main component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -518,6 +524,55 @@ export default function PackageDetailPage({
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
   const [mobileDatePanelOpen, setMobileDatePanelOpen] = useState(false);
   const mobileSheetRef = useRef<HTMLDivElement>(null);
+
+  // ── Sticky-tab nav state ──────────────────────────────────────────────
+  // Same pattern as TourDetailPage: three sections stacked vertically with
+  // a sticky tab bar that highlights the in-view section as the user scrolls.
+  // `activeSection` is driven by the IntersectionObserver below — clicks on
+  // the tabs only smooth-scroll, never set state directly.
+  // `Partial<Record<...>>` here (instead of a mapped type) because the
+  // "hotel-info" key has a hyphen and needs bracket access.
+  const [activeSection, setActiveSection] = useState<SectionId>("overview");
+  const [hoveredTab, setHoveredTab] = useState<SectionId | null>(null);
+  const tabBarRef = useRef<HTMLElement>(null);
+  const tabRefs = useRef<Partial<Record<SectionId, HTMLButtonElement | null>>>({});
+  const [tabIndicator, setTabIndicator] = useState({ left: 0, width: 0 });
+  const sectionRefs = useRef<Partial<Record<SectionId, HTMLElement | null>>>({});
+
+  // Update the sliding underline position whenever the active or hovered tab changes.
+  useEffect(() => {
+    const target = hoveredTab ?? activeSection;
+    const el = tabRefs.current[target];
+    if (el && tabBarRef.current) {
+      setTabIndicator({ left: el.offsetLeft, width: el.offsetWidth });
+    }
+  }, [activeSection, hoveredTab]);
+
+  // IntersectionObserver: which section is currently "in view"?
+  // rootMargin shrinks the observed band: -88px from the top (32px sticky
+  // offset + ~56px nav height = the area covered by the sticky bar) and
+  // -55% from the bottom (only count a section once it's reached the upper
+  // ~45% of the screen).
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length === 0) return;
+        const topmost = visible.reduce((a, b) =>
+          a.boundingClientRect.top < b.boundingClientRect.top ? a : b
+        );
+        setActiveSection(topmost.target.id as SectionId);
+      },
+      { rootMargin: "-88px 0px -55% 0px", threshold: 0 }
+    );
+
+    SECTION_IDS.forEach((id) => {
+      const el = sectionRefs.current[id];
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   // ── Derived values ─────────────────────────────────────────────────────────
   const currSym = currencySymbol(pkg.price.currency);
@@ -637,116 +692,66 @@ export default function PackageDetailPage({
             </button>
           </div>
 
-          {/* ── HOTEL INFO + PRICE ROW ─────────────────────────────────────────
-              Below the hero: a row layout with hotel identity on the LEFT
-              and the price/CTA block on the RIGHT.
-              This matches the Figma "Frame 1000002102" structure exactly.
+          {/* ── HOTEL IDENTITY ROW ──────────────────────────────────────────
+              Below the hero, just the hotel-identity column. The right-side
+              price + CTA block was removed — that information now lives only
+              in the always-visible booking widget (sidebar / mobile sheet).
+              The "Package details" pills also moved out — they're now a card
+              at the top of the Overview section.
           ──────────────────────────────────────────────────────────────────── */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 lg:gap-12 px-4 sm:px-6 md:px-10 pt-8 pb-5 md:pb-8">
+          <div className="flex flex-col gap-4 px-4 sm:px-6 md:px-10 pt-8 pb-5 md:pb-8">
 
-            {/* ── LEFT: Hotel identity + Package details ──────────────────── */}
-            <div className="flex flex-col gap-4">
+            {/* Quick facts row: rating badge + hotel name + stars */}
+            <div className="flex flex-col gap-1.5">
 
-              {/* Quick facts row: rating badge + hotel name + stars */}
-              {/* Figma node 6113:2448 "Quick facts" */}
-              <div className="flex flex-col gap-1.5">
-
-                {/* Rating badge — uses shared RatingBlock component (same as HotelDetailPage) */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  <RatingBlock
-                    reviewScore={pkg.hotel.trustYou.rating / 10}
-                    reviewCount={pkg.hotel.trustYou.reviewCount}
-                  />
-                  <button
-                    onClick={() => setReviewsOpen(true)}
-                    className="text-sm text-foreground underline hover:no-underline"
-                  >
-                    {pkg.hotel.trustYou.reviewCount.toLocaleString()} reviews
-                  </button>
-                </div>
-
-                {/* Hotel name + star rating — AccommodationStar handles full/half/empty star logic */}
-                <div className="flex items-baseline gap-2">
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground leading-[1.1] tracking-tight">
-                    {pkg.hotel.name}
-                  </h1>
-                  <AccommodationStar
-                    rating={pkg.hotel.category}
-                    offerName={pkg.hotel.name}
-                    size={16}
-                  />
-                </div>
-              </div>
-
-              {/* Duration + Location row — duration first, then location, then map link */}
-              <div className="flex items-center gap-4 text-base text-foreground flex-wrap">
-                <div className="flex items-center gap-1.5">
-                  <CalendarDays size={15} className="text-foreground shrink-0" aria-hidden="true" />
-                  <span>{nights} days</span>
-                </div>
-                <span className="text-border hidden sm:block">|</span>
-                <div className="flex items-center gap-1.5">
-                  <MapPin size={15} className="text-foreground shrink-0" aria-hidden="true" />
-                  <span>{pkg.hotel.location}</span>
-                </div>
-                {/* "Show on map" link — same style as TourDetailPage */}
+              {/* Rating badge — uses shared RatingBlock component (same as HotelDetailPage) */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <RatingBlock
+                  reviewScore={pkg.hotel.trustYou.rating / 10}
+                  reviewCount={pkg.hotel.trustYou.reviewCount}
+                />
                 <button
-                  onClick={() => setShowMapModal(true)}
-                  className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                  onClick={() => setReviewsOpen(true)}
+                  className="text-sm text-foreground underline hover:no-underline"
                 >
-                  <MapPinned size={14} aria-hidden="true" />
-                  Show on map
+                  {pkg.hotel.trustYou.reviewCount.toLocaleString()} reviews
                 </button>
               </div>
 
-              {/* Package details — Figma: small heading + 3-item list
-                  "Package details" heading (medium bold)
-                  Items: plane icon + "Return flights from London"
-                         building icon + "Superior Ocean View Room"
-                         utensils icon + "All Inclusive" */}
-              {/* Package details — horizontal row, no background, Lucide icons */}
-              <h3 className="text-lg font-bold text-foreground">Package details</h3>
-              <div className="flex flex-row flex-wrap gap-x-6 gap-y-2">
-                <div className="flex items-center gap-2 text-base text-foreground">
-                  <Plane size={15} className="text-foreground shrink-0" aria-hidden="true" />
-                  <span>Return flights from {pkg.flights.outbound.departureAirport}</span>
-                </div>
-                <div className="flex items-center gap-2 text-base text-foreground">
-                  <Building2 size={15} className="text-foreground shrink-0" aria-hidden="true" />
-                  <span>{pkg.room.roomType}</span>
-                </div>
-                <div className="flex items-center gap-2 text-base text-foreground">
-                  <Utensils size={15} className="text-foreground shrink-0" aria-hidden="true" />
-                  <span>{pkg.room.boardType}</span>
-                </div>
+              {/* Hotel name + star rating — AccommodationStar handles full/half/empty star logic */}
+              <div className="flex items-baseline gap-2">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground leading-[1.1] tracking-tight">
+                  {pkg.hotel.name}
+                </h1>
+                <AccommodationStar
+                  rating={pkg.hotel.category}
+                  offerName={pkg.hotel.name}
+                  size={16}
+                />
               </div>
             </div>
 
-            {/* ── RIGHT: Price + CTA ────────────────────────────────────────
-                Figma node 6115:4151 "Frame 10029" — price block on the right.
-                Contains: £828 bold + "per person" + "Flight + hotel · 7 nights"
-                          + "Total for 2 adults: £1,656" + CTA button
-                CTA: primary background, rounded-lg, white text
-            ──────────────────────────────────────────────────────────────── */}
-            <div className="flex flex-col gap-3 lg:min-w-[280px] lg:items-end lg:justify-end">
-
-              {/* Price block */}
-              <div className="flex flex-col items-end text-right">
-                {/* Small grey label: per-person rate + package details */}
-                <span className="text-grey text-xs">{currSym}{activePrice.toLocaleString()} per person · Flight + hotel · {nights} nights</span>
-                {/* Big bold total — same structure as hotel page */}
-                <span className="text-foreground font-bold text-2xl">Total for {adults} adults: {currSym}{totalPrice.toLocaleString()}</span>
+            {/* Duration + Location row — duration first, then location, then map link */}
+            <div className="flex items-center gap-4 text-base text-foreground flex-wrap">
+              <div className="flex items-center gap-1.5">
+                <CalendarDays size={15} className="text-foreground shrink-0" aria-hidden="true" />
+                <span>{nights} days</span>
               </div>
-
-              {/* CTA button — primary background, rounded-lg, white text */}
+              <span className="text-border hidden sm:block">|</span>
+              <div className="flex items-center gap-1.5">
+                <MapPin size={15} className="text-foreground shrink-0" aria-hidden="true" />
+                <span>{pkg.hotel.location}</span>
+              </div>
+              {/* "Show on map" link — same style as TourDetailPage */}
               <button
-                onClick={() => onBook(pkg, selectedDate)}
-                className="w-full lg:min-w-[280px] bg-primary hover:brightness-85 text-white font-bold text-base md:text-base py-3 md:py-4 px-4 md:px-6 rounded-lg transition-colors text-center"
+                onClick={() => setShowMapModal(true)}
+                className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
               >
-                Personalise Your Holiday
+                <MapPinned size={14} aria-hidden="true" />
+                Show on map
               </button>
-
             </div>
+
           </div>
         </div>
       </div>
@@ -759,18 +764,118 @@ export default function PackageDetailPage({
       ══════════════════════════════════════════════════════════════════════ */}
       <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8">
 
-        {/* ── "Hotel and flight information" H2 heading ─────────────────────
-            Main section heading before the content columns begin. */}
-        <h2 className="text-3xl font-bold text-foreground mb-6">
-          Hotel and flight information
-        </h2>
-
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 lg:gap-10 items-start">
 
           {/* ╔═══════════════════════════════════════════════════════════════
-              LEFT COLUMN — all the content sections
+              LEFT COLUMN — sticky nav + three stacked sections
           ═══════════════════════════════════════════════════════════════╗ */}
-          <div className="flex flex-col gap-6 min-w-0">
+          <div className="flex flex-col min-w-0">
+
+            {/* ── Sticky section nav — same pattern as TourDetailPage ──
+                Pinned at top:32 once the user scrolls past the hero. The
+                32px buffer above the nav at rest comes from the body's
+                py-8 padding. The cover strip (-top-8 absolute) extends the
+                grey UP into that buffer band when sticky, so any content
+                scrolling through can't peek out above the nav.
+
+                Background = bg-grey-lightest (matches the page body) so
+                content scrolling underneath visually disappears.
+
+                Negative side-margins + matching padding stretch the grey
+                full column-width, while the inner div keeps the bottom
+                hairline aligned to the content edges only.
+
+                z-30 sits above the Leaflet map (z-0) but below dialogs
+                (z-50). */}
+            <nav
+              ref={tabBarRef}
+              aria-label="Package sections"
+              className="sticky top-[32px] z-30 -mx-3 sm:-mx-4 md:-mx-8 px-3 sm:px-4 md:px-8 bg-grey-lightest mb-8"
+            >
+              {/* Cover strip — 32px tall, sits absolutely 32px above the nav
+                  so when the nav is pinned at top:32, the strip lands at
+                  top:0 covering the gap band. At rest it overlaps the
+                  body's py-8 padding (same grey, invisible). */}
+              <div
+                aria-hidden="true"
+                className="absolute -top-8 left-0 right-0 h-8 bg-grey-lightest"
+              />
+              {/* Inner wrapper at content-width — carries the bottom hairline
+                  AND is the offsetParent for the sliding underline. */}
+              <div className="relative flex gap-0 overflow-x-auto border-b border-border">
+                {SECTION_IDS.map((tab) => {
+                  const labels: Record<SectionId, string> = {
+                    overview:    "Overview",
+                    "hotel-info": "Hotel info",
+                    reviews:     "Reviews",
+                  };
+                  return (
+                    <button
+                      key={tab}
+                      ref={(el) => { tabRefs.current[tab] = el; }}
+                      onClick={() => sectionRefs.current[tab]?.scrollIntoView({ behavior: "smooth" })}
+                      onMouseEnter={() => setHoveredTab(tab)}
+                      onMouseLeave={() => setHoveredTab(null)}
+                      aria-current={activeSection === tab ? "true" : undefined}
+                      className={cn(
+                        "shrink-0 px-5 py-3 text-base font-bold whitespace-nowrap",
+                        activeSection === tab ? "text-primary" : "text-foreground"
+                      )}
+                    >
+                      {labels[tab]}
+                    </button>
+                  );
+                })}
+                {/* Sliding blue underline — animates between tabs */}
+                <div
+                  className="absolute bottom-0 h-[2.5px] bg-primary rounded-full transition-all duration-300 ease-out"
+                  style={{ left: tabIndicator.left, width: tabIndicator.width }}
+                />
+              </div>
+            </nav>
+
+            {/* ── All sections stacked vertically. Each <section> has:
+                  • a stable id (so #overview, #hotel-info, #reviews work as deep links)
+                  • a ref the IntersectionObserver attaches to
+                  • scroll-mt-[120px] so when we scroll TO this section, the
+                    heading lands BELOW the sticky nav with breathing room. */}
+            <div className="flex flex-col gap-12 md:gap-16">
+
+              {/* ── OVERVIEW ──────────────────────────────────────────────
+                  Package details pill card → Selected room → Selected flights */}
+              <section
+                id="overview"
+                ref={(el) => { sectionRefs.current.overview = el; }}
+                className="scroll-mt-[120px] flex flex-col gap-6"
+              >
+
+                <h3 className="text-xl font-bold text-foreground">
+                  What's included
+                </h3>
+
+                {/* Package details — pill badges in a card, mirroring the
+                    "Tour details" card on TourDetailPage. */}
+                <div className="bg-card rounded-xl shadow-sm overflow-visible">
+                  <div className="p-5">
+                    <p className="text-sm font-bold text-foreground mb-3">Package details</p>
+                    <div className="flex flex-wrap gap-2">
+                      <div className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3.5 py-2">
+                        <Plane size={15} className="text-primary shrink-0" aria-hidden="true" />
+                        <span className="text-sm text-foreground font-medium">
+                          Return flights from {pkg.flights.outbound.departureAirport}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3.5 py-2">
+                        <Building2 size={15} className="text-primary shrink-0" aria-hidden="true" />
+                        <span className="text-sm text-foreground font-medium">{pkg.room.roomType}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3.5 py-2">
+                        <Utensils size={15} className="text-primary shrink-0" aria-hidden="true" />
+                        <span className="text-sm text-foreground font-medium">{pkg.room.boardType}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
             {/* ── SELECTED ROOM ──────────────────────────────────────────────
                 Figma: "Selected room" heading (Heading Bold/H3) + "Change room"
@@ -869,10 +974,15 @@ export default function PackageDetailPage({
               </div>
             </div>
 
-            {/* ── HOTEL INFORMATION ─────────────────────────────────────────
-                Section heading + card with description, highlights, and map.
-            ──────────────────────────────────────────────────────────────── */}
-            <div>
+              </section>
+              {/* ── END #overview ────────────────────────────────────────── */}
+
+              {/* ── HOTEL INFO ───────────────────────────────────────────── */}
+              <section
+                id="hotel-info"
+                ref={(el) => { sectionRefs.current["hotel-info"] = el; }}
+                className="scroll-mt-[120px]"
+              >
               <h3 className="text-xl font-bold text-foreground mb-4">Hotel information</h3>
             <div className="bg-card rounded-lg shadow-sm overflow-hidden">
 
@@ -964,12 +1074,15 @@ export default function PackageDetailPage({
               </div>
 
             </div>
-            </div>
+              </section>
+              {/* ── END #hotel-info ──────────────────────────────────────── */}
 
-            {/* ── REVIEWS ───────────────────────────────────────────────────
-                Row layout, card, rounded-lg, shadow.
-                Left: score summary column. Right: horizontally scrollable review cards.
-            ──────────────────────────────────────────────────────────────── */}
+              {/* ── REVIEWS ──────────────────────────────────────────────── */}
+              <section
+                id="reviews"
+                ref={(el) => { sectionRefs.current.reviews = el; }}
+                className="scroll-mt-[120px] flex flex-col gap-4"
+              >
             <h3 className="text-xl font-bold text-foreground">Guest reviews</h3>
             <div className="bg-card rounded-lg shadow-xs flex flex-col md:flex-row gap-5 md:gap-10 p-4 md:py-6 md:pl-6 md:pr-0">
 
@@ -1032,6 +1145,11 @@ export default function PackageDetailPage({
               </div>
 
             </div>
+              </section>
+              {/* ── END #reviews ─────────────────────────────────────────── */}
+
+            </div>
+            {/* ── END sections wrapper ─────────────────────────────────── */}
 
             {/* The old mobile "Explore travel dates" accordion lived here.
                 It's been replaced by the expandable booking sheet at the
@@ -1045,7 +1163,7 @@ export default function PackageDetailPage({
               Contains: price summary + "Explore travel dates" section
               with calendar and CTA button.
           ═══════════════════════════════════════════════════════════════╗ */}
-          <div className="hidden lg:block sticky top-[64px] pt-2">
+          <div className="hidden lg:block sticky top-[32px]">
             {/* Sidebar card — bg-card, border, rounded-lg, shadow */}
             <div className="bg-card border border-border rounded-lg shadow-md">
 
