@@ -85,7 +85,11 @@ interface TourDetailPageProps {
   backLabel?: string;
 }
 
-type DetailTab = "overview" | "itinerary" | "highlights" | "included" | "excluded";
+// Each section on the page has a stable id. The id is what the sticky
+// nav links to (#overview, #itinerary, etc) and what the IntersectionObserver
+// reports back when a section scrolls into the active band.
+type SectionId = "overview" | "itinerary" | "highlights" | "included" | "excluded";
+const SECTION_IDS: SectionId[] = ["overview", "itinerary", "highlights", "included", "excluded"];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Component
@@ -127,22 +131,61 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
   const dateSummary = selectedDate ? format(selectedDate, "MMM d, yyyy") : tour.startDate;
   const travelDate  = selectedDate ? format(selectedDate, "MMM d, yyyy") : tour.startDate;
 
-  // Detail tabs — top-level tab bar with sliding indicator (matches Discovery page)
-  const [activeTab, setActiveTab] = useState<DetailTab>("overview");
-  const [hoveredTab, setHoveredTab] = useState<DetailTab | null>(null);
-  const tabBarRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<{ [key in DetailTab]?: HTMLButtonElement | null }>({});
+  // Section nav — sticky tab bar with sliding indicator (matches Discovery page).
+  // `activeSection` is now driven by scroll position via IntersectionObserver
+  // (set up in a useEffect below), NOT by clicks. Clicks only smooth-scroll
+  // to the target section; the IO updates `activeSection` as the page scrolls.
+  const [activeSection, setActiveSection] = useState<SectionId>("overview");
+  const [hoveredTab, setHoveredTab] = useState<SectionId | null>(null);
+  const tabBarRef = useRef<HTMLElement>(null);
+  const tabRefs = useRef<{ [key in SectionId]?: HTMLButtonElement | null }>({});
   const [tabIndicator, setTabIndicator] = useState({ left: 0, width: 0 });
 
-  // Update the sliding underline position whenever the active or hovered tab changes
+  // Refs for each <section> on the page — used both for smooth-scroll-on-click
+  // AND for the IntersectionObserver to track which section is in view.
+  const sectionRefs = useRef<{ [k in SectionId]?: HTMLElement | null }>({});
+
+  // Update the sliding underline position whenever the active section
+  // (scroll-driven) or the hovered tab (mouse-driven) changes.
   useEffect(() => {
-    const target = hoveredTab ?? activeTab;
+    const target = hoveredTab ?? activeSection;
     const el = tabRefs.current[target];
     const bar = tabBarRef.current;
     if (el && bar) {
       setTabIndicator({ left: el.offsetLeft, width: el.offsetWidth });
     }
-  }, [activeTab, hoveredTab]);
+  }, [activeSection, hoveredTab]);
+
+  // ── IntersectionObserver: which section is currently "in view"? ──
+  // We watch all five <section> elements. The rootMargin is the trick that
+  // makes this feel right: it shrinks the observed viewport from the top
+  // (to ignore the area covered by the app header + sticky nav) and from
+  // the bottom (so a section is only "active" when its top is in the
+  // upper part of the screen, not the very bottom).
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length === 0) return;
+        // Pick whichever intersecting section is closest to the top of the
+        // observed band — that's the one the user is reading right now.
+        const topmost = visible.reduce((a, b) =>
+          a.boundingClientRect.top < b.boundingClientRect.top ? a : b
+        );
+        setActiveSection(topmost.target.id as SectionId);
+      },
+      // top    -88px → ignore the 32px grey gap + ~56px sticky nav at the top
+      // bottom -55%  → only count a section once it's in the upper ~45% of the screen
+      { rootMargin: "-88px 0px -55% 0px", threshold: 0 }
+    );
+
+    SECTION_IDS.forEach((id) => {
+      const el = sectionRefs.current[id];
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const currency = sym(tour.price.currency);
   const totalPrice = tour.price.perPerson * adults;
@@ -289,49 +332,86 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
           ═══════════════════════════════════════════════════════════════╗ */}
           <div className="flex flex-col min-w-0">
 
-            {/* ── Tab bar — Discovery page style with sliding underline ──── */}
-            <div
+            {/* ── Sticky section nav — Discovery-style sliding underline ──
+                Pinned at top:0 of the viewport once the user scrolls past
+                the hero. The visible "32px breathing room" above the tab
+                buttons is `pt-8` INSIDE the nav (not a gap above it) — so
+                the entire 32px+nav strip is one opaque grey block. Why it
+                matters: if we left a real gap above the nav, content would
+                leak through that gap as it scrolled up. With pt-8 inside,
+                content disappears under the whole sticky block cleanly.
+
+                Background = bg-grey-lightest (matches the page body) so
+                the buffer + nav blend into the page — there's no card
+                boundary, just the tabs floating on the grey surface.
+
+                Negative side-margins + matching padding stretch the grey
+                full-width inside the column so the cover spans the entire
+                content width.
+
+                z-30 keeps it above the Leaflet map (z-0) but below dialogs
+                (z-50). */}
+            <nav
               ref={tabBarRef}
-              className="relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto"
+              aria-label="Tour sections"
+              className="sticky top-0 z-30 -mx-3 sm:-mx-4 md:-mx-8 px-3 sm:px-4 md:px-8 pt-8 bg-grey-lightest mb-8"
             >
-              {(["overview", "itinerary", "highlights", "included", "excluded"] as DetailTab[]).map((tab) => {
-                const labels: Record<DetailTab, string> = {
-                  overview:   "Overview",
-                  itinerary:  "Itinerary",
-                  highlights: "Highlights",
-                  included:   "Included",
-                  excluded:   "Excluded",
-                };
-                return (
-                  <button
-                    key={tab}
-                    ref={(el) => { tabRefs.current[tab] = el; }}
-                    onClick={() => setActiveTab(tab)}
-                    onMouseEnter={() => setHoveredTab(tab)}
-                    onMouseLeave={() => setHoveredTab(null)}
-                    className={cn(
-                      "shrink-0 px-5 py-3 text-base font-bold whitespace-nowrap",
-                      activeTab === tab ? "text-primary" : "text-foreground"
-                    )}
-                  >
-                    {labels[tab]}
-                  </button>
-                );
-              })}
-              {/* Sliding blue underline — animates between tabs */}
-              <div
-                className="absolute bottom-0 h-[2.5px] bg-primary rounded-full transition-all duration-300 ease-out"
-                style={{ left: tabIndicator.left, width: tabIndicator.width }}
-              />
-            </div>
+              {/* Inner wrapper at content-width — carries the bottom hairline
+                  AND is the offsetParent for the sliding underline. We split
+                  the nav this way so the GREY BG can extend to the column
+                  edges (covering scrolled content) while the LINE stops
+                  exactly where the tab buttons stop. */}
+              <div className="relative flex gap-0 overflow-x-auto border-b border-border">
+                {SECTION_IDS.map((tab) => {
+                  const labels: Record<SectionId, string> = {
+                    overview:   "Overview",
+                    itinerary:  "Itinerary",
+                    highlights: "Highlights",
+                    included:   "Included",
+                    excluded:   "Excluded",
+                  };
+                  return (
+                    <button
+                      key={tab}
+                      ref={(el) => { tabRefs.current[tab] = el; }}
+                      // Smooth-scroll to the corresponding <section>. The IO
+                      // will pick up the new active section as the page scrolls.
+                      onClick={() => sectionRefs.current[tab]?.scrollIntoView({ behavior: "smooth" })}
+                      onMouseEnter={() => setHoveredTab(tab)}
+                      onMouseLeave={() => setHoveredTab(null)}
+                      aria-current={activeSection === tab ? "true" : undefined}
+                      className={cn(
+                        "shrink-0 px-5 py-3 text-base font-bold whitespace-nowrap",
+                        activeSection === tab ? "text-primary" : "text-foreground"
+                      )}
+                    >
+                      {labels[tab]}
+                    </button>
+                  );
+                })}
+                {/* Sliding blue underline — animates between tabs */}
+                <div
+                  className="absolute bottom-0 h-[2.5px] bg-primary rounded-full transition-all duration-300 ease-out"
+                  style={{ left: tabIndicator.left, width: tabIndicator.width }}
+                />
+              </div>
+            </nav>
 
-            {/* ── Tab content panels ─────────────────────────────────────── */}
+            {/* ── All sections, stacked vertically ──────────────────────
+                Each <section> has:
+                  • a stable id (so #overview, #itinerary, etc. work as deep links)
+                  • a ref the IntersectionObserver attaches to
+                  • scroll-mt-[120px] so when we scroll TO this section,
+                    the heading lands just below the ~56px sticky nav
+                    with a bit of breathing room, not jammed under it. */}
+            <div className="flex flex-col gap-12 md:gap-16">
 
-            {/* Overview — highlights pills, tour route with stops + map */}
-            {activeTab === "overview" && (
-              <div className="flex flex-col gap-6">
-
-                {/* Section title — matches the "Day by day adventures" style on the Itinerary tab */}
+              {/* Overview — tour details pills + tour route map */}
+              <section
+                id="overview"
+                ref={(el) => { sectionRefs.current.overview = el; }}
+                className="scroll-mt-[120px] flex flex-col gap-6"
+              >
                 <h3 className="text-xl font-bold text-foreground">
                   Your journey at a glance
                 </h3>
@@ -394,62 +474,73 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
                   </div>
                 </div>
+              </section>
 
-              </div>
-            )}
+              {/* Itinerary — day-by-day accordion */}
+              <section
+                id="itinerary"
+                ref={(el) => { sectionRefs.current.itinerary = el; }}
+                className="scroll-mt-[120px]"
+              >
+                <DayByDaySection days={tour.days} slug={slug} />
+              </section>
 
-            {/* Itinerary — day-by-day accordion */}
-            {activeTab === "itinerary" && (
-              <DayByDaySection days={tour.days} slug={slug} />
-            )}
-
-            {/* Highlights */}
-            {activeTab === "highlights" && (
-              <div className="flex flex-col gap-6">
+              {/* Highlights */}
+              <section
+                id="highlights"
+                ref={(el) => { sectionRefs.current.highlights = el; }}
+                className="scroll-mt-[120px] flex flex-col gap-6"
+              >
                 <h3 className="text-xl font-bold text-foreground">
                   Moments you won't forget
                 </h3>
                 <div className="bg-card rounded-xl shadow-sm p-5">
                   <InfoList title="Tour highlights" items={tour.highlights} variant="highlight" />
                 </div>
-              </div>
-            )}
+              </section>
 
-            {/* Included */}
-            {activeTab === "included" && (
-              <div className="flex flex-col gap-6">
+              {/* Included */}
+              <section
+                id="included"
+                ref={(el) => { sectionRefs.current.included = el; }}
+                className="scroll-mt-[120px] flex flex-col gap-6"
+              >
                 <h3 className="text-xl font-bold text-foreground">
                   Everything taken care of
                 </h3>
                 <div className="bg-card rounded-xl shadow-sm p-5">
                   <InfoList title="What's included" items={tour.included} variant="check" />
                 </div>
-              </div>
-            )}
+              </section>
 
-            {/* Excluded */}
-            {activeTab === "excluded" && (
-              <div className="flex flex-col gap-6">
+              {/* Excluded */}
+              <section
+                id="excluded"
+                ref={(el) => { sectionRefs.current.excluded = el; }}
+                className="scroll-mt-[120px] flex flex-col gap-6"
+              >
                 <h3 className="text-xl font-bold text-foreground">
                   Good to know before you go
                 </h3>
                 <div className="bg-card rounded-xl shadow-sm p-5">
                   <InfoList title="Not included" items={tour.excluded} variant="cross" />
                 </div>
-              </div>
-            )}
+              </section>
+
+            </div>
 
           </div>
           {/* ╚═══════════════════════ END LEFT COLUMN ════════════════════╝ */}
 
           {/* ╔═══════════════════════════════════════════════════════════════
               RIGHT COLUMN — STICKY BOOKING WIDGET SIDEBAR
-              Identical container to the rate calendar sidebar in PackageDetailPage:
-                bg-card, border border-border, rounded-xl,
-                shadow-md, overflow-hidden
-              Sits at sticky top-[64px], hidden on mobile (has footer instead).
+              Same container style as the rate calendar in PackageDetailPage
+              (bg-card, rounded-xl, shadow-md). Pins at top:0 — exactly
+              the same Y as the sticky tabs in the left column, so the
+              two visually align as a single horizontal band when stuck.
+              Hidden on mobile (the bottom-sheet footer takes over).
           ═══════════════════════════════════════════════════════════════╗ */}
-          <div className="hidden lg:block sticky top-[64px] pt-2">
+          <div className="hidden lg:block sticky top-[32px]">
             <div className="bg-card border border-border rounded-xl shadow-md">
 
               {/* ── Price summary ── */}
