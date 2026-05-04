@@ -833,7 +833,7 @@ export const NON_CACHED_PACKAGES_BY_DESTINATION: Record<string, UnifiedPackage[]
         },
       },
       price: { perPerson: 1349, total: 2698, currency: "GBP" },
-      tripType: "individual-tour",
+      tripType: "hotel-flight",
     },
     {
       packageId: "pkg_nc_ph002",

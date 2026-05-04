@@ -8,6 +8,9 @@ import PackageSearchForm from "../components/PackageSearchForm";
 import heroBg from "../../../../assets/discovery-background.jpg";
 // Real tour images from mock data — each card now shows the actual destination photo
 import { DISCOVERY_TOUR_MAP } from "../../../mocks/tours";
+// Destination registry — used to resolve a card's destCode into the full label
+// and isCached flag that the search hook expects.
+import { DESTINATIONS } from "../../../mocks/destinations";
 import {
   Building2,
   Plane,
@@ -303,44 +306,49 @@ const POPULAR_DESTINATIONS = [
 ];
 
 // Holiday destination inspiration cards — clicking pre-fills the search form and goes to results
+//
+// `destCode` is the key from DESTINATIONS used to look up the full search label
+// (e.g. "Cancún, Mexico") and isCached flag at click time. Without this, the
+// destination filter in useUnifiedSearch wouldn't match any packages and the
+// list would come back empty.
 const HOLIDAY_DESTINATIONS = [
   {
-    id: 1, destination: "Maldives", country: "Maldives", flag: "mv",
+    id: 1, destination: "Maldives", country: "Maldives", flag: "mv", destCode: "MALDIVES",
     // Maldives — overwater bungalows on crystal-clear turquoise lagoon
     image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&h=600&fit=crop&auto=format",
     desc: "Escape to an exclusive overwater villa with crystal-clear lagoons, world-class diving, and total seclusion.",
     nights: 7, price: "from £1,899",
   },
   {
-    id: 2, destination: "Santorini", country: "Greece", flag: "gr",
+    id: 2, destination: "Santorini", country: "Greece", flag: "gr", destCode: "SANTORINI",
     // Santorini — white-washed buildings with iconic blue domed church
     image: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=800&h=600&fit=crop&auto=format",
     desc: "Iconic white-washed clifftop suites with infinity pools overlooking the famous Santorini caldera.",
     nights: 7, price: "from £1,249",
   },
   {
-    id: 3, destination: "Bali", country: "Indonesia", flag: "id",
+    id: 3, destination: "Bali", country: "Indonesia", flag: "id", destCode: "BALI",
     // Bali — lush green rice terraces in Ubud
     image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&h=600&fit=crop&auto=format",
     desc: "Beachfront luxury with tropical gardens, private pools, and vibrant Seminyak dining on your doorstep.",
     nights: 10, price: "from £1,499",
   },
   {
-    id: 4, destination: "Cancún", country: "Mexico", flag: "mx",
+    id: 4, destination: "Cancún", country: "Mexico", flag: "mx", destCode: "CANCUN",
     // Cancún — turquoise Caribbean beach with white sand
     image: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=800&h=600&fit=crop&auto=format",
     desc: "All-inclusive beachfront resort with direct Caribbean Sea access and nightly entertainment.",
     nights: 7, price: "from £1,099",
   },
   {
-    id: 5, destination: "Dubai", country: "UAE", flag: "ae",
+    id: 5, destination: "Dubai", country: "UAE", flag: "ae", destCode: "DUBAI",
     // Dubai — Burj Khalifa and modern skyline at dusk
     image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&h=600&fit=crop&auto=format",
     desc: "Iconic resort on Palm Jumeirah with a private beach, waterpark, and world-famous restaurants.",
     nights: 7, price: "from £999",
   },
   {
-    id: 6, destination: "Phuket", country: "Thailand", flag: "th",
+    id: 6, destination: "Phuket", country: "Thailand", flag: "th", destCode: "PHUKET",
     // Phuket — tropical Thai beach with limestone karsts
     image: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&h=600&fit=crop&auto=format",
     desc: "Secluded luxury on a private bay with stunning ocean views, villa pools, and impeccable Thai hospitality.",
@@ -2019,24 +2027,34 @@ export default function DiscoveryPage({
 
             {activeTripType === "hotel-flight" && (
               <div className="pl-[max(1rem,calc((100vw-75rem)/2))] md:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
-                {HOLIDAY_DESTINATIONS.map((dest) => (
-                  <div key={dest.id} className="shrink-0 w-[320px] snap-start">
-                    <HolidayCard
-                      dest={dest}
-                      onSelect={() => onHolidaySearch({
-                        from: "London (LHR)",
-                        to: dest.destination,
-                        isCachedDestination: false,
-                        dateMode: "specific",
-                        dateRange: undefined,
-                        selectedMonths: [],
-                        nights: dest.nights,
-                        adults: 2,
-                        children: 0,
-                      })}
-                    />
-                  </div>
-                ))}
+                {HOLIDAY_DESTINATIONS.map((dest) => {
+                  // Resolve the card's destCode to its full DESTINATIONS entry
+                  // so we pass the correct search label (e.g. "Cancún, Mexico")
+                  // and the right isCachedDestination flag — otherwise the
+                  // search hook can't match any packages and results come back empty.
+                  const destEntry = DESTINATIONS.find((d) => d.code === dest.destCode);
+                  return (
+                    <div key={dest.id} className="shrink-0 w-[320px] snap-start">
+                      <HolidayCard
+                        dest={dest}
+                        onSelect={() => onHolidaySearch({
+                          from: "London (LHR)",
+                          to: destEntry?.label ?? dest.destination,
+                          isCachedDestination: destEntry?.isCached ?? false,
+                          dateMode: "specific",
+                          dateRange: undefined,
+                          selectedMonths: [],
+                          nights: dest.nights,
+                          adults: 2,
+                          children: 0,
+                          // Pre-activate the Hotel + Flight filter on HolidayListPage
+                          // since these cards live under the Hotel + Flight tab.
+                          initialFilters: { tripType: "hotel-flight" },
+                        })}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             )}
 
