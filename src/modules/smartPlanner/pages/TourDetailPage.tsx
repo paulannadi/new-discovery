@@ -331,6 +331,11 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
             {activeTab === "overview" && (
               <div className="flex flex-col gap-6">
 
+                {/* Section title — matches the "Day by day adventures" style on the Itinerary tab */}
+                <h3 className="text-xl font-bold text-foreground">
+                  Your journey at a glance
+                </h3>
+
                 {/* ── Single card: Tour details pills + divider + Tour route ── */}
                 <div className="bg-card rounded-xl shadow-sm overflow-visible">
 
@@ -400,22 +405,37 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
             {/* Highlights */}
             {activeTab === "highlights" && (
-              <div className="bg-card rounded-xl shadow-sm p-5">
-                <InfoList title="Tour highlights" items={tour.highlights} variant="highlight" />
+              <div className="flex flex-col gap-6">
+                <h3 className="text-xl font-bold text-foreground">
+                  Moments you won't forget
+                </h3>
+                <div className="bg-card rounded-xl shadow-sm p-5">
+                  <InfoList title="Tour highlights" items={tour.highlights} variant="highlight" />
+                </div>
               </div>
             )}
 
             {/* Included */}
             {activeTab === "included" && (
-              <div className="bg-card rounded-xl shadow-sm p-5">
-                <InfoList title="What's included" items={tour.included} variant="check" />
+              <div className="flex flex-col gap-6">
+                <h3 className="text-xl font-bold text-foreground">
+                  Everything taken care of
+                </h3>
+                <div className="bg-card rounded-xl shadow-sm p-5">
+                  <InfoList title="What's included" items={tour.included} variant="check" />
+                </div>
               </div>
             )}
 
             {/* Excluded */}
             {activeTab === "excluded" && (
-              <div className="bg-card rounded-xl shadow-sm p-5">
-                <InfoList title="Not included" items={tour.excluded} variant="cross" />
+              <div className="flex flex-col gap-6">
+                <h3 className="text-xl font-bold text-foreground">
+                  Good to know before you go
+                </h3>
+                <div className="bg-card rounded-xl shadow-sm p-5">
+                  <InfoList title="Not included" items={tour.excluded} variant="cross" />
+                </div>
               </div>
             )}
 
