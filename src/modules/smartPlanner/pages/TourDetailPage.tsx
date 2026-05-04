@@ -23,12 +23,13 @@ import {
   Check,
   MapPinned,
   Hotel,
-  Bus,
+  Bus,  
   ChevronDown,
 
   Plus,
   Minus,
   X,
+  LayoutGrid,
 } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
@@ -47,6 +48,11 @@ import L from "leaflet";
 import type { Tour, TourAttribute, TourDay, TourDayItem, TourStop } from "../../../types";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
+
+// Reads the --primary CSS variable so we can pass it to non-Tailwind props (e.g. Leaflet)
+function getPrimaryColor(): string {
+  return getComputedStyle(document.documentElement).getPropertyValue("--primary").trim() || "#2681ff";
+}
 
 function sym(currency: string): string {
   const map: Record<string, string> = { GBP: "£", USD: "$", EUR: "€", CHF: "CHF " };
@@ -218,17 +224,18 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               {/* 2×2 thumbnail grid — desktop only, clicking opens the modal */}
               <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-2">
                 {galleryImages.slice(1, 5).map((url, i) => (
-                  <div
+                  <button
                     key={url}
                     className="overflow-hidden rounded-xl cursor-pointer group"
                     onClick={() => setPhotosOpen(true)}
+                    aria-label={`View tour photo ${i + 2}`}
                   >
                     <img
                       src={url}
                       alt={`Tour photo ${i + 2}`}
                       className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
                     />
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -236,9 +243,9 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
             {/* "See all photos" button — overlaid bottom-right, same as PackageDetailPage */}
             <button
               onClick={() => setPhotosOpen(true)}
-              className="absolute bottom-4 right-4 bg-white border border-primary text-primary text-sm font-semibold px-4 py-2 rounded-sm flex items-center gap-2 hover:bg-primary hover:text-white transition-colors shadow-sm"
+              className="absolute bottom-4 right-4 bg-card border border-primary text-primary text-sm font-semibold px-4 py-2 rounded-md flex items-center gap-2 hover:bg-primary hover:text-white transition-colors shadow-sm"
             >
-              ⊞ See all photos
+              <LayoutGrid size={16} aria-hidden="true" /> See all photos
             </button>
           </div>
 
@@ -450,7 +457,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   <button
                     onClick={() => setOpenPanel(openPanel === "date" ? null : "date")}
                     className={cn(
-                      "h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                      "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
                       openPanel === "date"
                         ? "border-primary ring-2 ring-primary/20 bg-card"
                         : "border-border bg-card hover:border-primary"
@@ -492,7 +499,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   <button
                     onClick={() => setOpenPanel(openPanel === "guests" ? null : "guests")}
                     className={cn(
-                      "h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                      "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
                       openPanel === "guests"
                         ? "border-primary ring-2 ring-primary/20 bg-card"
                         : "border-border bg-card hover:border-primary"
@@ -528,17 +535,17 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                               onClick={() => set(Math.max(min, value - 1))}
                               disabled={value <= min}
                               className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-30"
-                              aria-hidden="true"
+                              aria-label={`Decrease ${label}`}
                             >
-                              <Minus size={14} />
+                              <Minus size={14} aria-hidden="true" />
                             </button>
                             <span className="text-base font-bold text-foreground w-4 text-center">{value}</span>
                             <button
                               onClick={() => set(Math.min(9, value + 1))}
                               className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors"
-                              aria-hidden="true"
+                              aria-label={`Increase ${label}`}
                             >
-                              <Plus size={14} />
+                              <Plus size={14} aria-hidden="true" />
                             </button>
                           </div>
                         </div>
@@ -558,7 +565,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   <button
                     onClick={() => setOpenPanel(openPanel === "hotel" ? null : "hotel")}
                     className={cn(
-                      "h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                      "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
                       openPanel === "hotel"
                         ? "border-primary ring-2 ring-primary/20 bg-card"
                         : "border-border bg-card hover:border-primary"
@@ -574,7 +581,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                     <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "hotel" && "rotate-180")} aria-hidden="true" />
                   </button>
                   {openPanel === "hotel" && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-sm shadow-md z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-md z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                       {["Standard", "Superior", "Deluxe", "Luxury"].map((opt) => (
                         <button
                           key={opt}
@@ -693,7 +700,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               <button
                 onClick={() => setOpenPanel(openPanel === "date" ? null : "date")}
                 className={cn(
-                  "h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
                   openPanel === "date"
                     ? "border-primary ring-2 ring-primary/20 bg-card"
                     : "border-border bg-card hover:border-primary"
@@ -731,7 +738,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               <button
                 onClick={() => setOpenPanel(openPanel === "guests" ? null : "guests")}
                 className={cn(
-                  "h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
                   openPanel === "guests"
                     ? "border-primary ring-2 ring-primary/20 bg-card"
                     : "border-border bg-card hover:border-primary"
@@ -765,15 +772,17 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                           onClick={() => set(Math.max(min, value - 1))}
                           disabled={value <= min}
                           className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-30"
+                          aria-label={`Decrease ${label}`}
                         >
-                          <Minus size={14} />
+                          <Minus size={14} aria-hidden="true" />
                         </button>
                         <span className="text-base font-bold text-foreground w-4 text-center">{value}</span>
                         <button
                           onClick={() => set(Math.min(9, value + 1))}
                           className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors"
+                          aria-label={`Increase ${label}`}
                         >
-                          <Plus size={14} />
+                          <Plus size={14} aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -793,7 +802,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               <button
                 onClick={() => setOpenPanel(openPanel === "hotel" ? null : "hotel")}
                 className={cn(
-                  "h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
                   openPanel === "hotel"
                     ? "border-primary ring-2 ring-primary/20 bg-card"
                     : "border-border bg-card hover:border-primary"
@@ -809,7 +818,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
               {/* Hotel options — opens upward on mobile */}
               {openPanel === "hotel" && (
-                <div className="absolute bottom-full left-0 right-0 mb-1 bg-card border border-border rounded-sm shadow-md z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute bottom-full left-0 right-0 mb-1 bg-card border border-border rounded-lg shadow-md z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                   {["Standard", "Superior", "Deluxe", "Luxury"].map((opt) => (
                     <button
                       key={opt}
@@ -857,7 +866,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               <img
                 src={galleryImages[0]}
                 alt={tour.title}
-                className="w-full aspect-[16/7] object-cover rounded-[16px]"
+                className="w-full aspect-[16/7] object-cover rounded-2xl"
               />
             </div>
             {/* Extra gallery images — 2-col grid, sourced from day photos + gallery */}
@@ -869,7 +878,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                 key={url}
                 src={url}
                 alt={`Tour photo ${i + 2}`}
-                className="w-full aspect-[4/3] object-cover rounded-[16px]"
+                className="w-full aspect-[4/3] object-cover rounded-2xl"
               />
             ))}
           </div>
@@ -888,10 +897,11 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 // Creates a circular numbered pin (e.g. "1", "2") for each stop on the map.
 // Blue circle with white number — visually ties back to the day pills.
 function createDayPinIcon(dayNumber: number) {
+  // Uses the CSS variable --primary so the pin colour stays in sync with the theme
   const html = `
     <div style="
       width: 28px; height: 28px;
-      background: #2681FF;
+      background: var(--primary);
       color: white;
       border: 3px solid white;
       border-radius: 50%;
@@ -956,7 +966,7 @@ function TourRouteMap({ stops }: { stops: TourStop[] }) {
             {/* Route line connecting all stops in order */}
             <Polyline
               positions={routePositions}
-              pathOptions={{ color: "#2681FF", weight: 3, opacity: 0.7, dashArray: "8 6" }}
+              pathOptions={{ color: getPrimaryColor(), weight: 3, opacity: 0.7, dashArray: "8 6" }}
             />
 
             {/* Numbered day pins for each stop */}
@@ -1011,7 +1021,7 @@ function TourRouteMapInline({ stops }: { stops: TourStop[] }) {
       <MapFitter positions={routePositions} />
       <Polyline
         positions={routePositions}
-        pathOptions={{ color: "#2681FF", weight: 3, opacity: 0.7, dashArray: "8 6" }}
+        pathOptions={{ color: getPrimaryColor(), weight: 3, opacity: 0.7, dashArray: "8 6" }}
       />
       {stopsWithCoords.map((stop, i) => (
         <Marker
@@ -1162,10 +1172,10 @@ function InfoList({ title, items, variant }: {
           <div key={item} className="flex items-start gap-3">
             <div className={cn(
               "w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5",
-              variant === "cross" ? "bg-red-50" : "bg-success/10"
+              variant === "cross" ? "bg-danger/10" : "bg-success/10"
             )}>
               {variant === "cross"
-                ? <span className="text-red-400 text-xs font-bold leading-none">✕</span>
+                ? <X size={11} className="text-danger" aria-hidden="true" />
                 : <Check size={11} className="text-success" aria-hidden="true" />
               }
             </div>
