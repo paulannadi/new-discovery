@@ -174,7 +174,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
         );
         setActiveSection(topmost.target.id as SectionId);
       },
-      // top    -88px → ignore the 32px grey gap + ~56px sticky nav at the top
+      // top    -88px → ignore the 32px sticky offset + ~56px sticky nav
       // bottom -55%  → only count a section once it's in the upper ~45% of the screen
       { rootMargin: "-88px 0px -55% 0px", threshold: 0 }
     );
@@ -334,28 +334,35 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
             {/* ── Sticky section nav — Discovery-style sliding underline ──
                 Pinned at top:0 of the viewport once the user scrolls past
-                the hero. The visible "32px breathing room" above the tab
-                buttons is `pt-8` INSIDE the nav (not a gap above it) — so
-                the entire 32px+nav strip is one opaque grey block. Why it
-                matters: if we left a real gap above the nav, content would
-                leak through that gap as it scrolled up. With pt-8 inside,
-                content disappears under the whole sticky block cleanly.
+                the hero. The 32px of grey breathing room you see above the
+                tabs at rest comes from the body wrapper's py-8 padding (the
+                grid container above) — it scrolls away naturally, so when
+                stuck the nav sits flush at the very top.
 
                 Background = bg-grey-lightest (matches the page body) so
-                the buffer + nav blend into the page — there's no card
-                boundary, just the tabs floating on the grey surface.
+                content scrolling up beneath the nav visually "disappears"
+                behind it.
 
                 Negative side-margins + matching padding stretch the grey
-                full-width inside the column so the cover spans the entire
-                content width.
+                full-width inside the column so the disappearing effect
+                covers the entire content width.
 
                 z-30 keeps it above the Leaflet map (z-0) but below dialogs
                 (z-50). */}
             <nav
               ref={tabBarRef}
               aria-label="Tour sections"
-              className="sticky top-0 z-30 -mx-3 sm:-mx-4 md:-mx-8 px-3 sm:px-4 md:px-8 pt-8 bg-grey-lightest mb-8"
+              className="sticky top-[32px] z-30 -mx-3 sm:-mx-4 md:-mx-8 px-3 sm:px-4 md:px-8 bg-grey-lightest mb-8"
             >
+              {/* Cover strip — sits 32px ABOVE the nav. When the nav is
+                  pinned at top:32, this lands at top:0 and covers the gap
+                  band (hiding any section heading scrolling through it).
+                  At rest, it overlaps the body wrapper's py-8 padding —
+                  same grey, so it's invisible and adds no extra height. */}
+              <div
+                aria-hidden="true"
+                className="absolute -top-8 left-0 right-0 h-8 bg-grey-lightest"
+              />
               {/* Inner wrapper at content-width — carries the bottom hairline
                   AND is the offsetParent for the sliding underline. We split
                   the nav this way so the GREY BG can extend to the column
@@ -535,9 +542,10 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
           {/* ╔═══════════════════════════════════════════════════════════════
               RIGHT COLUMN — STICKY BOOKING WIDGET SIDEBAR
               Same container style as the rate calendar in PackageDetailPage
-              (bg-card, rounded-xl, shadow-md). Pins at top:0 — exactly
-              the same Y as the sticky tabs in the left column, so the
-              two visually align as a single horizontal band when stuck.
+              (bg-card, rounded-xl, shadow-md). Pins at top:0 — same Y as
+              the sticky tabs, so they align as a single horizontal band
+              when stuck. The 32px grey buffer above both at rest comes
+              from the body wrapper's py-8 padding above this grid.
               Hidden on mobile (the bottom-sheet footer takes over).
           ═══════════════════════════════════════════════════════════════╗ */}
           <div className="hidden lg:block sticky top-[32px]">
