@@ -17,6 +17,9 @@ import {
 import { format, addDays, parseISO } from "date-fns";
 import { Button } from "../../../shared/components/ui/button";
 import { cn } from "../../../shared/components/ui/utils";
+// Activity is a new starting-context source — Discovery → Activities tab →
+// ActivityListPage → ActivityDetailPage → "Start planning" lands here.
+import type { Activity } from "../../../types";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -84,6 +87,10 @@ export type StartingContext =
   | { type: "hotel"; hotel: HotelData; nights: number }
   | { type: "flight"; flight: FlightData }
   | { type: "holiday"; pkg: HolidayPackageData }
+  // The Activity object is rich enough that we don't need a separate
+  // ActivityData shape — we pass it through whole so SmartPlanner can read
+  // anything it needs (location, durationDays, type, etc.).
+  | { type: "activity"; activity: Activity; travelDate?: string }
   | { type: "ai"; prompt: string };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -92,11 +99,12 @@ export type StartingContext =
 
 function getDestination(ctx: StartingContext): string {
   switch (ctx.type) {
-    case "tour":    return ctx.tour.country;
-    case "hotel":   return ctx.hotel.location;
-    case "flight":  return ctx.flight.to;
-    case "holiday": return ctx.pkg.destination;
-    case "ai":      return extractAIDestination(ctx.prompt);
+    case "tour":     return ctx.tour.country;
+    case "hotel":    return ctx.hotel.location;
+    case "flight":   return ctx.flight.to;
+    case "holiday":  return ctx.pkg.destination;
+    case "activity": return ctx.activity.location;
+    case "ai":       return extractAIDestination(ctx.prompt);
   }
 }
 
@@ -121,6 +129,10 @@ function getNights(ctx: StartingContext): number {
     const match = ctx.tour.duration.match(/(\d+)/);
     return match ? parseInt(match[1]) - 1 : 7;
   }
+  // Activities: durationDays is the trip length in days, so nights = days - 1
+  if (ctx.type === "activity") {
+    return Math.max(1, ctx.activity.durationDays - 1);
+  }
   return 7;
 }
 
@@ -131,6 +143,17 @@ function getTripStartDate(ctx: StartingContext): Date {
   if (ctx.type === "hotel" && ctx.hotel.checkIn) return parseISO(ctx.hotel.checkIn);
   if (ctx.type === "holiday" && ctx.pkg.checkIn) return parseISO(ctx.pkg.checkIn);
   if (ctx.type === "flight" && ctx.flight.legs?.[0]?.dateISO) return parseISO(ctx.flight.legs[0].dateISO);
+  // Activity: prefer the date the user picked in the booking widget (ISO);
+  // fall back to the activity's display startDate (e.g. "Jun 12, 2026"),
+  // which the JS Date constructor parses cleanly.
+  if (ctx.type === "activity") {
+    if (ctx.travelDate) {
+      const d = new Date(ctx.travelDate);
+      if (!isNaN(d.getTime())) return d;
+    }
+    const d = new Date(ctx.activity.startDate);
+    if (!isNaN(d.getTime())) return d;
+  }
   return addDays(new Date(), 30); // fallback when no date was entered
 }
 

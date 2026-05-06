@@ -1,0 +1,319 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e472]:
+    - generic [ref=e474]:
+      - button "Back to discovery" [ref=e475]:
+        - img [ref=e476]
+        - text: Back to discovery
+      - generic [ref=e478]:
+        - button "Activity type Any activity" [ref=e480] [cursor=pointer]:
+          - img [ref=e481]
+          - generic [ref=e484]:
+            - generic [ref=e485]: Activity type
+            - generic [ref=e486]: Any activity
+          - img [ref=e487]
+        - generic [ref=e490]:
+          - img [ref=e491]
+          - generic [ref=e494]:
+            - generic [ref=e495]: Destination
+            - textbox "Anywhere" [ref=e496]
+        - button "When Any time" [ref=e498] [cursor=pointer]:
+          - img [ref=e499]
+          - generic [ref=e501]:
+            - generic [ref=e502]: When
+            - generic [ref=e503]: Any time
+          - img [ref=e504]
+        - button "Travellers 2 Travellers" [ref=e507] [cursor=pointer]:
+          - img [ref=e508]
+          - generic [ref=e513]:
+            - generic [ref=e514]: Travellers
+            - generic [ref=e515]: 2 Travellers
+          - img [ref=e516]
+        - button "Search" [ref=e518]:
+          - img [ref=e519]
+          - text: Search
+    - generic [ref=e522]:
+      - generic [ref=e524]:
+        - 'button "Sort: Recommended" [ref=e525]':
+          - img [ref=e526]
+          - text: "Sort: Recommended"
+          - img [ref=e529]
+        - button "Activity type" [ref=e531]:
+          - img [ref=e532]
+          - text: Activity type
+          - img [ref=e535]
+        - button "Duration" [ref=e537]:
+          - img [ref=e538]
+          - text: Duration
+          - img [ref=e541]
+        - button "Difficulty" [ref=e543]:
+          - img [ref=e544]
+          - text: Difficulty
+          - img [ref=e546]
+        - button "Price" [ref=e548]:
+          - img [ref=e549]
+          - text: Price
+          - img [ref=e552]
+      - paragraph [ref=e555]: 7 activities found
+      - generic [ref=e556]:
+        - generic [ref=e557]:
+          - button "Norwegian Fjords Ocean Cruise Cruise ship Norwegian Fjords Ocean Cruise Bergen → Geiranger → Ålesund → Bergen 7 days Jun 12, 2026 – Jun 19, 2026 4.7 (1,284 reviews) Sail through UNESCO-listed Geirangerfjord Midnight sun cruising in the Arctic Circle Onboard Michelin-trained dining Per person from £1,899 View details" [ref=e559] [cursor=pointer]:
+            - generic [ref=e560]:
+              - img "Norwegian Fjords Ocean Cruise" [ref=e561]
+              - generic [ref=e562]:
+                - img [ref=e563]
+                - text: Cruise ship
+            - generic [ref=e567]:
+              - generic [ref=e568]:
+                - heading "Norwegian Fjords Ocean Cruise" [level=3] [ref=e569]
+                - generic [ref=e570]:
+                  - img [ref=e571]
+                  - generic [ref=e574]: Bergen → Geiranger → Ålesund → Bergen
+                - generic [ref=e575]:
+                  - generic [ref=e576]:
+                    - img [ref=e577]
+                    - text: 7 days
+                  - generic [ref=e580]:
+                    - img [ref=e581]
+                    - text: Jun 12, 2026 – Jun 19, 2026
+                - generic [ref=e583]:
+                  - img [ref=e584]
+                  - generic [ref=e586]: "4.7"
+                  - generic [ref=e587]: (1,284 reviews)
+                - generic [ref=e588]:
+                  - generic [ref=e589]: Sail through UNESCO-listed Geirangerfjord
+                  - generic [ref=e590]: Midnight sun cruising in the Arctic Circle
+                  - generic [ref=e591]: Onboard Michelin-trained dining
+              - generic [ref=e592]:
+                - generic [ref=e593]:
+                  - generic [ref=e594]: Per person from
+                  - generic [ref=e595]: £1,899
+                - button "View details" [ref=e596]
+          - button "Rhine River Cruise — Amsterdam to Basel River cruise Rhine River Cruise — Amsterdam to Basel Amsterdam → Cologne → Strasbourg → Basel 8 days Sep 04, 2026 – Sep 11, 2026 4.8 (612 reviews) Sail past 40+ castles in the Middle Rhine UNESCO valley Guided walking tour of Cologne's old town Wine tasting in the Alsace vineyards Per person from £2,299 View details" [ref=e598] [cursor=pointer]:
+            - generic [ref=e599]:
+              - img "Rhine River Cruise — Amsterdam to Basel" [ref=e600]
+              - generic [ref=e601]:
+                - img [ref=e602]
+                - text: River cruise
+            - generic [ref=e605]:
+              - generic [ref=e606]:
+                - heading "Rhine River Cruise — Amsterdam to Basel" [level=3] [ref=e607]
+                - generic [ref=e608]:
+                  - img [ref=e609]
+                  - generic [ref=e612]: Amsterdam → Cologne → Strasbourg → Basel
+                - generic [ref=e613]:
+                  - generic [ref=e614]:
+                    - img [ref=e615]
+                    - text: 8 days
+                  - generic [ref=e618]:
+                    - img [ref=e619]
+                    - text: Sep 04, 2026 – Sep 11, 2026
+                - generic [ref=e621]:
+                  - img [ref=e622]
+                  - generic [ref=e624]: "4.8"
+                  - generic [ref=e625]: (612 reviews)
+                - generic [ref=e626]:
+                  - generic [ref=e627]: Sail past 40+ castles in the Middle Rhine UNESCO valley
+                  - generic [ref=e628]: Guided walking tour of Cologne's old town
+                  - generic [ref=e629]: Wine tasting in the Alsace vineyards
+              - generic [ref=e630]:
+                - generic [ref=e631]:
+                  - generic [ref=e632]: Per person from
+                  - generic [ref=e633]: £2,299
+                - button "View details" [ref=e634]
+          - button "Tuscany Road Trip — Florence, Siena & the Val d'Orcia Multi-day tour Tuscany Road Trip — Florence, Siena & the Val d'Orcia Florence · Siena · Val d'Orcia 6 days May 18, 2026 – May 23, 2026 4.9 (487 reviews) Skip-the-line Uffizi Gallery entry Private cooking class in a Chianti farmhouse Hot-air balloon ride over Val d'Orcia (weather permitting) Per person from £1,499 View details" [ref=e636] [cursor=pointer]:
+            - generic [ref=e637]:
+              - img "Tuscany Road Trip — Florence, Siena & the Val d'Orcia" [ref=e638]
+              - generic [ref=e639]:
+                - img [ref=e640]
+                - text: Multi-day tour
+            - generic [ref=e642]:
+              - generic [ref=e643]:
+                - heading "Tuscany Road Trip — Florence, Siena & the Val d'Orcia" [level=3] [ref=e644]
+                - generic [ref=e645]:
+                  - img [ref=e646]
+                  - generic [ref=e649]: Florence · Siena · Val d'Orcia
+                - generic [ref=e650]:
+                  - generic [ref=e651]:
+                    - img [ref=e652]
+                    - text: 6 days
+                  - generic [ref=e655]:
+                    - img [ref=e656]
+                    - text: May 18, 2026 – May 23, 2026
+                - generic [ref=e658]:
+                  - img [ref=e659]
+                  - generic [ref=e661]: "4.9"
+                  - generic [ref=e662]: (487 reviews)
+                - generic [ref=e663]:
+                  - generic [ref=e664]: Skip-the-line Uffizi Gallery entry
+                  - generic [ref=e665]: Private cooking class in a Chianti farmhouse
+                  - generic [ref=e666]: Hot-air balloon ride over Val d'Orcia (weather permitting)
+              - generic [ref=e667]:
+                - generic [ref=e668]:
+                  - generic [ref=e669]: Per person from
+                  - generic [ref=e670]: £1,499
+                - button "View details" [ref=e671]
+          - button "Cinque Terre Coastal Walking Tour Walking tour Cinque Terre Coastal Walking Tour Monterosso → Vernazza → Corniglia → Manarola → Riomaggiore 5 days Apr 22, 2026 – Apr 26, 2026 Moderate 4.6 (312 reviews) Self-guided coastal hiking with luggage transfers Pesto-making workshop in Monterosso Boat trip to Portovenere on the final day Per person from £899 View details" [ref=e673] [cursor=pointer]:
+            - generic [ref=e674]:
+              - img "Cinque Terre Coastal Walking Tour" [ref=e675]
+              - generic [ref=e676]:
+                - img [ref=e677]
+                - text: Walking tour
+            - generic [ref=e680]:
+              - generic [ref=e681]:
+                - heading "Cinque Terre Coastal Walking Tour" [level=3] [ref=e682]
+                - generic [ref=e683]:
+                  - img [ref=e684]
+                  - generic [ref=e687]: Monterosso → Vernazza → Corniglia → Manarola → Riomaggiore
+                - generic [ref=e688]:
+                  - generic [ref=e689]:
+                    - img [ref=e690]
+                    - text: 5 days
+                  - generic [ref=e693]:
+                    - img [ref=e694]
+                    - text: Apr 22, 2026 – Apr 26, 2026
+                  - generic [ref=e696]:
+                    - img [ref=e697]
+                    - text: Moderate
+                - generic [ref=e702]:
+                  - img [ref=e703]
+                  - generic [ref=e705]: "4.6"
+                  - generic [ref=e706]: (312 reviews)
+                - generic [ref=e707]:
+                  - generic [ref=e708]: Self-guided coastal hiking with luggage transfers
+                  - generic [ref=e709]: Pesto-making workshop in Monterosso
+                  - generic [ref=e710]: Boat trip to Portovenere on the final day
+              - generic [ref=e711]:
+                - generic [ref=e712]:
+                  - generic [ref=e713]: Per person from
+                  - generic [ref=e714]: £899
+                - button "View details" [ref=e715]
+          - button "Loire Valley Châteaux Bike Tour Bicycle tour Loire Valley Châteaux Bike Tour Tours → Amboise → Chenonceau → Blois 7 days Jun 02, 2026 – Jun 08, 2026 Easy 4.8 (246 reviews) Mostly flat, traffic-free Loire à Vélo route Skip-the-line entry to Chambord, Chenonceau, and Amboise Riverside picnic lunches Per person from £1,349 View details" [ref=e717] [cursor=pointer]:
+            - generic [ref=e718]:
+              - img "Loire Valley Châteaux Bike Tour" [ref=e719]
+              - generic [ref=e720]:
+                - img [ref=e721]
+                - text: Bicycle tour
+            - generic [ref=e726]:
+              - generic [ref=e727]:
+                - heading "Loire Valley Châteaux Bike Tour" [level=3] [ref=e728]
+                - generic [ref=e729]:
+                  - img [ref=e730]
+                  - generic [ref=e733]: Tours → Amboise → Chenonceau → Blois
+                - generic [ref=e734]:
+                  - generic [ref=e735]:
+                    - img [ref=e736]
+                    - text: 7 days
+                  - generic [ref=e739]:
+                    - img [ref=e740]
+                    - text: Jun 02, 2026 – Jun 08, 2026
+                  - generic [ref=e742]:
+                    - img [ref=e743]
+                    - text: Easy
+                - generic [ref=e748]:
+                  - img [ref=e749]
+                  - generic [ref=e751]: "4.8"
+                  - generic [ref=e752]: (246 reviews)
+                - generic [ref=e753]:
+                  - generic [ref=e754]: Mostly flat, traffic-free Loire à Vélo route
+                  - generic [ref=e755]: Skip-the-line entry to Chambord, Chenonceau, and Amboise
+                  - generic [ref=e756]: Riverside picnic lunches
+              - generic [ref=e757]:
+                - generic [ref=e758]:
+                  - generic [ref=e759]: Per person from
+                  - generic [ref=e760]: £1,349
+                - button "View details" [ref=e761]
+          - button "Kenya Big Five Safari Safari Kenya Big Five Safari Maasai Mara · Lake Nakuru · Amboseli 8 days Aug 04, 2026 – Aug 11, 2026 4.9 (198 reviews) Daily game drives with expert local guides Hot-air balloon ride over the Maasai Mara at sunrise Maasai village cultural visit Per person from £3,299 View details" [ref=e763] [cursor=pointer]:
+            - generic [ref=e764]:
+              - img "Kenya Big Five Safari" [ref=e765]
+              - generic [ref=e766]:
+                - img [ref=e767]
+                - text: Safari
+            - generic [ref=e771]:
+              - generic [ref=e772]:
+                - heading "Kenya Big Five Safari" [level=3] [ref=e773]
+                - generic [ref=e774]:
+                  - img [ref=e775]
+                  - generic [ref=e778]: Maasai Mara · Lake Nakuru · Amboseli
+                - generic [ref=e779]:
+                  - generic [ref=e780]:
+                    - img [ref=e781]
+                    - text: 8 days
+                  - generic [ref=e784]:
+                    - img [ref=e785]
+                    - text: Aug 04, 2026 – Aug 11, 2026
+                - generic [ref=e787]:
+                  - img [ref=e788]
+                  - generic [ref=e790]: "4.9"
+                  - generic [ref=e791]: (198 reviews)
+                - generic [ref=e792]:
+                  - generic [ref=e793]: Daily game drives with expert local guides
+                  - generic [ref=e794]: Hot-air balloon ride over the Maasai Mara at sunrise
+                  - generic [ref=e795]: Maasai village cultural visit
+              - generic [ref=e796]:
+                - generic [ref=e797]:
+                  - generic [ref=e798]: Per person from
+                  - generic [ref=e799]: £3,299
+                - button "View details" [ref=e800]
+          - button "Antarctica Classic Expedition Expedition Antarctica Classic Expedition Ushuaia → Antarctic Peninsula → Ushuaia 11 days Dec 03, 2026 – Dec 13, 2026 4.9 (142 reviews) Up to two Zodiac landings per day Optional kayaking and camping on the ice Onboard naturalist and photography lectures Per person from £7,499 View details" [ref=e802] [cursor=pointer]:
+            - generic [ref=e803]:
+              - img "Antarctica Classic Expedition" [ref=e804]
+              - generic [ref=e805]:
+                - img [ref=e806]
+                - text: Expedition
+            - generic [ref=e808]:
+              - generic [ref=e809]:
+                - heading "Antarctica Classic Expedition" [level=3] [ref=e810]
+                - generic [ref=e811]:
+                  - img [ref=e812]
+                  - generic [ref=e815]: Ushuaia → Antarctic Peninsula → Ushuaia
+                - generic [ref=e816]:
+                  - generic [ref=e817]:
+                    - img [ref=e818]
+                    - text: 11 days
+                  - generic [ref=e821]:
+                    - img [ref=e822]
+                    - text: Dec 03, 2026 – Dec 13, 2026
+                - generic [ref=e824]:
+                  - img [ref=e825]
+                  - generic [ref=e827]: "4.9"
+                  - generic [ref=e828]: (142 reviews)
+                - generic [ref=e829]:
+                  - generic [ref=e830]: Up to two Zodiac landings per day
+                  - generic [ref=e831]: Optional kayaking and camping on the ice
+                  - generic [ref=e832]: Onboard naturalist and photography lectures
+              - generic [ref=e833]:
+                - generic [ref=e834]:
+                  - generic [ref=e835]: Per person from
+                  - generic [ref=e836]: £7,499
+                - button "View details" [ref=e837]
+        - generic [ref=e840]:
+          - generic:
+            - generic:
+              - button "£1,899" [ref=e841] [cursor=pointer]:
+                - generic [ref=e842]: £1,899
+              - button "£2,299" [ref=e843] [cursor=pointer]:
+                - generic [ref=e844]: £2,299
+              - button "£1,499" [ref=e845] [cursor=pointer]:
+                - generic [ref=e846]: £1,499
+              - button "£899" [ref=e847] [cursor=pointer]:
+                - generic [ref=e848]: £899
+              - button "£1,349" [ref=e849] [cursor=pointer]:
+                - generic [ref=e850]: £1,349
+              - button "£3,299" [ref=e851] [cursor=pointer]:
+                - generic [ref=e852]: £3,299
+              - button "£7,499" [ref=e853] [cursor=pointer]:
+                - generic [ref=e854]: £7,499
+          - generic:
+            - generic [ref=e855]:
+              - button "Zoom in" [ref=e856] [cursor=pointer]: +
+              - button "Zoom out" [ref=e857] [cursor=pointer]: −
+            - generic [ref=e858]:
+              - link "Leaflet" [ref=e859] [cursor=pointer]:
+                - /url: https://leafletjs.com
+                - img [ref=e860]
+                - text: Leaflet
+              - text: "| ©"
+              - link "OpenStreetMap" [ref=e864] [cursor=pointer]:
+                - /url: https://www.openstreetmap.org/copyright
+              - text: contributors

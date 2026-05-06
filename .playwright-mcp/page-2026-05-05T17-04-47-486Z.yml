@@ -1,0 +1,43 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e2746]:
+    - generic [ref=e2748]:
+      - banner [ref=e2749]:
+        - button "Back" [ref=e2750] [cursor=pointer]:
+          - img
+          - text: Back
+        - generic [ref=e2751]:
+          - generic [ref=e2752]: Expert
+          - switch [ref=e2753]
+      - img "Florence · Siena · Val d'Orcia destination" [ref=e2755]
+      - generic [ref=e2756]:
+        - generic [ref=e2757]:
+          - heading "Individual trip to Florence · Siena · Val d'Orcia" [level=1] [ref=e2758]
+          - paragraph [ref=e2759]:
+            - generic [ref=e2760]: For 2 adults
+            - generic [ref=e2761]: ·
+            - generic [ref=e2762]: from 18 May
+            - generic [ref=e2763]: to
+            - generic [ref=e2764]: 23 May 2026
+        - generic [ref=e2765]:
+          - button "Share itinerary" [ref=e2766] [cursor=pointer]:
+            - img
+          - button "Book · from €2,499" [ref=e2767] [cursor=pointer]
+    - generic [ref=e2768]:
+      - button "Add Stop" [ref=e2770] [cursor=pointer]:
+        - img
+        - text: Add Stop
+      - generic [ref=e2772]:
+        - button "Back" [ref=e2773] [cursor=pointer]:
+          - img
+          - text: Back
+        - button "Book · from €2,499" [ref=e2774] [cursor=pointer]
+    - generic [ref=e2776]:
+      - generic [ref=e2777]:
+        - paragraph [ref=e2778]: Departing Mon, 18 May 2026
+        - separator [ref=e2779]
+        - paragraph [ref=e2780]: Returning Sat, 23 May 2026
+      - generic [ref=e2781]:
+        - paragraph [ref=e2782]: 2 adults
+        - paragraph [ref=e2783]: 5 nights
+      - button "Book · from €2,499" [ref=e2784] [cursor=pointer]

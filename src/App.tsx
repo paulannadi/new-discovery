@@ -12,6 +12,10 @@ import SmartPlannerPage, {
   type StartingContext,
 } from "./modules/smartPlanner/pages/SmartPlannerPage";
 import type { UnifiedPackage } from "./types";
+// Activities — new entry point added alongside Holidays / Hotels / Flights.
+import ActivityListPage from "./modules/smartPlanner/pages/ActivityListPage";
+import ActivityDetailPage from "./modules/smartPlanner/pages/ActivityDetailPage";
+import type { Activity, ActivitySearchCriteria } from "./types";
 import { Toast } from "./shared/components/ui/toast";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toastify.css";
@@ -120,7 +124,17 @@ export type SelectedFlightLeg = {
 export default function App() {
   // Which screen is currently visible?
   const [currentPage, setCurrentPage] = useState<
-    "discovery" | "hotel-list" | "hotel-detail" | "holiday-list" | "package-detail" | "tour-detail" | "flight-results" | "smart-planner"
+    | "discovery"
+    | "hotel-list"
+    | "hotel-detail"
+    | "holiday-list"
+    | "package-detail"
+    | "tour-detail"
+    | "flight-results"
+    | "smart-planner"
+    // ── Activities flow ──
+    | "activity-list"
+    | "activity-detail"
   >("discovery");
 
   // The "how did you get here" context passed into SmartPlanner.
@@ -167,6 +181,24 @@ export default function App() {
 
   // Where the back button on TourDetailPage should return to.
   const [tourDetailBackPage, setTourDetailBackPage] = useState<"discovery" | "holiday-list">("holiday-list");
+
+  // ── ACTIVITIES state ──────────────────────────────────────────────────────
+  // Search criteria from the Activities tab — passed to ActivityListPage so
+  // it can pre-filter the result list (e.g. by activity type).
+  const [activitySearchCriteria, setActivitySearchCriteria] =
+    useState<ActivitySearchCriteria>({
+      destination: "",
+      activityTypes: [],
+      travellers: 2,
+    });
+  // The activity the user clicked on the list — held here so we can pass it
+  // into ActivityDetailPage without re-fetching from the mock dataset.
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  // Where the back button on ActivityDetailPage should return to. We support
+  // entering the detail page directly from Discovery in case we later add a
+  // category-card shortcut.
+  const [activityDetailBackPage, setActivityDetailBackPage] =
+    useState<"discovery" | "activity-list">("activity-list");
 
   // ── FLIGHT search state ───────────────────────────────────────────────────
   // What the user searched for — passed to FlightListPage as read-only criteria.
@@ -352,6 +384,26 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
+  // ── ACTIVITIES tab: submit search → ActivityListPage ──────────────────────
+  const handleActivitySearch = (criteria: ActivitySearchCriteria) => {
+    setActivitySearchCriteria(criteria);
+    setCurrentPage("activity-list");
+    window.scrollTo(0, 0);
+  };
+
+  // ── ActivityListPage: refine the search in-place ──────────────────────────
+  const handleRefineActivitySearch = (criteria: ActivitySearchCriteria) => {
+    setActivitySearchCriteria(criteria);
+  };
+
+  // ── ActivityListPage: click an ActivityCard → ActivityDetailPage ──────────
+  const handleActivitySelect = (activity: Activity) => {
+    setSelectedActivity(activity);
+    setActivityDetailBackPage("activity-list");
+    setCurrentPage("activity-detail");
+    window.scrollTo(0, 0);
+  };
+
   // ── PackageDetailPage: click "Personalise Your Holiday" → SmartPlanner ────
   // Builds the holiday StartingContext from the UnifiedPackage and chosen date.
   const handlePackageDetailBook = (pkg: UnifiedPackage, selectedDate: string) => {
@@ -396,6 +448,7 @@ export default function App() {
           onTourSelect={handleTourSelect}
           onFlightSearch={handleFlightSearch}
           onHolidaySearch={handleHolidaySearch}
+          onActivitySearch={handleActivitySearch}
         />
       )}
 
@@ -479,6 +532,46 @@ export default function App() {
                 price: `${tour.price.currency} ${tour.price.perPerson.toLocaleString()}`,
                 image: tour.mainImage,
               },
+            });
+            setCurrentPage("smart-planner");
+            window.scrollTo(0, 0);
+          }}
+        />
+      )}
+
+      {/* Screen: Activity results list — reached from the Activities tab */}
+      {currentPage === "activity-list" && (
+        <ActivityListPage
+          searchCriteria={activitySearchCriteria}
+          onViewDetail={handleActivitySelect}
+          onBack={handleBack}
+          onRefineSearch={handleRefineActivitySearch}
+        />
+      )}
+
+      {/* Screen: Activity detail — single-page sticky-tabs layout.
+          Sections vary by activity type (cruise → ports + cabins,
+          tour/safari → itinerary, walking/bicycle → route map + stats). */}
+      {currentPage === "activity-detail" && selectedActivity && (
+        <ActivityDetailPage
+          activity={selectedActivity}
+          backLabel={
+            activityDetailBackPage === "discovery"
+              ? "Back to discovery"
+              : "Back to all activities"
+          }
+          onBack={() => {
+            setCurrentPage(activityDetailBackPage);
+            window.scrollTo(0, 0);
+          }}
+          onBook={(activity, travelDate, _travellers, _preference) => {
+            // Seed SmartPlanner with the chosen activity. travelDate is a
+            // display string ("Jun 12, 2026") — getTripStartDate parses it
+            // via the JS Date constructor, with a graceful fallback.
+            setStartingContext({
+              type: "activity",
+              activity,
+              travelDate,
             });
             setCurrentPage("smart-planner");
             window.scrollTo(0, 0);

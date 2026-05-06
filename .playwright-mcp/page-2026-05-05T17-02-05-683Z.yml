@@ -1,0 +1,75 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - img "Discover the world" [ref=e6]
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - generic [ref=e11]:
+            - generic [ref=e12]: AI Experience
+            - switch [ref=e13]
+          - generic [ref=e14]:
+            - heading "Explore the world's hidden gems" [level=1] [ref=e15]
+            - heading "You dream it. We'll plan it." [level=1]
+        - generic [ref=e16]:
+          - generic [ref=e19]:
+            - generic [ref=e21]:
+              - button "Holidays" [ref=e22]:
+                - img [ref=e24]
+                - generic [ref=e30]: Holidays
+              - button "Hotels" [ref=e31]:
+                - img [ref=e33]
+                - generic [ref=e37]: Hotels
+              - button "Flights" [ref=e38]:
+                - img [ref=e40]
+                - generic [ref=e42]: Flights
+              - button "Activities" [active] [ref=e43]:
+                - img [ref=e45]
+                - generic [ref=e48]: Activities
+            - generic [ref=e428]:
+              - button "Activity type Any activity" [ref=e430] [cursor=pointer]:
+                - img [ref=e431]
+                - generic [ref=e434]:
+                  - generic [ref=e435]: Activity type
+                  - generic [ref=e436]: Any activity
+                - img [ref=e437]
+              - generic [ref=e440]:
+                - img [ref=e441]
+                - generic [ref=e444]:
+                  - generic [ref=e445]: Destination
+                  - textbox "Anywhere" [ref=e446]
+              - button "When Any time" [ref=e448] [cursor=pointer]:
+                - img [ref=e449]
+                - generic [ref=e451]:
+                  - generic [ref=e452]: When
+                  - generic [ref=e453]: Any time
+                - img [ref=e454]
+              - button "Travellers 2 Travellers" [ref=e457] [cursor=pointer]:
+                - img [ref=e458]
+                - generic [ref=e463]:
+                  - generic [ref=e464]: Travellers
+                  - generic [ref=e465]: 2 Travellers
+                - img [ref=e466]
+              - button "Search activities" [ref=e468]:
+                - img [ref=e469]
+                - text: Search activities
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - textbox "Describe your ideal trip — destination, dates, budget, travel style…"
+                - generic:
+                  - button "Attach files":
+                    - img
+                    - generic: Attach files
+                  - button "Plan my trip":
+                    - img
+                    - text: Plan my trip
+            - generic:
+              - generic: "Try asking:"
+              - generic:
+                - button "Find me a beach resort in Bali for next month"
+                - button "Plan a 5-day family trip to Paris"
+                - button "Weekend getaway in the Alps under €500"
+                - button "Luxury honeymoon in the Maldives"
+    - paragraph [ref=e427]: © 2026 Nezasa · TripBuilder · Over 500,000 hotels worldwide

@@ -1,0 +1,236 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e2430]:
+    - generic [ref=e2432]:
+      - button "Back to all activities" [ref=e2434]:
+        - img [ref=e2435]
+        - text: Back to all activities
+      - generic [ref=e2437]:
+        - generic [ref=e2438]:
+          - img "Tuscany Road Trip — Florence, Siena & the Val d'Orcia" [ref=e2440]
+          - generic [ref=e2441]:
+            - button "View activity photo 2" [ref=e2442] [cursor=pointer]:
+              - img "Activity photo 2" [ref=e2443]
+            - button "View activity photo 3" [ref=e2444] [cursor=pointer]:
+              - img "Activity photo 3" [ref=e2445]
+            - button "View activity photo 4" [ref=e2446] [cursor=pointer]:
+              - img "Activity photo 4" [ref=e2447]
+            - button "View activity photo 5" [ref=e2448] [cursor=pointer]:
+              - img "Activity photo 5" [ref=e2449]
+        - button "See all photos" [ref=e2450]:
+          - img [ref=e2451]
+          - text: See all photos
+      - generic [ref=e2456]:
+        - generic [ref=e2457]:
+          - img [ref=e2458]
+          - text: Multi-day tour
+        - heading "Tuscany Road Trip — Florence, Siena & the Val d'Orcia" [level=1] [ref=e2460]
+        - paragraph [ref=e2461]: Six days exploring Renaissance cities, hilltop villages, and family-run vineyards in the heart of Italy.
+        - generic [ref=e2462]:
+          - generic [ref=e2463]:
+            - img [ref=e2464]
+            - generic [ref=e2467]: 6 days
+          - generic [ref=e2468]: "|"
+          - generic [ref=e2469]:
+            - img [ref=e2470]
+            - generic [ref=e2473]: Florence · Siena · Val d'Orcia
+          - generic [ref=e2474]: "|"
+          - generic [ref=e2475]:
+            - img [ref=e2476]
+            - generic [ref=e2478]: "4.9"
+            - generic [ref=e2479]: (487)
+    - generic [ref=e2481]:
+      - generic [ref=e2482]:
+        - navigation "Activity sections" [ref=e2483]:
+          - generic [ref=e2485]:
+            - button "Overview" [ref=e2486]
+            - button "Itinerary" [ref=e2487]
+            - button "Highlights" [ref=e2488]
+            - button "Included" [ref=e2489]
+            - button "Excluded" [ref=e2490]
+        - generic [ref=e2492]:
+          - generic [ref=e2493]:
+            - heading "Your experience at a glance" [level=3] [ref=e2494]
+            - generic [ref=e2495]:
+              - generic [ref=e2496]:
+                - paragraph [ref=e2497]: Activity details
+                - generic [ref=e2498]:
+                  - generic [ref=e2499]:
+                    - img [ref=e2500]
+                    - generic [ref=e2505]: Private tour
+                  - generic [ref=e2506]:
+                    - img [ref=e2507]
+                    - generic [ref=e2509]: Moderate walking
+                  - generic [ref=e2510]:
+                    - img [ref=e2511]
+                    - generic [ref=e2515]: English, Italian
+                  - generic [ref=e2516]:
+                    - img [ref=e2517]
+                    - generic [ref=e2520]: 10+
+              - paragraph [ref=e2523]: Activity route
+              - generic [ref=e2524]:
+                - generic [ref=e2526]:
+                  - generic:
+                    - generic:
+                      - img
+                    - generic:
+                      - button "1" [ref=e2528] [cursor=pointer]:
+                        - generic [ref=e2529]: "1"
+                      - button "2" [ref=e2530] [cursor=pointer]:
+                        - generic [ref=e2531]: "2"
+                      - button "3" [ref=e2532] [cursor=pointer]:
+                        - generic [ref=e2533]: "3"
+                  - generic:
+                    - generic [ref=e2534]:
+                      - button "Zoom in" [ref=e2535] [cursor=pointer]: +
+                      - button "Zoom out" [ref=e2536] [cursor=pointer]: −
+                    - generic [ref=e2537]:
+                      - link "Leaflet" [ref=e2538] [cursor=pointer]:
+                        - /url: https://leafletjs.com
+                        - img [ref=e2539]
+                        - text: Leaflet
+                      - text: "| ©"
+                      - link "OpenStreetMap" [ref=e2543] [cursor=pointer]:
+                        - /url: https://www.openstreetmap.org/copyright
+                - generic [ref=e2544]:
+                  - paragraph [ref=e2545]: Stops
+                  - generic [ref=e2546]:
+                    - generic [ref=e2547]:
+                      - generic [ref=e2548]: "1"
+                      - generic [ref=e2549]:
+                        - paragraph [ref=e2550]:
+                          - text: Florence
+                          - generic [ref=e2551]: · 2 nights
+                        - paragraph [ref=e2552]: May 18 – May 19
+                    - generic [ref=e2553]:
+                      - generic [ref=e2554]: "2"
+                      - generic [ref=e2555]:
+                        - paragraph [ref=e2556]:
+                          - text: Siena
+                          - generic [ref=e2557]: · 2 nights
+                        - paragraph [ref=e2558]: May 20 – May 21
+                    - generic [ref=e2559]:
+                      - generic [ref=e2560]: "3"
+                      - generic [ref=e2561]:
+                        - paragraph [ref=e2562]:
+                          - text: Montalcino
+                          - generic [ref=e2563]: · 1 night
+                        - paragraph [ref=e2564]: May 22
+          - generic [ref=e2566]:
+            - heading "Day by day" [level=3] [ref=e2567]
+            - generic [ref=e2568]:
+              - generic [ref=e2569]:
+                - button "Day 1 Arrival in Florence Florence" [ref=e2570]:
+                  - generic [ref=e2571]: Day 1
+                  - generic [ref=e2572]: Arrival in Florence
+                  - generic [ref=e2573]: Florence
+                - generic [ref=e2574]:
+                  - 'img "Day 1: Arrival in Florence" [ref=e2577]'
+                  - generic [ref=e2578]:
+                    - generic [ref=e2579]:
+                      - img [ref=e2580]
+                      - generic [ref=e2584]:
+                        - paragraph [ref=e2585]: Welcome stroll over Ponte Vecchio
+                        - paragraph [ref=e2586]: Settle in to your hotel near Piazza Santa Croce, then a guided sunset walk along the Arno.
+                    - generic [ref=e2587]:
+                      - img [ref=e2588]
+                      - paragraph [ref=e2592]: Hotel Brunelleschi **** or similar
+              - button "Day 2 Renaissance Florence Florence" [ref=e2594]:
+                - generic [ref=e2595]: Day 2
+                - generic [ref=e2596]: Renaissance Florence
+                - generic [ref=e2597]: Florence
+              - button "Day 3 Chianti country Florence → Siena" [ref=e2599]:
+                - generic [ref=e2600]: Day 3
+                - generic [ref=e2601]: Chianti country
+                - generic [ref=e2602]: Florence → Siena
+              - button "Day 4 Siena & San Gimignano Siena" [ref=e2604]:
+                - generic [ref=e2605]: Day 4
+                - generic [ref=e2606]: Siena & San Gimignano
+                - generic [ref=e2607]: Siena
+              - button "Day 5 Val d'Orcia hill towns Pienza · Montepulciano" [ref=e2609]:
+                - generic [ref=e2610]: Day 5
+                - generic [ref=e2611]: Val d'Orcia hill towns
+                - generic [ref=e2612]: Pienza · Montepulciano
+              - button "Day 6 Departure Florence" [ref=e2614]:
+                - generic [ref=e2615]: Day 6
+                - generic [ref=e2616]: Departure
+                - generic [ref=e2617]: Florence
+          - generic [ref=e2618]:
+            - heading "Why you'll love it" [level=3] [ref=e2619]
+            - generic [ref=e2621]:
+              - paragraph [ref=e2622]: Activity highlights
+              - generic [ref=e2623]:
+                - generic [ref=e2624]:
+                  - img [ref=e2626]
+                  - paragraph [ref=e2628]: Skip-the-line Uffizi Gallery entry
+                - generic [ref=e2629]:
+                  - img [ref=e2631]
+                  - paragraph [ref=e2633]: Private cooking class in a Chianti farmhouse
+                - generic [ref=e2634]:
+                  - img [ref=e2636]
+                  - paragraph [ref=e2638]: Hot-air balloon ride over Val d'Orcia (weather permitting)
+                - generic [ref=e2639]:
+                  - img [ref=e2641]
+                  - paragraph [ref=e2643]: Sunset wine tasting in Montepulciano
+          - generic [ref=e2644]:
+            - heading "Everything included" [level=3] [ref=e2645]
+            - generic [ref=e2647]:
+              - paragraph [ref=e2648]: What's included
+              - generic [ref=e2649]:
+                - generic [ref=e2650]:
+                  - img [ref=e2652]
+                  - paragraph [ref=e2654]: Five nights boutique accommodation
+                - generic [ref=e2655]:
+                  - img [ref=e2657]
+                  - paragraph [ref=e2659]: Daily breakfast and three farmhouse dinners
+                - generic [ref=e2660]:
+                  - img [ref=e2662]
+                  - paragraph [ref=e2664]: Private guide for two days
+                - generic [ref=e2665]:
+                  - img [ref=e2667]
+                  - paragraph [ref=e2669]: Wine tasting at three estates
+                - generic [ref=e2670]:
+                  - img [ref=e2672]
+                  - paragraph [ref=e2674]: Airport transfers
+          - generic [ref=e2675]:
+            - heading "Good to know before you book" [level=3] [ref=e2676]
+            - generic [ref=e2678]:
+              - paragraph [ref=e2679]: Not included
+              - generic [ref=e2680]:
+                - generic [ref=e2681]:
+                  - img [ref=e2683]
+                  - paragraph [ref=e2686]: International flights
+                - generic [ref=e2687]:
+                  - img [ref=e2689]
+                  - paragraph [ref=e2692]: Lunches
+                - generic [ref=e2693]:
+                  - img [ref=e2695]
+                  - paragraph [ref=e2698]: Optional excursions
+                - generic [ref=e2699]:
+                  - img [ref=e2701]
+                  - paragraph [ref=e2704]: Personal travel insurance
+      - generic [ref=e2706]:
+        - generic [ref=e2708]:
+          - generic [ref=e2709]: £1,499 per person · 6-day experience
+          - generic [ref=e2710]: "Total for 2 travellers: £2,998"
+        - generic [ref=e2711]:
+          - paragraph [ref=e2712]: Customise your trip
+          - button "Travel date May 18, 2026" [ref=e2714]:
+            - img [ref=e2715]
+            - generic [ref=e2717]:
+              - generic [ref=e2718]: Travel date
+              - generic [ref=e2719]: May 18, 2026
+            - img [ref=e2720]
+          - button "Travellers 2 Travellers" [ref=e2723]:
+            - img [ref=e2724]
+            - generic [ref=e2729]:
+              - generic [ref=e2730]: Travellers
+              - generic [ref=e2731]: 2 Travellers
+            - img [ref=e2732]
+          - button "Accommodation preference Standard" [ref=e2735]:
+            - img [ref=e2736]
+            - generic [ref=e2739]:
+              - generic [ref=e2740]: Accommodation preference
+              - generic [ref=e2741]: Standard
+            - img [ref=e2742]
+        - button "Start planning" [ref=e2745]

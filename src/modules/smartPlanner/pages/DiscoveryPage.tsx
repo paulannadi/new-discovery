@@ -43,16 +43,22 @@ import {
   User,
   Paperclip,
   Send,
+  Compass,
 } from "lucide-react";
 import { Switch } from "../../../shared/components/ui/switch";
 import { DayPicker, DateRange } from "react-day-picker";
 import { format, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
 import type { FlightSearchCriteria, FlightLeg, HolidaySearchCriteria } from "../../../App";
+// Activities tab uses a self-contained search form, mirroring how Holidays
+// uses PackageSearchForm. The form is the only "Activities" UI on the
+// discovery hero; results live on a separate page.
+import ActivitySearchForm from "../components/ActivitySearchForm";
+import type { ActivitySearchCriteria } from "../../../types";
 
 // --- Types ---
 
-type TabId = "hotels" | "flights" | "holidays";
+type TabId = "hotels" | "flights" | "holidays" | "activities";
 
 type RoomConfig = {
   id: number;
@@ -81,15 +87,20 @@ type DiscoveryPageProps = {
   onFlightSearch: (criteria: FlightSearchCriteria) => void;
   // Called when the user submits the Holidays search form → leads to HolidayListPage
   onHolidaySearch: (criteria: HolidaySearchCriteria) => void;
+  // Called when the user submits the Activities search form → leads to ActivityListPage
+  onActivitySearch: (criteria: ActivitySearchCriteria) => void;
 };
 
 // --- Tab Definitions ---
-// Only 'hotels' is connected to a real search flow; the others are visual for now.
+// Activities is the newest tab — added last so existing users still land on
+// Holidays by default and the existing tab order is undisturbed.
 const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
-  // Holidays is now first — Tours and Holidays have merged into one experience
+  // Holidays is the default — Tours and Holidays merged into one experience
   { id: "holidays", label: "Holidays", icon: <Sun size={20} /> },
   { id: "hotels", label: "Hotels", icon: <Building2 size={20} /> },
   { id: "flights", label: "Flights", icon: <Plane size={20} /> },
+  // Compass icon evokes the experience-led "explore by activity" framing
+  { id: "activities", label: "Activities", icon: <Compass size={20} /> },
 ];
 
 // --- Section data ---
@@ -405,6 +416,7 @@ export default function DiscoveryPage({
   onTourSelect,
   onFlightSearch,
   onHolidaySearch,
+  onActivitySearch,
 }: DiscoveryPageProps) {
   const [activeTab, setActiveTab] = useState<TabId>("holidays");
   // Controls whether the hero shows the normal search card or the AI Experience mode
@@ -1514,6 +1526,12 @@ export default function DiscoveryPage({
                 {/* HOLIDAYS PANEL */}
                 {activeTab === "holidays" && (
                   <PackageSearchForm variant="hero" onSearch={onHolidaySearch} />
+                )}
+
+                {/* ACTIVITIES PANEL — same shape as Holidays: a single self-
+                    contained search form that takes the user to the list page. */}
+                {activeTab === "activities" && (
+                  <ActivitySearchForm variant="hero" onSearch={onActivitySearch} />
                 )}
 
               </div>

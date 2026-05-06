@@ -206,3 +206,118 @@ export interface Tour {
   // Plays when the user taps the play button on the main image.
   videoUrl?: string;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Activity Types
+//
+// An "Activity" is an experience-led starting point for an itinerary —
+// e.g. a cruise, a multi-day tour, a walking tour, a bike tour, a river cruise.
+// Unlike Tour (which is always a multi-stop guided journey), an Activity can
+// be a single experience (a river cruise) or a multi-day immersive trip
+// (a bicycle tour). The detail page renders type-specific sections (ports +
+// cabins for cruises, day-by-day itinerary for multi-day tours, route + stats
+// for walking/bicycle) on top of the shared overview/highlights/included blocks.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// The shape of activity the user is looking at — drives icons, badges, and
+// which sections appear on the detail page.
+export type ActivityType =
+  | "cruise-ship"
+  | "river-cruise"
+  | "multi-day-tour"
+  | "walking-tour"
+  | "bicycle-tour"
+  | "safari"
+  | "expedition";
+
+// One port-of-call on a cruise itinerary.
+// Displayed in the "Ports" section on the detail page.
+export interface ActivityPort {
+  name: string;          // e.g. "Bergen, Norway"
+  day: number;           // Which day of the cruise this stop is
+  arrives?: string;      // Display string, e.g. "08:00"
+  departs?: string;      // Display string, e.g. "17:00"
+  description?: string;  // Optional 1–2 sentence blurb
+}
+
+// A bookable cabin on a cruise/river cruise.
+// Displayed in the "Cabins" section on the detail page.
+export interface ActivityCabin {
+  name: string;             // e.g. "Balcony Stateroom"
+  pricePerPerson: number;   // in the activity's currency
+  image: string;
+  description?: string;     // 1-line cabin features summary
+  capacity?: number;        // max guests, e.g. 2
+}
+
+// The top-level Activity object — used for ActivityCard, search, and the
+// ActivityDetailPage. Optional blocks (cruise / itineraryDays / routeStops /
+// difficulty / distanceKm) are only set for relevant activity types.
+export interface Activity {
+  activityId: string;
+  type: ActivityType;
+  title: string;
+  subtitle: string;
+  mainImage: string;
+  gallery: string[];
+  videoUrl?: string;
+
+  // Free-text location label, e.g. "Norwegian Fjords",
+  // "Tuscany, Italy", "Amsterdam to Basel".
+  location: string;
+
+  durationDays: number;
+  startDate: string;       // Display string, e.g. "Jun 12, 2026"
+  endDate: string;         // Display string, e.g. "Jun 19, 2026"
+
+  price: { perPerson: number; total: number; currency: string };
+  rating: { score: number; reviewCount: number };
+
+  highlights: string[];
+  included: string[];
+  excluded: string[];
+
+  // Quick-fact attribute pills shown in the detail Overview section.
+  // Reuses the same iconKey union as TourAttribute so the AttributeIcon
+  // component can render both tour and activity attributes.
+  attributes: TourAttribute[];
+
+  // ── Type-specific blocks ────────────────────────────────────────────────
+  // Only one of these will be present, based on `type`. The detail page reads
+  // the populated block to decide which sticky-tab sections to render.
+
+  // Present for type === "cruise-ship" or "river-cruise"
+  cruise?: {
+    ship: string;                   // e.g. "MS Nordstjernen"
+    ports: ActivityPort[];
+    cabinTypes: ActivityCabin[];
+    deckPlanImage?: string;
+  };
+
+  // Present for type === "multi-day-tour" / "safari" / "expedition"
+  // Reuses the existing TourDay shape so we can share the day-by-day component.
+  itineraryDays?: TourDay[];
+
+  // Present for activities with a geographic route (cruises, multi-day tours,
+  // walking/bicycle). Reuses TourStop so we can share the Leaflet route map.
+  routeStops?: TourStop[];
+
+  // Present for type === "walking-tour" / "bicycle-tour"
+  difficulty?: "Easy" | "Moderate" | "Challenging";
+  distanceKm?: number;
+}
+
+// Holds the search criteria filled in on the Activities search form.
+// Carried forward so ActivityListPage starts pre-populated.
+export interface ActivitySearchCriteria {
+  // Free-text destination / region (e.g. "Norway", "Anywhere").
+  destination: string;
+  // Multi-select of activity types to include. Empty array = all types.
+  activityTypes: ActivityType[];
+  // Date range (optional — undefined means "Any time").
+  // Using a Date tuple instead of react-day-picker's DateRange so this file
+  // stays free of UI library imports.
+  dateFrom?: string;       // ISO "YYYY-MM-DD"
+  dateTo?: string;         // ISO "YYYY-MM-DD"
+  travellers: number;
+}

@@ -23,9 +23,7 @@ import {
   Check,
   MapPinned,
   Hotel,
-  Bus,  
   ChevronDown,
-
   Plus,
   Minus,
   X,
@@ -42,17 +40,14 @@ import {
   DialogTitle,
 } from "../../../shared/components/ui/dialog";
 import { cn } from "../../../shared/components/ui/utils";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import type { Tour, TourAttribute, TourDay, TourDayItem, TourStop } from "../../../types";
+import type { Tour, TourAttribute } from "../../../types";
+// Shared section components — extracted from TourDetailPage so ActivityDetailPage
+// can render the same day-by-day accordion, info lists, and route map.
+import { DayByDaySection } from "../components/DayByDaySection";
+import { InfoList } from "../components/InfoList";
+import { TourRouteMapInline } from "../components/TourRouteMap";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
-
-// Reads the --primary CSS variable so we can pass it to non-Tailwind props (e.g. Leaflet)
-function getPrimaryColor(): string {
-  return getComputedStyle(document.documentElement).getPropertyValue("--primary").trim() || "#2681ff";
-}
 
 function sym(currency: string): string {
   const map: Record<string, string> = { GBP: "£", USD: "$", EUR: "€", CHF: "CHF " };
@@ -65,13 +60,6 @@ function AttributeIcon({ iconKey, size = 15 }: { iconKey: TourAttribute["iconKey
   if (iconKey === "languages")      return <Languages size={size} className={cls} aria-hidden="true" />;
   if (iconKey === "activity")       return <Activity size={size} className={cls} aria-hidden="true" />;
   if (iconKey === "calendar-check") return <CalendarCheck size={size} className={cls} aria-hidden="true" />;
-  return null;
-}
-
-function DayItemIcon({ type }: { type: TourDayItem["type"] }) {
-  if (type === "highlight") return <MapPinned size={15} className="text-foreground shrink-0 mt-0.5" aria-hidden="true" />;
-  if (type === "hotel")     return <Hotel     size={15} className="text-foreground shrink-0 mt-0.5" aria-hidden="true" />;
-  if (type === "transport") return <Bus       size={15} className="text-foreground shrink-0 mt-0.5" aria-hidden="true" />;
   return null;
 }
 
@@ -1009,299 +997,10 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TourRouteMap — interactive map showing numbered day pins connected by a route
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Creates a circular numbered pin (e.g. "1", "2") for each stop on the map.
-// Blue circle with white number — visually ties back to the day pills.
-function createDayPinIcon(dayNumber: number) {
-  // Uses the CSS variable --primary so the pin colour stays in sync with the theme
-  const html = `
-    <div style="
-      width: 28px; height: 28px;
-      background: var(--primary);
-      color: white;
-      border: 3px solid white;
-      border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      font-size: 12px;
-      font-weight: 700;
-      font-family: system-ui, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    ">${dayNumber}</div>
-  `;
-  return L.divIcon({ html, className: "", iconSize: [28, 28], iconAnchor: [14, 14] });
-}
-
-// Fits the map to the stop bounds once on mount
-function MapFitter({ positions }: { positions: [number, number][] }) {
-  const map = useMap();
-  const fitted = useRef(false);
-  useEffect(() => {
-    if (fitted.current || positions.length === 0) return;
-    const bounds = L.latLngBounds(positions);
-    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 10 });
-    fitted.current = true;
-  }, [positions, map]);
-  return null;
-}
-
-function TourRouteMap({ stops }: { stops: TourStop[] }) {
-  // Only use stops that have coordinates
-  const stopsWithCoords = stops.filter(
-    (s): s is TourStop & { lat: number; lng: number } =>
-      s.lat != null && s.lng != null
-  );
-
-  if (stopsWithCoords.length === 0) return null;
-
-  // Build the route line coordinates — in stop order
-  const routePositions: [number, number][] = stopsWithCoords.map((s) => [s.lat, s.lng]);
-
-  // Fallback center from the first stop
-  const center: [number, number] = [stopsWithCoords[0].lat, stopsWithCoords[0].lng];
-
-  return (
-    <div>
-      <h3 className="text-xl font-bold text-foreground mb-4">Tour route</h3>
-      <div className="bg-card rounded-xl shadow-sm overflow-hidden border border-border">
-        <div className="h-[300px]">
-          <MapContainer
-            center={center}
-            zoom={6}
-            className="w-full h-full"
-            style={{ height: "100%", width: "100%" }}
-            scrollWheelZoom={true}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            />
-            <MapFitter positions={routePositions} />
-
-            {/* Route line connecting all stops in order */}
-            <Polyline
-              positions={routePositions}
-              pathOptions={{ color: getPrimaryColor(), weight: 3, opacity: 0.7, dashArray: "8 6" }}
-            />
-
-            {/* Numbered day pins for each stop */}
-            {stopsWithCoords.map((stop, i) => (
-              <Marker
-                key={stop.destinationName}
-                position={[stop.lat, stop.lng]}
-                icon={createDayPinIcon(i + 1)}
-              >
-                <Popup>
-                  <div className="text-sm">
-                    <div className="font-bold text-foreground">{stop.destinationName}</div>
-                    <div className="text-muted-foreground text-xs mt-0.5">
-                      {stop.nights} {stop.nights === 1 ? "night" : "nights"} · {stop.dateRange}
-                    </div>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Inline variant — no heading or card wrapper, fills its parent container.
-// Used inside the combined stops + map card on the Overview tab.
-function TourRouteMapInline({ stops }: { stops: TourStop[] }) {
-  const stopsWithCoords = stops.filter(
-    (s): s is TourStop & { lat: number; lng: number } =>
-      s.lat != null && s.lng != null
-  );
-
-  if (stopsWithCoords.length === 0) return null;
-
-  const routePositions: [number, number][] = stopsWithCoords.map((s) => [s.lat, s.lng]);
-  const center: [number, number] = [stopsWithCoords[0].lat, stopsWithCoords[0].lng];
-
-  return (
-    <MapContainer
-      center={center}
-      zoom={6}
-      className="w-full h-full"
-      style={{ height: "100%", width: "100%" }}
-      scrollWheelZoom={true}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      />
-      <MapFitter positions={routePositions} />
-      <Polyline
-        positions={routePositions}
-        pathOptions={{ color: getPrimaryColor(), weight: 3, opacity: 0.7, dashArray: "8 6" }}
-      />
-      {stopsWithCoords.map((stop, i) => (
-        <Marker
-          key={stop.destinationName}
-          position={[stop.lat, stop.lng]}
-          icon={createDayPinIcon(i + 1)}
-        >
-          <Popup>
-            <div className="text-sm">
-              <div className="font-bold text-foreground">{stop.destinationName}</div>
-              <div className="text-muted-foreground text-xs mt-0.5">
-                {stop.nights} {stop.nights === 1 ? "night" : "nights"} · {stop.dateRange}
-              </div>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// DayByDaySection — manages which day is active (only one at a time)
-// ─────────────────────────────────────────────────────────────────────────────
-
-function DayByDaySection({ days, slug }: { days: TourDay[]; slug: string }) {
-  // Only one day can be active/expanded at a time — default to day 1
-  const [activeDayNumber, setActiveDayNumber] = useState(1);
-
-  return (
-    <div>
-      <h3 className="text-xl font-bold text-foreground mb-4">
-        Day by day adventures
-      </h3>
-      <div className="flex flex-col gap-3">
-        {days.map((day) => (
-          <DayCard
-            key={day.dayNumber}
-            day={day}
-            slug={slug}
-            isActive={day.dayNumber === activeDayNumber}
-            onSelect={() => setActiveDayNumber(day.dayNumber)}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// DayCard — single day row; only the active day shows expanded content
-// ─────────────────────────────────────────────────────────────────────────────
-
-function DayCard({
-  day,
-  slug,
-  isActive,
-  onSelect,
-}: {
-  day: TourDay;
-  slug: string;
-  isActive: boolean;
-  onSelect: () => void;
-}) {
-  const dayImage = day.image ?? `https://picsum.photos/seed/${slug}-day${day.dayNumber}/400/280`;
-
-  return (
-    <div className={cn(
-      "bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow",
-      // Active day gets a solid blue border all around
-      isActive ? "border border-primary" : ""
-    )}>
-
-      {/* Header row — day pill, title, location */}
-      <button
-        className="w-full flex items-center gap-3 px-5 py-3.5 text-left"
-        onClick={onSelect}
-      >
-        {/* Day pill — light blue fill, matches holiday list card chips */}
-        <span className="bg-primary/10 text-primary text-xs font-bold px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap capitalize">
-          Day {day.dayNumber}
-        </span>
-        {/* Day title — bold when active, medium weight when collapsed */}
-        <span className={cn(
-          "flex-1 text-sm text-foreground",
-          isActive ? "font-bold" : "font-medium"
-        )}>
-          {day.title}
-        </span>
-        {/* Location — right-aligned */}
-        {day.location && (
-          <span className="text-xs text-muted-foreground shrink-0">
-            {day.location}
-          </span>
-        )}
-      </button>
-
-      {/* Expanded content — only shown for the active day, no divider */}
-      {isActive && (
-        <div className="flex flex-col md:flex-row">
-
-          {/* Day photo on the left */}
-          <div className="md:w-[200px] shrink-0 p-4 md:pr-0">
-            <div className="rounded-xl overflow-hidden h-[140px] md:h-full">
-              <img
-                src={dayImage}
-                alt={`Day ${day.dayNumber}: ${day.title}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-
-          {/* Items list on the right */}
-          <div className="flex-1 px-5 py-4 flex flex-col gap-3">
-            {day.items.map((item, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <DayItemIcon type={item.type} />
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{item.label}</p>
-                  {item.description && (
-                    <p className="text-xs text-foreground mt-0.5">{item.description}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// InfoList — bullet list for Highlights / Included / Excluded tabs
-// ─────────────────────────────────────────────────────────────────────────────
-
-function InfoList({ title, items, variant }: {
-  title: string;
-  items: string[];
-  variant: "highlight" | "check" | "cross";
-}) {
-  return (
-    <div className="flex flex-col gap-4">
-      <p className="text-base font-bold text-foreground">{title}</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
-        {items.map((item) => (
-          <div key={item} className="flex items-start gap-3">
-            <div className={cn(
-              "w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5",
-              variant === "cross" ? "bg-danger/10" : "bg-success/10"
-            )}>
-              {variant === "cross"
-                ? <X size={11} className="text-danger" aria-hidden="true" />
-                : <Check size={11} className="text-success" aria-hidden="true" />
-              }
-            </div>
-            <p className="text-sm text-foreground leading-normal">{item}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+// All inline section components (DayByDaySection, DayCard, InfoList,
+// TourRouteMap/Inline, MapFitter, createDayPinIcon) used to live here.
+// They're now imported at the top of this file from:
+//   ../components/DayByDaySection
+//   ../components/InfoList
+//   ../components/TourRouteMap
+// so that ActivityDetailPage can reuse the same pieces.
