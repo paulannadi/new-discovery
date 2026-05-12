@@ -85,21 +85,6 @@ export type HolidayPackageData = {
   checkIn?: string;     // ISO date string from the Holidays search form, e.g. "2026-04-09"
 };
 
-// Snapshot of the cruise context passed in from CruiseDetailPage.
-// We keep this shallow (just the display fields SmartPlanner needs) so we
-// don't have to lug the full Cruise object around.
-export type CruiseData = {
-  title: string;
-  shipName: string;
-  cruiseLine: string;
-  route: string;
-  duration: string;       // e.g. "7 nights"
-  departureDate: string;  // ISO date "YYYY-MM-DD"
-  price: string;          // e.g. "$899"
-  image: string;
-  nights: number;         // cruise duration in nights
-};
-
 export type StartingContext =
   | { type: "tour"; tour: TourData }
   | { type: "hotel"; hotel: HotelData; nights: number }
@@ -109,7 +94,6 @@ export type StartingContext =
   // ActivityData shape — we pass it through whole so SmartPlanner can read
   // anything it needs (location, durationDays, type, etc.).
   | { type: "activity"; activity: Activity; travelDate?: string }
-  | { type: "cruise"; cruise: CruiseData }
   | { type: "ai"; prompt: string };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -123,7 +107,6 @@ function getDestination(ctx: StartingContext): string {
     case "flight":   return ctx.flight.to;
     case "holiday":  return ctx.pkg.destination;
     case "activity": return ctx.activity.location;
-    case "cruise":   return ctx.cruise.route;
     case "ai":       return extractAIDestination(ctx.prompt);
   }
 }
@@ -153,8 +136,6 @@ function getNights(ctx: StartingContext): number {
   if (ctx.type === "activity") {
     return Math.max(1, ctx.activity.durationDays - 1);
   }
-  // Cruises already carry their duration as nights
-  if (ctx.type === "cruise") return Math.max(1, ctx.cruise.nights);
   return 7;
 }
 
@@ -174,11 +155,6 @@ function getTripStartDate(ctx: StartingContext): Date {
       if (!isNaN(d.getTime())) return d;
     }
     const d = new Date(ctx.activity.startDate);
-    if (!isNaN(d.getTime())) return d;
-  }
-  // Cruise: departureDate is already an ISO string from CruiseDetailPage
-  if (ctx.type === "cruise" && ctx.cruise.departureDate) {
-    const d = parseISO(ctx.cruise.departureDate);
     if (!isNaN(d.getTime())) return d;
   }
   return addDays(new Date(), 30); // fallback when no date was entered

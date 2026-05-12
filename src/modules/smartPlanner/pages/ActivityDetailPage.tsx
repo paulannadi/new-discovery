@@ -6,7 +6,7 @@
 // driven by activity type:
 //
 //   cruise-ship / river-cruise        → Overview · Ports · Cabins · Highlights · Included · Excluded
-//   multi-day-tour / safari / expedition → Overview · Itinerary · Highlights · Included · Excluded
+//   multi-day-tour / safari / expedition / event → Overview · Itinerary · Highlights · Included · Excluded
 //   walking-tour / bicycle-tour       → Overview · Route · Highlights · Included · Excluded
 //
 // All other UI (hero, gallery modal, sticky tabs IO, sidebar booking widget,
@@ -43,6 +43,7 @@ import {
   Star,
   Ship,
   Ruler,
+  Waves,
 } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
@@ -63,6 +64,12 @@ import { ACTIVITY_TYPE_OPTIONS } from "../components/ActivitySearchForm";
 // ImageWithPlaceholder — reserves space, lazy-loads, fades in.
 // Hero gets `priority`; thumbnails, cabin photos and modal images stay lazy.
 import { ImageWithPlaceholder } from "../../../shared/components/loading";
+
+// Deep-ocean blue used only for cruise-specific accents — the sea-day row
+// in the Ports table and the "Best value" badge on the cheapest cabin.
+// Stored as a hex string so we can derive translucent variants with `${X}0D`
+// (5% opacity) for the row wash without polluting the global Tailwind palette.
+const CRUISE_ACCENT = "#0e4d92";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -129,7 +136,8 @@ function getSections(activity: Activity): SectionId[] {
   if (
     activity.type === "multi-day-tour" ||
     activity.type === "safari" ||
-    activity.type === "expedition"
+    activity.type === "expedition" ||
+    activity.type === "event"
   ) {
     const out: SectionId[] = ["overview"];
     if (activity.itineraryDays?.length) out.push("itinerary");
@@ -589,7 +597,7 @@ export default function ActivityDetailPage({
                 </div>
               </section>
 
-              {/* ── Itinerary (multi-day-tour / safari / expedition) ── */}
+              {/* ── Itinerary (multi-day-tour / safari / expedition / event) ── */}
               {sectionIds.includes("itinerary") && activity.itineraryDays && (
                 <section
                   id="itinerary"
@@ -1184,58 +1192,103 @@ export default function ActivityDetailPage({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PortsTable — list of ports of call shown on cruise / river-cruise pages
+// PortsTable — list of ports of call shown on cruise / river-cruise pages.
+// Sea days (port.isSeaDay) get a distinct wave-tinted row with a Waves icon
+// and "At sea — relaxation day" label — a deliberate visual cue that this is
+// a non-port day, not a missing destination.
 // ─────────────────────────────────────────────────────────────────────────────
 function PortsTable({ ports }: { ports: ActivityPort[] }) {
   return (
     <div className="flex flex-col">
-      {ports.map((port, i) => (
-        <div
-          key={`${port.name}-${port.day}`}
-          className={cn(
-            "grid grid-cols-[auto_1fr_auto] gap-4 items-start py-3",
-            i < ports.length - 1 && "border-b border-border"
-          )}
-        >
-          {/* Day pill */}
-          <span className="bg-primary/10 text-primary text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
-            Day {port.day}
-          </span>
+      {ports.map((port, i) => {
+        // ── Sea day variant ────────────────────────────────────────────────
+        // Replaces the port name + arrival/departure times with a single
+        // "at sea" label so the row doesn't look like it's missing data.
+        if (port.isSeaDay) {
+          return (
+            <div
+              key={`${port.name}-${port.day}`}
+              className={cn(
+                "grid grid-cols-[auto_1fr] gap-4 items-center py-3 px-3 rounded-md",
+                i < ports.length - 1 && "border-b border-border",
+              )}
+              // 0D = 5% opacity wash — subtle ocean tint, not a hard fill
+              style={{ backgroundColor: `${CRUISE_ACCENT}0D` }}
+            >
+              <span
+                className="text-white text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap"
+                style={{ backgroundColor: CRUISE_ACCENT }}
+              >
+                Day {port.day}
+              </span>
+              <div className="flex items-center gap-2 min-w-0">
+                <Waves size={16} className="shrink-0" style={{ color: CRUISE_ACCENT }} aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground">
+                    At sea — relaxation day
+                  </p>
+                  {port.description && (
+                    <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
+                      {port.description}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        }
 
-          {/* Name + description */}
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-              <MapPinned size={13} className="text-foreground shrink-0" aria-hidden="true" />
-              {port.name}
-            </p>
-            {port.description && (
-              <p className="text-xs text-foreground mt-1 leading-snug">
-                {port.description}
-              </p>
+        // ── Standard port-of-call row ──────────────────────────────────────
+        return (
+          <div
+            key={`${port.name}-${port.day}`}
+            className={cn(
+              "grid grid-cols-[auto_1fr_auto] gap-4 items-start py-3",
+              i < ports.length - 1 && "border-b border-border"
             )}
-          </div>
+          >
+            {/* Day pill */}
+            <span className="bg-primary/10 text-primary text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
+              Day {port.day}
+            </span>
 
-          {/* Times — right aligned */}
-          <div className="text-right text-xs text-muted-foreground whitespace-nowrap">
-            {port.arrives && (
-              <p>
-                <span className="font-semibold text-foreground">Arrives</span> {port.arrives}
+            {/* Name + description */}
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                <MapPinned size={13} className="text-foreground shrink-0" aria-hidden="true" />
+                {port.name}
               </p>
-            )}
-            {port.departs && (
-              <p>
-                <span className="font-semibold text-foreground">Departs</span> {port.departs}
-              </p>
-            )}
+              {port.description && (
+                <p className="text-xs text-foreground mt-1 leading-snug">
+                  {port.description}
+                </p>
+              )}
+            </div>
+
+            {/* Times — right aligned */}
+            <div className="text-right text-xs text-muted-foreground whitespace-nowrap">
+              {port.arrives && (
+                <p>
+                  <span className="font-semibold text-foreground">Arrives</span> {port.arrives}
+                </p>
+              )}
+              {port.departs && (
+                <p>
+                  <span className="font-semibold text-foreground">Departs</span> {port.departs}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CabinGrid — selectable cabin cards on cruise / river-cruise pages
+// CabinGrid — selectable cabin cards on cruise / river-cruise pages.
+// The cheapest cabin gets a "Best value" badge in the top-left corner so
+// budget-conscious travellers can spot it without scanning every price.
 // ─────────────────────────────────────────────────────────────────────────────
 function CabinGrid({
   cabins,
@@ -1248,18 +1301,36 @@ function CabinGrid({
   selected: string;
   onSelect: (name: string) => void;
 }) {
+  // Find the cheapest cabin by price. Skip the badge entirely when there's
+  // only one cabin — "best value" is meaningless without a comparison.
+  const cheapestName =
+    cabins.length > 1
+      ? cabins.reduce((min, c) => (c.pricePerPerson < min.pricePerPerson ? c : min)).name
+      : null;
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {cabins.map((cabin) => {
         const isSelected = selected === cabin.name;
+        const isCheapest = cabin.name === cheapestName;
         return (
           <div
             key={cabin.name}
             className={cn(
-              "bg-card rounded-xl shadow-sm overflow-hidden flex flex-col transition-all",
+              // `relative` so the absolute-positioned "Best value" badge anchors here
+              "relative bg-card rounded-xl shadow-sm overflow-hidden flex flex-col transition-all",
               isSelected ? "border-2 border-primary" : "border border-border"
             )}
           >
+            {/* "Best value" badge — only shown on the cheapest cabin */}
+            {isCheapest && (
+              <span
+                className="absolute top-2 left-2 z-10 text-white text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-md"
+                style={{ backgroundColor: CRUISE_ACCENT }}
+              >
+                Best value
+              </span>
+            )}
             <ImageWithPlaceholder
               src={cabin.image}
               alt={cabin.name}

@@ -9,11 +9,15 @@
 //
 // Filter pills:
 //   • Sort           — Recommended / Price ↑ / Price ↓ / Top rated
-//   • Activity type  — multi-select (cruise, walking, bicycle, etc.)
 //   • Duration       — 1–3 / 4–7 / 8–14 / 15+ days
 //   • Difficulty     — Easy / Moderate / Challenging (only meaningful for
 //                      walking + bicycle, but harmless on other types)
 //   • Price          — dual-handle slider over the per-person price range
+//
+// Note: Activity type is not exposed as a filter here — it's already a search
+// criterion (picked in ActivitySearchForm above and on the Discovery hero),
+// so duplicating it as a pill would be redundant. The search criterion still
+// narrows results via `searchCriteria.activityTypes`.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useMemo, useEffect, useRef } from "react";
@@ -21,7 +25,6 @@ import {
   ChevronDown,
   Check,
   ArrowUpDown,
-  Compass,
   Clock,
   Mountain,
   Tag,
@@ -31,11 +34,9 @@ import { cn } from "../../../shared/components/ui/utils";
 import LeafletMap, {
   type MapMarkerData,
 } from "../../../shared/components/LeafletMap";
-import type { Activity, ActivitySearchCriteria, ActivityType } from "../../../types";
+import type { Activity, ActivitySearchCriteria } from "../../../types";
 import { ALL_ACTIVITIES } from "../../../mocks/activities";
-import ActivitySearchForm, {
-  ACTIVITY_TYPE_OPTIONS,
-} from "../components/ActivitySearchForm";
+import ActivitySearchForm from "../components/ActivitySearchForm";
 import { ActivityCard } from "../components/ActivityCard";
 // Loading kit — vertical SkeletonCards while activities "load" briefly
 // (matches the doc's 1s–3s tier), then a 60ms staggered reveal.
@@ -66,7 +67,6 @@ type Difficulty = typeof DIFFICULTY_OPTIONS[number];
 // Which dropdown is open. Only one open at a time, like in HolidayListPage.
 type FilterDropdown =
   | "sort"
-  | "type"
   | "duration"
   | "difficulty"
   | "price"
@@ -170,11 +170,11 @@ export default function ActivityListPage({
   // Sort defaults to "recommended" (the order from ALL_ACTIVITIES).
   const [sortBy, setSortBy] = useState<SortId>("recommended");
 
-  // Type filter is seeded from the search criteria so a user clicking a
-  // "Cruise ship" category card on Discovery lands here pre-filtered.
-  const [selectedTypes, setSelectedTypes] = useState<ActivityType[]>(
-    searchCriteria.activityTypes
-  );
+  // Activity type narrowing comes straight from the search criteria — there's
+  // no list-page filter pill for it (the search form is the single source of
+  // truth). When the user clicks e.g. the "Cruises" tab on Discovery, this
+  // list arrives pre-filtered to cruise-ships.
+  const selectedTypes = searchCriteria.activityTypes;
 
   // Duration buckets are stored by id ("short" | "week" | …)
   const [selectedDurations, setSelectedDurations] = useState<string[]>([]);
@@ -309,18 +309,23 @@ export default function ActivityListPage({
   ]);
 
   // ── Map markers ────────────────────────────────────────────────────────
-  // Use the first routeStop's coordinates as the activity's pin position,
-  // since cruises/tours don't have a single point. Falls back to filtering
-  // out activities without a usable lat/lng.
+  // For multi-stop activities (cruises with routeStops, walking/bicycle routes)
+  // we anchor the pin to the first stop. For single-point activities (events,
+  // day trips) and cruises that only carry a `location` string, we fall back
+  // to the top-level `coordinates` field. Activities with neither are silently
+  // dropped from the map — but the data should now provide one or the other
+  // for every activity, so this is a defensive guard rather than the rule.
   const mapMarkers: MapMarkerData[] = useMemo(() => {
     return filteredActivities
       .map<MapMarkerData | null>((a) => {
         const stop = a.routeStops?.[0];
-        if (!stop?.lat || !stop?.lng) return null;
+        const lat = stop?.lat ?? a.coordinates?.lat;
+        const lng = stop?.lng ?? a.coordinates?.lng;
+        if (lat == null || lng == null) return null;
         return {
           id: a.activityId,
-          lat: stop.lat,
-          lng: stop.lng,
+          lat,
+          lng,
           label: a.title,
           price: `${a.price.currency === "GBP" ? "£" : "$"}${a.price.perPerson.toLocaleString()}`,
           isHighlighted: highlightedActivityId === a.activityId,
@@ -331,12 +336,6 @@ export default function ActivityListPage({
   }, [filteredActivities, highlightedActivityId]);
 
   // ── Filter toggle helpers ───────────────────────────────────────────────
-  const toggleType = (id: ActivityType) => {
-    setSelectedTypes((prev) =>
-      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
-    );
-  };
-
   const toggleDuration = (id: string) => {
     setSelectedDurations((prev) =>
       prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id]
@@ -377,29 +376,6 @@ export default function ActivityListPage({
               {opt.label}
               {sortBy === opt.id && <Check size={14} aria-hidden="true" />}
             </button>
-          ))}
-        </div>
-      );
-    }
-
-    if (openDropdown === "type") {
-      return (
-        <div
-          style={{ left: `${dropdownLeft}px` }}
-          className="absolute top-full mt-2 z-30 bg-card rounded-xl shadow-xl border border-border p-3 min-w-[260px] flex flex-col gap-1 animate-in fade-in zoom-in-95 duration-150"
-        >
-          {ACTIVITY_TYPE_OPTIONS.map((opt) => (
-            <CheckboxRow
-              key={opt.id}
-              label={
-                <span className="flex items-center gap-2">
-                  {opt.icon}
-                  {opt.label}
-                </span>
-              }
-              checked={selectedTypes.includes(opt.id)}
-              onChange={() => toggleType(opt.id)}
-            />
           ))}
         </div>
       );
@@ -507,7 +483,6 @@ export default function ActivityListPage({
   };
 
   // ── Selection-count helpers — drive the "active" pill state ──────────────
-  const typeCount       = selectedTypes.length;
   const durationCount   = selectedDurations.length;
   const difficultyCount = selectedDifficulties.length;
   const priceActive =
@@ -554,13 +529,6 @@ export default function ActivityListPage({
               icon={<ArrowUpDown size={14} aria-hidden="true" />}
               active={openDropdown === "sort"}
               onClick={(e) => handleFilterClick("sort", e)}
-            />
-            <FilterButton
-              label={typeCount > 0 ? `Activity type (${typeCount})` : "Activity type"}
-              icon={<Compass size={14} aria-hidden="true" />}
-              active={openDropdown === "type"}
-              hasSelection={typeCount > 0}
-              onClick={(e) => handleFilterClick("type", e)}
             />
             <FilterButton
               label={durationCount > 0 ? `Duration (${durationCount})` : "Duration"}

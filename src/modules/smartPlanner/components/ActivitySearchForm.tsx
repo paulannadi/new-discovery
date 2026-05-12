@@ -32,6 +32,7 @@ import {
   Map as MapIcon,
   Tent,
   Mountain,
+  Ticket,
 } from "lucide-react";
 import { DayPicker, DateRange } from "react-day-picker";
 import { format, parseISO } from "date-fns";
@@ -54,6 +55,10 @@ export const ACTIVITY_TYPE_OPTIONS: {
   { id: "bicycle-tour",   label: "Bicycle tour",    icon: <Bike       size={14} aria-hidden="true" /> },
   { id: "safari",         label: "Safari",          icon: <Tent       size={14} aria-hidden="true" /> },
   { id: "expedition",     label: "Expedition",      icon: <Mountain   size={14} aria-hidden="true" /> },
+  // Ticketed events — Wimbledon, Oktoberfest, Rio Carnival, etc.
+  // Grouped together so travellers can browse "trips built around an event"
+  // as a single category.
+  { id: "event",          label: "Events",          icon: <Ticket     size={14} aria-hidden="true" /> },
 ];
 
 type OpenPanel = "type" | "destination" | "dates" | "guests" | null;

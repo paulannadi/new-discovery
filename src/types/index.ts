@@ -233,7 +233,12 @@ export type ActivityType =
   | "walking-tour"
   | "bicycle-tour"
   | "safari"
-  | "expedition";
+  | "expedition"
+  // "event" covers ticketed events the traveller plans a trip around —
+  // Wimbledon, Oktoberfest, Rio Carnival etc. They share the same shape as
+  // multi-day-tour (hotel + day-by-day itinerary + ticket package) but get
+  // their own type so they can be grouped together in the UI.
+  | "event";
 
 // One port-of-call on a cruise itinerary.
 // Displayed in the "Ports" section on the detail page.
@@ -243,6 +248,9 @@ export interface ActivityPort {
   arrives?: string;      // Display string, e.g. "08:00"
   departs?: string;      // Display string, e.g. "17:00"
   description?: string;  // Optional 1–2 sentence blurb
+  // When true, the Ports section renders this entry with a wave-tinted row
+  // and "At sea" label instead of a port name + arrival/departure times.
+  isSeaDay?: boolean;
 }
 
 // A bookable cabin on a cruise/river cruise.
@@ -307,6 +315,11 @@ export interface Activity {
   // walking/bicycle). Reuses TourStop so we can share the Leaflet route map.
   routeStops?: TourStop[];
 
+  // Single pin location for the search-results map. Used as a fallback when an
+  // activity doesn't have routeStops (e.g. single-day experiences, big cruise
+  // itineraries, event packages). The map prefers routeStops[0] when present.
+  coordinates?: { lat: number; lng: number };
+
   // Present for type === "walking-tour" / "bicycle-tour"
   difficulty?: "Easy" | "Moderate" | "Challenging";
   distanceKm?: number;
@@ -327,117 +340,3 @@ export interface ActivitySearchCriteria {
   travellers: number;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Cruise Types
-//
-// A Cruise is a ship-based voyage with a fixed itinerary of ports. Unlike
-// Activity (which covers many experience types), Cruise is a dedicated
-// first-class entity with its own search, list, and detail pages.
-// ─────────────────────────────────────────────────────────────────────────────
-
-// The cruise line operating the ship
-export type CruiseLine =
-  | "MSC Cruises"
-  | "Royal Caribbean"
-  | "Disney Cruise Line"
-  | "Norwegian Cruise Line"
-  | "Celebrity Cruises"
-  | "Costa Cruises"
-  | "TUI Cruises";
-
-// Regions for browsing/filtering
-export type CruiseRegion =
-  | "Caribbean"
-  | "Mediterranean"
-  | "Northern Europe"
-  | "Alaska"
-  | "Asia"
-  | "South Pacific"
-  | "Transatlantic";
-
-// One port stop on the itinerary
-export interface CruisePort {
-  name: string;           // e.g. "Barcelona, Spain"
-  day: number;            // Day number in the cruise (1-based)
-  arrives?: string;       // "08:00" — undefined for embarkation port
-  departs?: string;       // "17:00" — undefined for disembarkation port
-  isSeaDay?: boolean;     // true for "At Sea" days
-  description?: string;   // 1-2 sentence port blurb
-  lat?: number;           // For map pin placement
-  lng?: number;
-}
-
-// A bookable cabin category
-export interface CruiseCabin {
-  id: string;
-  name: string;             // e.g. "Balcony Stateroom"
-  category: "Interior" | "Ocean View" | "Balcony" | "Suite";
-  pricePerPerson: number;
-  image: string;
-  description?: string;     // 1-line feature summary
-  capacity: number;         // max guests
-  sqMeters?: number;        // cabin size
-}
-
-// One available departure date with pricing
-export interface CruiseDeparture {
-  date: string;             // ISO "YYYY-MM-DD"
-  pricePerPerson: number;   // Cheapest cabin for this date
-  available: boolean;
-}
-
-// The top-level Cruise object
-export interface Cruise {
-  cruiseId: string;
-  cruiseLine: CruiseLine;
-  shipName: string;
-  title: string;              // e.g. "Western Mediterranean Explorer"
-  subtitle: string;           // 1-2 sentence description
-  region: CruiseRegion;
-  route: string;              // e.g. "Barcelona → Marseille → Rome → Naples → Barcelona"
-
-  mainImage: string;
-  gallery: string[];
-  shipImage?: string;         // Photo of the ship itself
-
-  durationNights: number;
-  departurePort: string;      // e.g. "Barcelona, Spain"
-
-  // Next available departure (for card display)
-  nextDeparture: string;      // Display string e.g. "Jul 12, 2026"
-  departures: CruiseDeparture[];  // All available dates
-
-  price: {
-    fromPerPerson: number;    // Cheapest starting price
-    currency: string;
-  };
-
-  rating: { score: number; reviewCount: number };
-
-  // Itinerary
-  ports: CruisePort[];
-
-  // Cabin options
-  cabinTypes: CruiseCabin[];
-
-  // Content sections
-  highlights: string[];
-  included: string[];
-  excluded: string[];
-
-  // Ship amenities shown as pills
-  shipAmenities: string[];
-
-  // For map display — use first/last port coordinates or route center
-  lat?: number;
-  lng?: number;
-}
-
-// Search criteria from the Cruises tab search form
-export interface CruiseSearchCriteria {
-  region: CruiseRegion | "";
-  cruiseLine: CruiseLine | "";
-  departureMonth: string;       // "YYYY-MM" or "" for any
-  durationRange: "any" | "short" | "week" | "long";  // any / 2-5 / 6-9 / 10+
-  passengers: number;
-}

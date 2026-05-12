@@ -48,7 +48,6 @@ import {
   Paperclip,
   Send,
   Compass,
-  Ship,
   Footprints,
   Bus,
 } from "lucide-react";
@@ -61,23 +60,14 @@ import type { FlightSearchCriteria, FlightLeg, HolidaySearchCriteria } from "../
 // uses PackageSearchForm. The form is the only "Activities" UI on the
 // discovery hero; results live on a separate page.
 import ActivitySearchForm, { ACTIVITY_TYPE_OPTIONS } from "../components/ActivitySearchForm";
-import type { Activity, ActivitySearchCriteria, Cruise, CruiseSearchCriteria } from "../../../types";
+import type { Activity, ActivitySearchCriteria, ActivityType } from "../../../types";
 // Full Activity mock lookup — Discovery cards resolve their activityId here to
 // open the right ActivityDetailPage when clicked.
 import { ACTIVITY_BY_ID } from "../../../mocks/activities";
-// Cruise search form + curated mock data for the Cruises tab.
-// CRUISE_REGIONS drives the "Browse by region" row; FEATURED_CRUISES drives the
-// "Popular cruises" carousel; CRUISE_LINES drives the cruise-line pill row.
-import CruiseSearchForm from "../components/CruiseSearchForm";
-import {
-  CRUISE_REGIONS,
-  FEATURED_CRUISES,
-  CRUISE_LINES,
-} from "../../../mocks/cruises";
 
 // --- Types ---
 
-type TabId = "hotels" | "flights" | "holidays" | "activities" | "cruises";
+type TabId = "hotels" | "flights" | "holidays" | "activities";
 
 type RoomConfig = {
   id: number;
@@ -111,12 +101,6 @@ type DiscoveryPageProps = {
   // Called when the user clicks a one-day experience or iconic event card on
   // the Experiences tab → leads straight to ActivityDetailPage, skipping the list.
   onActivityDirectSelect: (activity: Activity) => void;
-  // Called when the user submits the Cruises search form (or clicks a region /
-  // featured cruise / cruise-line pill) → leads to CruiseListPage.
-  onCruiseSearch: (criteria: CruiseSearchCriteria) => void;
-  // Called when the user clicks a featured CruiseCard on the Cruises tab → leads
-  // straight to CruiseDetailPage, skipping the list.
-  onCruiseDirectSelect: (cruise: Cruise) => void;
 };
 
 // --- Tab Definitions ---
@@ -127,8 +111,6 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "holidays", label: "Holidays", icon: <Sun size={20} /> },
   { id: "hotels", label: "Hotels", icon: <Building2 size={20} /> },
   { id: "flights", label: "Flights", icon: <Plane size={20} /> },
-  // Cruises sits after Flights — completing the transport-led group
-  { id: "cruises", label: "Cruises", icon: <Ship size={20} /> },
   // Compass icon evokes the experience-led "explore by activity" framing
   { id: "activities", label: "Experiences", icon: <Compass size={20} /> },
 ];
@@ -205,37 +187,72 @@ const TOUR_CARDS = [
 // Three local arrays drive the below-hero content on the Experiences tab.
 // Shape matches TourCardData so we reuse <TourCard> instead of duplicating one.
 
-// 1. Short, single-day "do something this afternoon" experiences. Mix of walking
-//    tours, food crawls, scenic flights, and tastings across a global spread.
-//    Each `activityId` matches an Activity in src/mocks/activities.ts so clicking
-//    the card opens its full ActivityDetailPage.
-const ONE_DAY_EXPERIENCES = [
-  { id: 101, activityId: "rome-night-walk",          country: "Italy",       flag: "it", title: "Rome by Night Walking Tour",   desc: "A 3-hour stroll past the Colosseum, Trevi Fountain, and Pantheon — all lit up after dark.",        duration: "3 hours",       price: "from €35",   image: "https://images.unsplash.com/photo-1525874684015-58379d421a52?w=800&h=600&fit=crop&auto=format" },
-  { id: 102, activityId: "kyoto-food-crawl",         country: "Japan",       flag: "jp", title: "Kyoto Street Food Crawl",      desc: "Six tastings through Nishiki Market and the Gion district with a local guide.",                       duration: "4 hours",       price: "from €85",   image: "https://images.unsplash.com/photo-1554797589-7241bb691973?w=800&h=600&fit=crop&auto=format" },
-  { id: 103, activityId: "lake-geneva-sunset-cruise", country: "Switzerland", flag: "ch", title: "Lake Geneva Sunset Cruise",    desc: "A two-hour catamaran sail past the Château de Chillon with a glass of Lavaux wine.",                  duration: "2 hours",       price: "from CHF 60", image: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?w=800&h=600&fit=crop&auto=format" },
-  { id: 104, activityId: "grand-canyon-helicopter",  country: "USA",         flag: "us", title: "Grand Canyon Helicopter Tour", desc: "A 45-minute helicopter ride from Vegas over the West Rim with a Champagne landing.",                 duration: "Half day",      price: "from $399",  image: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800&h=600&fit=crop&auto=format" },
-  { id: 105, activityId: "champagne-day-trip",       country: "France",      flag: "fr", title: "Champagne Vineyard Day Trip",  desc: "Reims and Épernay cellar visits with three tastings — round-trip from Paris by minibus.",            duration: "Full day",      price: "from €189",  image: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=800&h=600&fit=crop&auto=format" },
-  { id: 106, activityId: "cappadocia-hot-air-balloon", country: "Türkiye",   flag: "tr", title: "Cappadocia Hot-Air Balloon",   desc: "Sunrise float over fairy chimneys and ancient cave villages — toast with a glass of fizz.",          duration: "1 hour flight", price: "from €230",  image: "https://images.unsplash.com/photo-1641128324972-af3212f0f6bd?w=800&h=600&fit=crop&auto=format" },
-];
+// 1. "Experience what you like" — activities grouped by their type. Each entry
+//    matches an Activity in src/mocks/activities.ts via `activityId`, so
+//    clicking the card opens the right ActivityDetailPage. Cards are shown
+//    inside a tab bar (one tab per activity type) mirroring the
+//    "Travel the way you like" pattern on the Holidays tab.
+//
+// Order of keys here doesn't matter — the tab order comes from
+// ACTIVITY_TYPE_OPTIONS (cruise-ship is already first there).
+type ActivityCardData = {
+  id: number;
+  activityId: string;
+  country: string;
+  flag: string;
+  title: string;
+  desc: string;
+  duration: string;
+  price: string;
+  image: string;
+};
 
-// 2. Iconic events the world plans trips around. Each `activityId` matches a
-// multi-day-tour Activity in src/mocks/activities.ts so clicking the card opens
-// its full ActivityDetailPage with hotel + itinerary + ticket package details.
-const ICONIC_EVENTS = [
-  { id: 201, activityId: "wimbledon-package",        country: "United Kingdom", flag: "gb", title: "Wimbledon Championships",     desc: "Centre Court grass-court tennis with strawberries and cream — late June to mid-July.",                            duration: "Match day",    price: "from £180",   image: "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=800&h=600&fit=crop&auto=format" },
-  { id: 202, activityId: "monaco-gp-package",        country: "Monaco",         flag: "mc", title: "Monaco Grand Prix",            desc: "Formula 1 racing through the streets of Monte-Carlo — the crown jewel of the F1 calendar, every May.",            duration: "Race weekend", price: "from €1,250", image: "https://images.unsplash.com/photo-1518542698050-a3041b27d5b2?w=800&h=600&fit=crop&auto=format" },
-  { id: 203, activityId: "nyc-marathon-package",     country: "USA",            flag: "us", title: "TCS New York City Marathon",   desc: "26.2 miles through all five boroughs on the first Sunday of November — 50,000 runners, two million spectators.", duration: "Race day",     price: "from $349",   image: "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=800&h=600&fit=crop&auto=format" },
-  { id: 204, activityId: "oktoberfest-package",      country: "Germany",        flag: "de", title: "Munich Oktoberfest",           desc: "The world's biggest beer festival — 14 vast tents, lederhosen and brass bands, mid-September to early October.",  duration: "3 days",       price: "from €690",   image: "https://images.unsplash.com/photo-1601057344679-2d2f1c0e9bf8?w=800&h=600&fit=crop&auto=format" },
-  { id: 205, activityId: "rio-carnival-package",     country: "Brazil",         flag: "br", title: "Rio de Janeiro Carnival",      desc: "Samba parades at the Sambódromo and city-wide street blocos — the week before Lent in February or March.",      duration: "4 nights",     price: "from $1,290", image: "https://images.unsplash.com/photo-1518963272958-29c5e2dafde6?w=800&h=600&fit=crop&auto=format" },
-  { id: 206, activityId: "edinburgh-fringe-package", country: "United Kingdom", flag: "gb", title: "Edinburgh Festival Fringe",    desc: "The world's largest arts festival — comedy, theatre, and street performers take over the city every August.",    duration: "5 nights",     price: "from £540",   image: "https://images.unsplash.com/photo-1506377585622-bedcbb027afc?w=800&h=600&fit=crop&auto=format" },
-];
-
-// 3. Browse-by pills — derived from ACTIVITY_TYPE_OPTIONS so adding new
-// activity types automatically shows them here. Skip "cruise-ship" because
-// ocean cruises live on the dedicated Cruises tab.
-const EXPERIENCE_TYPE_PILLS = ACTIVITY_TYPE_OPTIONS.filter(
-  (o) => o.id !== "cruise-ship"
-);
+const ACTIVITY_CARDS_BY_TYPE: Record<ActivityType, ActivityCardData[]> = {
+  "cruise-ship": [
+    { id: 301, activityId: "norwegian-fjords-cruise",          country: "Norway",    flag: "no", title: "Norwegian Fjords Ocean Cruise", desc: "Seven nights through UNESCO-listed Geirangerfjord with midnight-sun cruising and onboard Michelin-trained dining.", duration: "7 days",  price: "from £1,899", image: "https://images.unsplash.com/photo-1516496636080-14fb876e029d?w=800&h=600&fit=crop&auto=format" },
+    { id: 302, activityId: "western-mediterranean-explorer",   country: "Spain",     flag: "es", title: "Western Mediterranean Explorer", desc: "Barcelona, Marseille, Rome, and Palma in one eight-day Mediterranean loop aboard a mega-ship.",                     duration: "8 days",  price: "from $899",   image: "https://images.unsplash.com/photo-1530841377377-3ff06c0ca713?w=800&h=600&fit=crop&auto=format" },
+    { id: 303, activityId: "caribbean-island-hopping",         country: "Bahamas",   flag: "bs", title: "Caribbean Island Hopping",       desc: "Eight days of turquoise water with stops at CocoCay, St. Thomas, and St. Maarten from Miami.",                     duration: "8 days",  price: "from $999",   image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop&auto=format" },
+    { id: 304, activityId: "alaska-inside-passage",            country: "USA",       flag: "us", title: "Alaska Inside Passage",          desc: "Glacier Bay, Juneau, Skagway, and Ketchikan on a classic Inside Passage round-trip from Seattle.",                  duration: "8 days",  price: "from $1,299", image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&h=600&fit=crop&auto=format" },
+    { id: 305, activityId: "greek-islands-turkey",             country: "Greece",    flag: "gr", title: "Greek Islands & Turkey",         desc: "Mykonos, Santorini, Rhodes, and Kusadasi over eight days of whitewashed villages and Aegean blue.",                 duration: "8 days",  price: "from $1,349", image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=800&h=600&fit=crop&auto=format" },
+    { id: 306, activityId: "disney-magic-at-sea",              country: "USA",       flag: "us", title: "Disney Magic at Sea",            desc: "Five nights of family-friendly fun from Port Canaveral with a private day on Castaway Cay.",                       duration: "5 days",  price: "from $1,299", image: "https://images.unsplash.com/photo-1583416750470-965b2707b355?w=800&h=600&fit=crop&auto=format" },
+  ],
+  "river-cruise": [
+    { id: 311, activityId: "rhine-river-cruise",        country: "Germany",     flag: "de", title: "Rhine River Cruise — Amsterdam to Basel", desc: "Eight days along the Rhine with castle-strewn gorges, Strasbourg's old town, and Black Forest wines.", duration: "8 days", price: "from £2,299", image: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=800&h=600&fit=crop&auto=format" },
+    { id: 312, activityId: "lake-geneva-sunset-cruise", country: "Switzerland", flag: "ch", title: "Lake Geneva Sunset Cruise",                desc: "A two-hour catamaran sail past the Château de Chillon with a glass of Lavaux wine.",                    duration: "2 hours", price: "from CHF 60", image: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?w=800&h=600&fit=crop&auto=format" },
+  ],
+  "multi-day-tour": [
+    { id: 321, activityId: "tuscany-road-trip",          country: "Italy",          flag: "it", title: "Tuscany Road Trip",      desc: "Six days through Florence, Siena, and the Val d'Orcia — Renaissance art, Chianti, and hilltop villages.",      duration: "6 days", price: "from £1,499", image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&auto=format" },
+    { id: 326, activityId: "champagne-day-trip",         country: "France",         flag: "fr", title: "Champagne Vineyard Day Trip", desc: "Reims and Épernay cellar visits with three tastings — round-trip from Paris by minibus.",                    duration: "Full day", price: "from €189",  image: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=800&h=600&fit=crop&auto=format" },
+  ],
+  "walking-tour": [
+    { id: 331, activityId: "cinque-terre-walk",  country: "Italy", flag: "it", title: "Cinque Terre Coastal Walk", desc: "Self-guided five-day walk linking the five UNESCO villages along the Ligurian coast.",        duration: "5 days",  price: "from £899", image: "https://images.unsplash.com/photo-1499678329028-101435549a4e?w=800&h=600&fit=crop&auto=format" },
+    { id: 332, activityId: "rome-night-walk",    country: "Italy", flag: "it", title: "Rome by Night Walking Tour", desc: "A 3-hour stroll past the Colosseum, Trevi Fountain, and Pantheon — all lit up after dark.",   duration: "3 hours", price: "from €35",  image: "https://images.unsplash.com/photo-1525874684015-58379d421a52?w=800&h=600&fit=crop&auto=format" },
+    { id: 333, activityId: "kyoto-food-crawl",   country: "Japan", flag: "jp", title: "Kyoto Street Food Crawl",    desc: "Six tastings through Nishiki Market and the Gion district with a local guide.",                duration: "4 hours", price: "from €85",  image: "https://images.unsplash.com/photo-1554797589-7241bb691973?w=800&h=600&fit=crop&auto=format" },
+  ],
+  "bicycle-tour": [
+    { id: 341, activityId: "loire-bicycle-tour", country: "France", flag: "fr", title: "Loire Valley Châteaux Bike Tour", desc: "Seven days of easy riding past Chenonceau, Amboise, and Blois with luggage transfers between hotels.", duration: "7 days", price: "from £1,349", image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&h=600&fit=crop&auto=format" },
+  ],
+  "safari": [
+    { id: 351, activityId: "kenya-safari", country: "Kenya", flag: "ke", title: "Kenya Big Five Safari", desc: "Eight days across the Maasai Mara, Lake Nakuru, and Amboseli — Big Five game drives with Kilimanjaro views.", duration: "8 days", price: "from £3,299", image: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800&h=600&fit=crop&auto=format" },
+  ],
+  "expedition": [
+    { id: 361, activityId: "antarctica-expedition",      country: "Antarctica", flag: "aq", title: "Antarctica Classic Expedition", desc: "Eleven days from Ushuaia to the Antarctic Peninsula — penguin colonies, Zodiac landings, and ice cliffs.", duration: "11 days",     price: "from £7,499", image: "https://images.unsplash.com/photo-1551845041-63e8e76836ea?w=800&h=600&fit=crop&auto=format" },
+    { id: 362, activityId: "grand-canyon-helicopter",    country: "USA",        flag: "us", title: "Grand Canyon Helicopter Tour",  desc: "A 45-minute helicopter ride from Vegas over the West Rim with a Champagne landing.",                        duration: "Half day",     price: "from $399",  image: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800&h=600&fit=crop&auto=format" },
+    { id: 363, activityId: "cappadocia-hot-air-balloon", country: "Türkiye",    flag: "tr", title: "Cappadocia Hot-Air Balloon",    desc: "Sunrise float over fairy chimneys and ancient cave villages — toast with a glass of fizz on landing.",       duration: "1 hour flight", price: "from €230",  image: "https://images.unsplash.com/photo-1641128324972-af3212f0f6bd?w=800&h=600&fit=crop&auto=format" },
+  ],
+  // Ticketed events — trips built around a fixture / festival.
+  // Each `activityId` matches an Activity in src/mocks/activities.ts (type "event")
+  // so clicking the card lands directly on its ActivityDetailPage with hotel +
+  // itinerary + ticket package details.
+  "event": [
+    { id: 371, activityId: "wimbledon-package",        country: "United Kingdom", flag: "gb", title: "Wimbledon Championships",   desc: "Centre Court grass-court tennis with strawberries and cream — late June to mid-July.",                            duration: "Match day",    price: "from £180",   image: "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=800&h=600&fit=crop&auto=format" },
+    { id: 372, activityId: "monaco-gp-package",        country: "Monaco",         flag: "mc", title: "Monaco Grand Prix",          desc: "Formula 1 racing through the streets of Monte-Carlo — the crown jewel of the F1 calendar, every May.",            duration: "Race weekend", price: "from €1,250", image: "https://images.unsplash.com/photo-1614949194403-9602bdc14a3a?w=800&h=600&fit=crop&auto=format" },
+    { id: 373, activityId: "nyc-marathon-package",     country: "USA",            flag: "us", title: "TCS New York City Marathon", desc: "26.2 miles through all five boroughs on the first Sunday of November — 50,000 runners, two million spectators.", duration: "Race day",     price: "from $349",   image: "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=800&h=600&fit=crop&auto=format" },
+    { id: 374, activityId: "oktoberfest-package",      country: "Germany",        flag: "de", title: "Munich Oktoberfest",         desc: "The world's biggest beer festival — 14 vast tents, lederhosen and brass bands, mid-September to early October.",  duration: "3 days",       price: "from €690",   image: "https://images.unsplash.com/photo-1661078226424-28f190c723e0?w=800&h=600&fit=crop&auto=format" },
+    { id: 375, activityId: "rio-carnival-package",     country: "Brazil",         flag: "br", title: "Rio de Janeiro Carnival",    desc: "Samba parades at the Sambódromo and city-wide street blocos — the week before Lent in February or March.",      duration: "4 nights",     price: "from $1,290", image: "https://images.unsplash.com/photo-1522008629172-0c17aa47d1ee?w=800&h=600&fit=crop&auto=format" },
+    { id: 376, activityId: "edinburgh-fringe-package", country: "United Kingdom", flag: "gb", title: "Edinburgh Festival Fringe",  desc: "The world's largest arts festival — comedy, theatre, and street performers take over the city every August.",    duration: "5 nights",     price: "from £540",   image: "https://images.unsplash.com/photo-1506377585622-bedcbb027afc?w=800&h=600&fit=crop&auto=format" },
+  ],
+};
 
 // Tours by destination (Section 2)
 const DESTINATION_FILTERS = ["Thailand", "Indonesia", "Peru", "Japan", "Morocco"];
@@ -495,8 +512,6 @@ export default function DiscoveryPage({
   onHolidaySearch,
   onActivitySearch,
   onActivityDirectSelect,
-  onCruiseSearch,
-  onCruiseDirectSelect,
 }: DiscoveryPageProps) {
   const [activeTab, setActiveTab] = useState<TabId>("holidays");
   // Controls whether the hero shows the normal search card or the AI Experience mode
@@ -637,6 +652,22 @@ export default function DiscoveryPage({
     const bar = tripTypeTabBarRef.current;
     if (el && bar) setTripTypeIndicator({ left: el.offsetLeft, width: el.offsetWidth });
   }, [activeTripType, hoveredTripType]);
+
+  // ── Activity type tabs for the "Experience what you like" section on the
+  // Activities tab. Same sliding-underline pattern as Trip Types above.
+  // Cruises are first because they're the most popular activity category.
+  const [activeActivityType, setActiveActivityType] = useState<ActivityType>("cruise-ship");
+  const activityTypeTabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+  const activityTypeTabBarRef = useRef<HTMLDivElement>(null);
+  const [activityTypeIndicator, setActivityTypeIndicator] = useState({ left: 0, width: 0 });
+  const [hoveredActivityType, setHoveredActivityType] = useState<ActivityType | null>(null);
+
+  useEffect(() => {
+    const target = hoveredActivityType ?? activeActivityType;
+    const el = activityTypeTabRefs.current[target];
+    const bar = activityTypeTabBarRef.current;
+    if (el && bar) setActivityTypeIndicator({ left: el.offsetLeft, width: el.offsetWidth });
+  }, [activeActivityType, hoveredActivityType]);
 
   // Hotels panel state
   type HotelPanel = "destination" | "dates" | "guests" | null;
@@ -1618,11 +1649,6 @@ export default function DiscoveryPage({
                   <ActivitySearchForm variant="hero" onSearch={onActivitySearch} />
                 )}
 
-                {/* CRUISES PANEL — single-form panel like Holidays / Activities */}
-                {activeTab === "cruises" && (
-                  <CruiseSearchForm variant="hero" onSearch={onCruiseSearch} />
-                )}
-
               </div>
             </div>
             </div>
@@ -1707,266 +1733,89 @@ export default function DiscoveryPage({
       >
 
 
-      {/* ── CRUISES ── */}
-      {/* Three content rows: (1) Browse by region, (2) Popular cruises,
-          (3) Browse by cruise line. Mirrors the Holidays tab's mix of
-          inspirational discovery + quick-search shortcuts. */}
-      {activeTab === "cruises" && (
-        <section className="py-10 md:py-16 px-4 md:px-6 lg:px-12">
-          <div className="max-w-[1200px] mx-auto flex flex-col gap-12 md:gap-16">
-
-            {/* ── 1. Browse by region ── */}
-            <div>
-              <div className="mb-6 md:mb-8">
-                <div className="flex items-center gap-2.5 mb-2">
-                  <Compass size={24} className="text-primary md:size-7" />
-                  <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
-                    Browse by region
-                  </h2>
-                </div>
-                <p className="text-muted-foreground text-sm md:text-lg">
-                  Pick a region and we'll show you every available departure
-                </p>
-              </div>
-
-              {/* Horizontal-scrolling region cards */}
-              <div className="flex gap-4 md:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {CRUISE_REGIONS.map((region) => (
-                  <button
-                    key={region.id}
-                    onClick={() => {
-                      // Clicking a region card runs a search with that region pre-filled
-                      onCruiseSearch({
-                        region: region.label,
-                        cruiseLine: "",
-                        departureMonth: "",
-                        durationRange: "any",
-                        passengers: 2,
-                      });
-                    }}
-                    className="shrink-0 w-[280px] h-[200px] md:w-[320px] md:h-[220px] relative rounded-2xl overflow-hidden cursor-pointer snap-start group focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <ImageWithPlaceholder
-                      src={region.image}
-                      alt={region.label}
-                      containerClassName="absolute inset-0 w-full h-full"
-                      className="group-hover:scale-[1.04] transition-transform duration-500"
-                    />
-                    {/* Bottom-fade overlay so the label stays readable */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between gap-2">
-                      <div className="text-left text-white">
-                        <p className="text-2xl mb-1" aria-hidden="true">{region.emoji}</p>
-                        <p className="text-lg font-extrabold leading-tight">{region.label}</p>
-                        <p className="text-xs opacity-90 mt-0.5">{region.cruiseCount} cruises</p>
-                      </div>
-                      <ArrowRight
-                        size={20}
-                        className="text-white shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* ── 2. Popular cruises ── */}
-            <div>
-              <div className="mb-6 md:mb-8">
-                <div className="flex items-center gap-2.5 mb-2">
-                  <Ship size={24} className="text-primary md:size-7" />
-                  <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
-                    Popular cruises
-                  </h2>
-                </div>
-                <p className="text-muted-foreground text-sm md:text-lg">
-                  Hand-picked itineraries from the world's top cruise lines
-                </p>
-              </div>
-
-              {/* Simplified cruise carousel — smaller than the full CruiseCard
-                  so it fits a "browse" mood rather than a "search results" one */}
-              <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {FEATURED_CRUISES.map((cruise) => {
-                  const sym = cruise.price.currency === "GBP" ? "£" : "$";
-                  return (
-                    <button
-                      key={cruise.cruiseId}
-                      onClick={() => onCruiseDirectSelect(cruise)}
-                      className="shrink-0 w-[280px] bg-card rounded-2xl overflow-hidden shadow-[0_4px_6px_-4px_rgba(0,0,0,0.10),0_10px_15px_-3px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-200 snap-start text-left focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      <ImageWithPlaceholder
-                        src={cruise.mainImage}
-                        alt={cruise.title}
-                        containerClassName="w-full h-[180px]"
-                      />
-                      <div className="p-4 flex flex-col gap-2">
-                        {/* Cruise line tag */}
-                        <span className="flex items-center gap-1 text-[11px] font-bold text-primary uppercase tracking-wide">
-                          <Ship size={11} aria-hidden="true" />
-                          {cruise.cruiseLine}
-                        </span>
-                        <p className="text-base font-bold text-foreground leading-snug line-clamp-2">
-                          {cruise.title}
-                        </p>
-                        <p className="text-xs text-muted-foreground line-clamp-1">
-                          {cruise.shipName} · {cruise.route}
-                        </p>
-                        <div className="flex items-center justify-between mt-1 pt-2 border-t border-muted">
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Moon size={12} aria-hidden="true" />
-                            {cruise.durationNights} nights
-                          </span>
-                          <span className="text-lg font-extrabold text-foreground">
-                            {sym}{cruise.price.fromPerPerson.toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* ── 3. Browse by cruise line ── */}
-            <div>
-              <div className="mb-6 md:mb-8">
-                <div className="flex items-center gap-2.5 mb-2">
-                  <Heart size={24} className="text-primary md:size-7" />
-                  <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
-                    Browse by cruise line
-                  </h2>
-                </div>
-                <p className="text-muted-foreground text-sm md:text-lg">
-                  Stick with your favourite line — every cruise from one operator
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                {CRUISE_LINES.map((line) => (
-                  <button
-                    key={line.id}
-                    onClick={() =>
-                      onCruiseSearch({
-                        region: "",
-                        // The id matches the CruiseLine union type, so we can cast safely
-                        cruiseLine: line.id as CruiseSearchCriteria["cruiseLine"],
-                        departureMonth: "",
-                        durationRange: "any",
-                        passengers: 2,
-                      })
-                    }
-                    className="flex items-center gap-2 bg-card border border-border text-foreground hover:border-primary hover:text-primary text-sm font-semibold px-4 py-2.5 rounded-full transition-colors"
-                  >
-                    <Ship size={14} aria-hidden="true" />
-                    {line.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-          </div>
-        </section>
-      )}
-
       {/* ── EXPERIENCES (rendered when activeTab === "activities") ── */}
-      {/* Three content rows: (1) One-day experiences, (2) Iconic events,
-          (3) Browse by experience type. Mirrors the Cruises layout so
-          Discovery feels consistent across "big trip" categories. */}
+      {/* Two content rows: (1) Experience what you like (tabbed by activity
+          type), (2) Iconic events. */}
       {activeTab === "activities" && (
         <section className="py-10 md:py-16 px-4 md:px-6 lg:px-12">
           <div className="max-w-[1200px] mx-auto flex flex-col gap-12 md:gap-16">
 
-            {/* ── 1. One-day experiences ── */}
+            {/* ── 1. Experience what you like ── */}
+            {/* Activities grouped by activity type, behind a tab bar that
+                mirrors the "Travel the way you like" section on Holidays.
+                Cruises lead the tab order since they're the headline category. */}
             <div>
               <div className="mb-6 md:mb-8">
                 <div className="flex items-center gap-2.5 mb-2">
                   <Footprints size={24} className="text-primary md:size-7" />
                   <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
-                    One-day experiences
+                    Experience what you like
                   </h2>
                 </div>
                 <p className="text-muted-foreground text-sm md:text-lg">
-                  Short on time? Book a tour, tasting or scenic ride for any day of your trip
+                  Browse hand-picked activities by the kind of trip you love
                 </p>
               </div>
 
-              {/* Horizontal-scrolling experience cards — TourCard at 320px width */}
-              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {ONE_DAY_EXPERIENCES.map((exp) => (
-                  <div key={exp.id} className="shrink-0 w-[320px] snap-start">
-                    <TourCard
-                      tour={exp}
-                      // Resolve the card's activityId to the full Activity object
-                      // and jump straight to its detail page (skip the list).
-                      onSelect={() => onActivityDirectSelect(ACTIVITY_BY_ID[exp.activityId])}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* ── 2. Iconic events ── */}
-            <div>
-              <div className="mb-6 md:mb-8">
-                <div className="flex items-center gap-2.5 mb-2">
-                  <Sparkles size={24} className="text-primary md:size-7" />
-                  <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
-                    Iconic events
-                  </h2>
-                </div>
-                <p className="text-muted-foreground text-sm md:text-lg">
-                  Plan your trip around once-in-a-lifetime sporting and cultural moments
-                </p>
-              </div>
-
-              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {ICONIC_EVENTS.map((evt) => (
-                  <div key={evt.id} className="shrink-0 w-[320px] snap-start">
-                    <TourCard
-                      tour={evt}
-                      // Open the full event package detail page directly.
-                      onSelect={() => onActivityDirectSelect(ACTIVITY_BY_ID[evt.activityId])}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* ── 3. Browse by experience type ── */}
-            <div>
-              <div className="mb-6 md:mb-8">
-                <div className="flex items-center gap-2.5 mb-2">
-                  <Compass size={24} className="text-primary md:size-7" />
-                  <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
-                    Browse by experience type
-                  </h2>
-                </div>
-                <p className="text-muted-foreground text-sm md:text-lg">
-                  Find your kind of adventure
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                {EXPERIENCE_TYPE_PILLS.map((pill) => (
+              {/* Tab bar — sliding underline driven by the activityTypeTabRefs.
+                  Order comes from ACTIVITY_TYPE_OPTIONS, which has
+                  cruise-ship first. */}
+              <div ref={activityTypeTabBarRef} className="relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {ACTIVITY_TYPE_OPTIONS.map((opt) => (
                   <button
-                    key={pill.id}
-                    onClick={() =>
-                      onActivitySearch({
-                        destination: "",
-                        activityTypes: [pill.id],
-                        travellers: 2,
-                        dateFrom: "",
-                        dateTo: "",
-                      })
-                    }
-                    className="flex items-center gap-2 bg-card border border-border text-foreground hover:border-primary hover:text-primary text-sm font-semibold px-4 py-2.5 rounded-full transition-colors"
+                    key={opt.id}
+                    ref={(el) => { activityTypeTabRefs.current[opt.id] = el; }}
+                    onClick={() => setActiveActivityType(opt.id)}
+                    onMouseEnter={() => setHoveredActivityType(opt.id)}
+                    onMouseLeave={() => setHoveredActivityType(null)}
+                    className={cn(
+                      "shrink-0 px-5 py-3 text-base font-bold whitespace-nowrap",
+                      activeActivityType === opt.id ? "text-primary" : "text-foreground"
+                    )}
                   >
-                    {pill.icon}
-                    {pill.label}
+                    {opt.label}
                   </button>
                 ))}
+                <div
+                  className="absolute bottom-0 h-[2.5px] bg-primary rounded-full transition-all duration-300 ease-out"
+                  style={{ left: activityTypeIndicator.left, width: activityTypeIndicator.width }}
+                />
+              </div>
+
+              {/* Horizontal-scrolling cards for the active activity type.
+                  TourCard at 320px wide — same width used elsewhere on
+                  Discovery so the rhythm stays consistent. */}
+              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {ACTIVITY_CARDS_BY_TYPE[activeActivityType].map((card) => (
+                  <div key={card.id} className="shrink-0 w-[320px] snap-start">
+                    <TourCard
+                      tour={card}
+                      // Resolve activityId to the full Activity and jump
+                      // straight to the detail page (skip the list).
+                      onSelect={() => onActivityDirectSelect(ACTIVITY_BY_ID[card.activityId])}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* View-all CTA — drops the user into ActivityListPage already
+                  filtered to the active type (the list page reads this
+                  criterion to scope results). */}
+              <div className="mt-5 md:mt-6 flex justify-end">
+                <button
+                  onClick={() =>
+                    onActivitySearch({
+                      destination: "",
+                      activityTypes: [activeActivityType],
+                      travellers: 2,
+                      dateFrom: "",
+                      dateTo: "",
+                    })
+                  }
+                  className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
+                >
+                  View all {ACTIVITY_TYPE_OPTIONS.find((o) => o.id === activeActivityType)?.label} activities
+                </button>
               </div>
             </div>
 

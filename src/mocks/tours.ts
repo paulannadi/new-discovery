@@ -633,7 +633,7 @@ export const BALI_DISCOVERY_TOUR: Tour = {
         { type: "highlight", label: "Seminyak Beach free day", description: "A full free day to relax, surf, swim, or browse the boutiques and beach clubs of Seminyak and Petitenget." },
         { type: "hotel",    label: "The Layar *****" },
       ],
-      image: "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=400&q=80",
+      image: "https://images.unsplash.com/photo-1552272492-3053fbacbf4b?w=400&q=80",
     },
     {
       dayNumber: 7,
@@ -753,7 +753,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
     "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=800&q=80",
     "https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?w=800&q=80",
     "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80",
-    "https://images.unsplash.com/photo-1591266752934-9cb8c1a3804b?w=800&q=80",
+    "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80",
   ],
   days: [
     {
@@ -793,7 +793,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
         { type: "highlight", label: "Ollantaytambo fortress", description: "Afternoon at the largest still-functioning Inca town — massive military terraces and a working water channel system." },
         { type: "hotel",    label: "Inkaterra Hacienda Urubamba *****" },
       ],
-      image: "https://images.unsplash.com/photo-1591266752934-9cb8c1a3804b?w=400&q=80",
+      image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=400&q=80",
     },
     {
       dayNumber: 5,
@@ -813,7 +813,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
         { type: "transport", label: "Aguas Calientes → Cusco (train + transfer)", description: "Return journey included" },
         { type: "hotel",    label: "Palacio del Inca *****" },
       ],
-      image: "https://images.unsplash.com/photo-1569575834128-ab65dce4b2d7?w=400&q=80",
+      image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=400&q=80",
     },
     {
       dayNumber: 7,
@@ -823,7 +823,7 @@ export const PERU_ADVENTURE_TOUR: Tour = {
         { type: "transport", label: "Cusco → Lima (evening flight)", description: "1h 20m · Domestic flight included" },
         { type: "hotel",    label: "JW Marriott Lima *****" },
       ],
-      image: "https://images.unsplash.com/photo-1504457047772-27faf794c6c8?w=400&q=80",
+      image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=400&q=80",
     },
     {
       dayNumber: 8,
@@ -1036,7 +1036,7 @@ export const JAPAN_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Tenryu-ji Garden", description: "UNESCO World Heritage Zen garden with a pond designed to frame the mountains beyond." },
         { type: "hotel",    label: "Hyatt Regency Kyoto *****" },
       ],
-      image: "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?w=400&q=80",
+      image: "https://images.unsplash.com/photo-1698618988744-737573cb6a7a?w=400&q=80",
     },
     {
       dayNumber: 8,
@@ -1209,10 +1209,10 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
     { iconKey: "calendar-check",  title: "Min age",     value: "16+" },
   ],
   gallery: [
-    "https://images.unsplash.com/photo-1548018560-c7196e4f3e46?w=800&q=80",
+    "https://images.unsplash.com/photo-1702211374779-792e3df71b59?w=800&q=80",
     "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80",
-    "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=800&q=80",
-    "https://images.unsplash.com/photo-1545601445-4d6a29737163?w=800&q=80",
+    "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=800&q=80",
+    "https://images.unsplash.com/photo-1677837488142-a85ffbffe408?w=800&q=80",
   ],
   days: [
     {
@@ -1222,7 +1222,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
         { type: "highlight", label: "Hassan II Mosque", description: "Arrive at Mohammed V Airport. Transfer to Casablanca. Visit the spectacular Hassan II Mosque — the world's third largest, partly built over the Atlantic Ocean." },
         { type: "hotel",    label: "Four Seasons Casablanca *****" },
       ],
-      image: "https://images.unsplash.com/photo-1548018560-c7196e4f3e46?w=400&q=80",
+      image: "https://images.unsplash.com/photo-1702211374779-792e3df71b59?w=400&q=80",
     },
     {
       dayNumber: 2,
@@ -1232,7 +1232,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
         { type: "highlight", label: "Chefchaouen Blue City walk", description: "Wander the labyrinthine alleys of this photogenic mountain town — every surface washed in vivid shades of blue." },
         { type: "hotel",    label: "Riad Lina & Spa ****" },
       ],
-      image: "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=400&q=80",
+      image: "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=400&q=80",
     },
     {
       dayNumber: 3,
@@ -1252,7 +1252,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
         { type: "highlight", label: "Pottery & zellige tile workshop visit", description: "Watch master craftsmen paint intricate Fassi geometric patterns by hand." },
         { type: "hotel",    label: "Riad Fes *****" },
       ],
-      image: "https://images.unsplash.com/photo-1545601445-4d6a29737163?w=400&q=80",
+      image: "https://images.unsplash.com/photo-1677837488142-a85ffbffe408?w=400&q=80",
     },
     {
       dayNumber: 5,
@@ -1262,7 +1262,7 @@ export const MOROCCO_IMPERIAL_TOUR: Tour = {
         { type: "highlight", label: "Erg Chebbi sand dunes", description: "Arrive at dusk as the great orange dunes of Erg Chebbi glow in the last light." },
         { type: "hotel",    label: "Kasbah Mohayut Desert Camp *****" },
       ],
-      image: "https://images.unsplash.com/photo-1504541525549-86a5f5b7b4e5?w=400&q=80",
+      image: "https://images.unsplash.com/photo-1559586616-361e18714958?w=400&q=80",
     },
     {
       dayNumber: 6,
@@ -1426,7 +1426,7 @@ export const DUBAI_HIGHLIGHTS_TOUR: Tour = {
   ],
   gallery: [
     "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80",
-    "https://images.unsplash.com/photo-1545579133-99bb5ad189be?w=800&q=80",
+    "https://images.unsplash.com/photo-1638180940769-bc94c1ffc9cd?w=800&q=80",
     "https://images.unsplash.com/photo-1590073844006-33379778ae09?w=800&q=80",
     "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=80",
   ],
@@ -1438,7 +1438,7 @@ export const DUBAI_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Arrive at Dubai International Airport", description: "Transfer to your hotel in Downtown Dubai. Evening at leisure — stroll along the Dubai Fountain." },
         { type: "hotel", label: "Address Downtown or similar" },
       ],
-      image: "https://images.unsplash.com/photo-1545579133-99bb5ad189be?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1638180940769-bc94c1ffc9cd?w=800&q=80",
     },
     {
       dayNumber: 2,
@@ -1448,7 +1448,7 @@ export const DUBAI_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Dubai Mall & Dubai Fountain show", description: "World's largest shopping mall. Evening Dubai Fountain water performance." },
         { type: "hotel", label: "Address Downtown or similar" },
       ],
-      image: "https://images.unsplash.com/photo-1545579133-99bb5ad189be?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1638180940769-bc94c1ffc9cd?w=800&q=80",
     },
     {
       dayNumber: 3,
@@ -1487,7 +1487,7 @@ export const DUBAI_HIGHLIGHTS_TOUR: Tour = {
         { type: "highlight", label: "Optional: Wild Wadi Waterpark or Ski Dubai", description: "Choose your own adventure — world-class waterpark or indoor ski slope in the desert." },
         { type: "hotel", label: "Address Downtown or similar" },
       ],
-      image: "https://images.unsplash.com/photo-1582610116397-edb72270f707?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1638180940769-bc94c1ffc9cd?w=800&q=80",
     },
     {
       dayNumber: 7,
@@ -1740,7 +1740,7 @@ export const MALDIVES_ISLAND_TOUR: Tour = {
     "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80",
     "https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=800&q=80",
     "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=800&q=80",
-    "https://images.unsplash.com/photo-1540202404-8d0de77c3573?w=800&q=80",
+    "https://images.unsplash.com/photo-1637576308588-6647bf80944d?w=800&q=80",
   ],
   days: [
     {
@@ -1778,7 +1778,7 @@ export const MALDIVES_ISLAND_TOUR: Tour = {
         { type: "highlight", label: "Hanifaru Bay UNESCO Biosphere snorkel", description: "UNESCO World Biosphere Reserve — snorkel with hundreds of manta rays in season." },
         { type: "hotel", label: "Six Senses Laamu or similar" },
       ],
-      image: "https://images.unsplash.com/photo-1540202404-8d0de77c3573?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1637576308588-6647bf80944d?w=800&q=80",
     },
     {
       dayNumber: 10,
@@ -1864,7 +1864,7 @@ export const TENERIFE_TOUR: Tour = {
     "Whale & dolphin watching cruise",
     "Masca gorge hike",
   ],
-  mainImage: "https://images.unsplash.com/photo-1500320576215-ac78814dfe80?w=800&q=80",
+  mainImage: "https://images.unsplash.com/photo-1650026831237-b318cdf3f5c7?w=800&q=80",
   price: { perPerson: 1099, total: 2198, currency: "GBP", paidBefore: 549, paidAtDestination: 550 },
   startDate: "Apr 11, 2026",
   endDate: "Apr 19, 2026",
@@ -1876,7 +1876,7 @@ export const TENERIFE_TOUR: Tour = {
     { iconKey: "calendar-check",  title: "Min age",     value: "12+" },
   ],
   gallery: [
-    "https://images.unsplash.com/photo-1500320576215-ac78814dfe80?w=800&q=80",
+    "https://images.unsplash.com/photo-1650026831237-b318cdf3f5c7?w=800&q=80",
     "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80",
     "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
@@ -1899,7 +1899,7 @@ export const TENERIFE_TOUR: Tour = {
         { type: "highlight", label: "Roques de García lava field walk", description: "Guided walk through the otherworldly volcanic landscape." },
         { type: "hotel", label: "Bahía del Duque or similar" },
       ],
-      image: "https://images.unsplash.com/photo-1500320576215-ac78814dfe80?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1650026831237-b318cdf3f5c7?w=800&q=80",
     },
     {
       dayNumber: 4,
@@ -2457,7 +2457,7 @@ export const THAILAND_NORTH_TOUR: Tour = {
     "https://images.unsplash.com/photo-1598935898639-81586f7d2129?w=800&q=80",
     "https://images.unsplash.com/photo-1512100356356-de1b84283e18?w=800&q=80",
     "https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?w=800&q=80",
-    "https://images.unsplash.com/photo-1600807840746-c6ac89a24520?w=800&q=80",
+    "https://images.unsplash.com/photo-1599576838688-8a6c11263108?w=800&q=80",
   ],
   days: [
     {
@@ -2502,7 +2502,7 @@ export const THAILAND_NORTH_TOUR: Tour = {
         { type: "highlight", label: "Golden Triangle viewpoint", description: "Stand at the point where Thailand, Laos, and Myanmar meet at the confluence of the Mekong and Ruak rivers." },
         { type: "hotel", label: "Le Méridien Chiang Rai ****" },
       ],
-      image: "https://images.unsplash.com/photo-1600807840746-c6ac89a24520?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1599576838688-8a6c11263108?w=800&q=80",
     },
     {
       dayNumber: 5,
@@ -2836,7 +2836,7 @@ export const BALI_BLISS_TOUR: Tour = {
   gallery: [
     "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
     "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
-    "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+    "https://images.unsplash.com/photo-1552272492-3053fbacbf4b?w=800&q=80",
     "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&q=80",
   ],
   days: [
@@ -2870,7 +2870,7 @@ export const BALI_BLISS_TOUR: Tour = {
         { type: "highlight", label: "Stand-up paddleboarding", description: "Gentle SUP session on the calm waters of Nusa Dua's protected bay." },
         { type: "hotel", label: "The Mulia *****" },
       ],
-      image: "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1552272492-3053fbacbf4b?w=800&q=80",
     },
     {
       dayNumber: 4,
@@ -2903,7 +2903,7 @@ export const BALI_BLISS_TOUR: Tour = {
         { type: "highlight", label: "Tegallalang Rice Terraces walk", description: "Afternoon stroll through the iconic cascading rice paddies carved into the hillside." },
         { type: "hotel", label: "Viceroy Bali *****" },
       ],
-      image: "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1552272492-3053fbacbf4b?w=800&q=80",
     },
     {
       dayNumber: 7,
@@ -3283,7 +3283,7 @@ export const LOMBOK_GILIS_TOUR: Tour = {
     "Gili Air beach cycling",
     "Turtle sanctuary visit",
   ],
-  mainImage: "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+  mainImage: "https://images.unsplash.com/photo-1552272492-3053fbacbf4b?w=800&q=80",
   price: {
     perPerson: 1650,
     total: 3300,
@@ -3303,7 +3303,7 @@ export const LOMBOK_GILIS_TOUR: Tour = {
     { iconKey: "calendar-check", title: "Min age",     value: "12+" },
   ],
   gallery: [
-    "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+    "https://images.unsplash.com/photo-1552272492-3053fbacbf4b?w=800&q=80",
     "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
     "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&q=80",
     "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
@@ -3317,7 +3317,7 @@ export const LOMBOK_GILIS_TOUR: Tour = {
         { type: "highlight", label: "Welcome to Lombok", description: "Arrive at Lombok International Airport. Transfer to Senggigi Beach on the west coast." },
         { type: "hotel", label: "Qunci Villas *****" },
       ],
-      image: "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1552272492-3053fbacbf4b?w=800&q=80",
     },
     {
       dayNumber: 2,
@@ -3360,7 +3360,7 @@ export const LOMBOK_GILIS_TOUR: Tour = {
         { type: "highlight", label: "Turtle sanctuary visit", description: "Visit the Gili Trawangan turtle hatchery and release baby turtles into the sea." },
         { type: "hotel", label: "Pondok Santi Estate ****" },
       ],
-      image: "https://images.unsplash.com/photo-1570789210967-2cac24ec863d?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1552272492-3053fbacbf4b?w=800&q=80",
     },
     {
       dayNumber: 6,
@@ -4427,7 +4427,7 @@ export const MOROCCO_SAHARA_TOUR: Tour = {
   ],
   gallery: [
     "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80",
-    "https://images.unsplash.com/photo-1548820996-c1e4d0e33aa2?w=800&q=80",
+    "https://images.unsplash.com/photo-1489573280374-2e193c63726c?w=800&q=80",
     "https://images.unsplash.com/photo-1531218150217-54595bc2b934?w=800&q=80",
     "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=800&q=80",
   ],
@@ -4441,7 +4441,7 @@ export const MOROCCO_SAHARA_TOUR: Tour = {
         { type: "highlight", label: "Aït Benhaddou UNESCO kasbah", description: "Explore the stunning fortified ksar — film location for Gladiator, Game of Thrones, and Lawrence of Arabia." },
         { type: "hotel", label: "Berbère Palace Ouarzazate ****" },
       ],
-      image: "https://images.unsplash.com/photo-1548820996-c1e4d0e33aa2?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1489573280374-2e193c63726c?w=800&q=80",
     },
     {
       dayNumber: 2,
@@ -4496,7 +4496,7 @@ export const MOROCCO_SAHARA_TOUR: Tour = {
         { type: "highlight", label: "Djemaa el-Fna arrival evening", description: "Arrive in Marrakech and head straight to the world's greatest open-air stage — food stalls, musicians, and snake charmers." },
         { type: "hotel", label: "La Mamounia *****" },
       ],
-      image: "https://images.unsplash.com/photo-1548820996-c1e4d0e33aa2?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1489573280374-2e193c63726c?w=800&q=80",
     },
     {
       dayNumber: 7,
@@ -4611,7 +4611,7 @@ export const MOROCCO_COASTAL_TOUR: Tour = {
     "Tangier Kasbah & Caves of Hercules",
     "Atlantic coast surfing",
   ],
-  mainImage: "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=800&q=80",
+  mainImage: "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=800&q=80",
   price: {
     perPerson: 1410,
     total: 2820,
@@ -4631,7 +4631,7 @@ export const MOROCCO_COASTAL_TOUR: Tour = {
     { iconKey: "calendar-check", title: "Min age",     value: "All ages" },
   ],
   gallery: [
-    "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=800&q=80",
+    "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=800&q=80",
     "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=800&q=80",
     "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=800&q=80",
     "https://images.unsplash.com/photo-1531218150217-54595bc2b934?w=800&q=80",
@@ -4645,7 +4645,7 @@ export const MOROCCO_COASTAL_TOUR: Tour = {
         { type: "highlight", label: "Welcome to Tangier", description: "Arrive at Tangier Ibn Battouta Airport. Transfer to your hotel overlooking the Strait of Gibraltar." },
         { type: "hotel", label: "El Minzah Hotel *****" },
       ],
-      image: "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=800&q=80",
     },
     {
       dayNumber: 2,
@@ -4667,7 +4667,7 @@ export const MOROCCO_COASTAL_TOUR: Tour = {
         { type: "highlight", label: "Chefchaouen blue medina walk", description: "Wander the labyrinthine alleys of Morocco's famous blue city — every surface washed in vivid shades of blue." },
         { type: "hotel", label: "Lina Ryad & Spa ****" },
       ],
-      image: "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=800&q=80",
     },
     {
       dayNumber: 4,
@@ -4711,7 +4711,7 @@ export const MOROCCO_COASTAL_TOUR: Tour = {
         { type: "highlight", label: "Sunset camel ride on the beach", description: "Ride a camel along the shoreline at golden hour — the Atlantic waves crashing beside you." },
         { type: "hotel", label: "Heure Bleue Palais *****" },
       ],
-      image: "https://images.unsplash.com/photo-1553899017-7b15c5d3590b?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=800&q=80",
     },
     {
       dayNumber: 8,

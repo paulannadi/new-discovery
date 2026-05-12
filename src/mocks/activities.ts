@@ -15,7 +15,7 @@
 // (free CDN previously used elsewhere in this prototype).
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { Activity } from "../types";
+import type { Activity, ActivityCabin } from "../types";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. CRUISE SHIP — Norwegian Fjords
@@ -433,8 +433,8 @@ export const LOIRE_BICYCLE_TOUR: Activity = {
   gallery: [
     "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=1200&q=80",
     "https://images.unsplash.com/photo-1551893665-f843f600794e?w=1200&q=80",
-    "https://images.unsplash.com/photo-1485870698773-15580fe18b6d?w=1200&q=80",
-    "https://images.unsplash.com/photo-1471331580036-fd17a8c0ce85?w=1200&q=80",
+    "https://images.unsplash.com/photo-1526817609938-a708708cf90f?w=1200&q=80",
+    "https://images.unsplash.com/photo-1526816229784-65d5d54ac8bc?w=1200&q=80",
   ],
   location: "Tours → Amboise → Chenonceau → Blois",
   durationDays: 7,
@@ -875,6 +875,7 @@ export const LAKE_GENEVA_CRUISE: Activity = {
     "https://images.unsplash.com/photo-1527142879-95b61a0b8226?w=1200&q=80",
   ],
   location: "Montreux → Chillon → Montreux",
+  coordinates: { lat: 46.4312, lng: 6.9107 },
   durationDays: 1,
   startDate: "Daily, 18:00",
   endDate: "Daily, 20:00",
@@ -927,6 +928,7 @@ export const GRAND_CANYON_HELI: Activity = {
     "https://images.unsplash.com/photo-1502786129293-79981df4e689?w=1200&q=80",
   ],
   location: "Las Vegas → Grand Canyon West Rim",
+  coordinates: { lat: 36.0120, lng: -113.8100 },
   durationDays: 1,
   startDate: "Daily departures",
   endDate: "Daily departures",
@@ -969,6 +971,7 @@ export const CHAMPAGNE_DAY_TRIP: Activity = {
     "https://images.unsplash.com/photo-1568213816046-0ee1c42bd559?w=1200&q=80",
   ],
   location: "Paris → Reims → Épernay → Paris",
+  coordinates: { lat: 49.0420, lng: 3.9595 },
   durationDays: 1,
   startDate: "Daily, 07:30",
   endDate: "Daily, 19:30",
@@ -1009,9 +1012,10 @@ export const CAPPADOCIA_BALLOON: Activity = {
   mainImage: "https://images.unsplash.com/photo-1641128324972-af3212f0f6bd?w=1600&q=80",
   gallery: [
     "https://images.unsplash.com/photo-1641128324972-af3212f0f6bd?w=1200&q=80",
-    "https://images.unsplash.com/photo-1600190083125-95a4d27e23da?w=1200&q=80",
+    "https://images.unsplash.com/photo-1674941237715-6f4f9a58636a?w=1200&q=80",
   ],
   location: "Göreme, Cappadocia",
+  coordinates: { lat: 38.6433, lng: 34.8294 },
   durationDays: 1,
   startDate: "Sunrise, daily",
   endDate: "Sunrise, daily",
@@ -1044,16 +1048,16 @@ export const CAPPADOCIA_BALLOON: Activity = {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ICONIC EVENTS — bookable trips built around world-famous occasions.
-// All use type "multi-day-tour" because that's the closest existing shape
-// (hotel + itinerary + tickets-included package). If/when "Events" becomes
-// a first-class ActivityType, swap the type field and update the search-form
-// filter pills accordingly — no other changes needed here.
+// Use the dedicated "event" ActivityType so they group together in the
+// Experiences tab. They share the hotel + day-by-day + tickets-included
+// shape with multi-day tours, so ActivityDetailPage treats them the same
+// way for itinerary rendering.
 // ═══════════════════════════════════════════════════════════════════════════
 
 // 14. WIMBLEDON CHAMPIONSHIPS
 export const WIMBLEDON_PACKAGE: Activity = {
   activityId: "wimbledon-package",
-  type: "multi-day-tour",
+  type: "event",
   title: "Wimbledon Championships — Match Day Package",
   subtitle:
     "Centre Court grass-court tennis with strawberries and cream — the world's oldest tennis tournament.",
@@ -1063,6 +1067,7 @@ export const WIMBLEDON_PACKAGE: Activity = {
     "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=1200&q=80",
   ],
   location: "London, United Kingdom",
+  coordinates: { lat: 51.4339, lng: -0.2148 },
   durationDays: 2,
   startDate: "Jul 04, 2026",
   endDate: "Jul 05, 2026",
@@ -1100,16 +1105,17 @@ export const WIMBLEDON_PACKAGE: Activity = {
 // 15. MONACO GRAND PRIX
 export const MONACO_GP_PACKAGE: Activity = {
   activityId: "monaco-gp-package",
-  type: "multi-day-tour",
+  type: "event",
   title: "Monaco Grand Prix — Race Weekend",
   subtitle:
     "Formula 1 racing through the streets of Monte-Carlo — the crown jewel of the F1 calendar.",
-  mainImage: "https://images.unsplash.com/photo-1518542698050-a3041b27d5b2?w=1600&q=80",
+  mainImage: "https://images.unsplash.com/photo-1614949194403-9602bdc14a3a?w=1600&q=80",
   gallery: [
-    "https://images.unsplash.com/photo-1518542698050-a3041b27d5b2?w=1200&q=80",
+    "https://images.unsplash.com/photo-1614949194403-9602bdc14a3a?w=1200&q=80",
     "https://images.unsplash.com/photo-1483721310020-03333e577078?w=1200&q=80",
   ],
   location: "Monte-Carlo, Monaco",
+  coordinates: { lat: 43.7384, lng: 7.4246 },
   durationDays: 3,
   startDate: "May 22, 2026",
   endDate: "May 24, 2026",
@@ -1140,19 +1146,19 @@ export const MONACO_GP_PACKAGE: Activity = {
         { type: "highlight", label: "Qualifying session", description: "The session that defines the race — pole at Monaco is everything." },
         { type: "highlight", label: "Casino Square cocktail reception", description: "Evening reception with fellow race fans." },
       ],
-      image: "https://images.unsplash.com/photo-1518542698050-a3041b27d5b2?w=1200&q=80" },
+      image: "https://images.unsplash.com/photo-1614949194403-9602bdc14a3a?w=1200&q=80" },
     { dayNumber: 3, title: "Race day", location: "Monte-Carlo",
       items: [
         { type: "highlight", label: "Grand Prix race", description: "78 laps of the most iconic circuit in motorsport." },
       ],
-      image: "https://images.unsplash.com/photo-1518542698050-a3041b27d5b2?w=1200&q=80" },
+      image: "https://images.unsplash.com/photo-1614949194403-9602bdc14a3a?w=1200&q=80" },
   ],
 };
 
 // 16. TCS NEW YORK CITY MARATHON
 export const NYC_MARATHON_PACKAGE: Activity = {
   activityId: "nyc-marathon-package",
-  type: "multi-day-tour",
+  type: "event",
   title: "TCS New York City Marathon",
   subtitle:
     "26.2 miles through all five boroughs on the first Sunday of November — 50,000 runners, two million spectators.",
@@ -1162,6 +1168,7 @@ export const NYC_MARATHON_PACKAGE: Activity = {
     "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=1200&q=80",
   ],
   location: "New York City, USA",
+  coordinates: { lat: 40.7128, lng: -74.0060 },
   durationDays: 4,
   startDate: "Oct 30, 2026",
   endDate: "Nov 02, 2026",
@@ -1210,16 +1217,17 @@ export const NYC_MARATHON_PACKAGE: Activity = {
 // 17. MUNICH OKTOBERFEST
 export const OKTOBERFEST_PACKAGE: Activity = {
   activityId: "oktoberfest-package",
-  type: "multi-day-tour",
+  type: "event",
   title: "Munich Oktoberfest — Beer Tent Package",
   subtitle:
     "The world's biggest beer festival — 14 vast tents, lederhosen and brass bands.",
-  mainImage: "https://images.unsplash.com/photo-1601057344679-2d2f1c0e9bf8?w=1600&q=80",
+  mainImage: "https://images.unsplash.com/photo-1661078226424-28f190c723e0?w=1600&q=80",
   gallery: [
-    "https://images.unsplash.com/photo-1601057344679-2d2f1c0e9bf8?w=1200&q=80",
-    "https://images.unsplash.com/photo-1568274656915-5d83d29f5cdb?w=1200&q=80",
+    "https://images.unsplash.com/photo-1661078226424-28f190c723e0?w=1200&q=80",
+    "https://images.unsplash.com/photo-1670124495894-52ba7ee378a9?w=1200&q=80",
   ],
   location: "Munich, Germany",
+  coordinates: { lat: 48.1351, lng: 11.5820 },
   durationDays: 3,
   startDate: "Sep 26, 2026",
   endDate: "Sep 28, 2026",
@@ -1245,34 +1253,35 @@ export const OKTOBERFEST_PACKAGE: Activity = {
         { type: "highlight", label: "Welcome reception", description: "Stein and pretzel at the Hofbräuhaus." },
         { type: "hotel", label: "Platzl Hotel **** or similar" },
       ],
-      image: "https://images.unsplash.com/photo-1601057344679-2d2f1c0e9bf8?w=1200&q=80" },
+      image: "https://images.unsplash.com/photo-1661078226424-28f190c723e0?w=1200&q=80" },
     { dayNumber: 2, title: "Festival day", location: "Theresienwiese",
       items: [
         { type: "highlight", label: "Tent reservation", description: "Reserved table in a Hofbräu Festzelt — brass bands and a litre of Oktoberfestbier." },
         { type: "highlight", label: "Fairground rides", description: "Wooden rollercoasters, Ferris wheel, and traditional games." },
       ],
-      image: "https://images.unsplash.com/photo-1568274656915-5d83d29f5cdb?w=1200&q=80" },
+      image: "https://images.unsplash.com/photo-1670124495894-52ba7ee378a9?w=1200&q=80" },
     { dayNumber: 3, title: "Departure", location: "Munich",
       items: [
         { type: "highlight", label: "Slow morning + Viktualienmarkt", description: "Bavarian breakfast before flying home." },
       ],
-      image: "https://images.unsplash.com/photo-1601057344679-2d2f1c0e9bf8?w=1200&q=80" },
+      image: "https://images.unsplash.com/photo-1661078226424-28f190c723e0?w=1200&q=80" },
   ],
 };
 
 // 18. RIO DE JANEIRO CARNIVAL
 export const RIO_CARNIVAL_PACKAGE: Activity = {
   activityId: "rio-carnival-package",
-  type: "multi-day-tour",
+  type: "event",
   title: "Rio de Janeiro Carnival",
   subtitle:
     "Samba parades at the Sambódromo and city-wide street blocos — the week before Lent.",
-  mainImage: "https://images.unsplash.com/photo-1518963272958-29c5e2dafde6?w=1600&q=80",
+  mainImage: "https://images.unsplash.com/photo-1522008629172-0c17aa47d1ee?w=1600&q=80",
   gallery: [
-    "https://images.unsplash.com/photo-1518963272958-29c5e2dafde6?w=1200&q=80",
+    "https://images.unsplash.com/photo-1522008629172-0c17aa47d1ee?w=1200&q=80",
     "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1200&q=80",
   ],
   location: "Rio de Janeiro, Brazil",
+  coordinates: { lat: -22.9068, lng: -43.1729 },
   durationDays: 4,
   startDate: "Feb 14, 2026",
   endDate: "Feb 17, 2026",
@@ -1303,12 +1312,12 @@ export const RIO_CARNIVAL_PACKAGE: Activity = {
         { type: "highlight", label: "Daytime bloco crawl", description: "Three of Rio's most loved street parties with a local guide." },
         { type: "highlight", label: "Sugarloaf at dusk", description: "Two-stage cable car for sunset views." },
       ],
-      image: "https://images.unsplash.com/photo-1518963272958-29c5e2dafde6?w=1200&q=80" },
+      image: "https://images.unsplash.com/photo-1522008629172-0c17aa47d1ee?w=1200&q=80" },
     { dayNumber: 3, title: "Sambódromo parade night", location: "Sambódromo",
       items: [
         { type: "highlight", label: "Grandstand seats", description: "Watch the top samba schools parade — show runs until dawn." },
       ],
-      image: "https://images.unsplash.com/photo-1518963272958-29c5e2dafde6?w=1200&q=80" },
+      image: "https://images.unsplash.com/photo-1522008629172-0c17aa47d1ee?w=1200&q=80" },
     { dayNumber: 4, title: "Slow day + departure", location: "Rio",
       items: [
         { type: "highlight", label: "Beach recovery", description: "Lazy morning on Ipanema before flying home." },
@@ -1320,16 +1329,17 @@ export const RIO_CARNIVAL_PACKAGE: Activity = {
 // 19. EDINBURGH FESTIVAL FRINGE
 export const EDINBURGH_FRINGE_PACKAGE: Activity = {
   activityId: "edinburgh-fringe-package",
-  type: "multi-day-tour",
+  type: "event",
   title: "Edinburgh Festival Fringe",
   subtitle:
     "The world's largest arts festival — comedy, theatre, and street performers take over the city every August.",
   mainImage: "https://images.unsplash.com/photo-1506377585622-bedcbb027afc?w=1600&q=80",
   gallery: [
     "https://images.unsplash.com/photo-1506377585622-bedcbb027afc?w=1200&q=80",
-    "https://images.unsplash.com/photo-1543393470-b2f8d5c166b1?w=1200&q=80",
+    "https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?w=1200&q=80",
   ],
   location: "Edinburgh, United Kingdom",
+  coordinates: { lat: 55.9533, lng: -3.1883 },
   durationDays: 5,
   startDate: "Aug 10, 2026",
   endDate: "Aug 14, 2026",
@@ -1354,7 +1364,7 @@ export const EDINBURGH_FRINGE_PACKAGE: Activity = {
         { type: "hotel", label: "The Witchery by the Castle **** or similar" },
         { type: "highlight", label: "Whisky tasting", description: "Five-dram tasting in a tucked-away Old Town cellar." },
       ],
-      image: "https://images.unsplash.com/photo-1543393470-b2f8d5c166b1?w=1200&q=80" },
+      image: "https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?w=1200&q=80" },
     { dayNumber: 2, title: "Royal Mile + headline show", location: "Edinburgh",
       items: [
         { type: "highlight", label: "Royal Mile street performers", description: "Free outdoor performances all day." },
@@ -1366,7 +1376,7 @@ export const EDINBURGH_FRINGE_PACKAGE: Activity = {
         { type: "highlight", label: "Edinburgh Castle entry", description: "Skip-the-line entry to the castle and crown jewels." },
         { type: "highlight", label: "Theatre show", description: "Underground stage at a Fringe favourite venue." },
       ],
-      image: "https://images.unsplash.com/photo-1543393470-b2f8d5c166b1?w=1200&q=80" },
+      image: "https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?w=1200&q=80" },
     { dayNumber: 4, title: "Two more shows + cabaret", location: "Edinburgh",
       items: [
         { type: "highlight", label: "Afternoon show", description: "Curated pick from this year's hottest tickets." },
@@ -1377,8 +1387,464 @@ export const EDINBURGH_FRINGE_PACKAGE: Activity = {
       items: [
         { type: "highlight", label: "Slow morning + brunch", description: "Easy departure after a final Edinburgh breakfast." },
       ],
-      image: "https://images.unsplash.com/photo-1543393470-b2f8d5c166b1?w=1200&q=80" },
+      image: "https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?w=1200&q=80" },
   ],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ocean cruises — six cruise-ship Activities surfaced alongside Norwegian Fjords.
+// These were previously top-level Cruise entries on a dedicated tab; they now
+// render through ActivityDetailPage like any other cruise-ship Activity, and
+// appear in the Experiences tab when the user filters by "Cruise ship".
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Same four-tier cabin shape every cruise reuses — prices change per cruise.
+function buildCruiseCabins(prices: [number, number, number, number]): ActivityCabin[] {
+  return [
+    {
+      name: "Interior Stateroom",
+      pricePerPerson: prices[0],
+      capacity: 2,
+      description: "Comfortable 14 m² cabin with twin beds, ensuite bathroom, and modern amenities.",
+      image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=900&h=600&fit=crop&auto=format",
+    },
+    {
+      name: "Ocean View Stateroom",
+      pricePerPerson: prices[1],
+      capacity: 2,
+      description: "17 m² cabin with a picture window facing the sea, queen bed, and lounge area.",
+      image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=900&h=600&fit=crop&auto=format",
+    },
+    {
+      name: "Balcony Stateroom",
+      pricePerPerson: prices[2],
+      capacity: 3,
+      description: "Private balcony, sitting area, and floor-to-ceiling glass doors for outdoor views.",
+      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&h=600&fit=crop&auto=format",
+    },
+    {
+      name: "Owner's Suite",
+      pricePerPerson: prices[3],
+      capacity: 4,
+      description: "Two-room suite with butler service, complimentary speciality dining, and premium drinks.",
+      image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=900&h=600&fit=crop&auto=format",
+    },
+  ];
+}
+
+// 1. Western Mediterranean — MSC Cruises
+export const WESTERN_MEDITERRANEAN_CRUISE: Activity = {
+  activityId: "western-mediterranean-explorer",
+  type: "cruise-ship",
+  title: "Western Mediterranean Explorer",
+  subtitle:
+    "Seven days sailing from Barcelona along the French and Italian rivieras — sun, ancient ports, and modern luxury at sea.",
+  mainImage: "https://images.unsplash.com/photo-1530841377377-3ff06c0ca713?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=1200&q=80",
+    "https://images.unsplash.com/photo-1543248939-ff40856f65d4?w=1200&q=80",
+    "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&q=80",
+    "https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=1200&q=80",
+  ],
+  location: "Barcelona → Marseille → Genoa → Rome → Palma → Barcelona",
+  coordinates: { lat: 41.3851, lng: 2.1734 },
+  durationDays: 8,
+  startDate: "Jul 12, 2026",
+  endDate: "Jul 19, 2026",
+  price: { perPerson: 899, total: 1798, currency: "USD" },
+  rating: { score: 4.6, reviewCount: 2147 },
+  highlights: [
+    "All meals onboard included",
+    "Six diverse Mediterranean ports",
+    "Award-winning theatre productions",
+    "Mediterranean-themed enrichment lectures",
+  ],
+  included: [
+    "Seven nights full-board accommodation",
+    "All shipboard meals across 12 restaurants",
+    "Daily entertainment and Broadway-style shows",
+    "Kids' clubs for ages 3–17",
+    "Port taxes and gratuities",
+  ],
+  excluded: [
+    "International flights to Barcelona",
+    "Shore excursions",
+    "Premium drinks package",
+    "Spa treatments and salon services",
+    "Travel insurance",
+  ],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 6,300 guests" },
+    { iconKey: "activity", title: "Activity level", value: "Relaxed" },
+    { iconKey: "languages", title: "Language", value: "English, Italian, Spanish" },
+    { iconKey: "calendar-check", title: "Min age", value: "0+" },
+  ],
+  cruise: {
+    ship: "MSC Virtuosa",
+    ports: [
+      { name: "Barcelona, Spain", day: 1, departs: "17:00",
+        description: "Embark in the heart of Catalonia — final tapas in the Gothic Quarter before sailing." },
+      { name: "Marseille, France", day: 2, arrives: "08:00", departs: "18:00",
+        description: "France's oldest city — visit the Notre-Dame de la Garde basilica and the Vieux-Port." },
+      { name: "Genoa, Italy", day: 3, arrives: "08:00", departs: "18:00",
+        description: "Birthplace of pesto and Columbus — wander the medieval caruggi laneways." },
+      { name: "At Sea", isSeaDay: true, day: 4,
+        description: "Pool deck day with shows, cooking demos, and an afternoon at the spa." },
+      { name: "Rome (Civitavecchia), Italy", day: 5, arrives: "06:00", departs: "20:00",
+        description: "Optional all-day excursion to the Colosseum, Pantheon, and St Peter's." },
+      { name: "Palma de Mallorca, Spain", day: 6, arrives: "09:00", departs: "17:00",
+        description: "Stroll the cathedral seafront, then beach time at Cala Major." },
+      { name: "Barcelona, Spain", day: 7, arrives: "07:00",
+        description: "Disembark after breakfast." },
+    ],
+    cabinTypes: buildCruiseCabins([899, 1149, 1599, 2899]),
+  },
+};
+
+// 2. Caribbean Island Hopping — Royal Caribbean
+export const CARIBBEAN_CRUISE: Activity = {
+  activityId: "caribbean-island-hopping",
+  type: "cruise-ship",
+  title: "Caribbean Island Hopping",
+  subtitle:
+    "Seven nights aboard the world's largest cruise ship — turquoise waters, white-sand islands, and adrenaline at sea.",
+  mainImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1535498730771-e735b998cd64?w=1200&q=80",
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
+    "https://images.unsplash.com/photo-1473221326025-9183b464bb7e?w=1200&q=80",
+    "https://images.unsplash.com/photo-1548574505-5e239809ee19?w=1200&q=80",
+  ],
+  location: "Miami → CocoCay → St. Thomas → St. Maarten → Miami",
+  coordinates: { lat: 25.7617, lng: -80.1918 },
+  durationDays: 8,
+  startDate: "Aug 02, 2026",
+  endDate: "Aug 09, 2026",
+  price: { perPerson: 999, total: 1998, currency: "USD" },
+  rating: { score: 4.8, reviewCount: 3892 },
+  highlights: [
+    "Largest cruise ship in the world",
+    "Private island day at CocoCay",
+    "Surf simulator and zip line onboard",
+    "Award-winning Broadway shows",
+  ],
+  included: [
+    "Seven nights accommodation",
+    "All meals in 20+ dining venues",
+    "Surf simulator, rock wall, and ice skating",
+    "Adventure Ocean kids' programmes",
+    "Port taxes and gratuities",
+  ],
+  excluded: [
+    "International flights to Miami",
+    "Shore excursions",
+    "Drinks packages (alcoholic and non-alcoholic)",
+    "Specialty restaurant cover charges",
+    "Wi-Fi and spa treatments",
+  ],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 6,988 guests" },
+    { iconKey: "activity", title: "Activity level", value: "Active" },
+    { iconKey: "languages", title: "Language", value: "English" },
+    { iconKey: "calendar-check", title: "Min age", value: "0+" },
+  ],
+  cruise: {
+    ship: "Wonder of the Seas",
+    ports: [
+      { name: "Miami, USA", day: 1, departs: "17:00",
+        description: "Set sail from the busiest cruise port in the world after lunch in Little Havana." },
+      { name: "CocoCay, Bahamas", day: 2, arrives: "08:00", departs: "17:00",
+        description: "Royal Caribbean's private island — water park, zip lines, and overwater cabanas." },
+      { name: "At Sea", isSeaDay: true, day: 3,
+        description: "Surf simulator, ice skating, and Broadway-quality shows in the Royal Theatre." },
+      { name: "St. Thomas, USVI", day: 4, arrives: "08:00", departs: "17:00",
+        description: "Snorkel at Magens Bay or browse duty-free shopping in Charlotte Amalie." },
+      { name: "St. Maarten", day: 5, arrives: "08:00", departs: "17:00",
+        description: "Two-nations island — French croissants in the morning, Dutch beach bars by afternoon." },
+      { name: "At Sea", isSeaDay: true, day: 6,
+        description: "Final pool day, farewell dinner, and the captain's gala." },
+      { name: "Miami, USA", day: 7, arrives: "06:00",
+        description: "Disembark by 09:00 after breakfast." },
+    ],
+    cabinTypes: buildCruiseCabins([999, 1299, 1799, 3199]),
+  },
+};
+
+// 3. Disney Magic at Sea — Disney Cruise Line
+export const DISNEY_CRUISE: Activity = {
+  activityId: "disney-magic-at-sea",
+  type: "cruise-ship",
+  title: "Disney Magic at Sea",
+  subtitle:
+    "Four nights of Disney magic — character meet-and-greets, deck-top fireworks, and a private day on Castaway Cay.",
+  mainImage: "https://images.unsplash.com/photo-1583416750470-965b2707b355?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?w=1200&q=80",
+    "https://images.unsplash.com/photo-1546484959-f9a381d1330d?w=1200&q=80",
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
+    "https://images.unsplash.com/photo-1556881286-fc6915169721?w=1200&q=80",
+  ],
+  location: "Port Canaveral → Nassau → Castaway Cay → Port Canaveral",
+  coordinates: { lat: 28.4087, lng: -80.6093 },
+  durationDays: 5,
+  startDate: "Jun 22, 2026",
+  endDate: "Jun 26, 2026",
+  price: { perPerson: 1299, total: 2598, currency: "USD" },
+  rating: { score: 4.9, reviewCount: 2456 },
+  highlights: [
+    "Two visits with Disney characters daily",
+    "Private island day on Castaway Cay",
+    "Deck-top pirate party with fireworks",
+    "Broadway-style original Disney shows",
+  ],
+  included: [
+    "Four nights accommodation",
+    "All meals and rotational dining",
+    "Character meet-and-greets",
+    "Oceaneer Club kids' programmes",
+    "Soft drinks at meals and bars",
+  ],
+  excluded: [
+    "International flights to Orlando",
+    "Shore excursions and Aquaventure tickets",
+    "Alcoholic drinks and specialty coffee",
+    "Adult-exclusive Palo restaurant",
+    "Spa, salon, and Wi-Fi",
+  ],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 4,000 guests" },
+    { iconKey: "activity", title: "Activity level", value: "Family-friendly" },
+    { iconKey: "languages", title: "Language", value: "English" },
+    { iconKey: "calendar-check", title: "Min age", value: "0+" },
+  ],
+  cruise: {
+    ship: "Disney Wish",
+    ports: [
+      { name: "Port Canaveral, USA", day: 1, departs: "16:00",
+        description: "Embark with character welcome on the atrium staircase." },
+      { name: "Nassau, Bahamas", day: 2, arrives: "08:00", departs: "17:00",
+        description: "Optional excursion to Atlantis Aquaventure or the colourful Straw Market." },
+      { name: "Castaway Cay, Bahamas", day: 3, arrives: "09:00", departs: "16:00",
+        description: "Disney's private island — character beach parties, snorkelling, and barbeque lunch." },
+      { name: "Port Canaveral, USA", day: 4, arrives: "07:00",
+        description: "Disembark by 10:00 with breakfast served in the main dining rooms." },
+    ],
+    cabinTypes: buildCruiseCabins([1299, 1599, 2099, 3899]),
+  },
+};
+
+// 4. Norwegian Fjords Voyage — Norwegian Cruise Line
+// (separate product from the existing Norwegian Fjords Ocean Cruise activity)
+export const NORWEGIAN_FJORDS_VOYAGE: Activity = {
+  activityId: "norwegian-fjords-voyage",
+  type: "cruise-ship",
+  title: "Norwegian Fjords Voyage",
+  subtitle:
+    "Ten nights sailing past glaciers, waterfalls, and Viking-era ports — including a stop at the UNESCO-listed Geirangerfjord.",
+  mainImage: "https://images.unsplash.com/photo-1516496636080-14fb876e029d?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1516496636080-14fb876e029d?w=1200&q=80",
+    "https://images.unsplash.com/photo-1485470733090-0aae1788d5af?w=1200&q=80",
+    "https://images.unsplash.com/photo-1531168556467-80aace0d0144?w=1200&q=80",
+    "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80",
+  ],
+  location: "Southampton → Bergen → Geiranger → Ålesund → Stavanger → Southampton",
+  coordinates: { lat: 50.9097, lng: -1.4044 },
+  durationDays: 11,
+  startDate: "Jul 05, 2026",
+  endDate: "Jul 15, 2026",
+  price: { perPerson: 1699, total: 3398, currency: "GBP" },
+  rating: { score: 4.7, reviewCount: 1683 },
+  highlights: [
+    "UNESCO Geirangerfjord scenic cruising",
+    "Five spectacular Norwegian ports",
+    "Freestyle dining across 12+ venues",
+    "Onboard Norwegian-themed enrichment",
+  ],
+  included: [
+    "Ten nights accommodation",
+    "Freestyle dining in main restaurants",
+    "Entertainment, theatre, and activities",
+    "Kids' Splash Academy programmes",
+    "Port taxes and gratuities",
+  ],
+  excluded: [
+    "Flights to Southampton",
+    "Shore excursions",
+    "Premium beverage and dining packages",
+    "Spa treatments",
+    "Travel insurance",
+  ],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 2,348 guests" },
+    { iconKey: "activity", title: "Activity level", value: "Relaxed" },
+    { iconKey: "languages", title: "Language", value: "English" },
+    { iconKey: "calendar-check", title: "Min age", value: "0+" },
+  ],
+  cruise: {
+    ship: "Norwegian Star",
+    ports: [
+      { name: "Southampton, UK", day: 1, departs: "17:00",
+        description: "Set sail from England's south coast after a final pub lunch." },
+      { name: "At Sea", isSeaDay: true, day: 2,
+        description: "Across the North Sea — spa day, observation lounge, and afternoon tea." },
+      { name: "Bergen, Norway", day: 3, arrives: "08:00", departs: "18:00",
+        description: "Colourful Bryggen harbour, funicular up Mount Fløyen, and fresh fish market." },
+      { name: "Geiranger, Norway", day: 4, arrives: "07:00", departs: "20:00",
+        description: "Anchor in the heart of UNESCO-listed Geirangerfjord — kayak past Seven Sisters waterfall." },
+      { name: "Ålesund, Norway", day: 5, arrives: "08:00", departs: "18:00",
+        description: "Wander the art-nouveau old town and climb Mount Aksla for sweeping views." },
+      { name: "At Sea", isSeaDay: true, day: 6,
+        description: "Cruising fjord country — onboard cooking class with Norwegian chef." },
+      { name: "Stavanger, Norway", day: 7, arrives: "09:00", departs: "18:00",
+        description: "Hike to Pulpit Rock or stroll the cobbled lanes of Gamle Stavanger." },
+      { name: "At Sea", isSeaDay: true, day: 8,
+        description: "Final spa day, captain's gala, and farewell dinner." },
+      { name: "At Sea", isSeaDay: true, day: 9,
+        description: "Return crossing to England — packing day with afternoon entertainment." },
+      { name: "Southampton, UK", day: 10, arrives: "07:00",
+        description: "Disembark by 10:00." },
+    ],
+    cabinTypes: buildCruiseCabins([1699, 1999, 2599, 3899]),
+  },
+};
+
+// 5. Greek Islands & Turkey — Celebrity Cruises
+export const GREEK_ISLANDS_CRUISE: Activity = {
+  activityId: "greek-islands-turkey",
+  type: "cruise-ship",
+  title: "Greek Islands & Turkey",
+  subtitle:
+    "Seven nights island-hopping through the Aegean — white-washed villages, ancient ruins, and crystal-clear waters.",
+  mainImage: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1555993539-1732b0258235?w=1200&q=80",
+    "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=1200&q=80",
+    "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&q=80",
+    "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?w=1200&q=80",
+  ],
+  location: "Piraeus → Mykonos → Kusadasi → Santorini → Rhodes → Piraeus",
+  coordinates: { lat: 37.9420, lng: 23.6463 },
+  durationDays: 8,
+  startDate: "Jun 28, 2026",
+  endDate: "Jul 05, 2026",
+  price: { perPerson: 1349, total: 2698, currency: "USD" },
+  rating: { score: 4.8, reviewCount: 2014 },
+  highlights: [
+    "Four iconic Greek islands",
+    "Optional Ephesus archaeological tour",
+    "Sunset in Oia, Santorini",
+    "Award-winning Le Petit Chef dining",
+  ],
+  included: [
+    "Seven nights accommodation",
+    "Classic drinks package",
+    "Basic Wi-Fi",
+    "Gratuities included",
+    "Premium dining in main restaurants",
+  ],
+  excluded: [
+    "International flights to Athens",
+    "Shore excursions",
+    "Premium beverage upgrade",
+    "Spa and salon services",
+    "Specialty restaurant supplements",
+  ],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 3,260 guests" },
+    { iconKey: "activity", title: "Activity level", value: "Relaxed" },
+    { iconKey: "languages", title: "Language", value: "English" },
+    { iconKey: "calendar-check", title: "Min age", value: "0+" },
+  ],
+  cruise: {
+    ship: "Celebrity Beyond",
+    ports: [
+      { name: "Athens (Piraeus), Greece", day: 1, departs: "17:00",
+        description: "Optional pre-cruise visit to the Acropolis before embarking at Greece's largest port." },
+      { name: "Mykonos, Greece", day: 2, arrives: "10:00", departs: "22:00",
+        description: "White-washed cubes, windmills, and Little Venice cocktails at sunset." },
+      { name: "Kusadasi, Turkey", day: 3, arrives: "07:00", departs: "17:00",
+        description: "Optional excursion to the ancient ruins of Ephesus and the House of the Virgin Mary." },
+      { name: "Santorini, Greece", day: 4, arrives: "08:00", departs: "22:00",
+        description: "Cable car up to Fira, sunset in Oia, and volcanic wine tasting." },
+      { name: "Rhodes, Greece", day: 5, arrives: "07:00", departs: "17:00",
+        description: "UNESCO medieval old town and the seven natural springs at Kallithea." },
+      { name: "At Sea", isSeaDay: true, day: 6,
+        description: "Spa day, world-class Le Petit Chef dining experience, and farewell gala." },
+      { name: "Athens (Piraeus), Greece", day: 7, arrives: "07:00",
+        description: "Disembark after Greek-style breakfast." },
+    ],
+    cabinTypes: buildCruiseCabins([1349, 1649, 2199, 4199]),
+  },
+};
+
+// 6. Alaska Inside Passage — Royal Caribbean
+export const ALASKA_CRUISE: Activity = {
+  activityId: "alaska-inside-passage",
+  type: "cruise-ship",
+  title: "Alaska Inside Passage",
+  subtitle:
+    "Seven nights through glacier country — gold-rush towns, whale-watching, and dramatic Glacier Bay scenic cruising.",
+  mainImage: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1542223189-67a03fa0f0bd?w=1200&q=80",
+    "https://images.unsplash.com/photo-1473448912268-2022ce9509d8?w=1200&q=80",
+    "https://images.unsplash.com/photo-1568430462989-44163eb1752f?w=1200&q=80",
+    "https://images.unsplash.com/photo-1490604001847-b712b0c2f967?w=1200&q=80",
+  ],
+  location: "Seattle → Juneau → Skagway → Glacier Bay → Ketchikan → Seattle",
+  coordinates: { lat: 47.6062, lng: -122.3321 },
+  durationDays: 8,
+  startDate: "Jul 19, 2026",
+  endDate: "Jul 26, 2026",
+  price: { perPerson: 1299, total: 2598, currency: "USD" },
+  rating: { score: 4.7, reviewCount: 1827 },
+  highlights: [
+    "Glacier Bay scenic cruising",
+    "White Pass historic railway",
+    "Whale-watching in Juneau",
+    "North Star observation pod",
+  ],
+  included: [
+    "Seven nights accommodation",
+    "All meals in main dining venues",
+    "Onboard entertainment and shows",
+    "Adventure Ocean kids' programmes",
+    "Port taxes and gratuities",
+  ],
+  excluded: [
+    "Flights to Seattle",
+    "Shore excursions (helicopter, train, whale-watching)",
+    "Drinks packages",
+    "Specialty dining",
+    "Wi-Fi and spa",
+  ],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 4,180 guests" },
+    { iconKey: "activity", title: "Activity level", value: "Active" },
+    { iconKey: "languages", title: "Language", value: "English" },
+    { iconKey: "calendar-check", title: "Min age", value: "0+" },
+  ],
+  cruise: {
+    ship: "Quantum of the Seas",
+    ports: [
+      { name: "Seattle, USA", day: 1, departs: "16:00",
+        description: "Final coffee at Pike Place Market before sailing through Puget Sound." },
+      { name: "At Sea", isSeaDay: true, day: 2,
+        description: "Inside Passage cruising — keep eyes peeled for orcas and humpback whales." },
+      { name: "Juneau, Alaska", day: 3, arrives: "10:00", departs: "21:00",
+        description: "Helicopter tour to Mendenhall Glacier or whale-watching in Auke Bay." },
+      { name: "Skagway, Alaska", day: 4, arrives: "07:00", departs: "20:00",
+        description: "Ride the historic White Pass & Yukon Route railway through gold-rush country." },
+      { name: "Glacier Bay (Scenic Cruising)", day: 5, arrives: "07:00", departs: "16:00",
+        description: "Day-long scenic cruising in the UNESCO Glacier Bay National Park." },
+      { name: "Ketchikan, Alaska", day: 6, arrives: "07:00", departs: "13:00",
+        description: "Salmon-fishing capital — visit Creek Street and the Totem Heritage Center." },
+      { name: "Seattle, USA", day: 7, arrives: "07:00",
+        description: "Disembark by 10:00." },
+    ],
+    cabinTypes: buildCruiseCabins([1299, 1599, 2099, 3699]),
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1388,6 +1854,13 @@ export const EDINBURGH_FRINGE_PACKAGE: Activity = {
 export const ALL_ACTIVITIES: Activity[] = [
   NORWEGIAN_FJORDS_CRUISE,
   RHINE_RIVER_CRUISE,
+  // Ocean cruises — six cruise-ship Activities (previously the dedicated Cruises tab)
+  WESTERN_MEDITERRANEAN_CRUISE,
+  CARIBBEAN_CRUISE,
+  DISNEY_CRUISE,
+  NORWEGIAN_FJORDS_VOYAGE,
+  GREEK_ISLANDS_CRUISE,
+  ALASKA_CRUISE,
   TUSCANY_TOUR,
   CINQUE_TERRE_WALK,
   LOIRE_BICYCLE_TOUR,

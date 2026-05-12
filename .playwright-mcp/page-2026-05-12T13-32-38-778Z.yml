@@ -1,0 +1,277 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - img "Discover the world" [ref=e7]
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - generic [ref=e12]:
+            - generic [ref=e13]: AI Experience
+            - switch [ref=e14]
+          - generic [ref=e15]:
+            - heading "Explore the world's hidden gems" [level=1] [ref=e16]
+            - heading "You dream it. We'll plan it." [level=1]
+        - generic [ref=e17]:
+          - generic [ref=e20]:
+            - generic [ref=e22]:
+              - button "Holidays" [ref=e23]:
+                - img [ref=e25]
+                - generic [ref=e31]: Holidays
+              - button "Hotels" [ref=e32]:
+                - img [ref=e34]
+                - generic [ref=e38]: Hotels
+              - button "Flights" [ref=e39]:
+                - img [ref=e41]
+                - generic [ref=e43]: Flights
+              - button "Experiences" [ref=e44]:
+                - img [ref=e46]
+                - generic [ref=e49]: Experiences
+            - generic [ref=e462]:
+              - button "Activity type Any activity" [ref=e464] [cursor=pointer]:
+                - img [ref=e465]
+                - generic [ref=e468]:
+                  - generic [ref=e469]: Activity type
+                  - generic [ref=e470]: Any activity
+                - img [ref=e471]
+              - generic [ref=e474]:
+                - img [ref=e475]
+                - generic [ref=e478]:
+                  - generic [ref=e479]: Destination
+                  - textbox "Anywhere" [ref=e480]
+              - button "When Any time" [ref=e482] [cursor=pointer]:
+                - img [ref=e483]
+                - generic [ref=e485]:
+                  - generic [ref=e486]: When
+                  - generic [ref=e487]: Any time
+                - img [ref=e488]
+              - button "Travellers 2 Travellers" [ref=e491] [cursor=pointer]:
+                - img [ref=e492]
+                - generic [ref=e497]:
+                  - generic [ref=e498]: Travellers
+                  - generic [ref=e499]: 2 Travellers
+                - img [ref=e500]
+              - button "Search activities" [ref=e502]:
+                - img [ref=e503]
+                - text: Search activities
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - textbox "Describe your ideal trip — destination, dates, budget, travel style…"
+                - generic:
+                  - button "Attach files":
+                    - img
+                    - generic: Attach files
+                  - button "Plan my trip":
+                    - img
+                    - text: Plan my trip
+            - generic:
+              - generic: "Try asking:"
+              - generic:
+                - button "Find me a beach resort in Bali for next month"
+                - button "Plan a 5-day family trip to Paris"
+                - button "Weekend getaway in the Alps under €500"
+                - button "Luxury honeymoon in the Maldives"
+    - generic [ref=e104]:
+      - generic [ref=e507]:
+        - generic [ref=e508]:
+          - generic [ref=e509]:
+            - generic [ref=e510]:
+              - img [ref=e511]
+              - heading "Experience what you like" [level=2] [ref=e514]
+            - paragraph [ref=e515]: Browse hand-picked activities by the kind of trip you love
+          - generic [ref=e516]:
+            - button "Cruise ship" [ref=e517]:
+              - img [ref=e518]
+              - text: Cruise ship
+            - button "River cruise" [ref=e522]:
+              - img [ref=e523]
+              - text: River cruise
+            - button "Multi-day tour" [ref=e526]:
+              - img [ref=e527]
+              - text: Multi-day tour
+            - button "Walking tour" [active] [ref=e529]:
+              - img [ref=e530]
+              - text: Walking tour
+            - button "Bicycle tour" [ref=e533]:
+              - img [ref=e534]
+              - text: Bicycle tour
+            - button "Safari" [ref=e539]:
+              - img [ref=e540]
+              - text: Safari
+            - button "Expedition" [ref=e544]:
+              - img [ref=e545]
+              - text: Expedition
+          - generic [ref=e547]:
+            - generic [ref=e803] [cursor=pointer]:
+              - img "Cinque Terre Coastal Walk" [ref=e805]
+              - generic [ref=e806]:
+                - generic [ref=e807]:
+                  - img "Italy" [ref=e808]
+                  - text: Italy
+                - generic [ref=e809]: Cinque Terre Coastal Walk
+                - generic [ref=e810]: Self-guided five-day walk linking the five UNESCO villages along the Ligurian coast.
+                - generic [ref=e811]:
+                  - generic [ref=e812]:
+                    - img [ref=e813]
+                    - text: 5 days
+                  - generic [ref=e816]:
+                    - generic [ref=e817]: Per person
+                    - generic [ref=e818]: from £899
+            - generic [ref=e820] [cursor=pointer]:
+              - img "Rome by Night Walking Tour" [ref=e822]
+              - generic [ref=e823]:
+                - generic [ref=e824]:
+                  - img "Italy" [ref=e825]
+                  - text: Italy
+                - generic [ref=e826]: Rome by Night Walking Tour
+                - generic [ref=e827]: A 3-hour stroll past the Colosseum, Trevi Fountain, and Pantheon — all lit up after dark.
+                - generic [ref=e828]:
+                  - generic [ref=e829]:
+                    - img [ref=e830]
+                    - text: 3 hours
+                  - generic [ref=e833]:
+                    - generic [ref=e834]: Per person
+                    - generic [ref=e835]: from €35
+            - generic [ref=e837] [cursor=pointer]:
+              - img "Kyoto Street Food Crawl" [ref=e839]
+              - generic [ref=e840]:
+                - generic [ref=e841]:
+                  - img "Japan" [ref=e842]
+                  - text: Japan
+                - generic [ref=e843]: Kyoto Street Food Crawl
+                - generic [ref=e844]: Six tastings through Nishiki Market and the Gion district with a local guide.
+                - generic [ref=e845]:
+                  - generic [ref=e846]:
+                    - img [ref=e847]
+                    - text: 4 hours
+                  - generic [ref=e850]:
+                    - generic [ref=e851]: Per person
+                    - generic [ref=e852]: from €85
+          - button "View all Walking tour activities" [ref=e853]
+        - generic [ref=e652]:
+          - generic [ref=e653]:
+            - generic [ref=e654]:
+              - img [ref=e655]
+              - heading "Iconic events" [level=2] [ref=e657]
+            - paragraph [ref=e658]: Plan your trip around once-in-a-lifetime sporting and cultural moments
+          - generic [ref=e659]:
+            - generic [ref=e661] [cursor=pointer]:
+              - img "Wimbledon Championships" [ref=e663]
+              - generic [ref=e664]:
+                - generic [ref=e665]:
+                  - img "United Kingdom" [ref=e666]
+                  - text: United Kingdom
+                - generic [ref=e667]: Wimbledon Championships
+                - generic [ref=e668]: Centre Court grass-court tennis with strawberries and cream — late June to mid-July.
+                - generic [ref=e669]:
+                  - generic [ref=e670]:
+                    - img [ref=e671]
+                    - text: Match day
+                  - generic [ref=e674]:
+                    - generic [ref=e675]: Per person
+                    - generic [ref=e676]: from £180
+            - generic [ref=e678] [cursor=pointer]:
+              - img "Monaco Grand Prix" [ref=e680]
+              - generic [ref=e681]:
+                - generic [ref=e682]:
+                  - img "Monaco" [ref=e683]
+                  - text: Monaco
+                - generic [ref=e684]: Monaco Grand Prix
+                - generic [ref=e685]: Formula 1 racing through the streets of Monte-Carlo — the crown jewel of the F1 calendar, every May.
+                - generic [ref=e686]:
+                  - generic [ref=e687]:
+                    - img [ref=e688]
+                    - text: Race weekend
+                  - generic [ref=e691]:
+                    - generic [ref=e692]: Per person
+                    - generic [ref=e693]: from €1,250
+            - generic [ref=e695] [cursor=pointer]:
+              - img "TCS New York City Marathon" [ref=e697]
+              - generic [ref=e698]:
+                - generic [ref=e699]:
+                  - img "USA" [ref=e700]
+                  - text: USA
+                - generic [ref=e701]: TCS New York City Marathon
+                - generic [ref=e702]: 26.2 miles through all five boroughs on the first Sunday of November — 50,000 runners, two million spectators.
+                - generic [ref=e703]:
+                  - generic [ref=e704]:
+                    - img [ref=e705]
+                    - text: Race day
+                  - generic [ref=e708]:
+                    - generic [ref=e709]: Per person
+                    - generic [ref=e710]: from $349
+            - generic [ref=e712] [cursor=pointer]:
+              - img "Munich Oktoberfest" [ref=e714]
+              - generic [ref=e715]:
+                - generic [ref=e716]:
+                  - img "Germany" [ref=e717]
+                  - text: Germany
+                - generic [ref=e718]: Munich Oktoberfest
+                - generic [ref=e719]: The world's biggest beer festival — 14 vast tents, lederhosen and brass bands, mid-September to early October.
+                - generic [ref=e720]:
+                  - generic [ref=e721]:
+                    - img [ref=e722]
+                    - text: 3 days
+                  - generic [ref=e725]:
+                    - generic [ref=e726]: Per person
+                    - generic [ref=e727]: from €690
+            - generic [ref=e729] [cursor=pointer]:
+              - img "Rio de Janeiro Carnival" [ref=e731]
+              - generic [ref=e732]:
+                - generic [ref=e733]:
+                  - img "Brazil" [ref=e734]
+                  - text: Brazil
+                - generic [ref=e735]: Rio de Janeiro Carnival
+                - generic [ref=e736]: Samba parades at the Sambódromo and city-wide street blocos — the week before Lent in February or March.
+                - generic [ref=e737]:
+                  - generic [ref=e738]:
+                    - img [ref=e739]
+                    - text: 4 nights
+                  - generic [ref=e742]:
+                    - generic [ref=e743]: Per person
+                    - generic [ref=e744]: from $1,290
+            - generic [ref=e746] [cursor=pointer]:
+              - img "Edinburgh Festival Fringe" [ref=e748]
+              - generic [ref=e749]:
+                - generic [ref=e750]:
+                  - img "United Kingdom" [ref=e751]
+                  - text: United Kingdom
+                - generic [ref=e752]: Edinburgh Festival Fringe
+                - generic [ref=e753]: The world's largest arts festival — comedy, theatre, and street performers take over the city every August.
+                - generic [ref=e754]:
+                  - generic [ref=e755]:
+                    - img [ref=e756]
+                    - text: 5 nights
+                  - generic [ref=e759]:
+                    - generic [ref=e760]: Per person
+                    - generic [ref=e761]: from £540
+        - generic [ref=e762]:
+          - generic [ref=e763]:
+            - generic [ref=e764]:
+              - img [ref=e765]
+              - heading "Browse by experience type" [level=2] [ref=e768]
+            - paragraph [ref=e769]: Find your kind of adventure
+          - generic [ref=e770]:
+            - button "Cruise ship" [ref=e771]:
+              - img [ref=e772]
+              - text: Cruise ship
+            - button "River cruise" [ref=e776]:
+              - img [ref=e777]
+              - text: River cruise
+            - button "Multi-day tour" [ref=e780]:
+              - img [ref=e781]
+              - text: Multi-day tour
+            - button "Walking tour" [ref=e783]:
+              - img [ref=e784]
+              - text: Walking tour
+            - button "Bicycle tour" [ref=e787]:
+              - img [ref=e788]
+              - text: Bicycle tour
+            - button "Safari" [ref=e793]:
+              - img [ref=e794]
+              - text: Safari
+            - button "Expedition" [ref=e798]:
+              - img [ref=e799]
+              - text: Expedition
+      - paragraph [ref=e461]: © 2026 Nezasa · TripBuilder · Over 500,000 hotels worldwide
