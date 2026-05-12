@@ -23,6 +23,7 @@ import {
   Check,
   MapPinned,
   Hotel,
+  Bus,
   ChevronDown,
   Plus,
   Minus,
@@ -94,13 +95,24 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
 
   // Booking widget state — lives in the sidebar (desktop) and bottom sheet (mobile)
-  // openPanel controls which dropdown is visible at any time (only one at once)
+  // openPanel controls which dropdown is visible at any time (only one at once).
+  // The "hotel" panel doubles as the "departure point" panel for coach/bus tours;
+  // we swap the label, icon, and options based on whether `tour.departurePoints` is set.
   type BookingPanel = "date" | "guests" | "hotel" | null;
   const [openPanel, setOpenPanel]             = useState<BookingPanel>(null);
   const [selectedDate, setSelectedDate]       = useState<Date | undefined>(undefined);
   const [adults, setAdults]                   = useState(tour.adults);
   const [children, setChildren]               = useState(0);
-  const [hotelPreference, setHotelPreference] = useState("Standard");
+
+  // When the tour has `departurePoints`, this state holds the chosen pickup point
+  // (e.g. "Freiburg"). Otherwise it holds the chosen hotel preference ("Standard"…).
+  // Same dropdown UI for both — only the label/icon/options change.
+  const isDepartureMode = (tour.departurePoints?.length ?? 0) > 0;
+  const preferenceLabel = isDepartureMode ? "Departure point" : "Hotel preference";
+  const preferenceOptions = isDepartureMode
+    ? (tour.departurePoints as string[])
+    : ["Standard", "Superior", "Deluxe", "Luxury"];
+  const [hotelPreference, setHotelPreference] = useState(preferenceOptions[0]);
 
   // Mobile bottom sheet — controls whether the booking fields are visible
   // on small screens. When closed, only the price + CTA show.
@@ -673,7 +685,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   )}
                 </div>
 
-                {/* ── Hotel preference — dropdown ── */}
+                {/* ── Hotel preference (or Departure point for coach tours) ── */}
                 <div className="relative">
                   <button
                     onClick={() => setOpenPanel(openPanel === "hotel" ? null : "hotel")}
@@ -684,10 +696,12 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                         : "border-border bg-card hover:border-primary"
                     )}
                   >
-                    <Hotel size={16} className="text-primary shrink-0" aria-hidden="true" />
+                    {isDepartureMode
+                      ? <Bus   size={16} className="text-primary shrink-0" aria-hidden="true" />
+                      : <Hotel size={16} className="text-primary shrink-0" aria-hidden="true" />}
                     <div className="flex flex-col flex-1 min-w-0">
                       <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
-                        Hotel preference
+                        {preferenceLabel}
                       </span>
                       <span className="text-xs font-semibold text-foreground">{hotelPreference}</span>
                     </div>
@@ -695,7 +709,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   </button>
                   {openPanel === "hotel" && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-md z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-                      {["Standard", "Superior", "Deluxe", "Luxury"].map((opt) => (
+                      {preferenceOptions.map((opt) => (
                         <button
                           key={opt}
                           onClick={() => { setHotelPreference(opt); setOpenPanel(null); }}
@@ -910,7 +924,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               )}
             </div>
 
-            {/* ── Hotel preference ── */}
+            {/* ── Hotel preference (or Departure point for coach tours) ── */}
             <div className="relative">
               <button
                 onClick={() => setOpenPanel(openPanel === "hotel" ? null : "hotel")}
@@ -921,18 +935,20 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                     : "border-border bg-card hover:border-primary"
                 )}
               >
-                <Hotel size={16} className="text-primary shrink-0" aria-hidden="true" />
+                {isDepartureMode
+                  ? <Bus   size={16} className="text-primary shrink-0" aria-hidden="true" />
+                  : <Hotel size={16} className="text-primary shrink-0" aria-hidden="true" />}
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Hotel preference</span>
+                  <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">{preferenceLabel}</span>
                   <span className="text-xs font-semibold text-foreground">{hotelPreference}</span>
                 </div>
                 <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "hotel" && "rotate-180")} aria-hidden="true" />
               </button>
 
-              {/* Hotel options — opens upward on mobile */}
+              {/* Dropdown options — opens upward on mobile */}
               {openPanel === "hotel" && (
                 <div className="absolute bottom-full left-0 right-0 mb-1 bg-card border border-border rounded-lg shadow-md z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-                  {["Standard", "Superior", "Deluxe", "Luxury"].map((opt) => (
+                  {preferenceOptions.map((opt) => (
                     <button
                       key={opt}
                       onClick={() => { setHotelPreference(opt); setOpenPanel(null); }}

@@ -205,6 +205,11 @@ export interface Tour {
   // Optional hero video shown on the detail page (Pexels-sourced).
   // Plays when the user taps the play button on the main image.
   videoUrl?: string;
+
+  // Optional pickup points for coach / bus tours. When set, the booking widget
+  // on TourDetailPage swaps the "Hotel preference" selector for a "Departure point"
+  // selector populated with these options.
+  departurePoints?: string[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

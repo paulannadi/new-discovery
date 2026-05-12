@@ -50,6 +50,7 @@ import {
   Compass,
   Ship,
   Footprints,
+  Bus,
 } from "lucide-react";
 import { Switch } from "../../../shared/components/ui/switch";
 import { DayPicker, DateRange } from "react-day-picker";
@@ -195,6 +196,9 @@ const TOUR_CARDS = [
   { id: 4, country: "Thailand", flag: "th", title: "Island Paradise", desc: "Focus on Thailand's stunning islands with beach time, snorkeling, and tropical adventures.", duration: "9 days", price: "from $1,790", image: tourImg(4) },
   { id: 5, country: "Peru", flag: "pe", title: "Inca Trail Adventure", desc: "For the adventurous traveler: trek the classic Inca Trail to Machu Picchu.", duration: "8 days", price: "from $2,450", image: tourImg(5) },
   { id: 6, country: "Peru", flag: "pe", title: "Amazon & Andes", desc: "Experience Peru's diverse landscapes from Amazon rainforest to high-altitude lakes.", duration: "10 days", price: "from $2,180", image: tourImg(6) },
+  // Bus tour — also surfaced under the "Bus Tours" tab in "Travel the way you like".
+  // Lives here so it appears in the Culture & History travel style carousel too.
+  { id: 22, country: "Italy", flag: "it", title: "Lake Garda Wine Festival Bus Tour", desc: "4-day coach tour from Germany to Italy's Lake Garda with the Bardolino wine festival.", duration: "4 days", price: "from €649", image: tourImg(22) },
 ];
 
 // ─── Experiences tab — sample data ────────────────────────────────────────────
@@ -434,7 +438,7 @@ const HOLIDAY_DESTINATIONS = [
 
 // Trip type showcase cards — displayed in the "Browse by trip type" section
 // on the Holidays tab. Each type has 3 example cards using existing images.
-type TripTypeId = "hotel-flight" | "group-tour" | "individual-tour" | "round-trip" | "last-minute";
+type TripTypeId = "hotel-flight" | "group-tour" | "individual-tour" | "round-trip" | "last-minute" | "bus-tour";
 
 const TRIP_TYPES: { id: TripTypeId; label: string; icon: React.ReactNode }[] = [
   { id: "hotel-flight",    label: "Hotel + Flight",  icon: <Plane size={15} /> },
@@ -442,10 +446,14 @@ const TRIP_TYPES: { id: TripTypeId; label: string; icon: React.ReactNode }[] = [
   { id: "individual-tour", label: "Individual Tours",icon: <User size={15} /> },
   { id: "round-trip",      label: "Round Trips",     icon: <RotateCcw size={15} /> },
   { id: "last-minute",     label: "Last Minute",     icon: <Zap size={15} /> },
+  { id: "bus-tour",        label: "Bus Tours",       icon: <Bus size={15} /> },
 ];
 
-// Trip-type cards — each uses a real destination photo
-const TRIP_TYPE_CARDS: Record<TripTypeId, { id: number; title: string; destination: string; flag: string; desc: string; image: string; duration: string; price: string }[]> = {
+// Trip-type cards — each uses a real destination photo.
+// Optional `tourId` opens the matching DISCOVERY_TOUR_MAP entry in TourDetailPage
+// instead of running a holiday search. Used today by the Bus Tours tab so the
+// Lake Garda card jumps straight to its full itinerary on click.
+const TRIP_TYPE_CARDS: Record<TripTypeId, { id: number; title: string; destination: string; flag: string; desc: string; image: string; duration: string; price: string; tourId?: number }[]> = {
   "hotel-flight": [
     { id: 1, title: "Cancún All-Inclusive Escape",     destination: "Cancún, Mexico",   flag: "mx", desc: "Powdery white sands, turquoise Caribbean water, and all-inclusive resort luxury.",        image: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80", duration: "7 nights", price: "from £849" },
     { id: 2, title: "Maldives Overwater Villa",         destination: "Maldives",         flag: "mv", desc: "Stilted villas above crystal lagoons, world-class diving, and pure tropical seclusion.",  image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80", duration: "7 nights", price: "from £1,899" },
@@ -470,6 +478,10 @@ const TRIP_TYPE_CARDS: Record<TripTypeId, { id: number; title: string; destinati
     { id: 13, title: "Santorini Getaway",              destination: "Greece",           flag: "gr", desc: "Whitewashed cliffs, volcanic beaches, and legendary sunsets over the caldera.",           image: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=800&q=80", duration: "7 nights", price: "from £749" },
     { id: 14, title: "Bangkok Long Weekend",           destination: "Thailand",         flag: "th", desc: "Street food, rooftop bars, golden temples, and buzzing night markets await.",             image: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80", duration: "5 nights", price: "from £599" },
     { id: 15, title: "Cancún Quick Escape",            destination: "Mexico",           flag: "mx", desc: "Last-minute Caribbean sun, all-inclusive deals, and white-sand beaches for less.",        image: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80", duration: "7 nights", price: "from £819" },
+  ],
+  "bus-tour": [
+    // `tourId: 22` jumps the click handler straight to the matching tour in DISCOVERY_TOUR_MAP.
+    { id: 16, tourId: 22, title: "Lake Garda Wine Festival Bus Tour", destination: "Lazise, Italy", flag: "it", desc: "4-day coach tour from Germany to Italy's Lake Garda with the Bardolino wine festival.", image: "https://images.unsplash.com/photo-1583266093066-fbe43d9caa83?w=800&q=80", duration: "4 days", price: "from €649" },
   ],
 };
 
@@ -2426,17 +2438,38 @@ export default function DiscoveryPage({
                   <div key={card.id} className="shrink-0 w-[300px] snap-start">
                     <div
                       className="bg-card rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
-                      onClick={() => onHolidaySearch({
-                        from: "London (LHR)",
-                        to: card.destination,
-                        isCachedDestination: false,
-                        dateMode: "specific",
-                        dateRange: undefined,
-                        selectedMonths: [],
-                        nights: 7,
-                        adults: 2,
-                        children: 0,
-                      })}
+                      onClick={() => {
+                        // Cards with `tourId` jump straight to TourDetailPage
+                        // (used by the Bus Tours tab). All other trip-type cards
+                        // run a holiday search as before.
+                        if (card.tourId) {
+                          // Only `id` is read downstream (handleTourSelect looks up
+                          // DISCOVERY_TOUR_MAP[id]), but TourCardData requires the
+                          // full shape — map the trip-type card fields across.
+                          onTourSelect({
+                            id: card.tourId,
+                            country: card.destination,
+                            flag: card.flag,
+                            title: card.title,
+                            desc: card.desc,
+                            duration: card.duration,
+                            price: card.price,
+                            image: card.image,
+                          });
+                          return;
+                        }
+                        onHolidaySearch({
+                          from: "London (LHR)",
+                          to: card.destination,
+                          isCachedDestination: false,
+                          dateMode: "specific",
+                          dateRange: undefined,
+                          selectedMonths: [],
+                          nights: 7,
+                          adults: 2,
+                          children: 0,
+                        });
+                      }}
                     >
                       <div className="relative">
                         <ImageWithPlaceholder

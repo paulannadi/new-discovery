@@ -4824,6 +4824,227 @@ export const ALL_TOURS: Tour[] = [
   TENERIFE_TOUR,
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Italy — "Lake Garda Wine Festival Bus Tour"
+// 4-day coach tour from Germany to Italy's Lake Garda, built around the
+// Festa dell'uva e del vino wine festival in Bardolino. Sourced and translated
+// from m-tours.de. Maps to Discovery TourCard id 22.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const LAKE_GARDA_BUS_TOUR: Tour = {
+  tourId: "lake-garda-wine-festival-bus",
+  title: "Lake Garda – Wine Festival in Bardolino",
+  subtitle: "4-day coach tour to Italy's Lake Garda with the Bardolino wine festival.",
+  tripType: "group-tour",
+  duration: 4,
+  locationsLabel: "Lazise · Sirmione · Garda · Bardolino",
+  highlights: [
+    "Bardolino wine festival",
+    "Sirmione's Rocca Scaligera fortress",
+    "Lake Garda boat trip",
+    "4★ Hotel Bella Lazise",
+  ],
+  // Lake Garda hero shot (Unsplash)
+  mainImage: "https://images.unsplash.com/photo-1583266093066-fbe43d9caa83?w=1200&q=80",
+  price: {
+    perPerson: 649,
+    total: 1298,
+    currency: "EUR",
+    paidBefore: 649,
+    // €2.50/night bed tax × 3 nights, paid at the hotel
+    paidAtDestination: 8,
+  },
+  startDate: "Oct 1, 2026",
+  endDate: "Oct 4, 2026",
+  adults: 2,
+  destinationCodes: ["ITALY"],
+  // Coach pickup points in Germany — drive the "Departure point" selector
+  // in the TourDetailPage booking widget (instead of "Hotel preference").
+  departurePoints: ["Freiburg", "Kirchzarten", "Lörrach"],
+
+  // ── Quick-fact attribute chips ────────────────────────────────────────────
+  attributes: [
+    { iconKey: "users",          title: "Group size",     value: "Group tour · max 40 guests" },
+    { iconKey: "activity",       title: "Travel by",      value: "Coach from Germany" },
+    { iconKey: "languages",      title: "Tour language",  value: "German-speaking guide" },
+    { iconKey: "calendar-check", title: "Travel dates",   value: "Oct 1–4, 2026" },
+  ],
+
+  // ── Photo gallery ─────────────────────────────────────────────────────────
+  // Six landscape photos of Lake Garda, Sirmione, Bardolino, and the wine festival
+  gallery: [
+    "https://images.unsplash.com/photo-1583266093066-fbe43d9caa83?w=800&q=80", // Lake Garda
+    "https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=800&q=80", // Sirmione
+    "https://images.unsplash.com/photo-1568213816046-0ee1c42bd559?w=800&q=80", // Wine tasting / Bardolino
+    "https://images.unsplash.com/photo-1505976058322-6b1e1d8045b9?w=800&q=80", // Vineyards
+    "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80", // Italian lakeside town
+    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80", // Alpine lake scenery
+  ],
+
+  // ── Day-by-day itinerary ──────────────────────────────────────────────────
+  days: [
+    {
+      dayNumber: 1,
+      title: "Departure & arrival at Lake Garda",
+      location: "Germany → Lazise",
+      items: [
+        {
+          type: "transport",
+          label: "Coach departure from Germany",
+          description: "Morning pickup from Freiburg, Kirchzarten, or Lörrach. Comfortable modern coach journey south to Lake Garda.",
+        },
+        {
+          type: "highlight",
+          label: "Welcome dinner at the hotel",
+          description: "After hotel check-in, gather for a welcome dinner at the Hotel Bella Lazise restaurant.",
+        },
+        {
+          type: "hotel",
+          label: "Hotel Bella Lazise **** or similar",
+        },
+      ],
+      image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Full-day Lake Garda excursion",
+      location: "Sirmione → Garda",
+      items: [
+        {
+          type: "highlight",
+          label: "Sirmione & the Rocca Scaligera fortress",
+          description: "A German-speaking guide leads you through the picturesque old town of Sirmione on its narrow peninsula, with a stop at the impressive Rocca Scaligera fortress.",
+        },
+        {
+          type: "transport",
+          label: "Boat from Sirmione to Garda",
+          description: "Scenic lake crossing past olive groves and lakeside coves.",
+        },
+        {
+          type: "highlight",
+          label: "Explore Garda town",
+          description: "Time to wander the colourful houses and squares of Garda before returning to the hotel around 5:30 PM.",
+        },
+        {
+          type: "hotel",
+          label: "Hotel Bella Lazise **** or similar",
+        },
+      ],
+      image: "https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=800&q=80",
+    },
+    {
+      dayNumber: 3,
+      title: "Bardolino wine festival",
+      location: "Lazise → Bardolino",
+      items: [
+        {
+          type: "highlight",
+          label: "Free morning in Lazise",
+          description: "A leisurely morning to explore Lazise's historic centre, walk the lakefront, or enjoy the hotel pool and gardens.",
+        },
+        {
+          type: "highlight",
+          label: "Festa dell'uva e del vino in Bardolino",
+          description: "Afternoon excursion to Bardolino's famous wine festival. Taste regional Bardolino wines straight from local producers along the waterfront, sample specialties like risotto, grilled meats with polenta, and fresh fish, and enjoy folkloric performances, concerts, and colourful parades. Return to the hotel around 8:30 PM.",
+        },
+        {
+          type: "hotel",
+          label: "Hotel Bella Lazise **** or similar",
+        },
+      ],
+      image: "https://images.unsplash.com/photo-1568213816046-0ee1c42bd559?w=800&q=80",
+    },
+    {
+      dayNumber: 4,
+      title: "Return journey home",
+      location: "Lazise → Germany",
+      items: [
+        {
+          type: "highlight",
+          label: "Breakfast & checkout",
+          description: "Enjoy a final breakfast buffet at the hotel before checking out.",
+        },
+        {
+          type: "transport",
+          label: "Coach return to Germany",
+          description: "Comfortable return journey to your original pickup point.",
+        },
+      ],
+      image: "https://images.unsplash.com/photo-1505976058322-6b1e1d8045b9?w=800&q=80",
+    },
+  ],
+
+  // ── Included / Excluded ───────────────────────────────────────────────────
+  included: [
+    "Return coach travel from Freiburg, Kirchzarten, or Lörrach",
+    "3 nights at the 4★ Hotel Bella Lazise with daily breakfast buffet",
+    "Welcome dinner at the hotel on arrival evening",
+    "Full-day guided Lake Garda excursion (Sirmione & Garda)",
+    "Boat trip from Sirmione to Garda",
+    "Audio headsets during city tours",
+    "Excursion to the Bardolino wine festival",
+    "M-TOURS tour leader throughout",
+  ],
+  excluded: [
+    "Italian bed tax (€2.50 per person per night, paid at the hotel)",
+    "Lunches and dinners (other than the welcome dinner)",
+    "Gratuities and personal expenses",
+    "Travel insurance",
+    "Optional wine tastings & food purchases at the festival",
+  ],
+
+  // ── TourCard fields (route breadcrumb) ───────────────────────────────────
+  // Single base hotel in Lazise with day-trip activities to Sirmione, Garda, and Bardolino.
+  stops: [
+    {
+      destinationName: "Lazise",
+      dateRange: "Oct 01 – 04",
+      nights: 3,
+      description: "A quiet base on the eastern shore of Lake Garda, 1.5 km from the lakeside town of Lazise.",
+      accommodation: {
+        hotelName: "Hotel Bella Lazise",
+        stars: 4,
+        image: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=400&q=80",
+        checkIn: "Oct 01", checkOut: "Oct 04",
+        checkInISO: "2026-10-01", checkOutISO: "2026-10-04",
+        roomType: "Double Room", boardType: "Buffet breakfast",
+      },
+      activities: [
+        {
+          date: "Fri, Oct 02",
+          name: "Sirmione & Garda excursion",
+          description: "Guided tour of Sirmione's old town and Rocca Scaligera fortress, followed by a scenic boat trip across the lake to Garda.",
+          image: "https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=400&q=80",
+        },
+        {
+          date: "Sat, Oct 03",
+          name: "Bardolino wine festival",
+          description: "Afternoon at the Festa dell'uva e del vino — regional wine tasting, local food, folklore performances, and parades along the Bardolino waterfront.",
+          image: "https://images.unsplash.com/photo-1568213816046-0ee1c42bd559?w=400&q=80",
+        },
+      ],
+      lat: 45.5024,
+      lng: 10.7333,
+    },
+  ],
+  transfers: [
+    {
+      from: "Germany",
+      to: "Lazise",
+      date: "Oct 01, Coach Transfer",
+      mode: "Coach",
+      description: "Modern coach from Freiburg / Kirchzarten / Lörrach to Lake Garda",
+    },
+    {
+      from: "Lazise",
+      to: "Germany",
+      date: "Oct 04, Coach Transfer",
+      mode: "Coach",
+      description: "Return coach to your original pickup point",
+    },
+  ],
+};
+
 // Maps a Discovery TourCardData.id to a Tour object.
 // Every card now points to its own unique tour (except 13/14/15 which are v2 copies).
 export const DISCOVERY_TOUR_MAP: Record<number, Tour> = {
@@ -4848,4 +5069,5 @@ export const DISCOVERY_TOUR_MAP: Record<number, Tour> = {
   19: MOROCCO_IMPERIAL_TOUR,   // Imperial Cities of Morocco
   20: MOROCCO_SAHARA_TOUR,     // Sahara & Kasbahs
   21: MOROCCO_COASTAL_TOUR,    // Coastal Morocco
+  22: LAKE_GARDA_BUS_TOUR,     // Lake Garda Wine Festival Bus Tour
 };
