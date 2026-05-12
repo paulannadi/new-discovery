@@ -20,6 +20,9 @@ import { cn } from "../../../shared/components/ui/utils";
 // Activity is a new starting-context source — Discovery → Activities tab →
 // ActivityListPage → ActivityDetailPage → "Start planning" lands here.
 import type { Activity } from "../../../types";
+// ImageWithPlaceholder — lazy loading + reserved space for hero & card images
+// in the itinerary view. Hero is `priority` (above the fold).
+import { ImageWithPlaceholder } from "../../../shared/components/loading";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -82,6 +85,21 @@ export type HolidayPackageData = {
   checkIn?: string;     // ISO date string from the Holidays search form, e.g. "2026-04-09"
 };
 
+// Snapshot of the cruise context passed in from CruiseDetailPage.
+// We keep this shallow (just the display fields SmartPlanner needs) so we
+// don't have to lug the full Cruise object around.
+export type CruiseData = {
+  title: string;
+  shipName: string;
+  cruiseLine: string;
+  route: string;
+  duration: string;       // e.g. "7 nights"
+  departureDate: string;  // ISO date "YYYY-MM-DD"
+  price: string;          // e.g. "$899"
+  image: string;
+  nights: number;         // cruise duration in nights
+};
+
 export type StartingContext =
   | { type: "tour"; tour: TourData }
   | { type: "hotel"; hotel: HotelData; nights: number }
@@ -91,6 +109,7 @@ export type StartingContext =
   // ActivityData shape — we pass it through whole so SmartPlanner can read
   // anything it needs (location, durationDays, type, etc.).
   | { type: "activity"; activity: Activity; travelDate?: string }
+  | { type: "cruise"; cruise: CruiseData }
   | { type: "ai"; prompt: string };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -104,6 +123,7 @@ function getDestination(ctx: StartingContext): string {
     case "flight":   return ctx.flight.to;
     case "holiday":  return ctx.pkg.destination;
     case "activity": return ctx.activity.location;
+    case "cruise":   return ctx.cruise.route;
     case "ai":       return extractAIDestination(ctx.prompt);
   }
 }
@@ -133,6 +153,8 @@ function getNights(ctx: StartingContext): number {
   if (ctx.type === "activity") {
     return Math.max(1, ctx.activity.durationDays - 1);
   }
+  // Cruises already carry their duration as nights
+  if (ctx.type === "cruise") return Math.max(1, ctx.cruise.nights);
   return 7;
 }
 
@@ -152,6 +174,11 @@ function getTripStartDate(ctx: StartingContext): Date {
       if (!isNaN(d.getTime())) return d;
     }
     const d = new Date(ctx.activity.startDate);
+    if (!isNaN(d.getTime())) return d;
+  }
+  // Cruise: departureDate is already an ISO string from CruiseDetailPage
+  if (ctx.type === "cruise" && ctx.cruise.departureDate) {
+    const d = parseISO(ctx.cruise.departureDate);
     if (!isNaN(d.getTime())) return d;
   }
   return addDays(new Date(), 30); // fallback when no date was entered
@@ -236,11 +263,14 @@ export default function SmartPlannerPage({
             </div>
           </header>
 
-          {/* Hero image — same picsum.photos pattern as before, now with real-app rounding */}
-          <img
+          {/* Hero image — same picsum.photos pattern as before, now wrapped
+              in ImageWithPlaceholder for proper space reservation + fade-in.
+              priority because the hero is above the fold. */}
+          <ImageWithPlaceholder
             src={`https://picsum.photos/seed/${heroSeed}-landscape/1200/480`}
             alt={`${cityName} destination`}
-            className="w-full object-cover max-h-48 md:max-h-96 lg:rounded-t-3xl"
+            priority
+            containerClassName="w-full max-h-48 md:max-h-96 lg:rounded-t-3xl"
           />
 
           {/*
@@ -365,7 +395,11 @@ function TourItinerary({
           {format(startDate, "EEE, dd MMM yyyy")}
         </p>
         <div className="border border-border rounded-lg md:rounded-3xl shadow-sm overflow-hidden mb-0">
-          <img src={tour.image} alt={tour.title} className="w-full h-48 object-cover" />
+          <ImageWithPlaceholder
+            src={tour.image}
+            alt={tour.title}
+            containerClassName="w-full h-48"
+          />
           <div className="bg-card p-4 md:p-6">
             {/* Flag + country + "Added" badge */}
             <div className="flex items-center gap-2 mb-2">
@@ -858,11 +892,12 @@ function AccommodationCard({
     <div className="border border-border rounded-lg md:rounded-3xl shadow-sm">
       <div className="bg-card rounded-lg md:rounded-3xl grid md:grid-cols-[160px_1fr] lg:grid-cols-[270px_1fr] md:grid-rows-[250px]">
 
-        {/* Hotel image — full-width on mobile, fixed-width column on desktop */}
-        <img
+        {/* Hotel image — full-width on mobile, fixed-width column on desktop.
+            ImageWithPlaceholder reserves space + lazy-loads + fades in. */}
+        <ImageWithPlaceholder
           src={hotel.image}
           alt={hotel.name}
-          className="block w-full h-32 md:h-full object-cover max-md:rounded-t-lg md:rounded-l-3xl"
+          containerClassName="block w-full h-32 md:h-full max-md:rounded-t-lg md:rounded-l-3xl"
         />
 
         {/* Content grid: left info column | right actions column */}

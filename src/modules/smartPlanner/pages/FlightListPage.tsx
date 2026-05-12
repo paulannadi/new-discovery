@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { BackButton } from "../../../shared/components/BackButton";
 import { cn } from "../../../shared/components/ui/utils";
 import {
@@ -15,6 +15,16 @@ import type {
   FlightOption,
   SelectedFlightLeg,
 } from "../../../App";
+// Loading kit — flight search can take up to 8s, so we apply the 3s+ tier:
+// skeleton list with a status banner explaining what's happening. No
+// decorative loader — page structure + skeletons are the loading state.
+import {
+  Skeleton,
+} from "../../../shared/components/ui/skeleton";
+import {
+  StaggeredList,
+  StreamingStatusBanner,
+} from "../../../shared/components/loading";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -286,6 +296,35 @@ function StepDot({
 // Main component
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// FlightCardSkeleton
+//
+// A small skeleton matching the flight card row layout (departure/arrival
+// times + airline + price). Real flight searches take 3–8s so per the doc
+// we use the streaming pattern: globe loader scene above, skeletons below,
+// then progressive arrival of cards as carriers respond.
+// ─────────────────────────────────────────────────────────────────────────────
+function FlightCardSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-busy="true"
+      aria-label="Loading flight"
+      className="bg-card rounded-xl border border-border p-4 flex items-center gap-4"
+    >
+      {/* Airline logo placeholder */}
+      <Skeleton className="size-10 rounded-full shrink-0" />
+      {/* Times + duration row */}
+      <div className="flex-1 flex flex-col gap-2">
+        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-3 w-1/2" />
+      </div>
+      {/* Price */}
+      <Skeleton className="h-6 w-16 shrink-0" />
+    </div>
+  );
+}
+
 export default function FlightListPage({
   searchCriteria,
   currentLegIndex,
@@ -296,6 +335,38 @@ export default function FlightListPage({
   // Sort state: which sort mode is active
   type SortMode = "best" | "cheapest" | "fastest";
   const [activeSort, setActiveSort] = useState<SortMode>("best");
+
+  // ── Simulated streaming search ─────────────────────────────────────────────
+  // Real flight queries take several seconds and arrive from multiple carriers.
+  // We mimic this in the prototype with two phases:
+  //   • isSearching = true for 2.5s — globe + skeletons
+  //   • streamingProgress ticks 1→3 as "suppliers" return, banner stays visible
+  //     until all three have reported in
+  // Reset whenever the leg or criteria changes so the user sees the loader
+  // every time they advance to the next leg.
+  const [isSearching, setIsSearching] = useState(true);
+  const [streamingProgress, setStreamingProgress] = useState({ completed: 0, total: 3 });
+
+  useEffect(() => {
+    setIsSearching(true);
+    setStreamingProgress({ completed: 0, total: 3 });
+
+    // Phase 1 — first batch arrives, hide skeletons, banner stays
+    const t1 = setTimeout(() => {
+      setIsSearching(false);
+      setStreamingProgress({ completed: 1, total: 3 });
+    }, 2500);
+    // Phase 2 — second carrier reports
+    const t2 = setTimeout(() => setStreamingProgress({ completed: 2, total: 3 }), 3500);
+    // Phase 3 — final carrier, banner disappears
+    const t3 = setTimeout(() => setStreamingProgress({ completed: 3, total: 3 }), 4500);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [currentLegIndex, searchCriteria]);
 
   // The leg currently being picked
   const currentLeg = searchCriteria.legs[currentLegIndex];
@@ -463,17 +534,42 @@ export default function FlightListPage({
           </span>
         </div>
 
-        {/* ── RESULTS LIST ────────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-3">
-          {sortedFlights.map((option) => (
-            <FlightCard
-              key={option.id}
-              option={option}
-              cabinLabel={cabinLabel}
-              onSelect={() => onFlightLegSelect(option)}
+        {/* ── RESULTS LIST ──────────────────────────────────────────────────
+            While searching: 4 skeleton rows that match the FlightCard layout
+            (page structure + skeletons are the loading state — no globe).
+            A streaming banner sits below the skeletons to convey the 3s+
+            status message ("Searching flights across carriers…").
+            After: StaggeredList fades cards in over 60ms intervals, and the
+            banner stays visible until all carriers have reported. */}
+        {isSearching ? (
+          <div className="flex flex-col gap-3">
+            {[1, 2, 3, 4].map(i => (
+              <FlightCardSkeleton key={i} />
+            ))}
+            <StreamingStatusBanner
+              isStreaming
+              message="Searching flights across carriers…"
             />
-          ))}
-        </div>
+          </div>
+        ) : (
+          <>
+            <StaggeredList className="flex flex-col gap-3">
+              {sortedFlights.map((option) => (
+                <FlightCard
+                  key={option.id}
+                  option={option}
+                  cabinLabel={cabinLabel}
+                  onSelect={() => onFlightLegSelect(option)}
+                />
+              ))}
+            </StaggeredList>
+            <StreamingStatusBanner
+              isStreaming={streamingProgress.completed < streamingProgress.total}
+              progress={streamingProgress}
+              message="Checking remaining carriers…"
+            />
+          </>
+        )}
 
         {/* Already selected legs summary (shown after leg 1 is chosen) */}
         {selectedLegs.length > 0 && (

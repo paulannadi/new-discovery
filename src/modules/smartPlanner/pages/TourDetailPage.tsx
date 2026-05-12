@@ -46,6 +46,10 @@ import type { Tour, TourAttribute } from "../../../types";
 import { DayByDaySection } from "../components/DayByDaySection";
 import { InfoList } from "../components/InfoList";
 import { TourRouteMapInline } from "../components/TourRouteMap";
+// ImageWithPlaceholder — reserves space + lazy-loads + fades in. We use
+// `priority` for the hero (above the fold) and lazy for the thumbnails and
+// modal gallery (below the fold or hidden until opened).
+import { ImageWithPlaceholder } from "../../../shared/components/loading";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -242,10 +246,11 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                     aria-label={`Tour video for ${tour.title}`}
                   />
                 ) : (
-                  <img
+                  <ImageWithPlaceholder
                     src={galleryImages[0]}
                     alt={tour.title}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    priority
+                    containerClassName="absolute inset-0 w-full h-full"
                   />
                 )}
                 {/* Subtle gradient at the bottom so the video blends nicely */}
@@ -261,10 +266,11 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                     onClick={() => setPhotosOpen(true)}
                     aria-label={`View tour photo ${i + 2}`}
                   >
-                    <img
+                    <ImageWithPlaceholder
                       src={url}
                       alt={`Tour photo ${i + 2}`}
-                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                      containerClassName="w-full h-full"
+                      className="group-hover:scale-[1.03] transition-transform duration-500"
                     />
                   </button>
                 ))}
@@ -970,22 +976,25 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
           <div className="grid grid-cols-2 gap-2 mt-2">
             {/* Hero image — full width */}
             <div className="col-span-2">
-              <img
+              <ImageWithPlaceholder
                 src={galleryImages[0]}
                 alt={tour.title}
-                className="w-full aspect-[16/7] object-cover rounded-2xl"
+                aspectRatio="16/7"
+                rounded="rounded-2xl"
               />
             </div>
-            {/* Extra gallery images — 2-col grid, sourced from day photos + gallery */}
+            {/* Extra gallery images — 2-col grid, sourced from day photos + gallery.
+                Lazy-loaded by default since they're below the fold inside the modal. */}
             {[...dayImages, ...galleryImages.slice(1)].filter(
               // Remove duplicates and the hero image (already shown above)
               (url, i, arr) => arr.indexOf(url) === i && url !== galleryImages[0]
             ).map((url, i) => (
-              <img
+              <ImageWithPlaceholder
                 key={url}
                 src={url}
                 alt={`Tour photo ${i + 2}`}
-                className="w-full aspect-[4/3] object-cover rounded-2xl"
+                aspectRatio="4/3"
+                rounded="rounded-2xl"
               />
             ))}
           </div>

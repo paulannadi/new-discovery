@@ -141,7 +141,10 @@ export function TourRouteMap({ stops }: { stops: TourStop[] }) {
   return (
     <div>
       <h3 className="text-xl font-bold text-foreground mb-4">Tour route</h3>
-      <div className="bg-card rounded-xl shadow-sm overflow-hidden border border-border">
+      {/* relative z-0 creates a new stacking context so Leaflet's internal
+          high z-indexes (tile/marker/popup panes) can't paint on top of
+          sticky elements above this map (e.g. the section tab bar). */}
+      <div className="relative z-0 bg-card rounded-xl shadow-sm overflow-hidden border border-border">
         <div className="h-[300px]">
           <MapBody stops={stops} />
         </div>

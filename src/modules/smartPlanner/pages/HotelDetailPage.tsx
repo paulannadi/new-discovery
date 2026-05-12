@@ -38,6 +38,9 @@ import { showToast } from "../../../shared/utils/toast";
 import { hotelDescription, nearbyPOIs, locationCoords } from "../../../shared/utils/hotelUtils";
 import PoliciesSection from "../components/PoliciesSection";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../../../shared/components/ui/tooltip";
+// Loading kit — ImageWithPlaceholder for hero/thumbnails/modal photos and
+// SkeletonCard for the room-list loading state (replaces the inline pulse).
+import { ImageWithPlaceholder, SkeletonCard } from "../../../shared/components/loading";
 
 // --- Types ---
 
@@ -322,10 +325,10 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
     )}>
       {/* Image Carousel */}
       <div className="h-[200px] relative bg-gray-100 group">
-        <img
+        <ImageWithPlaceholder
           src={room.image}
           alt={room.name}
-          className="w-full h-full object-cover absolute inset-0"
+          containerClassName="absolute inset-0 w-full h-full"
         />
         <div className="absolute inset-0 bg-foreground/5 opacity-0 group-hover:opacity-100 transition-opacity" />
 
@@ -640,40 +643,47 @@ export default function HotelDetailPage({
               button in the bottom-right corner, exactly like PackageDetailPage does. */}
           <div className="relative mx-4 sm:mx-6 md:mx-10">
             <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[280px] md:h-[402px] gap-2">
-              {/* Left: Main hero image — clicking it also opens the photos modal */}
+              {/* Left: Main hero image — clicking it also opens the photos modal.
+                  priority: this is above the fold, so eager-load it. */}
               <div
                 className="relative overflow-hidden rounded-xl group cursor-pointer"
                 onClick={() => setPhotosOpen(true)}
               >
-                <img
+                <ImageWithPlaceholder
                   src={hotel.image}
-                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
                   alt="Exterior"
+                  priority
+                  containerClassName="w-full h-full"
+                  className="group-hover:scale-[1.03] transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-transparent pointer-events-none" />
               </div>
 
               {/* Right: 2×2 thumbnail grid — 4 hotel photos, no map here.
-                  Each thumbnail is also clickable to open the photos modal. */}
+                  Each thumbnail is also clickable to open the photos modal.
+                  Lazy-loaded since they're paired with the hero (browsers
+                  prioritise the eager one and stagger these in). */}
               <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-2">
                 <div
                   className="overflow-hidden rounded-xl cursor-pointer group"
                   onClick={() => setPhotosOpen(true)}
                 >
-                  <img
+                  <ImageWithPlaceholder
                     src="https://images.unsplash.com/photo-1763207291832-819499e261dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJlc3RhdXJhbnQlMjBicmVha2Zhc3QlMjBidWZmZXR8ZW58MXx8fHwxNzY5NzgxMzM2fDA&ixlib=rb-4.1.0&q=80&w=1080"
-                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
                     alt="Breakfast"
+                    containerClassName="w-full h-full"
+                    className="group-hover:scale-[1.03] transition-transform duration-500"
                   />
                 </div>
                 <div
                   className="overflow-hidden rounded-xl cursor-pointer group"
                   onClick={() => setPhotosOpen(true)}
                 >
-                  <img
+                  <ImageWithPlaceholder
                     src="https://images.unsplash.com/photo-1729605411476-defbdab14c54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMGJhbGklMjBwb29sJTIwaW5maW5pdHl8ZW58MXx8fHwxNzY5NzgxMzM2fDA&ixlib=rb-4.1.0&q=80&w=1080"
-                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
                     alt="Pool"
+                    containerClassName="w-full h-full"
+                    className="group-hover:scale-[1.03] transition-transform duration-500"
                   />
                 </div>
                 {/* Slot 3 — room interior (was map, now a real hotel photo) */}
@@ -681,10 +691,11 @@ export default function HotelDetailPage({
                   className="overflow-hidden rounded-xl cursor-pointer group"
                   onClick={() => setPhotosOpen(true)}
                 >
-                  <img
+                  <ImageWithPlaceholder
                     src={ROOM_IMAGES[0]}
-                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
                     alt="Room"
+                    containerClassName="w-full h-full"
+                    className="group-hover:scale-[1.03] transition-transform duration-500"
                   />
                 </div>
                 {/* Slot 4 — another hotel photo (was an empty grey filler) */}
@@ -692,10 +703,11 @@ export default function HotelDetailPage({
                   className="overflow-hidden rounded-xl cursor-pointer group"
                   onClick={() => setPhotosOpen(true)}
                 >
-                  <img
+                  <ImageWithPlaceholder
                     src={ROOM_IMAGES[1]}
-                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
                     alt="Lounge"
+                    containerClassName="w-full h-full"
+                    className="group-hover:scale-[1.03] transition-transform duration-500"
                   />
                 </div>
               </div>
@@ -1106,9 +1118,13 @@ export default function HotelDetailPage({
                 return (
                   <div key={config.id} className="flex flex-col gap-6">
                     {isSearching ? (
+                      // Room loading state — vertical SkeletonCards match the
+                      // RoomCard layout (image on top, details below).
+                      // Replaces the previous bare animate-pulse div so the
+                      // shape matches the real card and prevents layout shift.
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[1, 2, 3].map(n => (
-                          <div key={n} className="bg-card rounded-xl border-2 border-border h-[420px] animate-pulse" />
+                          <SkeletonCard key={n} variant="vertical" />
                         ))}
                       </div>
                     ) : availableRooms.length > 0 ? (
@@ -1149,9 +1165,13 @@ export default function HotelDetailPage({
                 return (
                   <div key={config.id} className="flex flex-col gap-6">
                     {isSearching ? (
+                      // Room loading state — vertical SkeletonCards match the
+                      // RoomCard layout (image on top, details below).
+                      // Replaces the previous bare animate-pulse div so the
+                      // shape matches the real card and prevents layout shift.
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[1, 2, 3].map(n => (
-                          <div key={n} className="bg-card rounded-xl border-2 border-border h-[420px] animate-pulse" />
+                          <SkeletonCard key={n} variant="vertical" />
                         ))}
                       </div>
                     ) : availableRooms.length > 0 ? (
@@ -1567,19 +1587,21 @@ export default function HotelDetailPage({
           <div className="grid grid-cols-2 gap-2 mt-2">
             {/* Full-width hero at the top */}
             <div className="col-span-2">
-              <img
+              <ImageWithPlaceholder
                 src={hotel.image}
                 alt={hotel.name}
-                className="w-full aspect-[16/7] object-cover rounded-xl"
+                aspectRatio="16/7"
+                rounded="rounded-xl"
               />
             </div>
             {/* Room photos fill the remaining grid cells */}
             {ROOM_IMAGES.map((url, i) => (
-              <img
+              <ImageWithPlaceholder
                 key={url}
                 src={url}
                 alt={`Hotel photo ${i + 2}`}
-                className="w-full aspect-[4/3] object-cover rounded-xl"
+                aspectRatio="4/3"
+                rounded="rounded-xl"
               />
             ))}
           </div>

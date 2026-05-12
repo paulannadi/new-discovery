@@ -18,6 +18,9 @@ import { UnifiedPackage } from "../../../types";
 import { cn } from "../../../shared/components/ui/utils";
 import AccommodationStar from "../../../shared/components/AccommodationStar";
 import RatingBlock from "../../../shared/components/RatingBlock";
+// ImageWithPlaceholder — handles lazy loading, reserves space (no CLS),
+// and crossfades the image in on load. Replaces the raw <img> below.
+import { ImageWithPlaceholder } from "../../../shared/components/loading";
 
 // ── Currency symbol helper ──────────────────────────────────────────────────
 // Converts ISO currency code to a symbol. Add more as needed.
@@ -127,10 +130,10 @@ export function PackageCard({ pkg, onSelect, onHover, isHovered, isPricePending 
           The image uses absolute inset-0 on desktop so its natural dimensions
           (e.g. portrait photos) never push the card taller than the content. */}
       <div className="relative shrink-0 h-[200px] @[680px]:h-auto @[680px]:w-[260px] @[680px]:self-stretch overflow-hidden">
-        <img
+        <ImageWithPlaceholder
           src={pkg.hotel.mainImage}
           alt={pkg.hotel.name}
-          className="w-full h-full @[680px]:absolute @[680px]:inset-0 object-cover"
+          containerClassName="w-full h-full @[680px]:absolute @[680px]:inset-0"
         />
         <span className="absolute top-2 left-2 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-normal bg-white text-foreground">
           <Plane size={11} aria-hidden="true" />

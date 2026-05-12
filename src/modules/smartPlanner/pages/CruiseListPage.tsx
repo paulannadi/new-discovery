@@ -1,19 +1,17 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// ActivityListPage
+// CruiseListPage
 //
-// Search-results page for activities. Mirrors the layout of HolidayListPage
-// (split layout: cards on the left, map on the right, filter pills above) but
-// is much simpler — there's no live search, no live/cache merge, and no rate
-// calendar. We start from the static ALL_ACTIVITIES dataset and apply
-// client-side filters and sorts.
+// Search-results page for cruises. Mirrors the layout of ActivityListPage:
+// split layout with cards on the left and a Leaflet map on the right, with a
+// horizontal filter pill row above. Starts from the static ALL_CRUISES dataset
+// and applies client-side filters and sorts.
 //
 // Filter pills:
-//   • Sort           — Recommended / Price ↑ / Price ↓ / Top rated
-//   • Activity type  — multi-select (cruise, walking, bicycle, etc.)
-//   • Duration       — 1–3 / 4–7 / 8–14 / 15+ days
-//   • Difficulty     — Easy / Moderate / Challenging (only meaningful for
-//                      walking + bicycle, but harmless on other types)
-//   • Price          — dual-handle slider over the per-person price range
+//   • Sort        — Recommended / Price ↑ / Price ↓ / Top rated / Shortest / Longest
+//   • Cruise line — multi-select checkboxes
+//   • Region      — multi-select
+//   • Duration    — 2–5 / 6–9 / 10+ nights
+//   • Price       — dual-handle slider over the per-person fromPerPerson range
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useMemo, useEffect, useRef } from "react";
@@ -21,9 +19,9 @@ import {
   ChevronDown,
   Check,
   ArrowUpDown,
-  Compass,
+  Ship,
+  Globe,
   Clock,
-  Mountain,
   Tag,
 } from "lucide-react";
 import { BackButton } from "../../../shared/components/BackButton";
@@ -31,50 +29,61 @@ import { cn } from "../../../shared/components/ui/utils";
 import LeafletMap, {
   type MapMarkerData,
 } from "../../../shared/components/LeafletMap";
-import type { Activity, ActivitySearchCriteria, ActivityType } from "../../../types";
-import { ALL_ACTIVITIES } from "../../../mocks/activities";
-import ActivitySearchForm, {
-  ACTIVITY_TYPE_OPTIONS,
-} from "../components/ActivitySearchForm";
-import { ActivityCard } from "../components/ActivityCard";
-// Loading kit — vertical SkeletonCards while activities "load" briefly
-// (matches the doc's 1s–3s tier), then a 60ms staggered reveal.
+import type {
+  Cruise,
+  CruiseLine,
+  CruiseRegion,
+  CruiseSearchCriteria,
+} from "../../../types";
+import { ALL_CRUISES } from "../../../mocks/cruises";
+import CruiseSearchForm, {
+  CRUISE_REGION_OPTIONS,
+} from "../components/CruiseSearchForm";
+import { CruiseCard } from "../components/CruiseCard";
 import { SkeletonCard, StaggeredList } from "../../../shared/components/loading";
 
 // ── Filter option constants ──────────────────────────────────────────────────
 
 const SORT_OPTIONS = [
-  { id: "recommended", label: "Recommended" },
+  { id: "recommended", label: "Recommended"       },
   { id: "price-asc",   label: "Price: low to high" },
   { id: "price-desc",  label: "Price: high to low" },
-  { id: "rating",      label: "Top rated" },
+  { id: "rating",      label: "Top rated"          },
+  { id: "shortest",    label: "Shortest"            },
+  { id: "longest",     label: "Longest"             },
 ] as const;
 
 type SortId = typeof SORT_OPTIONS[number]["id"];
 
-// Duration buckets — values are inclusive ranges in days
+// Duration buckets — inclusive ranges in nights.
+// "short"/"week"/"long" line up with the CruiseSearchForm's durationRange ids
+// so passing through searchCriteria seeds the filter correctly.
 const DURATION_OPTIONS = [
-  { id: "short",   label: "1–3 days",   min: 1,  max: 3   },
-  { id: "week",    label: "4–7 days",   min: 4,  max: 7   },
-  { id: "long",    label: "8–14 days",  min: 8,  max: 14  },
-  { id: "epic",    label: "15+ days",   min: 15, max: 999 },
+  { id: "short", label: "2–5 nights",  min: 2,  max: 5   },
+  { id: "week",  label: "6–9 nights",  min: 6,  max: 9   },
+  { id: "long",  label: "10+ nights",  min: 10, max: 999 },
 ] as const;
 
-const DIFFICULTY_OPTIONS = ["Easy", "Moderate", "Challenging"] as const;
-type Difficulty = typeof DIFFICULTY_OPTIONS[number];
+const ALL_CRUISE_LINES: CruiseLine[] = [
+  "MSC Cruises",
+  "Royal Caribbean",
+  "Disney Cruise Line",
+  "Norwegian Cruise Line",
+  "Celebrity Cruises",
+  "Costa Cruises",
+  "TUI Cruises",
+];
 
-// Which dropdown is open. Only one open at a time, like in HolidayListPage.
 type FilterDropdown =
   | "sort"
-  | "type"
+  | "line"
+  | "region"
   | "duration"
-  | "difficulty"
   | "price"
   | null;
 
 // ── Sub-components ───────────────────────────────────────────────────────────
 
-// FilterButton — single pill in the horizontal filter bar.
 const FilterButton = ({
   label,
   active,
@@ -137,78 +146,71 @@ const CheckboxRow = ({
 
 // ── Props ────────────────────────────────────────────────────────────────────
 
-type ActivityListPageProps = {
-  searchCriteria: ActivitySearchCriteria;
-  // Called when the user clicks an ActivityCard → routes to ActivityDetailPage
-  onViewDetail: (activity: Activity) => void;
+type CruiseListPageProps = {
+  searchCriteria: CruiseSearchCriteria;
+  onViewDetail: (cruise: Cruise) => void;
   onBack: () => void;
-  onRefineSearch?: (criteria: ActivitySearchCriteria) => void;
+  onRefineSearch: (criteria: CruiseSearchCriteria) => void;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function ActivityListPage({
+export default function CruiseListPage({
   searchCriteria,
   onBack,
   onRefineSearch,
   onViewDetail,
-}: ActivityListPageProps) {
+}: CruiseListPageProps) {
   // ── Brief "searching" state ────────────────────────────────────────────
-  // We don't have a real backend in this prototype, but a short skeleton
-  // phase makes the page feel like the production app (which queries an
-  // activity inventory API). 1.2s lands in the 1s–3s tier — skeleton only,
-  // no globe needed.
+  // 1.5s lands in the 1s–3s tier from the loading patterns doc — skeleton only.
   const [isSearching, setIsSearching] = useState(true);
   useEffect(() => {
-    const id = setTimeout(() => setIsSearching(false), 1200);
+    const id = setTimeout(() => setIsSearching(false), 1500);
     return () => clearTimeout(id);
   }, [searchCriteria]);
 
   // ── Filter state ────────────────────────────────────────────────────────
-  // Sort defaults to "recommended" (the order from ALL_ACTIVITIES).
   const [sortBy, setSortBy] = useState<SortId>("recommended");
 
-  // Type filter is seeded from the search criteria so a user clicking a
-  // "Cruise ship" category card on Discovery lands here pre-filtered.
-  const [selectedTypes, setSelectedTypes] = useState<ActivityType[]>(
-    searchCriteria.activityTypes
+  // Cruise line filter — multi-select. Pre-seed if the search form passed one.
+  const [selectedLines, setSelectedLines] = useState<CruiseLine[]>(
+    searchCriteria.cruiseLine ? [searchCriteria.cruiseLine] : [],
   );
 
-  // Duration buckets are stored by id ("short" | "week" | …)
-  const [selectedDurations, setSelectedDurations] = useState<string[]>([]);
+  // Region filter — multi-select. Pre-seed if the search form passed one.
+  const [selectedRegions, setSelectedRegions] = useState<CruiseRegion[]>(
+    searchCriteria.region ? [searchCriteria.region] : [],
+  );
 
-  // Difficulty is multi-select since "Easy" + "Moderate" is a sensible combo
-  const [selectedDifficulties, setSelectedDifficulties] = useState<Difficulty[]>([]);
+  // Duration filter — single-select bucket id (or empty for any). Seeded from
+  // the search form's durationRange.
+  const [selectedDurations, setSelectedDurations] = useState<string[]>(
+    searchCriteria.durationRange !== "any" ? [searchCriteria.durationRange] : [],
+  );
 
-  // Price slider — defaults span the full dataset, recomputed below
+  // Price slider — defaults span the whole dataset.
   const priceBounds = useMemo(() => {
-    const prices = ALL_ACTIVITIES.map((a) => a.price.perPerson);
-    return { min: Math.floor(Math.min(...prices) / 100) * 100, max: Math.ceil(Math.max(...prices) / 100) * 100 };
+    const prices = ALL_CRUISES.map((c) => c.price.fromPerPerson);
+    return {
+      min: Math.floor(Math.min(...prices) / 100) * 100,
+      max: Math.ceil(Math.max(...prices) / 100) * 100,
+    };
   }, []);
   const [priceRange, setPriceRange] = useState<[number, number]>([
     priceBounds.min,
     priceBounds.max,
   ]);
 
-  // ── Open dropdown state — one at a time ────────────────────────────────
+  // ── Open dropdown state ────────────────────────────────────────────────
   const [openDropdown, setOpenDropdown] = useState<FilterDropdown>(null);
-
-  // Tracks the horizontal offset (in px) of the clicked filter button,
-  // measured relative to the filters row container. We use this to position
-  // each dropdown panel directly under the button that opened it — otherwise
-  // every dropdown would appear pinned to the very left of the filter bar.
   const [dropdownLeft, setDropdownLeft] = useState(0);
 
-  // Click outside to close — same pattern as HolidayListPage / TourDetailPage
   const filtersRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (
-        filtersRef.current &&
-        !filtersRef.current.contains(e.target as Node)
-      ) {
+      if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
         setOpenDropdown(null);
       }
     };
@@ -216,10 +218,6 @@ export default function ActivityListPage({
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Helper: toggle a filter dropdown AND remember where the clicked button
-  // sits horizontally so the panel can be anchored under it.
-  // We compare bounding rects (rather than offsetLeft) so the math stays
-  // correct even when the filter row has been horizontally scrolled on mobile.
   const handleFilterClick = (
     id: Exclude<FilterDropdown, null>,
     e: React.MouseEvent<HTMLButtonElement>,
@@ -237,103 +235,95 @@ export default function ActivityListPage({
   };
 
   // ── Map hover state ────────────────────────────────────────────────────
-  const [highlightedActivityId, setHighlightedActivityId] = useState<string | null>(null);
+  const [highlightedCruiseId, setHighlightedCruiseId] = useState<string | null>(null);
 
   // ── Filtering pipeline ─────────────────────────────────────────────────
-  // Order: destination match → type → duration → difficulty → price → sort.
-  const filteredActivities = useMemo(() => {
-    const destQuery = searchCriteria.destination.trim().toLowerCase();
-
-    let list = ALL_ACTIVITIES.filter((a) => {
-      // Destination match — substring search against location/title.
-      // If the user left it blank the filter is a no-op.
-      if (destQuery) {
-        const haystack = `${a.location} ${a.title}`.toLowerCase();
-        if (!haystack.includes(destQuery)) return false;
-      }
-
-      // Type filter — match if no types selected (i.e. all)
-      if (selectedTypes.length > 0 && !selectedTypes.includes(a.type)) {
+  const filteredCruises = useMemo(() => {
+    let list = ALL_CRUISES.filter((c) => {
+      if (selectedLines.length > 0 && !selectedLines.includes(c.cruiseLine)) {
         return false;
       }
-
-      // Duration buckets
+      if (selectedRegions.length > 0 && !selectedRegions.includes(c.region)) {
+        return false;
+      }
       if (selectedDurations.length > 0) {
         const matchesAnyBucket = selectedDurations.some((id) => {
           const bucket = DURATION_OPTIONS.find((o) => o.id === id);
           if (!bucket) return false;
-          return a.durationDays >= bucket.min && a.durationDays <= bucket.max;
+          return c.durationNights >= bucket.min && c.durationNights <= bucket.max;
         });
         if (!matchesAnyBucket) return false;
       }
-
-      // Difficulty — only excludes activities with a `difficulty` set that
-      // doesn't match. Activities without a difficulty (cruises, tours)
-      // are still included unless someone explicitly only wanted graded
-      // walking/bicycle results — we treat the filter as additive so
-      // an empty selection doesn't exclude anything.
-      if (selectedDifficulties.length > 0) {
-        if (!a.difficulty || !selectedDifficulties.includes(a.difficulty)) {
-          return false;
-        }
-      }
-
-      // Price range
       if (
-        a.price.perPerson < priceRange[0] ||
-        a.price.perPerson > priceRange[1]
+        c.price.fromPerPerson < priceRange[0] ||
+        c.price.fromPerPerson > priceRange[1]
       ) {
         return false;
       }
-
+      // Departure month filter — match if any departure falls in the selected
+      // month. We compare on the ISO "YYYY-MM" prefix.
+      if (searchCriteria.departureMonth) {
+        const monthMatches = c.departures.some((d) =>
+          d.date.startsWith(searchCriteria.departureMonth),
+        );
+        if (!monthMatches) return false;
+      }
       return true;
     });
 
-    // Sort
     if (sortBy === "price-asc") {
-      list = [...list].sort((a, b) => a.price.perPerson - b.price.perPerson);
+      list = [...list].sort((a, b) => a.price.fromPerPerson - b.price.fromPerPerson);
     } else if (sortBy === "price-desc") {
-      list = [...list].sort((a, b) => b.price.perPerson - a.price.perPerson);
+      list = [...list].sort((a, b) => b.price.fromPerPerson - a.price.fromPerPerson);
     } else if (sortBy === "rating") {
       list = [...list].sort((a, b) => b.rating.score - a.rating.score);
+    } else if (sortBy === "shortest") {
+      list = [...list].sort((a, b) => a.durationNights - b.durationNights);
+    } else if (sortBy === "longest") {
+      list = [...list].sort((a, b) => b.durationNights - a.durationNights);
     }
 
     return list;
   }, [
-    searchCriteria.destination,
-    selectedTypes,
+    selectedLines,
+    selectedRegions,
     selectedDurations,
-    selectedDifficulties,
     priceRange,
+    searchCriteria.departureMonth,
     sortBy,
   ]);
 
   // ── Map markers ────────────────────────────────────────────────────────
-  // Use the first routeStop's coordinates as the activity's pin position,
-  // since cruises/tours don't have a single point. Falls back to filtering
-  // out activities without a usable lat/lng.
+  // Use the cruise's lat/lng (or the first port's coords as a fallback).
   const mapMarkers: MapMarkerData[] = useMemo(() => {
-    return filteredActivities
-      .map<MapMarkerData | null>((a) => {
-        const stop = a.routeStops?.[0];
-        if (!stop?.lat || !stop?.lng) return null;
+    return filteredCruises
+      .map<MapMarkerData | null>((c) => {
+        const lat = c.lat ?? c.ports[0]?.lat;
+        const lng = c.lng ?? c.ports[0]?.lng;
+        if (lat == null || lng == null) return null;
         return {
-          id: a.activityId,
-          lat: stop.lat,
-          lng: stop.lng,
-          label: a.title,
-          price: `${a.price.currency === "GBP" ? "£" : "$"}${a.price.perPerson.toLocaleString()}`,
-          isHighlighted: highlightedActivityId === a.activityId,
-          image: a.mainImage,
+          id: c.cruiseId,
+          lat,
+          lng,
+          label: c.title,
+          price: `${c.price.currency === "GBP" ? "£" : "$"}${c.price.fromPerPerson.toLocaleString()}`,
+          isHighlighted: highlightedCruiseId === c.cruiseId,
+          image: c.mainImage,
         };
       })
       .filter((m): m is MapMarkerData => m !== null);
-  }, [filteredActivities, highlightedActivityId]);
+  }, [filteredCruises, highlightedCruiseId]);
 
   // ── Filter toggle helpers ───────────────────────────────────────────────
-  const toggleType = (id: ActivityType) => {
-    setSelectedTypes((prev) =>
-      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
+  const toggleLine = (line: CruiseLine) => {
+    setSelectedLines((prev) =>
+      prev.includes(line) ? prev.filter((l) => l !== line) : [...prev, line]
+    );
+  };
+
+  const toggleRegion = (region: CruiseRegion) => {
+    setSelectedRegions((prev) =>
+      prev.includes(region) ? prev.filter((r) => r !== region) : [...prev, region]
     );
   };
 
@@ -343,14 +333,7 @@ export default function ActivityListPage({
     );
   };
 
-  const toggleDifficulty = (d: Difficulty) => {
-    setSelectedDifficulties((prev) =>
-      prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]
-    );
-  };
-
   // ── Dropdown panels ─────────────────────────────────────────────────────
-  // Each panel is a fixed-width card hanging beneath its pill button.
   const renderDropdown = () => {
     if (!openDropdown) return null;
 
@@ -382,23 +365,36 @@ export default function ActivityListPage({
       );
     }
 
-    if (openDropdown === "type") {
+    if (openDropdown === "line") {
       return (
         <div
           style={{ left: `${dropdownLeft}px` }}
           className="absolute top-full mt-2 z-30 bg-card rounded-xl shadow-xl border border-border p-3 min-w-[260px] flex flex-col gap-1 animate-in fade-in zoom-in-95 duration-150"
         >
-          {ACTIVITY_TYPE_OPTIONS.map((opt) => (
+          {ALL_CRUISE_LINES.map((line) => (
             <CheckboxRow
-              key={opt.id}
-              label={
-                <span className="flex items-center gap-2">
-                  {opt.icon}
-                  {opt.label}
-                </span>
-              }
-              checked={selectedTypes.includes(opt.id)}
-              onChange={() => toggleType(opt.id)}
+              key={line}
+              label={line}
+              checked={selectedLines.includes(line)}
+              onChange={() => toggleLine(line)}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    if (openDropdown === "region") {
+      return (
+        <div
+          style={{ left: `${dropdownLeft}px` }}
+          className="absolute top-full mt-2 z-30 bg-card rounded-xl shadow-xl border border-border p-3 min-w-[240px] flex flex-col gap-1 animate-in fade-in zoom-in-95 duration-150"
+        >
+          {CRUISE_REGION_OPTIONS.map((region) => (
+            <CheckboxRow
+              key={region}
+              label={region}
+              checked={selectedRegions.includes(region)}
+              onChange={() => toggleRegion(region)}
             />
           ))}
         </div>
@@ -423,25 +419,8 @@ export default function ActivityListPage({
       );
     }
 
-    if (openDropdown === "difficulty") {
-      return (
-        <div
-          style={{ left: `${dropdownLeft}px` }}
-          className="absolute top-full mt-2 z-30 bg-card rounded-xl shadow-xl border border-border p-3 min-w-[220px] flex flex-col gap-1 animate-in fade-in zoom-in-95 duration-150"
-        >
-          {DIFFICULTY_OPTIONS.map((d) => (
-            <CheckboxRow
-              key={d}
-              label={d}
-              checked={selectedDifficulties.includes(d)}
-              onChange={() => toggleDifficulty(d)}
-            />
-          ))}
-        </div>
-      );
-    }
-
     if (openDropdown === "price") {
+      const currencyPrefix = ALL_CRUISES[0]?.price.currency === "GBP" ? "£" : "$";
       return (
         <div
           style={{ left: `${dropdownLeft}px` }}
@@ -452,11 +431,10 @@ export default function ActivityListPage({
               Price per person
             </p>
             <div className="flex items-center justify-between text-sm font-semibold text-foreground">
-              <span>£{priceRange[0].toLocaleString()}</span>
-              <span>£{priceRange[1].toLocaleString()}+</span>
+              <span>{currencyPrefix}{priceRange[0].toLocaleString()}</span>
+              <span>{currencyPrefix}{priceRange[1].toLocaleString()}+</span>
             </div>
           </div>
-          {/* Two simple range inputs — keep things lightweight and accessible */}
           <div className="flex flex-col gap-3">
             <label className="flex flex-col gap-1 text-xs text-grey">
               Minimum
@@ -507,14 +485,13 @@ export default function ActivityListPage({
   };
 
   // ── Selection-count helpers — drive the "active" pill state ──────────────
-  const typeCount       = selectedTypes.length;
-  const durationCount   = selectedDurations.length;
-  const difficultyCount = selectedDifficulties.length;
+  const lineCount      = selectedLines.length;
+  const regionCount    = selectedRegions.length;
+  const durationCount  = selectedDurations.length;
   const priceActive =
     priceRange[0] !== priceBounds.min || priceRange[1] !== priceBounds.max;
 
-  // Center used as a fallback for the map when there are zero markers
-  const fallbackCenter: [number, number] = [50, 10];
+  const fallbackCenter: [number, number] = [40, 0];
 
   // ─────────────────────────────────────────────────────────────────────────
   // Render
@@ -527,26 +504,26 @@ export default function ActivityListPage({
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;900&display=swap');`}</style>
 
       {/* ══════════════════════════════════════════════════════════════════
-          TOP CARD — back button + compact search form
-          (same shape as HolidayListPage's header card)
+          TOP CARD — back button + compact search form (same shape as
+          ActivityListPage's header card)
       ══════════════════════════════════════════════════════════════════ */}
       <div className="bg-card border-b border-border">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 md:px-10 pt-5 pb-5 flex flex-col gap-4">
           <BackButton label="Back to discovery" onClick={onBack} />
-          <ActivitySearchForm
+          <CruiseSearchForm
             variant="compact"
             initialValues={searchCriteria}
-            onSearch={(c) => onRefineSearch?.(c)}
+            onSearch={onRefineSearch}
           />
         </div>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
-          BODY — filter pills + split layout (cards left, map right)
+          BODY — filter pills + split layout
       ══════════════════════════════════════════════════════════════════ */}
       <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8">
 
-        {/* ── Filter pills row — horizontal, scrollable on mobile ── */}
+        {/* ── Filter pills row ── */}
         <div ref={filtersRef} className="relative mb-5 md:mb-6">
           <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <FilterButton
@@ -556,11 +533,18 @@ export default function ActivityListPage({
               onClick={(e) => handleFilterClick("sort", e)}
             />
             <FilterButton
-              label={typeCount > 0 ? `Activity type (${typeCount})` : "Activity type"}
-              icon={<Compass size={14} aria-hidden="true" />}
-              active={openDropdown === "type"}
-              hasSelection={typeCount > 0}
-              onClick={(e) => handleFilterClick("type", e)}
+              label={lineCount > 0 ? `Cruise line (${lineCount})` : "Cruise line"}
+              icon={<Ship size={14} aria-hidden="true" />}
+              active={openDropdown === "line"}
+              hasSelection={lineCount > 0}
+              onClick={(e) => handleFilterClick("line", e)}
+            />
+            <FilterButton
+              label={regionCount > 0 ? `Region (${regionCount})` : "Region"}
+              icon={<Globe size={14} aria-hidden="true" />}
+              active={openDropdown === "region"}
+              hasSelection={regionCount > 0}
+              onClick={(e) => handleFilterClick("region", e)}
             />
             <FilterButton
               label={durationCount > 0 ? `Duration (${durationCount})` : "Duration"}
@@ -568,13 +552,6 @@ export default function ActivityListPage({
               active={openDropdown === "duration"}
               hasSelection={durationCount > 0}
               onClick={(e) => handleFilterClick("duration", e)}
-            />
-            <FilterButton
-              label={difficultyCount > 0 ? `Difficulty (${difficultyCount})` : "Difficulty"}
-              icon={<Mountain size={14} aria-hidden="true" />}
-              active={openDropdown === "difficulty"}
-              hasSelection={difficultyCount > 0}
-              onClick={(e) => handleFilterClick("difficulty", e)}
             />
             <FilterButton
               label="Price"
@@ -585,15 +562,14 @@ export default function ActivityListPage({
             />
           </div>
 
-          {/* The actual dropdown panel — positioned absolute to the filters row */}
           {renderDropdown()}
         </div>
 
-        {/* ── Result count headline ── */}
+        {/* ── Result count ── */}
         <div className="mb-4 flex items-center justify-between">
           <p className="text-sm text-foreground">
-            <span className="font-bold">{filteredActivities.length}</span>{" "}
-            {filteredActivities.length === 1 ? "activity" : "activities"} found
+            <span className="font-bold">{filteredCruises.length}</span>{" "}
+            {filteredCruises.length === 1 ? "cruise" : "cruises"} found
           </p>
         </div>
 
@@ -602,20 +578,16 @@ export default function ActivityListPage({
 
           {/* LEFT — list of result cards */}
           <div className="flex flex-col gap-4 min-w-0">
-            {/* Loading skeletons — vertical variant matches the ActivityCard
-                layout (image on top, content below). 4 placeholders is enough
-                to fill the visible area without noisy excess. */}
             {isSearching ? (
               <>
-                {[1, 2, 3, 4].map(i => (
+                {[1, 2, 3].map((i) => (
                   <SkeletonCard key={i} variant="vertical" />
                 ))}
               </>
-            ) : filteredActivities.length === 0 ? (
-              // Empty state — same vibe as HolidayListPage's empty card
+            ) : filteredCruises.length === 0 ? (
               <div className="bg-card rounded-xl border border-border p-8 text-center">
                 <p className="text-base font-bold text-foreground mb-1">
-                  No activities match your filters
+                  No cruises match your filters
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Try widening the price range or clearing some filters.
@@ -623,14 +595,14 @@ export default function ActivityListPage({
               </div>
             ) : (
               <StaggeredList className="flex flex-col gap-4">
-                {filteredActivities.map((activity) => (
-                  <ActivityCard
-                    key={activity.activityId}
-                    activity={activity}
+                {filteredCruises.map((cruise) => (
+                  <CruiseCard
+                    key={cruise.cruiseId}
+                    cruise={cruise}
                     onSelect={onViewDetail}
-                    isHovered={highlightedActivityId === activity.activityId}
+                    isHovered={highlightedCruiseId === cruise.cruiseId}
                     onHover={(isHovering) =>
-                      setHighlightedActivityId(isHovering ? activity.activityId : null)
+                      setHighlightedCruiseId(isHovering ? cruise.cruiseId : null)
                     }
                   />
                 ))}
@@ -638,22 +610,22 @@ export default function ActivityListPage({
             )}
           </div>
 
-          {/* RIGHT — sticky map column, hidden on mobile */}
+          {/* RIGHT — sticky map */}
           <div className="hidden lg:block sticky top-[32px]">
             <div className="rounded-xl overflow-hidden border border-border h-[calc(100vh-120px)] min-h-[500px]">
               <LeafletMap
                 markers={mapMarkers}
                 center={fallbackCenter}
-                zoom={3}
-                centerKey={`activities-${selectedTypes.join("|")}-${searchCriteria.destination}`}
-                onMarkerHover={setHighlightedActivityId}
+                zoom={2}
+                centerKey={`cruises-${selectedRegions.join("|")}-${selectedLines.join("|")}`}
+                onMarkerHover={setHighlightedCruiseId}
                 onMarkerClick={(id) => {
-                  const activity = filteredActivities.find(
-                    (a) => a.activityId === id
+                  const cruise = filteredCruises.find(
+                    (c) => c.cruiseId === id,
                   );
-                  if (activity) onViewDetail(activity);
+                  if (cruise) onViewDetail(cruise);
                 }}
-                onMarkerDeselect={() => setHighlightedActivityId(null)}
+                onMarkerDeselect={() => setHighlightedCruiseId(null)}
               />
             </div>
           </div>

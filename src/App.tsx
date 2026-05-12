@@ -16,6 +16,10 @@ import type { UnifiedPackage } from "./types";
 import ActivityListPage from "./modules/smartPlanner/pages/ActivityListPage";
 import ActivityDetailPage from "./modules/smartPlanner/pages/ActivityDetailPage";
 import type { Activity, ActivitySearchCriteria } from "./types";
+// Cruises — new entry point alongside Holidays / Hotels / Flights / Activities.
+import CruiseListPage from "./modules/smartPlanner/pages/CruiseListPage";
+import CruiseDetailPage from "./modules/smartPlanner/pages/CruiseDetailPage";
+import type { Cruise, CruiseSearchCriteria } from "./types";
 import { Toast } from "./shared/components/ui/toast";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toastify.css";
@@ -135,6 +139,9 @@ export default function App() {
     // ── Activities flow ──
     | "activity-list"
     | "activity-detail"
+    // ── Cruises flow ──
+    | "cruise-list"
+    | "cruise-detail"
   >("discovery");
 
   // The "how did you get here" context passed into SmartPlanner.
@@ -199,6 +206,24 @@ export default function App() {
   // category-card shortcut.
   const [activityDetailBackPage, setActivityDetailBackPage] =
     useState<"discovery" | "activity-list">("activity-list");
+
+  // ── CRUISES state ─────────────────────────────────────────────────────────
+  // Search criteria from the Cruises tab — passed to CruiseListPage so it
+  // can pre-filter the result list (by region, cruise line, duration, etc.).
+  const [cruiseSearchCriteria, setCruiseSearchCriteria] = useState<CruiseSearchCriteria>({
+    region: "",
+    cruiseLine: "",
+    departureMonth: "",
+    durationRange: "any",
+    passengers: 2,
+  });
+  // The cruise the user clicked on the list (or featured carousel) — held here
+  // so we can pass it into CruiseDetailPage without re-fetching from the mock.
+  const [selectedCruise, setSelectedCruise] = useState<Cruise | null>(null);
+  // Where the back button on CruiseDetailPage should return to. Set to
+  // "discovery" when entering via a featured-cruise card.
+  const [cruiseDetailBackPage, setCruiseDetailBackPage] =
+    useState<"discovery" | "cruise-list">("cruise-list");
 
   // ── FLIGHT search state ───────────────────────────────────────────────────
   // What the user searched for — passed to FlightListPage as read-only criteria.
@@ -404,6 +429,35 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
+  // ── CRUISES tab: submit search → CruiseListPage ───────────────────────────
+  const handleCruiseSearch = (criteria: CruiseSearchCriteria) => {
+    setCruiseSearchCriteria(criteria);
+    setCurrentPage("cruise-list");
+    window.scrollTo(0, 0);
+  };
+
+  // ── CruiseListPage: refine search in-place ────────────────────────────────
+  const handleRefineCruiseSearch = (criteria: CruiseSearchCriteria) => {
+    setCruiseSearchCriteria(criteria);
+  };
+
+  // ── CruiseListPage: click a cruise card → CruiseDetailPage ────────────────
+  const handleCruiseSelect = (cruise: Cruise) => {
+    setSelectedCruise(cruise);
+    setCruiseDetailBackPage("cruise-list");
+    setCurrentPage("cruise-detail");
+    window.scrollTo(0, 0);
+  };
+
+  // ── DiscoveryPage featured-cruise card → CruiseDetailPage (skip the list) ─
+  // Sets the back button to return to discovery rather than the list.
+  const handleCruiseDirectSelect = (cruise: Cruise) => {
+    setSelectedCruise(cruise);
+    setCruiseDetailBackPage("discovery");
+    setCurrentPage("cruise-detail");
+    window.scrollTo(0, 0);
+  };
+
   // ── PackageDetailPage: click "Personalise Your Holiday" → SmartPlanner ────
   // Builds the holiday StartingContext from the UnifiedPackage and chosen date.
   const handlePackageDetailBook = (pkg: UnifiedPackage, selectedDate: string) => {
@@ -449,6 +503,8 @@ export default function App() {
           onFlightSearch={handleFlightSearch}
           onHolidaySearch={handleHolidaySearch}
           onActivitySearch={handleActivitySearch}
+          onCruiseSearch={handleCruiseSearch}
+          onCruiseDirectSelect={handleCruiseDirectSelect}
         />
       )}
 
@@ -572,6 +628,53 @@ export default function App() {
               type: "activity",
               activity,
               travelDate,
+            });
+            setCurrentPage("smart-planner");
+            window.scrollTo(0, 0);
+          }}
+        />
+      )}
+
+      {/* Screen: Cruise results list — reached from the Cruises tab on Discovery */}
+      {currentPage === "cruise-list" && (
+        <CruiseListPage
+          searchCriteria={cruiseSearchCriteria}
+          onViewDetail={handleCruiseSelect}
+          onBack={handleBack}
+          onRefineSearch={handleRefineCruiseSearch}
+        />
+      )}
+
+      {/* Screen: Cruise detail — single-page sticky-tabs layout for one cruise.
+          Reached from CruiseListPage or directly from a featured-cruise card. */}
+      {currentPage === "cruise-detail" && selectedCruise && (
+        <CruiseDetailPage
+          cruise={selectedCruise}
+          backLabel={
+            cruiseDetailBackPage === "discovery"
+              ? "Back to cruises"
+              : "Back to all cruises"
+          }
+          onBack={() => {
+            setCurrentPage(cruiseDetailBackPage);
+            window.scrollTo(0, 0);
+          }}
+          onBook={(cruise, departureDate, _passengers, _cabinId) => {
+            // Build the cruise StartingContext for SmartPlanner so the planner
+            // can show the right destination, dates, and hero image.
+            setStartingContext({
+              type: "cruise",
+              cruise: {
+                title: cruise.title,
+                shipName: cruise.shipName,
+                cruiseLine: cruise.cruiseLine,
+                route: cruise.route,
+                duration: `${cruise.durationNights} nights`,
+                departureDate,
+                price: `${cruise.price.currency === "USD" ? "$" : "£"}${cruise.price.fromPerPerson}`,
+                image: cruise.mainImage,
+                nights: cruise.durationNights,
+              },
             });
             setCurrentPage("smart-planner");
             window.scrollTo(0, 0);

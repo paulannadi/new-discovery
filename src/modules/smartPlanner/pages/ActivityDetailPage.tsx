@@ -60,6 +60,9 @@ import { DayByDaySection } from "../components/DayByDaySection";
 import { InfoList } from "../components/InfoList";
 import { TourRouteMap, TourRouteMapInline } from "../components/TourRouteMap";
 import { ACTIVITY_TYPE_OPTIONS } from "../components/ActivitySearchForm";
+// ImageWithPlaceholder — reserves space, lazy-loads, fades in.
+// Hero gets `priority`; thumbnails, cabin photos and modal images stay lazy.
+import { ImageWithPlaceholder } from "../../../shared/components/loading";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -341,10 +344,11 @@ export default function ActivityDetailPage({
                     aria-label={`Activity video for ${activity.title}`}
                   />
                 ) : (
-                  <img
+                  <ImageWithPlaceholder
                     src={galleryImages[0]}
                     alt={activity.title}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    priority
+                    containerClassName="absolute inset-0 w-full h-full"
                   />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent pointer-events-none" />
@@ -358,10 +362,11 @@ export default function ActivityDetailPage({
                     onClick={() => setPhotosOpen(true)}
                     aria-label={`View activity photo ${i + 2}`}
                   >
-                    <img
+                    <ImageWithPlaceholder
                       src={url}
                       alt={`Activity photo ${i + 2}`}
-                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                      containerClassName="w-full h-full"
+                      className="group-hover:scale-[1.03] transition-transform duration-500"
                     />
                   </button>
                 ))}
@@ -1153,20 +1158,22 @@ export default function ActivityDetailPage({
           </DialogHeader>
           <div className="grid grid-cols-2 gap-2 mt-2">
             <div className="col-span-2">
-              <img
+              <ImageWithPlaceholder
                 src={galleryImages[0]}
                 alt={activity.title}
-                className="w-full aspect-[16/7] object-cover rounded-2xl"
+                aspectRatio="16/7"
+                rounded="rounded-2xl"
               />
             </div>
             {[...dayImages, ...galleryImages.slice(1)]
               .filter((url, i, arr) => arr.indexOf(url) === i && url !== galleryImages[0])
               .map((url, i) => (
-                <img
+                <ImageWithPlaceholder
                   key={url}
                   src={url}
                   alt={`Activity photo ${i + 2}`}
-                  className="w-full aspect-[4/3] object-cover rounded-2xl"
+                  aspectRatio="4/3"
+                  rounded="rounded-2xl"
                 />
               ))}
           </div>
@@ -1253,10 +1260,10 @@ function CabinGrid({
               isSelected ? "border-2 border-primary" : "border border-border"
             )}
           >
-            <img
+            <ImageWithPlaceholder
               src={cabin.image}
               alt={cabin.name}
-              className="w-full h-[180px] object-cover"
+              containerClassName="w-full h-[180px]"
             />
             <div className="p-4 flex flex-col gap-2 flex-1">
               <p className="text-base font-bold text-foreground">{cabin.name}</p>

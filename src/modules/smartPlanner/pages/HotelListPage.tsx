@@ -38,6 +38,15 @@ import { DayPicker, DateRange } from "react-day-picker";
 import { format, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
 import LeafletMap, { type MapMarkerData } from "../../../shared/components/LeafletMap";
+// Loading kit — skeletons + staggered reveal + lazy-loaded images.
+// Pulled in to apply our project-wide loading patterns: 1.5s simulated wait
+// gets skeleton cards (per the doc's 1s–3s tier), images get reserved space
+// and a fade-in placeholder, the result list stags in over 60ms intervals.
+import {
+  SkeletonCard,
+  StaggeredList,
+  ImageWithPlaceholder,
+} from "../../../shared/components/loading";
 
 // --- Types ---
 
@@ -255,9 +264,17 @@ const HotelCard = ({ hotel, displayPrice, onSelect, onHover, isHovered }: { hote
       onMouseEnter={() => onHover?.(true)}
       onMouseLeave={() => onHover?.(false)}
     >
-      {/* Image — stacks above content below 1024px, sits beside it at lg+ */}
+      {/* Image — stacks above content below 1024px, sits beside it at lg+.
+          ImageWithPlaceholder reserves space (no layout jump on load), shows
+          a bg-muted placeholder until the image is ready, fades it in over
+          300ms, and uses native lazy-loading for cards below the fold. */}
       <div className="w-full lg:w-[260px] h-[160px] lg:h-auto shrink-0">
-        <img src={hotel.image} alt={hotel.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <ImageWithPlaceholder
+          src={hotel.image}
+          alt={hotel.name}
+          containerClassName="w-full h-full"
+          className="group-hover:scale-105 transition-transform duration-500"
+        />
       </div>
 
       {/* Content — p-4 on mobile, p-6 on lg+ */}
@@ -1163,20 +1180,31 @@ export default function HotelListPage({
           </div>
 
           <div className="flex flex-col gap-4 pb-24 md:pb-10">
-            {filteredAndSortedHotels.length > 0 ? (
-              filteredAndSortedHotels.map(hotel => {
-                const displayPrice = calculateDisplayPrice(hotel.price, hotel);
-                return (
-                  <HotelCard
-                    key={hotel.id}
-                    hotel={hotel}
-                    displayPrice={displayPrice}
-                    onSelect={() => onHotelSelect({ ...hotel, price: displayPrice }, { board: selectedBoardTypes, cancellation: selectedCancellation }, rooms)}
-                    onHover={(isHovering) => setHoveredHotelId(isHovering ? hotel.id : null)}
-                    isHovered={hoveredHotelId === hotel.id}
-                  />
-                );
-              })
+            {/* While the simulated 1.5s search is running, show 4 SkeletonCards
+                instead of jumping the real cards in. This is the doc's 1s–3s
+                tier — skeleton with pulse, no globe needed (fast enough). */}
+            {showLoadingBar && loadingProgress < 100 ? (
+              <>
+                {[1, 2, 3, 4].map(i => (
+                  <SkeletonCard key={i} variant="horizontal" />
+                ))}
+              </>
+            ) : filteredAndSortedHotels.length > 0 ? (
+              <StaggeredList className="flex flex-col gap-4">
+                {filteredAndSortedHotels.map(hotel => {
+                  const displayPrice = calculateDisplayPrice(hotel.price, hotel);
+                  return (
+                    <HotelCard
+                      key={hotel.id}
+                      hotel={hotel}
+                      displayPrice={displayPrice}
+                      onSelect={() => onHotelSelect({ ...hotel, price: displayPrice }, { board: selectedBoardTypes, cancellation: selectedCancellation }, rooms)}
+                      onHover={(isHovering) => setHoveredHotelId(isHovering ? hotel.id : null)}
+                      isHovered={hoveredHotelId === hotel.id}
+                    />
+                  );
+                })}
+              </StaggeredList>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 bg-card rounded-xl border border-dashed border-gray-200">
                 <Search size={48} className="text-gray-300 mb-4" aria-hidden="true" />

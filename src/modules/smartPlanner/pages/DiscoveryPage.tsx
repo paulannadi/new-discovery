@@ -11,6 +11,10 @@ import { DISCOVERY_TOUR_MAP } from "../../../mocks/tours";
 // Destination registry — used to resolve a card's destCode into the full label
 // and isCached flag that the search hook expects.
 import { DESTINATIONS } from "../../../mocks/destinations";
+// Loading kit — ImageWithPlaceholder reserves space, lazy-loads, and fades
+// images in. Used for the hero (with priority) and all big card images on
+// this page so we never see layout shift as photos arrive.
+import { ImageWithPlaceholder } from "../../../shared/components/loading";
 import {
   Building2,
   Plane,
@@ -44,6 +48,7 @@ import {
   Paperclip,
   Send,
   Compass,
+  Ship,
 } from "lucide-react";
 import { Switch } from "../../../shared/components/ui/switch";
 import { DayPicker, DateRange } from "react-day-picker";
@@ -54,11 +59,20 @@ import type { FlightSearchCriteria, FlightLeg, HolidaySearchCriteria } from "../
 // uses PackageSearchForm. The form is the only "Activities" UI on the
 // discovery hero; results live on a separate page.
 import ActivitySearchForm from "../components/ActivitySearchForm";
-import type { ActivitySearchCriteria } from "../../../types";
+import type { ActivitySearchCriteria, Cruise, CruiseSearchCriteria } from "../../../types";
+// Cruise search form + curated mock data for the Cruises tab.
+// CRUISE_REGIONS drives the "Browse by region" row; FEATURED_CRUISES drives the
+// "Popular cruises" carousel; CRUISE_LINES drives the cruise-line pill row.
+import CruiseSearchForm from "../components/CruiseSearchForm";
+import {
+  CRUISE_REGIONS,
+  FEATURED_CRUISES,
+  CRUISE_LINES,
+} from "../../../mocks/cruises";
 
 // --- Types ---
 
-type TabId = "hotels" | "flights" | "holidays" | "activities";
+type TabId = "hotels" | "flights" | "holidays" | "activities" | "cruises";
 
 type RoomConfig = {
   id: number;
@@ -89,6 +103,12 @@ type DiscoveryPageProps = {
   onHolidaySearch: (criteria: HolidaySearchCriteria) => void;
   // Called when the user submits the Activities search form → leads to ActivityListPage
   onActivitySearch: (criteria: ActivitySearchCriteria) => void;
+  // Called when the user submits the Cruises search form (or clicks a region /
+  // featured cruise / cruise-line pill) → leads to CruiseListPage.
+  onCruiseSearch: (criteria: CruiseSearchCriteria) => void;
+  // Called when the user clicks a featured CruiseCard on the Cruises tab → leads
+  // straight to CruiseDetailPage, skipping the list.
+  onCruiseDirectSelect: (cruise: Cruise) => void;
 };
 
 // --- Tab Definitions ---
@@ -97,6 +117,8 @@ type DiscoveryPageProps = {
 const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   // Holidays is the default — Tours and Holidays merged into one experience
   { id: "holidays", label: "Holidays", icon: <Sun size={20} /> },
+  // Cruises sits next to Holidays — they're our two "big trip" categories
+  { id: "cruises", label: "Cruises", icon: <Ship size={20} /> },
   { id: "hotels", label: "Hotels", icon: <Building2 size={20} /> },
   { id: "flights", label: "Flights", icon: <Plane size={20} /> },
   // Compass icon evokes the experience-led "explore by activity" framing
@@ -417,6 +439,8 @@ export default function DiscoveryPage({
   onFlightSearch,
   onHolidaySearch,
   onActivitySearch,
+  onCruiseSearch,
+  onCruiseDirectSelect,
 }: DiscoveryPageProps) {
   const [activeTab, setActiveTab] = useState<TabId>("holidays");
   // Controls whether the hero shows the normal search card or the AI Experience mode
@@ -793,10 +817,14 @@ export default function DiscoveryPage({
           animate={{ opacity: aiExperienceMode ? 0 : 1 }}
           transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
         >
-          <img
+          {/* Hero image — `priority` skips lazy loading because this is
+              above the fold. Per the doc, the first 2-3 images on a page
+              should be eager-loaded so the initial paint feels fast. */}
+          <ImageWithPlaceholder
             src={heroBg}
             alt="Discover the world"
-            className="w-full h-full object-cover"
+            priority
+            containerClassName="w-full h-full"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-foreground/25 to-black/10" />
         </motion.div>
@@ -1534,6 +1562,11 @@ export default function DiscoveryPage({
                   <ActivitySearchForm variant="hero" onSearch={onActivitySearch} />
                 )}
 
+                {/* CRUISES PANEL — single-form panel like Holidays / Activities */}
+                {activeTab === "cruises" && (
+                  <CruiseSearchForm variant="hero" onSearch={onCruiseSearch} />
+                )}
+
               </div>
             </div>
             </div>
@@ -1618,6 +1651,169 @@ export default function DiscoveryPage({
       >
 
 
+      {/* ── CRUISES ── */}
+      {/* Three content rows: (1) Browse by region, (2) Popular cruises,
+          (3) Browse by cruise line. Mirrors the Holidays tab's mix of
+          inspirational discovery + quick-search shortcuts. */}
+      {activeTab === "cruises" && (
+        <section className="py-10 md:py-16 px-4 md:px-6 lg:px-12">
+          <div className="max-w-[1200px] mx-auto flex flex-col gap-12 md:gap-16">
+
+            {/* ── 1. Browse by region ── */}
+            <div>
+              <div className="mb-6 md:mb-8">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <Compass size={24} className="text-primary md:size-7" />
+                  <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
+                    Browse by region
+                  </h2>
+                </div>
+                <p className="text-muted-foreground text-sm md:text-lg">
+                  Pick a region and we'll show you every available departure
+                </p>
+              </div>
+
+              {/* Horizontal-scrolling region cards */}
+              <div className="flex gap-4 md:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {CRUISE_REGIONS.map((region) => (
+                  <button
+                    key={region.id}
+                    onClick={() => {
+                      // Clicking a region card runs a search with that region pre-filled
+                      onCruiseSearch({
+                        region: region.label,
+                        cruiseLine: "",
+                        departureMonth: "",
+                        durationRange: "any",
+                        passengers: 2,
+                      });
+                    }}
+                    className="shrink-0 w-[280px] h-[200px] md:w-[320px] md:h-[220px] relative rounded-2xl overflow-hidden cursor-pointer snap-start group focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <ImageWithPlaceholder
+                      src={region.image}
+                      alt={region.label}
+                      containerClassName="absolute inset-0 w-full h-full"
+                      className="group-hover:scale-[1.04] transition-transform duration-500"
+                    />
+                    {/* Bottom-fade overlay so the label stays readable */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between gap-2">
+                      <div className="text-left text-white">
+                        <p className="text-2xl mb-1" aria-hidden="true">{region.emoji}</p>
+                        <p className="text-lg font-extrabold leading-tight">{region.label}</p>
+                        <p className="text-xs opacity-90 mt-0.5">{region.cruiseCount} cruises</p>
+                      </div>
+                      <ArrowRight
+                        size={20}
+                        className="text-white shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        aria-hidden="true"
+                      />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* ── 2. Popular cruises ── */}
+            <div>
+              <div className="mb-6 md:mb-8">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <Ship size={24} className="text-primary md:size-7" />
+                  <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
+                    Popular cruises
+                  </h2>
+                </div>
+                <p className="text-muted-foreground text-sm md:text-lg">
+                  Hand-picked itineraries from the world's top cruise lines
+                </p>
+              </div>
+
+              {/* Simplified cruise carousel — smaller than the full CruiseCard
+                  so it fits a "browse" mood rather than a "search results" one */}
+              <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {FEATURED_CRUISES.map((cruise) => {
+                  const sym = cruise.price.currency === "GBP" ? "£" : "$";
+                  return (
+                    <button
+                      key={cruise.cruiseId}
+                      onClick={() => onCruiseDirectSelect(cruise)}
+                      className="shrink-0 w-[280px] bg-card rounded-2xl overflow-hidden shadow-[0_4px_6px_-4px_rgba(0,0,0,0.10),0_10px_15px_-3px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-200 snap-start text-left focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      <ImageWithPlaceholder
+                        src={cruise.mainImage}
+                        alt={cruise.title}
+                        containerClassName="w-full h-[180px]"
+                      />
+                      <div className="p-4 flex flex-col gap-2">
+                        {/* Cruise line tag */}
+                        <span className="flex items-center gap-1 text-[11px] font-bold text-primary uppercase tracking-wide">
+                          <Ship size={11} aria-hidden="true" />
+                          {cruise.cruiseLine}
+                        </span>
+                        <p className="text-base font-bold text-foreground leading-snug line-clamp-2">
+                          {cruise.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground line-clamp-1">
+                          {cruise.shipName} · {cruise.route}
+                        </p>
+                        <div className="flex items-center justify-between mt-1 pt-2 border-t border-muted">
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Moon size={12} aria-hidden="true" />
+                            {cruise.durationNights} nights
+                          </span>
+                          <span className="text-lg font-extrabold text-foreground">
+                            {sym}{cruise.price.fromPerPerson.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ── 3. Browse by cruise line ── */}
+            <div>
+              <div className="mb-6 md:mb-8">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <Heart size={24} className="text-primary md:size-7" />
+                  <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
+                    Browse by cruise line
+                  </h2>
+                </div>
+                <p className="text-muted-foreground text-sm md:text-lg">
+                  Stick with your favourite line — every cruise from one operator
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                {CRUISE_LINES.map((line) => (
+                  <button
+                    key={line.id}
+                    onClick={() =>
+                      onCruiseSearch({
+                        region: "",
+                        // The id matches the CruiseLine union type, so we can cast safely
+                        cruiseLine: line.id as CruiseSearchCriteria["cruiseLine"],
+                        departureMonth: "",
+                        durationRange: "any",
+                        passengers: 2,
+                      })
+                    }
+                    className="flex items-center gap-2 bg-card border border-border text-foreground hover:border-primary hover:text-primary text-sm font-semibold px-4 py-2.5 rounded-full transition-colors"
+                  >
+                    <Ship size={14} aria-hidden="true" />
+                    {line.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </section>
+      )}
+
       {/* ── HOTELS ── */}
       {activeTab === "hotels" && (
         <section className="py-10 md:py-16 px-4 md:px-6 lg:px-12">
@@ -1663,10 +1859,10 @@ export default function DiscoveryPage({
                     });
                   }}
                 >
-                  <img
+                  <ImageWithPlaceholder
                     src={hotel.image}
                     alt={hotel.name}
-                    className="w-full h-[252px] object-cover"
+                    containerClassName="w-full h-[252px]"
                   />
 
                   <div className="p-4 flex flex-col gap-2.5">
@@ -1768,10 +1964,10 @@ export default function DiscoveryPage({
                   })}
                 >
                   <div className="relative">
-                    <img
+                    <ImageWithPlaceholder
                       src={route.image}
                       alt={`${route.from} to ${route.to}`}
-                      className="w-full h-[200px] object-cover"
+                      containerClassName="w-full h-[200px]"
                     />
                     {route.badge && (
                       <span
@@ -2095,7 +2291,11 @@ export default function DiscoveryPage({
                       })}
                     >
                       <div className="relative">
-                        <img src={card.image} alt={card.title} className="w-full h-[180px] object-cover" />
+                        <ImageWithPlaceholder
+                          src={card.image}
+                          alt={card.title}
+                          containerClassName="w-full h-[180px]"
+                        />
                         <span className="absolute top-3 left-3 flex items-center gap-1 bg-white text-foreground text-xs font-semibold px-2.5 py-1 rounded-full">
                           {TRIP_TYPES.find((t) => t.id === activeTripType)?.icon}
                           {TRIP_TYPES.find((t) => t.id === activeTripType)?.label}
@@ -2400,10 +2600,10 @@ function TourCard({ tour, onSelect }: { tour: TourCardData; onSelect?: () => voi
       className="bg-card rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
       onClick={onSelect}
     >
-      <img
+      <ImageWithPlaceholder
         src={tour.image}
         alt={tour.title}
-        className="w-full h-[200px] object-cover"
+        containerClassName="w-full h-[200px]"
       />
       <div className="p-4 flex flex-col gap-3">
         <div className="flex items-center gap-1.5 text-xs text-foreground">
@@ -2460,10 +2660,10 @@ function HolidayCard({
       className="bg-card rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.10)] cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
       onClick={onSelect}
     >
-      <img
+      <ImageWithPlaceholder
         src={dest.image}
         alt={dest.destination}
-        className="w-full h-[200px] object-cover"
+        containerClassName="w-full h-[200px]"
       />
 
       <div className="p-4 flex flex-col gap-3">

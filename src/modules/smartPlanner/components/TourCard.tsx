@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import type { Tour } from "../../../types";
 import { cn } from "../../../shared/components/ui/utils";
+// ImageWithPlaceholder — reserves space, lazy-loads, fades the image in.
+import { ImageWithPlaceholder } from "../../../shared/components/loading";
 
 function currencySymbol(currency: string): string {
   const map: Record<string, string> = {
@@ -84,10 +86,10 @@ export function TourCard({ tour, onSelect, onHover, isHovered }: TourCardProps) 
       {/* Below 680px: full width on top. At 680px+: fixed 260px on the left. */}
       {/* self-start stops the image column from stretching to the card height */}
       <div className="relative shrink-0 @[680px]:w-[260px] @[680px]:self-start">
-        <img
+        <ImageWithPlaceholder
           src={tour.mainImage}
           alt={tour.title}
-          className="w-full h-[200px] object-cover"
+          containerClassName="w-full h-[200px]"
         />
 
         <span className="absolute top-2 left-2 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-normal bg-white text-foreground">

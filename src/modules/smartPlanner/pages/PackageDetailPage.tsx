@@ -60,6 +60,9 @@ import { DayPicker } from "react-day-picker";
 import { cn } from "../../../shared/components/ui/utils";
 import LeafletMap from "../../../shared/components/LeafletMap";
 import { hotelDescription, nearbyPOIs, locationCoords } from "../../../shared/utils/hotelUtils";
+// ImageWithPlaceholder — reserves space, lazy-loads, fades in on load.
+// Hero image gets `priority`; thumbnails and modal images stay lazy.
+import { ImageWithPlaceholder } from "../../../shared/components/loading";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -653,18 +656,21 @@ export default function PackageDetailPage({
             {/* Photo grid — h-[402px] on desktop matches Figma exactly */}
             <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[280px] md:h-[402px] gap-2">
 
-              {/* Main hero image — rounded corners on all sides */}
+              {/* Main hero image — rounded corners on all sides.
+                  priority loads it eagerly (above the fold). */}
               <div className="relative overflow-hidden rounded-xl group">
-                <img
+                <ImageWithPlaceholder
                   src={pkg.hotel.mainImage}
                   alt={pkg.hotel.name}
-                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
+                  priority
+                  containerClassName="w-full h-full"
+                  className="group-hover:scale-[1.03] transition-transform duration-700"
                 />
                 {/* Subtle gradient for the bottom edge legibility */}
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-transparent pointer-events-none" />
               </div>
 
-              {/* 2×2 thumbnail grid — desktop only */}
+              {/* 2×2 thumbnail grid — desktop only. Lazy-loaded thumbnails. */}
               <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-2">
                 {hotelImages.gallery.map((url, i) => (
                   <div
@@ -672,10 +678,11 @@ export default function PackageDetailPage({
                     className="overflow-hidden rounded-xl cursor-pointer group"
                     onClick={() => setPhotosOpen(true)}
                   >
-                    <img
+                    <ImageWithPlaceholder
                       src={url}
                       alt={`${pkg.hotel.name} — photo ${i + 2}`}
-                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                      containerClassName="w-full h-full"
+                      className="group-hover:scale-[1.03] transition-transform duration-500"
                     />
                   </div>
                 ))}
@@ -901,10 +908,11 @@ export default function PackageDetailPage({
                 <div className="flex flex-col sm:flex-row">
                   {/* Room photo */}
                   <div className="h-[200px] sm:h-auto sm:w-[240px] shrink-0 overflow-hidden group">
-                    <img
+                    <ImageWithPlaceholder
                       src={hotelImages.room}
                       alt={`${pkg.room.roomType} room`}
-                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                      containerClassName="w-full h-full"
+                      className="group-hover:scale-[1.03] transition-transform duration-500"
                     />
                   </div>
 
@@ -1465,18 +1473,20 @@ export default function PackageDetailPage({
           </DialogHeader>
           <div className="grid grid-cols-2 gap-2 mt-2">
             <div className="col-span-2">
-              <img
+              <ImageWithPlaceholder
                 src={pkg.hotel.mainImage}
                 alt={pkg.hotel.name}
-                className="w-full aspect-[16/7] object-cover rounded-xl"
+                aspectRatio="16/7"
+                rounded="rounded-xl"
               />
             </div>
             {hotelImages.modal.map((url, i) => (
-              <img
+              <ImageWithPlaceholder
                 key={url}
                 src={url}
                 alt={`Hotel photo ${i + 2}`}
-                className="w-full aspect-[4/3] object-cover rounded-xl"
+                aspectRatio="4/3"
+                rounded="rounded-xl"
               />
             ))}
           </div>

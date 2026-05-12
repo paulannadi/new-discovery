@@ -22,6 +22,9 @@ import {
 import type { Activity } from "../../../types";
 import { cn } from "../../../shared/components/ui/utils";
 import { ACTIVITY_TYPE_OPTIONS } from "./ActivitySearchForm";
+// ImageWithPlaceholder reserves space + lazy-loads + fades the image in,
+// per our loading patterns doc. Replaces the bare <img> tag below.
+import { ImageWithPlaceholder } from "../../../shared/components/loading";
 
 // Symbol map mirrors the helper used elsewhere in the prototype
 function currencySymbol(currency: string): string {
@@ -93,10 +96,10 @@ export function ActivityCard({
             The <img> is absolutely positioned so it always fills whatever
             height the container ends up with. */}
         <div className="relative shrink-0 h-[200px] @[680px]:h-auto @[680px]:w-[260px]">
-          <img
+          <ImageWithPlaceholder
             src={activity.mainImage}
             alt={activity.title}
-            className="absolute inset-0 w-full h-full object-cover"
+            containerClassName="absolute inset-0 w-full h-full"
           />
 
           {/* Activity-type badge — lucide icon + label, matches TourCard chip style */}

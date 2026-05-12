@@ -18,7 +18,16 @@ import type { UnifiedPackage } from "../../../types";
 import PackageSearchForm from "../components/PackageSearchForm";
 import { PackageCard } from "../components/PackageCard";
 import { TourCard } from "../components/TourCard";
-import { LiveSearchProgressBanner } from "../components/LiveSearchProgressBanner";
+// Loading kit — shared components that follow our loading patterns doc.
+// Per the doc: page structure + skeletons are the loading state, no
+// decorative loaders. SkeletonCard replaces the inline PackageCardSkeleton,
+// StreamingStatusBanner conveys the 3s+ status message, StaggeredList does
+// the 60ms-staggered fade-in for results.
+import {
+  SkeletonCard,
+  StreamingStatusBanner,
+  StaggeredList,
+} from "../../../shared/components/loading";
 import { ALL_TOURS } from "../../../mocks/tours";
 import type { Tour } from "../../../types";
 import { useUnifiedSearch } from "../hooks/useUnifiedSearch";
@@ -126,49 +135,6 @@ const CheckboxRow = ({
       {checked && <Check size={14} className="text-white" />}
     </div>
     <span className="text-foreground text-sm font-medium">{label}</span>
-  </div>
-);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PackageCardSkeleton
-//
-// A pulsing placeholder that matches the shape of a real PackageCard.
-// Shown while non-cached destination packages are still being fetched.
-// Each block represents a piece of real content (image, hotel name, etc.)
-// ─────────────────────────────────────────────────────────────────────────────
-
-const PackageCardSkeleton = () => (
-  <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm flex flex-col md:flex-row animate-pulse">
-    {/* Left: image placeholder */}
-    <div className="md:w-[260px] shrink-0 h-[200px] md:h-auto bg-grey-light" />
-
-    {/* Right: content placeholder */}
-    <div className="flex-1 p-5 flex flex-col gap-3">
-      {/* Location line */}
-      <div className="h-3 w-32 bg-grey-light rounded-full" />
-      {/* Hotel name */}
-      <div className="h-3 w-48 bg-grey-light rounded-full" />
-      {/* Room type */}
-      <div className="h-3 w-48 bg-grey-light rounded-full" />
-      {/* Board type */}
-      <div className="h-3 w-48 bg-grey-light rounded-full" />
-      {/* Amenity chips */}
-      <div className="flex gap-2">
-        <div className="h-5 w-16 bg-grey-light rounded-full" />
-        <div className="h-5 w-20 bg-grey-light rounded-full" />
-        <div className="h-5 w-14 bg-grey-light rounded-full" />
-      </div>
-      {/* Dates */}
-      <div className="h-3 w-52 bg-grey-light rounded-full" />
-      {/* Price + CTA row */}
-      <div className="flex items-center justify-between mt-auto pt-3 border-t border-muted">
-        <div className="flex flex-col gap-1.5">
-          <div className="h-2.5 w-20 bg-grey-light rounded-full" />
-          <div className="h-6 w-24 bg-grey-light rounded-full" />
-        </div>
-        <div className="h-10 w-28 bg-grey-light rounded-lg" />
-      </div>
-    </div>
   </div>
 );
 
@@ -696,22 +662,32 @@ export default function HolidayListPage({
             )}
           </div>
 
-          {/* Skeleton cards — shown while non-cached packages are still being fetched.
-              These match the shape of real PackageCards so the transition feels smooth. */}
+          {/* Skeleton cards — shown while non-cached packages are still being
+              fetched. SkeletonCard mirrors the real PackageCard layout so
+              dimensions match exactly, preventing layout shift when results
+              arrive. No decorative animation — the page structure (header,
+              filters, "Searching for holidays…" h2 above) and the skeletons
+              themselves are the loading state. The streaming banner below
+              gives the 3s+ status update per the doc. */}
           {isNonCachedLoading && packages.length === 0 && (
             <div className="flex flex-col gap-4">
               {[1, 2, 3, 4].map((i) => (
-                <PackageCardSkeleton key={i} />
+                <SkeletonCard key={i} variant="horizontal" />
               ))}
+              <StreamingStatusBanner
+                isStreaming
+                message="Checking availability across suppliers…"
+              />
             </div>
           )}
 
-          {/* Loading skeleton — shown while the first cached results are loading */}
+          {/* Loading skeleton — shown while the first cached results are loading
+              (under 200ms). Just three skeleton placeholders, no globe — this
+              wait is short enough that the skeleton alone is the right pattern. */}
           {packages.length === 0 && !isLiveLoading && !isNonCachedLoading && (
-            // Brief loading state before the 200ms cached results arrive
             <div className="flex flex-col gap-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-card rounded-xl border border-border h-[200px] animate-pulse" />
+                <SkeletonCard key={i} variant="horizontal" />
               ))}
             </div>
           )}
@@ -732,10 +708,12 @@ export default function HolidayListPage({
           )}
 
           {/* Results list — tour cards + package cards.
-              Tour cards are always shown when available (not gated by package results),
-              so "Anywhere" searches still surface tours even before packages load. */}
+              StaggeredList fades each item in with a 60ms gap so the list
+              doesn't pop in all at once. The component caps the stagger at
+              ~6 items, so longer lists don't drag on, and respects
+              prefers-reduced-motion automatically. */}
           {(toursForDest.length > 0 || filteredAndSorted.length > 0) && (
-            <div className="flex flex-col gap-4 pb-4">
+            <StaggeredList className="flex flex-col gap-4 pb-4">
               {/* ── Tour cards — filtered to the searched destination.
                   When "Anywhere" is selected, all tours are shown.
                   Otherwise only tours matching the destination code are shown. */}
@@ -769,19 +747,27 @@ export default function HolidayListPage({
                 </div>
               ))}
 
-              {/* Live search progress banner — shows at the bottom of the list
+              {/* Streaming status banner — shows at the bottom of the list
                   while live supplier results are still being fetched.
-                  Disappears automatically when all suppliers have responded. */}
-              {isLiveLoading && (
-                <LiveSearchProgressBanner progress={liveProgress} />
-              )}
-            </div>
+                  Replaces the old LiveSearchProgressBanner with the
+                  generalised, accessible (aria-live) version. */}
+              <StreamingStatusBanner
+                isStreaming={isLiveLoading}
+                progress={liveProgress}
+              />
+            </StaggeredList>
           )}
 
-          {/* Banner shown when we have packages but live is still loading */}
-          {isLiveLoading && filteredAndSorted.length === 0 && packages.length === 0 && toursForDest.length === 0 && (
-            <LiveSearchProgressBanner progress={liveProgress} />
-          )}
+          {/* Banner shown when we have nothing yet but live is still loading */}
+          <StreamingStatusBanner
+            isStreaming={
+              isLiveLoading &&
+              filteredAndSorted.length === 0 &&
+              packages.length === 0 &&
+              toursForDest.length === 0
+            }
+            progress={liveProgress}
+          />
 
         </div>
 
