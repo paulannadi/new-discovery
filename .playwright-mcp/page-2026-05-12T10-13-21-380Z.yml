@@ -1,0 +1,299 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e2046]:
+    - generic [ref=e2047]:
+      - img "Discover the world" [ref=e2050]
+      - generic [ref=e2052]:
+        - generic [ref=e2053]:
+          - generic [ref=e2055]:
+            - generic [ref=e2056]: AI Experience
+            - switch [ref=e2057]
+          - generic [ref=e2058]:
+            - heading "Explore the world's hidden gems" [level=1] [ref=e2059]
+            - heading "You dream it. We'll plan it." [level=1]
+        - generic [ref=e2060]:
+          - generic [ref=e2063]:
+            - generic [ref=e2065]:
+              - button "Holidays" [ref=e2066]:
+                - img [ref=e2068]
+                - generic [ref=e2074]: Holidays
+              - button "Cruises" [ref=e2075]:
+                - img [ref=e2077]
+                - generic [ref=e2081]: Cruises
+              - button "Hotels" [ref=e2082]:
+                - img [ref=e2084]
+                - generic [ref=e2088]: Hotels
+              - button "Flights" [ref=e2089]:
+                - img [ref=e2091]
+                - generic [ref=e2093]: Flights
+              - button "Experiences" [active] [ref=e2094]:
+                - img [ref=e2096]
+                - generic [ref=e2099]: Experiences
+            - generic [ref=e2494]:
+              - button "Activity type Any activity" [ref=e2496] [cursor=pointer]:
+                - img [ref=e2497]
+                - generic [ref=e2500]:
+                  - generic [ref=e2501]: Activity type
+                  - generic [ref=e2502]: Any activity
+                - img [ref=e2503]
+              - generic [ref=e2506]:
+                - img [ref=e2507]
+                - generic [ref=e2510]:
+                  - generic [ref=e2511]: Destination
+                  - textbox "Anywhere" [ref=e2512]
+              - button "When Any time" [ref=e2514] [cursor=pointer]:
+                - img [ref=e2515]
+                - generic [ref=e2517]:
+                  - generic [ref=e2518]: When
+                  - generic [ref=e2519]: Any time
+                - img [ref=e2520]
+              - button "Travellers 2 Travellers" [ref=e2523] [cursor=pointer]:
+                - img [ref=e2524]
+                - generic [ref=e2529]:
+                  - generic [ref=e2530]: Travellers
+                  - generic [ref=e2531]: 2 Travellers
+                - img [ref=e2532]
+              - button "Search activities" [ref=e2534]:
+                - img [ref=e2535]
+                - text: Search activities
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - textbox "Describe your ideal trip — destination, dates, budget, travel style…"
+                - generic:
+                  - button "Attach files":
+                    - img
+                    - generic: Attach files
+                  - button "Plan my trip":
+                    - img
+                    - text: Plan my trip
+            - generic:
+              - generic: "Try asking:"
+              - generic:
+                - button "Find me a beach resort in Bali for next month"
+                - button "Plan a 5-day family trip to Paris"
+                - button "Weekend getaway in the Alps under €500"
+                - button "Luxury honeymoon in the Maldives"
+    - generic [ref=e2154]:
+      - generic [ref=e2539]:
+        - generic [ref=e2540]:
+          - generic [ref=e2541]:
+            - generic [ref=e2542]:
+              - img [ref=e2543]
+              - heading "One-day experiences" [level=2] [ref=e2546]
+            - paragraph [ref=e2547]: Short on time? Book a tour, tasting or scenic ride for any day of your trip
+          - generic [ref=e2548]:
+            - generic [ref=e2550] [cursor=pointer]:
+              - img "Rome by Night Walking Tour" [ref=e2552]
+              - generic [ref=e2553]:
+                - generic [ref=e2554]:
+                  - img "Italy" [ref=e2555]
+                  - text: Italy
+                - generic [ref=e2556]: Rome by Night Walking Tour
+                - generic [ref=e2557]: A 3-hour stroll past the Colosseum, Trevi Fountain, and Pantheon — all lit up after dark.
+                - generic [ref=e2558]:
+                  - generic [ref=e2559]:
+                    - img [ref=e2560]
+                    - text: 3 hours
+                  - generic [ref=e2563]:
+                    - generic [ref=e2564]: Per person
+                    - generic [ref=e2565]: from €35
+            - generic [ref=e2567] [cursor=pointer]:
+              - img "Kyoto Street Food Crawl" [ref=e2569]
+              - generic [ref=e2570]:
+                - generic [ref=e2571]:
+                  - img "Japan" [ref=e2572]
+                  - text: Japan
+                - generic [ref=e2573]: Kyoto Street Food Crawl
+                - generic [ref=e2574]: Six tastings through Nishiki Market and the Gion district with a local guide.
+                - generic [ref=e2575]:
+                  - generic [ref=e2576]:
+                    - img [ref=e2577]
+                    - text: 4 hours
+                  - generic [ref=e2580]:
+                    - generic [ref=e2581]: Per person
+                    - generic [ref=e2582]: from €85
+            - generic [ref=e2584] [cursor=pointer]:
+              - img "Lake Geneva Sunset Cruise" [ref=e2586]
+              - generic [ref=e2587]:
+                - generic [ref=e2588]:
+                  - img "Switzerland" [ref=e2589]
+                  - text: Switzerland
+                - generic [ref=e2590]: Lake Geneva Sunset Cruise
+                - generic [ref=e2591]: A two-hour catamaran sail past the Château de Chillon with a glass of Lavaux wine.
+                - generic [ref=e2592]:
+                  - generic [ref=e2593]:
+                    - img [ref=e2594]
+                    - text: 2 hours
+                  - generic [ref=e2597]:
+                    - generic [ref=e2598]: Per person
+                    - generic [ref=e2599]: from CHF 60
+            - generic [ref=e2601] [cursor=pointer]:
+              - img "Grand Canyon Helicopter Tour" [ref=e2603]
+              - generic [ref=e2604]:
+                - generic [ref=e2605]:
+                  - img "USA" [ref=e2606]
+                  - text: USA
+                - generic [ref=e2607]: Grand Canyon Helicopter Tour
+                - generic [ref=e2608]: A 45-minute helicopter ride from Vegas over the West Rim with a Champagne landing.
+                - generic [ref=e2609]:
+                  - generic [ref=e2610]:
+                    - img [ref=e2611]
+                    - text: Half day
+                  - generic [ref=e2614]:
+                    - generic [ref=e2615]: Per person
+                    - generic [ref=e2616]: from $399
+            - generic [ref=e2618] [cursor=pointer]:
+              - img "Champagne Vineyard Day Trip" [ref=e2620]
+              - generic [ref=e2621]:
+                - generic [ref=e2622]:
+                  - img "France" [ref=e2623]
+                  - text: France
+                - generic [ref=e2624]: Champagne Vineyard Day Trip
+                - generic [ref=e2625]: Reims and Épernay cellar visits with three tastings — round-trip from Paris by minibus.
+                - generic [ref=e2626]:
+                  - generic [ref=e2627]:
+                    - img [ref=e2628]
+                    - text: Full day
+                  - generic [ref=e2631]:
+                    - generic [ref=e2632]: Per person
+                    - generic [ref=e2633]: from €189
+            - generic [ref=e2635] [cursor=pointer]:
+              - img "Cappadocia Hot-Air Balloon" [ref=e2637]
+              - generic [ref=e2638]:
+                - generic [ref=e2639]:
+                  - img "Türkiye" [ref=e2640]
+                  - text: Türkiye
+                - generic [ref=e2641]: Cappadocia Hot-Air Balloon
+                - generic [ref=e2642]: Sunrise float over fairy chimneys and ancient cave villages — toast with a glass of fizz.
+                - generic [ref=e2643]:
+                  - generic [ref=e2644]:
+                    - img [ref=e2645]
+                    - text: 1 hour flight
+                  - generic [ref=e2648]:
+                    - generic [ref=e2649]: Per person
+                    - generic [ref=e2650]: from €230
+        - generic [ref=e2651]:
+          - generic [ref=e2652]:
+            - generic [ref=e2653]:
+              - img [ref=e2654]
+              - heading "Iconic events" [level=2] [ref=e2656]
+            - paragraph [ref=e2657]: Plan your trip around once-in-a-lifetime sporting and cultural moments
+          - generic [ref=e2658]:
+            - generic [ref=e2660] [cursor=pointer]:
+              - img "Wimbledon Championships" [ref=e2662]
+              - generic [ref=e2663]:
+                - generic [ref=e2664]:
+                  - img "United Kingdom" [ref=e2665]
+                  - text: United Kingdom
+                - generic [ref=e2666]: Wimbledon Championships
+                - generic [ref=e2667]: Centre Court grass-court tennis with strawberries and cream — late June to mid-July.
+                - generic [ref=e2668]:
+                  - generic [ref=e2669]:
+                    - img [ref=e2670]
+                    - text: Match day
+                  - generic [ref=e2673]:
+                    - generic [ref=e2674]: Per person
+                    - generic [ref=e2675]: from £180
+            - generic [ref=e2677] [cursor=pointer]:
+              - img "Monaco Grand Prix" [ref=e2679]
+              - generic [ref=e2680]:
+                - generic [ref=e2681]:
+                  - img "Monaco" [ref=e2682]
+                  - text: Monaco
+                - generic [ref=e2683]: Monaco Grand Prix
+                - generic [ref=e2684]: Formula 1 racing through the streets of Monte-Carlo — the crown jewel of the F1 calendar, every May.
+                - generic [ref=e2685]:
+                  - generic [ref=e2686]:
+                    - img [ref=e2687]
+                    - text: Race weekend
+                  - generic [ref=e2690]:
+                    - generic [ref=e2691]: Per person
+                    - generic [ref=e2692]: from €1,250
+            - generic [ref=e2694] [cursor=pointer]:
+              - img "TCS New York City Marathon" [ref=e2696]
+              - generic [ref=e2697]:
+                - generic [ref=e2698]:
+                  - img "USA" [ref=e2699]
+                  - text: USA
+                - generic [ref=e2700]: TCS New York City Marathon
+                - generic [ref=e2701]: 26.2 miles through all five boroughs on the first Sunday of November — 50,000 runners, two million spectators.
+                - generic [ref=e2702]:
+                  - generic [ref=e2703]:
+                    - img [ref=e2704]
+                    - text: Race day
+                  - generic [ref=e2707]:
+                    - generic [ref=e2708]: Per person
+                    - generic [ref=e2709]: from $349
+            - generic [ref=e2711] [cursor=pointer]:
+              - img "Munich Oktoberfest" [ref=e2713]
+              - generic [ref=e2714]:
+                - generic [ref=e2715]:
+                  - img "Germany" [ref=e2716]
+                  - text: Germany
+                - generic [ref=e2717]: Munich Oktoberfest
+                - generic [ref=e2718]: The world's biggest beer festival — 14 vast tents, lederhosen and brass bands, mid-September to early October.
+                - generic [ref=e2719]:
+                  - generic [ref=e2720]:
+                    - img [ref=e2721]
+                    - text: 3 days
+                  - generic [ref=e2724]:
+                    - generic [ref=e2725]: Per person
+                    - generic [ref=e2726]: from €690
+            - generic [ref=e2728] [cursor=pointer]:
+              - img "Rio de Janeiro Carnival" [ref=e2730]
+              - generic [ref=e2731]:
+                - generic [ref=e2732]:
+                  - img "Brazil" [ref=e2733]
+                  - text: Brazil
+                - generic [ref=e2734]: Rio de Janeiro Carnival
+                - generic [ref=e2735]: Samba parades at the Sambódromo and city-wide street blocos — the week before Lent in February or March.
+                - generic [ref=e2736]:
+                  - generic [ref=e2737]:
+                    - img [ref=e2738]
+                    - text: 4 nights
+                  - generic [ref=e2741]:
+                    - generic [ref=e2742]: Per person
+                    - generic [ref=e2743]: from $1,290
+            - generic [ref=e2745] [cursor=pointer]:
+              - img "Edinburgh Festival Fringe" [ref=e2747]
+              - generic [ref=e2748]:
+                - generic [ref=e2749]:
+                  - img "United Kingdom" [ref=e2750]
+                  - text: United Kingdom
+                - generic [ref=e2751]: Edinburgh Festival Fringe
+                - generic [ref=e2752]: The world's largest arts festival — comedy, theatre, and street performers take over the city every August.
+                - generic [ref=e2753]:
+                  - generic [ref=e2754]:
+                    - img [ref=e2755]
+                    - text: 5 nights
+                  - generic [ref=e2758]:
+                    - generic [ref=e2759]: Per person
+                    - generic [ref=e2760]: from £540
+        - generic [ref=e2761]:
+          - generic [ref=e2762]:
+            - generic [ref=e2763]:
+              - img [ref=e2764]
+              - heading "Browse by experience type" [level=2] [ref=e2767]
+            - paragraph [ref=e2768]: Find your kind of adventure
+          - generic [ref=e2769]:
+            - button "River cruise" [ref=e2770]:
+              - img [ref=e2771]
+              - text: River cruise
+            - button "Multi-day tour" [ref=e2774]:
+              - img [ref=e2775]
+              - text: Multi-day tour
+            - button "Walking tour" [ref=e2777]:
+              - img [ref=e2778]
+              - text: Walking tour
+            - button "Bicycle tour" [ref=e2781]:
+              - img [ref=e2782]
+              - text: Bicycle tour
+            - button "Safari" [ref=e2787]:
+              - img [ref=e2788]
+              - text: Safari
+            - button "Expedition" [ref=e2792]:
+              - img [ref=e2793]
+              - text: Expedition
+      - paragraph [ref=e2493]: © 2026 Nezasa · TripBuilder · Over 500,000 hotels worldwide

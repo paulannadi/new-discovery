@@ -1,0 +1,225 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e1744]:
+    - generic [ref=e1746]:
+      - button "Back to discovery" [ref=e1748]:
+        - img [ref=e1749]
+        - text: Back to discovery
+      - generic [ref=e1751]:
+        - generic [ref=e1752]:
+          - img "Rome by Night Walking Tour" [ref=e1755]
+          - generic [ref=e1756]:
+            - button "View activity photo 2" [ref=e1757] [cursor=pointer]:
+              - img "Activity photo 2" [ref=e1759]
+            - button "View activity photo 3" [ref=e1760] [cursor=pointer]:
+              - img "Activity photo 3" [ref=e1762]
+            - button "View activity photo 4" [ref=e1763] [cursor=pointer]:
+              - img "Activity photo 4" [ref=e1765]
+            - button "View activity photo 5" [ref=e1766] [cursor=pointer]:
+              - img "Activity photo 5" [ref=e1768]
+        - button "See all photos" [ref=e1769]:
+          - img [ref=e1770]
+          - text: See all photos
+      - generic [ref=e1775]:
+        - generic [ref=e1776]:
+          - img [ref=e1777]
+          - text: Walking tour
+        - heading "Rome by Night Walking Tour" [level=1] [ref=e1780]
+        - paragraph [ref=e1781]: A three-hour evening stroll past the Colosseum, Trevi Fountain, and Pantheon — every monument glowing against the dark.
+        - generic [ref=e1782]:
+          - generic [ref=e1783]:
+            - img [ref=e1784]
+            - generic [ref=e1787]: 1 days
+          - generic [ref=e1788]: "|"
+          - generic [ref=e1789]:
+            - img [ref=e1790]
+            - generic [ref=e1793]: Rome, Italy
+          - generic [ref=e1794]: "|"
+          - generic [ref=e1795]:
+            - img [ref=e1796]
+            - generic [ref=e1798]: Easy
+          - generic [ref=e1799]: "|"
+          - generic [ref=e1800]:
+            - img [ref=e1801]
+            - generic [ref=e1807]: 4 km
+          - generic [ref=e1808]: "|"
+          - generic [ref=e1809]:
+            - img [ref=e1810]
+            - generic [ref=e1812]: "4.8"
+            - generic [ref=e1813]: (2,147)
+    - generic [ref=e1815]:
+      - generic [ref=e1816]:
+        - navigation "Activity sections" [ref=e1817]:
+          - generic [ref=e1819]:
+            - button "Overview" [ref=e1820]
+            - button "Route" [ref=e1821]
+            - button "Highlights" [ref=e1822]
+            - button "Included" [ref=e1823]
+            - button "Excluded" [ref=e1824]
+        - generic [ref=e1826]:
+          - generic [ref=e1827]:
+            - heading "Your experience at a glance" [level=3] [ref=e1828]
+            - generic [ref=e1829]:
+              - generic [ref=e1830]:
+                - paragraph [ref=e1831]: Activity details
+                - generic [ref=e1832]:
+                  - generic [ref=e1833]:
+                    - img [ref=e1834]
+                    - generic [ref=e1839]: Up to 15 guests
+                  - generic [ref=e1840]:
+                    - img [ref=e1841]
+                    - generic [ref=e1843]: Easy walking
+                  - generic [ref=e1844]:
+                    - img [ref=e1845]
+                    - generic [ref=e1849]: English, Italian
+                  - generic [ref=e1850]:
+                    - img [ref=e1851]
+                    - generic [ref=e1854]: 8+
+              - paragraph [ref=e1857]: Activity route
+              - generic [ref=e1858]:
+                - generic [ref=e1860]:
+                  - generic:
+                    - generic:
+                      - img
+                    - generic:
+                      - button "1" [ref=e1862] [cursor=pointer]:
+                        - generic [ref=e1863]: "1"
+                      - button "2" [ref=e1864] [cursor=pointer]:
+                        - generic [ref=e1865]: "2"
+                      - button "3" [ref=e1866] [cursor=pointer]:
+                        - generic [ref=e1867]: "3"
+                  - generic:
+                    - generic [ref=e1868]:
+                      - button "Zoom in" [ref=e1869] [cursor=pointer]: +
+                      - button "Zoom out" [ref=e1870] [cursor=pointer]: −
+                    - generic [ref=e1871]:
+                      - link "Leaflet" [ref=e1872] [cursor=pointer]:
+                        - /url: https://leafletjs.com
+                        - img [ref=e1873]
+                        - text: Leaflet
+                      - text: "| ©"
+                      - link "OpenStreetMap" [ref=e1877] [cursor=pointer]:
+                        - /url: https://www.openstreetmap.org/copyright
+                - generic [ref=e1878]:
+                  - paragraph [ref=e1879]: Stops
+                  - generic [ref=e1880]:
+                    - generic [ref=e1881]:
+                      - generic [ref=e1882]: "1"
+                      - generic [ref=e1883]:
+                        - paragraph [ref=e1884]: Piazza del Colosseo
+                        - paragraph [ref=e1885]: Evening
+                    - generic [ref=e1886]:
+                      - generic [ref=e1887]: "2"
+                      - generic [ref=e1888]:
+                        - paragraph [ref=e1889]: Trevi Fountain
+                        - paragraph [ref=e1890]: Evening
+                    - generic [ref=e1891]:
+                      - generic [ref=e1892]: "3"
+                      - generic [ref=e1893]:
+                        - paragraph [ref=e1894]: Pantheon
+                        - paragraph [ref=e1895]: Evening
+          - generic [ref=e1896]:
+            - heading "Trail route" [level=3] [ref=e1897]
+            - generic [ref=e1898]:
+              - generic [ref=e1899]:
+                - img [ref=e1901]
+                - generic [ref=e1907]:
+                  - paragraph [ref=e1908]: Distance
+                  - paragraph [ref=e1909]: 4 km
+              - generic [ref=e1910]:
+                - img [ref=e1912]
+                - generic [ref=e1914]:
+                  - paragraph [ref=e1915]: Difficulty
+                  - paragraph [ref=e1916]: Easy
+            - generic [ref=e1917]:
+              - heading "Tour route" [level=3] [ref=e1918]
+              - generic [ref=e1921]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic:
+                    - button "1" [ref=e1923] [cursor=pointer]:
+                      - generic [ref=e1924]: "1"
+                    - button "2" [ref=e1925] [cursor=pointer]:
+                      - generic [ref=e1926]: "2"
+                    - button "3" [ref=e1927] [cursor=pointer]:
+                      - generic [ref=e1928]: "3"
+                - generic:
+                  - generic [ref=e1929]:
+                    - button "Zoom in" [ref=e1930] [cursor=pointer]: +
+                    - button "Zoom out" [ref=e1931] [cursor=pointer]: −
+                  - generic [ref=e1932]:
+                    - link "Leaflet" [ref=e1933] [cursor=pointer]:
+                      - /url: https://leafletjs.com
+                      - img [ref=e1934]
+                      - text: Leaflet
+                    - text: "| ©"
+                    - link "OpenStreetMap" [ref=e1938] [cursor=pointer]:
+                      - /url: https://www.openstreetmap.org/copyright
+          - generic [ref=e1939]:
+            - heading "Why you'll love it" [level=3] [ref=e1940]
+            - generic [ref=e1942]:
+              - paragraph [ref=e1943]: Activity highlights
+              - generic [ref=e1944]:
+                - generic [ref=e1945]:
+                  - img [ref=e1947]
+                  - paragraph [ref=e1949]: Colosseum lit up after dark
+                - generic [ref=e1950]:
+                  - img [ref=e1952]
+                  - paragraph [ref=e1954]: Skip-the-crowd Trevi Fountain photo stop
+                - generic [ref=e1955]:
+                  - img [ref=e1957]
+                  - paragraph [ref=e1959]: Local guide with hidden-piazza stories
+          - generic [ref=e1960]:
+            - heading "Everything included" [level=3] [ref=e1961]
+            - generic [ref=e1963]:
+              - paragraph [ref=e1964]: What's included
+              - generic [ref=e1965]:
+                - generic [ref=e1966]:
+                  - img [ref=e1968]
+                  - paragraph [ref=e1970]: Three-hour licensed local guide
+                - generic [ref=e1971]:
+                  - img [ref=e1973]
+                  - paragraph [ref=e1975]: Headsets for clear narration
+                - generic [ref=e1976]:
+                  - img [ref=e1978]
+                  - paragraph [ref=e1980]: Aperitivo stop with a glass of Prosecco
+          - generic [ref=e1981]:
+            - heading "Good to know before you book" [level=3] [ref=e1982]
+            - generic [ref=e1984]:
+              - paragraph [ref=e1985]: Not included
+              - generic [ref=e1986]:
+                - generic [ref=e1987]:
+                  - img [ref=e1989]
+                  - paragraph [ref=e1992]: Hotel transfers
+                - generic [ref=e1993]:
+                  - img [ref=e1995]
+                  - paragraph [ref=e1998]: Dinner
+                - generic [ref=e1999]:
+                  - img [ref=e2001]
+                  - paragraph [ref=e2004]: Gratuities
+      - generic [ref=e2006]:
+        - generic [ref=e2008]:
+          - generic [ref=e2009]: €35 per person · 1-day experience
+          - generic [ref=e2010]: "Total for 2 travellers: €70"
+        - generic [ref=e2011]:
+          - paragraph [ref=e2012]: Customise your trip
+          - button "Travel date Any evening" [ref=e2014]:
+            - img [ref=e2015]
+            - generic [ref=e2017]:
+              - generic [ref=e2018]: Travel date
+              - generic [ref=e2019]: Any evening
+            - img [ref=e2020]
+          - button "Travellers 2 Travellers" [ref=e2023]:
+            - img [ref=e2024]
+            - generic [ref=e2029]:
+              - generic [ref=e2030]: Travellers
+              - generic [ref=e2031]: 2 Travellers
+            - img [ref=e2032]
+          - button "Difficulty preference Easy" [ref=e2035]:
+            - img [ref=e2036]
+            - generic [ref=e2039]:
+              - generic [ref=e2040]: Difficulty preference
+              - generic [ref=e2041]: Easy
+            - img [ref=e2042]
+        - button "Start planning" [ref=e2045]

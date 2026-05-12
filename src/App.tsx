@@ -429,6 +429,16 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
+  // ── DiscoveryPage one-day/event card → ActivityDetailPage (skip the list) ─
+  // Sets the back button to return to discovery rather than the list — mirrors
+  // the cruise-direct-select pattern above.
+  const handleActivityDirectSelect = (activity: Activity) => {
+    setSelectedActivity(activity);
+    setActivityDetailBackPage("discovery");
+    setCurrentPage("activity-detail");
+    window.scrollTo(0, 0);
+  };
+
   // ── CRUISES tab: submit search → CruiseListPage ───────────────────────────
   const handleCruiseSearch = (criteria: CruiseSearchCriteria) => {
     setCruiseSearchCriteria(criteria);
@@ -503,6 +513,7 @@ export default function App() {
           onFlightSearch={handleFlightSearch}
           onHolidaySearch={handleHolidaySearch}
           onActivitySearch={handleActivitySearch}
+          onActivityDirectSelect={handleActivityDirectSelect}
           onCruiseSearch={handleCruiseSearch}
           onCruiseDirectSelect={handleCruiseDirectSelect}
         />

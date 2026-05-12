@@ -1,0 +1,378 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - img "Discover the world" [ref=e7]
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - generic [ref=e12]:
+            - generic [ref=e13]: AI Experience
+            - switch [ref=e14]
+          - generic [ref=e15]:
+            - heading "Explore the world's hidden gems" [level=1] [ref=e16]
+            - heading "You dream it. We'll plan it." [level=1]
+        - generic [ref=e17]:
+          - generic [ref=e20]:
+            - generic [ref=e22]:
+              - button "Holidays" [ref=e23]:
+                - img [ref=e25]
+                - generic [ref=e31]: Holidays
+              - button "Cruises" [ref=e32]:
+                - img [ref=e34]
+                - generic [ref=e38]: Cruises
+              - button "Hotels" [ref=e39]:
+                - img [ref=e41]
+                - generic [ref=e45]: Hotels
+              - button "Flights" [ref=e46]:
+                - img [ref=e48]
+                - generic [ref=e50]: Flights
+              - button "Experiences" [ref=e51]:
+                - img [ref=e53]
+                - generic [ref=e56]: Experiences
+            - generic [ref=e59]:
+              - generic [ref=e61] [cursor=pointer]:
+                - img [ref=e62]
+                - generic [ref=e64]:
+                  - generic [ref=e65]: Flying from
+                  - generic [ref=e66]: Departure city
+                - img [ref=e67]
+              - generic [ref=e70]:
+                - img [ref=e71]
+                - generic [ref=e74]:
+                  - generic [ref=e75]: Going to
+                  - textbox "Destination" [ref=e76]
+              - generic [ref=e78] [cursor=pointer]:
+                - img [ref=e79]
+                - generic [ref=e81]:
+                  - generic [ref=e82]: Duration
+                  - generic [ref=e83]: 7 nights
+                - img [ref=e84]
+              - generic [ref=e87] [cursor=pointer]:
+                - img [ref=e88]
+                - generic [ref=e90]:
+                  - generic [ref=e91]: Departure date
+                  - generic [ref=e92]: Select departure
+                - img [ref=e93]
+              - generic [ref=e96] [cursor=pointer]:
+                - img [ref=e97]
+                - generic [ref=e102]:
+                  - generic [ref=e103]: Travellers
+                  - generic [ref=e104]: 2 Adults
+                - img [ref=e105]
+              - button "Search Holidays" [ref=e107]:
+                - img [ref=e108]
+                - text: Search Holidays
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - textbox "Describe your ideal trip — destination, dates, budget, travel style…"
+                - generic:
+                  - button "Attach files":
+                    - img
+                    - generic: Attach files
+                  - button "Plan my trip":
+                    - img
+                    - text: Plan my trip
+            - generic:
+              - generic: "Try asking:"
+              - generic:
+                - button "Find me a beach resort in Bali for next month"
+                - button "Plan a 5-day family trip to Paris"
+                - button "Weekend getaway in the Alps under €500"
+                - button "Luxury honeymoon in the Maldives"
+    - generic [ref=e111]:
+      - generic [ref=e112]:
+        - generic [ref=e113]:
+          - generic [ref=e114]:
+            - img [ref=e115]
+            - heading "Tours for every travel style" [level=2] [ref=e120]
+          - paragraph [ref=e121]: Average prices based on current calendar month
+        - generic [ref=e122]:
+          - button "Culture & History" [ref=e123]
+          - button "Sun & Beach" [ref=e124]
+          - button "Safari" [ref=e125]
+          - button "Sustainable Travel" [ref=e126]
+          - button "Spa & Wellness" [ref=e127]
+          - button "More styles" [ref=e128]:
+            - text: More styles
+            - img [ref=e129]
+        - generic [ref=e132]:
+          - generic [ref=e134] [cursor=pointer]:
+            - img "Classic Thailand Explorer" [ref=e136]
+            - generic [ref=e137]:
+              - generic [ref=e138]:
+                - img "Thailand" [ref=e139]
+                - text: Thailand
+              - generic [ref=e140]: Classic Thailand Explorer
+              - generic [ref=e141]: Perfect introduction to Thailand with Bangkok temples, cultural experiences, and island hopping.
+              - generic [ref=e142]:
+                - generic [ref=e143]:
+                  - img [ref=e144]
+                  - text: 8 days
+                - generic [ref=e147]:
+                  - generic [ref=e148]: Per person
+                  - generic [ref=e149]: from $1,650
+          - generic [ref=e151] [cursor=pointer]:
+            - img "Cultural Bali Discovery" [ref=e153]
+            - generic [ref=e154]:
+              - generic [ref=e155]:
+                - img "Indonesia" [ref=e156]
+                - text: Indonesia
+              - generic [ref=e157]: Cultural Bali Discovery
+              - generic [ref=e158]: Immerse yourself in Balinese culture with traditional villages, temples, and artisan workshops.
+              - generic [ref=e159]:
+                - generic [ref=e160]:
+                  - img [ref=e161]
+                  - text: 8 days
+                - generic [ref=e164]:
+                  - generic [ref=e165]: Per person
+                  - generic [ref=e166]: from $1,980
+          - generic [ref=e168] [cursor=pointer]:
+            - img "Classic Peru Adventure" [ref=e170]
+            - generic [ref=e171]:
+              - generic [ref=e172]:
+                - img "Peru" [ref=e173]
+                - text: Peru
+              - generic [ref=e174]: Classic Peru Adventure
+              - generic [ref=e175]: The ultimate Peru experience with Machu Picchu, Sacred Valley, and Lima exploration.
+              - generic [ref=e176]:
+                - generic [ref=e177]:
+                  - img [ref=e178]
+                  - text: 8 days
+                - generic [ref=e181]:
+                  - generic [ref=e182]: Per person
+                  - generic [ref=e183]: from $1,980
+          - generic [ref=e185] [cursor=pointer]:
+            - img "Island Paradise" [ref=e187]
+            - generic [ref=e188]:
+              - generic [ref=e189]:
+                - img "Thailand" [ref=e190]
+                - text: Thailand
+              - generic [ref=e191]: Island Paradise
+              - generic [ref=e192]: Focus on Thailand's stunning islands with beach time, snorkeling, and tropical adventures.
+              - generic [ref=e193]:
+                - generic [ref=e194]:
+                  - img [ref=e195]
+                  - text: 9 days
+                - generic [ref=e198]:
+                  - generic [ref=e199]: Per person
+                  - generic [ref=e200]: from $1,790
+          - generic [ref=e202] [cursor=pointer]:
+            - img "Inca Trail Adventure" [ref=e204]
+            - generic [ref=e205]:
+              - generic [ref=e206]:
+                - img "Peru" [ref=e207]
+                - text: Peru
+              - generic [ref=e208]: Inca Trail Adventure
+              - generic [ref=e209]: "For the adventurous traveler: trek the classic Inca Trail to Machu Picchu."
+              - generic [ref=e210]:
+                - generic [ref=e211]:
+                  - img [ref=e212]
+                  - text: 8 days
+                - generic [ref=e215]:
+                  - generic [ref=e216]: Per person
+                  - generic [ref=e217]: from $2,450
+          - generic [ref=e219] [cursor=pointer]:
+            - img "Amazon & Andes" [ref=e221]
+            - generic [ref=e222]:
+              - generic [ref=e223]:
+                - img "Peru" [ref=e224]
+                - text: Peru
+              - generic [ref=e225]: Amazon & Andes
+              - generic [ref=e226]: Experience Peru's diverse landscapes from Amazon rainforest to high-altitude lakes.
+              - generic [ref=e227]:
+                - generic [ref=e228]:
+                  - img [ref=e229]
+                  - text: 10 days
+                - generic [ref=e232]:
+                  - generic [ref=e233]: Per person
+                  - generic [ref=e234]: from $2,180
+        - button "View all Culture & History tours (35)" [ref=e236]
+      - separator [ref=e237]
+      - generic [ref=e238]:
+        - generic [ref=e239]:
+          - generic [ref=e240]:
+            - img [ref=e241]
+            - heading "Your next dream destination" [level=2] [ref=e243]
+          - paragraph [ref=e244]: Average prices based on current calendar month
+        - generic [ref=e245]:
+          - button "Thailand" [ref=e246]
+          - button "Indonesia" [ref=e247]
+          - button "Peru" [ref=e248]
+          - button "Japan" [ref=e249]
+          - button "Morocco" [ref=e250]
+          - button "More destinations" [ref=e251]:
+            - text: More destinations
+            - img [ref=e252]
+        - generic [ref=e255]:
+          - generic [ref=e257] [cursor=pointer]:
+            - img "Bangkok & Beyond" [ref=e259]
+            - generic [ref=e260]:
+              - generic [ref=e261]:
+                - img "Thailand" [ref=e262]
+                - text: Thailand
+              - generic [ref=e263]: Bangkok & Beyond
+              - generic [ref=e264]: Discover the energy of Bangkok alongside peaceful temples and floating markets.
+              - generic [ref=e265]:
+                - generic [ref=e266]:
+                  - img [ref=e267]
+                  - text: 10 days
+                - generic [ref=e270]:
+                  - generic [ref=e271]: Per person
+                  - generic [ref=e272]: from $1,480
+          - generic [ref=e274] [cursor=pointer]:
+            - img "Northern Thailand Highlights" [ref=e276]
+            - generic [ref=e277]:
+              - generic [ref=e278]:
+                - img "Thailand" [ref=e279]
+                - text: Thailand
+              - generic [ref=e280]: Northern Thailand Highlights
+              - generic [ref=e281]: Chiang Mai hill tribes, elephant sanctuaries, and lush mountain scenery.
+              - generic [ref=e282]:
+                - generic [ref=e283]:
+                  - img [ref=e284]
+                  - text: 7 days
+                - generic [ref=e287]:
+                  - generic [ref=e288]: Per person
+                  - generic [ref=e289]: from $1,250
+          - generic [ref=e291] [cursor=pointer]:
+            - img "Phuket & the Islands" [ref=e293]
+            - generic [ref=e294]:
+              - generic [ref=e295]:
+                - img "Thailand" [ref=e296]
+                - text: Thailand
+              - generic [ref=e297]: Phuket & the Islands
+              - generic [ref=e298]: Sun, sea, and stunning scenery across Thailand's most beautiful southern islands.
+              - generic [ref=e299]:
+                - generic [ref=e300]:
+                  - img [ref=e301]
+                  - text: 9 days
+                - generic [ref=e304]:
+                  - generic [ref=e305]: Per person
+                  - generic [ref=e306]: from $1,890
+        - button "View all Thailand tours (22)" [ref=e308]
+      - separator [ref=e309]
+      - generic [ref=e310]:
+        - generic [ref=e311]:
+          - generic [ref=e312]:
+            - img [ref=e313]
+            - heading "Travel the way you like" [level=2] [ref=e317]
+          - paragraph [ref=e318]: Find the right style of holiday for you
+        - generic [ref=e319]:
+          - button "Hotel + Flight" [ref=e320]
+          - button "Group Tours" [ref=e321]
+          - button "Individual Tours" [ref=e322]
+          - button "Round Trips" [ref=e323]
+          - button "Last Minute" [ref=e324]
+        - generic [ref=e326]:
+          - generic [ref=e328] [cursor=pointer]:
+            - img "Maldives" [ref=e330]
+            - generic [ref=e331]:
+              - generic [ref=e332]:
+                - img "Maldives" [ref=e333]
+                - text: Maldives
+              - generic [ref=e334]: Escape to an exclusive overwater villa with crystal-clear lagoons, world-class diving, and total seclusion.
+              - generic [ref=e335]:
+                - generic [ref=e336]:
+                  - generic [ref=e337]:
+                    - img [ref=e338]
+                    - text: Return flights
+                  - generic [ref=e341]:
+                    - img [ref=e342]
+                    - text: 7 nights
+                - generic [ref=e344]:
+                  - generic [ref=e345]: Per person
+                  - generic [ref=e346]: from £1,899
+          - generic [ref=e348] [cursor=pointer]:
+            - img "Santorini" [ref=e350]
+            - generic [ref=e351]:
+              - generic [ref=e352]:
+                - img "Greece" [ref=e353]
+                - text: Santorini
+              - generic [ref=e354]: Iconic white-washed clifftop suites with infinity pools overlooking the famous Santorini caldera.
+              - generic [ref=e355]:
+                - generic [ref=e356]:
+                  - generic [ref=e357]:
+                    - img [ref=e358]
+                    - text: Return flights
+                  - generic [ref=e361]:
+                    - img [ref=e362]
+                    - text: 7 nights
+                - generic [ref=e364]:
+                  - generic [ref=e365]: Per person
+                  - generic [ref=e366]: from £1,249
+          - generic [ref=e368] [cursor=pointer]:
+            - img "Bali" [ref=e370]
+            - generic [ref=e371]:
+              - generic [ref=e372]:
+                - img "Indonesia" [ref=e373]
+                - text: Bali
+              - generic [ref=e374]: Beachfront luxury with tropical gardens, private pools, and vibrant Seminyak dining on your doorstep.
+              - generic [ref=e375]:
+                - generic [ref=e376]:
+                  - generic [ref=e377]:
+                    - img [ref=e378]
+                    - text: Return flights
+                  - generic [ref=e381]:
+                    - img [ref=e382]
+                    - text: 10 nights
+                - generic [ref=e384]:
+                  - generic [ref=e385]: Per person
+                  - generic [ref=e386]: from £1,499
+          - generic [ref=e388] [cursor=pointer]:
+            - img "Cancún" [ref=e390]
+            - generic [ref=e391]:
+              - generic [ref=e392]:
+                - img "Mexico" [ref=e393]
+                - text: Cancún
+              - generic [ref=e394]: All-inclusive beachfront resort with direct Caribbean Sea access and nightly entertainment.
+              - generic [ref=e395]:
+                - generic [ref=e396]:
+                  - generic [ref=e397]:
+                    - img [ref=e398]
+                    - text: Return flights
+                  - generic [ref=e401]:
+                    - img [ref=e402]
+                    - text: 7 nights
+                - generic [ref=e404]:
+                  - generic [ref=e405]: Per person
+                  - generic [ref=e406]: from £1,099
+          - generic [ref=e408] [cursor=pointer]:
+            - img "Dubai" [ref=e410]
+            - generic [ref=e411]:
+              - generic [ref=e412]:
+                - img "UAE" [ref=e413]
+                - text: Dubai
+              - generic [ref=e414]: Iconic resort on Palm Jumeirah with a private beach, waterpark, and world-famous restaurants.
+              - generic [ref=e415]:
+                - generic [ref=e416]:
+                  - generic [ref=e417]:
+                    - img [ref=e418]
+                    - text: Return flights
+                  - generic [ref=e421]:
+                    - img [ref=e422]
+                    - text: 7 nights
+                - generic [ref=e424]:
+                  - generic [ref=e425]: Per person
+                  - generic [ref=e426]: from £999
+          - generic [ref=e428] [cursor=pointer]:
+            - img "Phuket" [ref=e430]
+            - generic [ref=e431]:
+              - generic [ref=e432]:
+                - img "Thailand" [ref=e433]
+                - text: Phuket
+              - generic [ref=e434]: Secluded luxury on a private bay with stunning ocean views, villa pools, and impeccable Thai hospitality.
+              - generic [ref=e435]:
+                - generic [ref=e436]:
+                  - generic [ref=e437]:
+                    - img [ref=e438]
+                    - text: Return flights
+                  - generic [ref=e441]:
+                    - img [ref=e442]
+                    - text: 10 nights
+                - generic [ref=e444]:
+                  - generic [ref=e445]: Per person
+                  - generic [ref=e446]: from £1,349
+        - button "View all Hotel + Flight holidays" [ref=e448]
+      - paragraph [ref=e450]: © 2026 Nezasa · TripBuilder · Over 500,000 hotels worldwide

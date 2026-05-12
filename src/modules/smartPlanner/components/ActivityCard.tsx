@@ -128,7 +128,9 @@ export function ActivityCard({
             <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-foreground">
               <span className="flex items-center gap-1.5">
                 <Clock size={12} className="shrink-0" aria-hidden="true" />
-                {activity.durationDays} days
+                {activity.durationDays === 1
+                  ? "1 day"
+                  : `${activity.durationDays} days`}
               </span>
               <span className="flex items-center gap-1.5">
                 <Calendar size={12} className="shrink-0" aria-hidden="true" />

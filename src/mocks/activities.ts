@@ -755,6 +755,632 @@ export const ANTARCTICA_EXPEDITION: Activity = {
   ],
 };
 
+// ═══════════════════════════════════════════════════════════════════════════
+// ONE-DAY EXPERIENCES — short single-day activities featured on Discovery.
+// Each has durationDays: 1 and a minimal but valid type-specific block so
+// ActivityDetailPage renders correctly (Route for walks, Ports/Cabins for
+// cruises, Itinerary for tours/expeditions).
+// ═══════════════════════════════════════════════════════════════════════════
+
+// 8. ROME BY NIGHT — walking tour (1 day)
+export const ROME_NIGHT_WALK: Activity = {
+  activityId: "rome-night-walk",
+  type: "walking-tour",
+  title: "Rome by Night Walking Tour",
+  subtitle:
+    "A three-hour evening stroll past the Colosseum, Trevi Fountain, and Pantheon — every monument glowing against the dark.",
+  mainImage: "https://images.unsplash.com/photo-1525874684015-58379d421a52?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1525874684015-58379d421a52?w=1200&q=80",
+    "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&q=80",
+    "https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=1200&q=80",
+  ],
+  location: "Rome, Italy",
+  durationDays: 1,
+  startDate: "Any evening",
+  endDate: "Any evening",
+  price: { perPerson: 35, total: 70, currency: "EUR" },
+  rating: { score: 4.8, reviewCount: 2147 },
+  difficulty: "Easy",
+  distanceKm: 4,
+  highlights: [
+    "Colosseum lit up after dark",
+    "Skip-the-crowd Trevi Fountain photo stop",
+    "Local guide with hidden-piazza stories",
+  ],
+  included: [
+    "Three-hour licensed local guide",
+    "Headsets for clear narration",
+    "Aperitivo stop with a glass of Prosecco",
+  ],
+  excluded: ["Hotel transfers", "Dinner", "Gratuities"],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 15 guests" },
+    { iconKey: "activity", title: "Activity level", value: "Easy walking" },
+    { iconKey: "languages", title: "Language", value: "English, Italian" },
+    { iconKey: "calendar-check", title: "Min age", value: "8+" },
+  ],
+  routeStops: [
+    { destinationName: "Piazza del Colosseo", nights: 0, dateRange: "Evening",
+      description: "Meet at the Colosseum metro exit for sunset views.", lat: 41.890, lng: 12.492,
+      accommodation: { hotelName: "Walking tour — no overnight", stars: 0, checkIn: "—", checkOut: "—", checkInISO: "", checkOutISO: "", roomType: "—", boardType: "—" },
+      activities: [] },
+    { destinationName: "Trevi Fountain", nights: 0, dateRange: "Evening",
+      description: "Toss a coin and hear the legend behind it.", lat: 41.901, lng: 12.483,
+      accommodation: { hotelName: "Walking tour — no overnight", stars: 0, checkIn: "—", checkOut: "—", checkInISO: "", checkOutISO: "", roomType: "—", boardType: "—" },
+      activities: [] },
+    { destinationName: "Pantheon", nights: 0, dateRange: "Evening",
+      description: "End at the floodlit portico with an aperitivo.", lat: 41.899, lng: 12.477,
+      accommodation: { hotelName: "Walking tour — no overnight", stars: 0, checkIn: "—", checkOut: "—", checkInISO: "", checkOutISO: "", roomType: "—", boardType: "—" },
+      activities: [] },
+  ],
+};
+
+// 9. KYOTO STREET FOOD CRAWL — walking tour (1 day)
+export const KYOTO_FOOD_CRAWL: Activity = {
+  activityId: "kyoto-food-crawl",
+  type: "walking-tour",
+  title: "Kyoto Street Food Crawl",
+  subtitle:
+    "Six tastings through Nishiki Market and the Gion district with a local foodie guide.",
+  mainImage: "https://images.unsplash.com/photo-1554797589-7241bb691973?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1554797589-7241bb691973?w=1200&q=80",
+    "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=1200&q=80",
+    "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=1200&q=80",
+  ],
+  location: "Kyoto, Japan",
+  durationDays: 1,
+  startDate: "Daily, 11:00",
+  endDate: "Daily, 15:00",
+  price: { perPerson: 85, total: 170, currency: "EUR" },
+  rating: { score: 4.9, reviewCount: 1583 },
+  difficulty: "Easy",
+  distanceKm: 3,
+  highlights: [
+    "Six street-food tastings",
+    "Nishiki Market — Kyoto's 400-year-old food street",
+    "Matcha workshop at a Gion teahouse",
+  ],
+  included: ["Four-hour licensed foodie guide", "All six tastings", "Bottled water"],
+  excluded: ["Hotel transfers", "Drinks beyond water"],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 8 guests" },
+    { iconKey: "activity", title: "Activity level", value: "Easy walking" },
+    { iconKey: "languages", title: "Language", value: "English" },
+    { iconKey: "calendar-check", title: "Min age", value: "12+" },
+  ],
+  routeStops: [
+    { destinationName: "Nishiki Market", nights: 0, dateRange: "Late morning",
+      description: "Tastings of pickles, tamagoyaki, and yuba.", lat: 35.005, lng: 135.764,
+      accommodation: { hotelName: "Walking tour — no overnight", stars: 0, checkIn: "—", checkOut: "—", checkInISO: "", checkOutISO: "", roomType: "—", boardType: "—" },
+      activities: [] },
+    { destinationName: "Gion district", nights: 0, dateRange: "Afternoon",
+      description: "Matcha workshop in a 200-year-old teahouse.", lat: 35.003, lng: 135.775,
+      accommodation: { hotelName: "Walking tour — no overnight", stars: 0, checkIn: "—", checkOut: "—", checkInISO: "", checkOutISO: "", roomType: "—", boardType: "—" },
+      activities: [] },
+  ],
+};
+
+// 10. LAKE GENEVA SUNSET CRUISE — river cruise (1 day)
+export const LAKE_GENEVA_CRUISE: Activity = {
+  activityId: "lake-geneva-sunset-cruise",
+  type: "river-cruise",
+  title: "Lake Geneva Sunset Cruise",
+  subtitle:
+    "A two-hour catamaran sail past the Château de Chillon with a glass of Lavaux wine.",
+  mainImage: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?w=1200&q=80",
+    "https://images.unsplash.com/photo-1527142879-95b61a0b8226?w=1200&q=80",
+  ],
+  location: "Montreux → Chillon → Montreux",
+  durationDays: 1,
+  startDate: "Daily, 18:00",
+  endDate: "Daily, 20:00",
+  price: { perPerson: 60, total: 120, currency: "CHF" },
+  rating: { score: 4.7, reviewCount: 894 },
+  highlights: [
+    "Sunset over the Alps from the deck",
+    "Pass the Château de Chillon castle",
+    "Glass of Lavaux Chasselas included",
+  ],
+  included: ["Two-hour catamaran cruise", "Welcome glass of Lavaux wine", "Light cheese platter"],
+  excluded: ["Additional drinks", "Hotel transfers"],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 40 guests" },
+    { iconKey: "activity", title: "Activity level", value: "Relaxed" },
+    { iconKey: "languages", title: "Language", value: "English, French, German" },
+    { iconKey: "calendar-check", title: "Min age", value: "0+" },
+  ],
+  cruise: {
+    ship: "MS Lavaux",
+    ports: [
+      { name: "Montreux pier", day: 1, departs: "18:00",
+        description: "Board on the Quai du Casino at sunset." },
+      { name: "Château de Chillon", day: 1, arrives: "19:00", departs: "19:15",
+        description: "Slow pass past the medieval lakeside castle." },
+      { name: "Montreux pier", day: 1, arrives: "20:00",
+        description: "Disembark with the Alps still glowing pink." },
+    ],
+    cabinTypes: [
+      { name: "Open Deck Seat", pricePerPerson: 60, capacity: 1,
+        description: "Standard seating on the upper deck with full panoramic views.",
+        image: "https://images.unsplash.com/photo-1527142879-95b61a0b8226?w=900&q=80" },
+      { name: "Captain's Lounge", pricePerPerson: 95, capacity: 1,
+        description: "Reserved table in the glass-walled lounge with table service.",
+        image: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?w=900&q=80" },
+    ],
+  },
+};
+
+// 11. GRAND CANYON HELICOPTER — expedition (1 day)
+export const GRAND_CANYON_HELI: Activity = {
+  activityId: "grand-canyon-helicopter",
+  type: "expedition",
+  title: "Grand Canyon Helicopter Tour",
+  subtitle:
+    "A 45-minute helicopter ride from Vegas over the West Rim with a Champagne landing.",
+  mainImage: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=1200&q=80",
+    "https://images.unsplash.com/photo-1502786129293-79981df4e689?w=1200&q=80",
+  ],
+  location: "Las Vegas → Grand Canyon West Rim",
+  durationDays: 1,
+  startDate: "Daily departures",
+  endDate: "Daily departures",
+  price: { perPerson: 399, total: 798, currency: "USD" },
+  rating: { score: 4.8, reviewCount: 3056 },
+  highlights: [
+    "45-minute helicopter flight",
+    "Landing on the canyon floor",
+    "Champagne toast at landing site",
+  ],
+  included: ["Round-trip Vegas Strip hotel pickup", "Helicopter flight", "Champagne picnic"],
+  excluded: ["Park entry fees outside the West Rim", "Gratuities", "Travel insurance"],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 6 guests per heli" },
+    { iconKey: "activity", title: "Activity level", value: "Easy" },
+    { iconKey: "languages", title: "Language", value: "English" },
+    { iconKey: "calendar-check", title: "Min age", value: "2+" },
+  ],
+  itineraryDays: [
+    { dayNumber: 1, title: "Vegas to West Rim and back", location: "Grand Canyon West",
+      items: [
+        { type: "highlight", label: "Hotel pickup", description: "Limousine transfer from Vegas Strip to helipad." },
+        { type: "highlight", label: "Scenic flight", description: "45-minute flight over Hoover Dam, Lake Mead, and the canyon rim." },
+        { type: "highlight", label: "Canyon-floor landing", description: "Champagne picnic 4,000ft below the rim." },
+      ],
+      image: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=1200&q=80" },
+  ],
+};
+
+// 12. CHAMPAGNE VINEYARD DAY TRIP — multi-day tour (1 day)
+export const CHAMPAGNE_DAY_TRIP: Activity = {
+  activityId: "champagne-day-trip",
+  type: "multi-day-tour",
+  title: "Champagne Vineyard Day Trip",
+  subtitle:
+    "Reims and Épernay cellar visits with three tastings — round-trip from Paris by minibus.",
+  mainImage: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1200&q=80",
+    "https://images.unsplash.com/photo-1568213816046-0ee1c42bd559?w=1200&q=80",
+  ],
+  location: "Paris → Reims → Épernay → Paris",
+  durationDays: 1,
+  startDate: "Daily, 07:30",
+  endDate: "Daily, 19:30",
+  price: { perPerson: 189, total: 378, currency: "EUR" },
+  rating: { score: 4.7, reviewCount: 1284 },
+  highlights: [
+    "Visit a Grand Cru house in Reims",
+    "Small-producer cellar in Épernay",
+    "Three tastings with vineyard lunch",
+  ],
+  included: ["Round-trip minibus from Paris", "Two cellar visits", "Three tastings", "Vineyard lunch"],
+  excluded: ["Hotel transfers in Paris", "Additional bottle purchases"],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 8 guests" },
+    { iconKey: "activity", title: "Activity level", value: "Easy" },
+    { iconKey: "languages", title: "Language", value: "English, French" },
+    { iconKey: "calendar-check", title: "Min age", value: "18+" },
+  ],
+  itineraryDays: [
+    { dayNumber: 1, title: "Paris → Reims → Épernay → Paris", location: "Champagne region",
+      items: [
+        { type: "highlight", label: "Morning pickup in Paris", description: "Meet your guide at Place de la Concorde at 07:30." },
+        { type: "highlight", label: "Reims Grand Cru visit", description: "Tour the chalk cellars of a famous champagne house." },
+        { type: "highlight", label: "Vineyard lunch in Épernay", description: "Three-course lunch paired with two cuvées." },
+        { type: "highlight", label: "Small-producer tasting", description: "Family-owned vineyard with three further pours." },
+      ],
+      image: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1200&q=80" },
+  ],
+};
+
+// 13. CAPPADOCIA HOT-AIR BALLOON — expedition (1 day)
+export const CAPPADOCIA_BALLOON: Activity = {
+  activityId: "cappadocia-hot-air-balloon",
+  type: "expedition",
+  title: "Cappadocia Hot-Air Balloon",
+  subtitle:
+    "Sunrise float over fairy chimneys and ancient cave villages — toast with a glass of fizz.",
+  mainImage: "https://images.unsplash.com/photo-1641128324972-af3212f0f6bd?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1641128324972-af3212f0f6bd?w=1200&q=80",
+    "https://images.unsplash.com/photo-1600190083125-95a4d27e23da?w=1200&q=80",
+  ],
+  location: "Göreme, Cappadocia",
+  durationDays: 1,
+  startDate: "Sunrise, daily",
+  endDate: "Sunrise, daily",
+  price: { perPerson: 230, total: 460, currency: "EUR" },
+  rating: { score: 4.9, reviewCount: 5421 },
+  highlights: [
+    "Sunrise launch with 100+ balloons",
+    "Views over Göreme valley",
+    "Champagne toast on landing",
+  ],
+  included: ["Hotel pickup at 04:30", "1-hour balloon flight", "Champagne toast", "Flight certificate"],
+  excluded: ["Travel insurance", "Gratuities"],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 20 per balloon" },
+    { iconKey: "activity", title: "Activity level", value: "Easy" },
+    { iconKey: "languages", title: "Language", value: "English, Turkish" },
+    { iconKey: "calendar-check", title: "Min age", value: "6+" },
+  ],
+  itineraryDays: [
+    { dayNumber: 1, title: "Pre-dawn flight over Cappadocia", location: "Göreme",
+      items: [
+        { type: "highlight", label: "Hotel pickup", description: "04:30 — minibus transfer to the launch site." },
+        { type: "highlight", label: "Sunrise inflation", description: "Watch the burner light as 100 balloons rise together." },
+        { type: "highlight", label: "1-hour flight", description: "Drift over fairy chimneys and cave-cut churches." },
+        { type: "highlight", label: "Champagne landing", description: "Traditional toast and certificate on touchdown." },
+      ],
+      image: "https://images.unsplash.com/photo-1641128324972-af3212f0f6bd?w=1200&q=80" },
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ICONIC EVENTS — bookable trips built around world-famous occasions.
+// All use type "multi-day-tour" because that's the closest existing shape
+// (hotel + itinerary + tickets-included package). If/when "Events" becomes
+// a first-class ActivityType, swap the type field and update the search-form
+// filter pills accordingly — no other changes needed here.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// 14. WIMBLEDON CHAMPIONSHIPS
+export const WIMBLEDON_PACKAGE: Activity = {
+  activityId: "wimbledon-package",
+  type: "multi-day-tour",
+  title: "Wimbledon Championships — Match Day Package",
+  subtitle:
+    "Centre Court grass-court tennis with strawberries and cream — the world's oldest tennis tournament.",
+  mainImage: "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=1200&q=80",
+    "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=1200&q=80",
+  ],
+  location: "London, United Kingdom",
+  durationDays: 2,
+  startDate: "Jul 04, 2026",
+  endDate: "Jul 05, 2026",
+  price: { perPerson: 180, total: 360, currency: "GBP" },
+  rating: { score: 4.9, reviewCount: 612 },
+  highlights: [
+    "Centre Court or Court 1 ticket",
+    "Strawberries and cream tradition",
+    "Welcome reception in a Wimbledon hospitality marquee",
+  ],
+  included: ["One match-day ticket", "One night at a 4-star Wimbledon Village hotel", "Hospitality reception", "Underground travelcard"],
+  excluded: ["International flights to London", "Additional Wimbledon merchandise"],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Individual booking" },
+    { iconKey: "activity", title: "Activity level", value: "Easy" },
+    { iconKey: "languages", title: "Language", value: "English" },
+    { iconKey: "calendar-check", title: "Min age", value: "8+" },
+  ],
+  itineraryDays: [
+    { dayNumber: 1, title: "Match day", location: "All England Club, Wimbledon",
+      items: [
+        { type: "highlight", label: "Centre Court / Court 1 entry", description: "Reserved seating for one full session of play." },
+        { type: "highlight", label: "Strawberries and cream", description: "The signature tournament treat — included." },
+        { type: "hotel", label: "Cannizaro House Hotel **** or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=1200&q=80" },
+    { dayNumber: 2, title: "Departure", location: "London",
+      items: [
+        { type: "highlight", label: "Late check-out", description: "Time for shopping or a Thames walk before flying home." },
+      ],
+      image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80" },
+  ],
+};
+
+// 15. MONACO GRAND PRIX
+export const MONACO_GP_PACKAGE: Activity = {
+  activityId: "monaco-gp-package",
+  type: "multi-day-tour",
+  title: "Monaco Grand Prix — Race Weekend",
+  subtitle:
+    "Formula 1 racing through the streets of Monte-Carlo — the crown jewel of the F1 calendar.",
+  mainImage: "https://images.unsplash.com/photo-1518542698050-a3041b27d5b2?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1518542698050-a3041b27d5b2?w=1200&q=80",
+    "https://images.unsplash.com/photo-1483721310020-03333e577078?w=1200&q=80",
+  ],
+  location: "Monte-Carlo, Monaco",
+  durationDays: 3,
+  startDate: "May 22, 2026",
+  endDate: "May 24, 2026",
+  price: { perPerson: 1250, total: 2500, currency: "EUR" },
+  rating: { score: 4.8, reviewCount: 348 },
+  highlights: [
+    "Grandstand seat for Saturday qualifying + Sunday race",
+    "Yacht-side viewing optional",
+    "Pre-race paddock walk",
+  ],
+  included: ["3-day grandstand pass", "Two nights at a Monte-Carlo 5-star", "Paddock walk", "Welcome cocktail at Casino Square"],
+  excluded: ["International flights to Nice", "Additional pit-lane access"],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Individual booking" },
+    { iconKey: "activity", title: "Activity level", value: "Easy" },
+    { iconKey: "languages", title: "Language", value: "English, French" },
+    { iconKey: "calendar-check", title: "Min age", value: "12+" },
+  ],
+  itineraryDays: [
+    { dayNumber: 1, title: "Free practice", location: "Monte-Carlo",
+      items: [
+        { type: "highlight", label: "Friday practice sessions", description: "Watch the world's fastest cars on the most demanding street circuit." },
+        { type: "hotel", label: "Hôtel de Paris Monte-Carlo ***** or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1483721310020-03333e577078?w=1200&q=80" },
+    { dayNumber: 2, title: "Qualifying day", location: "Monte-Carlo",
+      items: [
+        { type: "highlight", label: "Qualifying session", description: "The session that defines the race — pole at Monaco is everything." },
+        { type: "highlight", label: "Casino Square cocktail reception", description: "Evening reception with fellow race fans." },
+      ],
+      image: "https://images.unsplash.com/photo-1518542698050-a3041b27d5b2?w=1200&q=80" },
+    { dayNumber: 3, title: "Race day", location: "Monte-Carlo",
+      items: [
+        { type: "highlight", label: "Grand Prix race", description: "78 laps of the most iconic circuit in motorsport." },
+      ],
+      image: "https://images.unsplash.com/photo-1518542698050-a3041b27d5b2?w=1200&q=80" },
+  ],
+};
+
+// 16. TCS NEW YORK CITY MARATHON
+export const NYC_MARATHON_PACKAGE: Activity = {
+  activityId: "nyc-marathon-package",
+  type: "multi-day-tour",
+  title: "TCS New York City Marathon",
+  subtitle:
+    "26.2 miles through all five boroughs on the first Sunday of November — 50,000 runners, two million spectators.",
+  mainImage: "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=1200&q=80",
+    "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=1200&q=80",
+  ],
+  location: "New York City, USA",
+  durationDays: 4,
+  startDate: "Oct 30, 2026",
+  endDate: "Nov 02, 2026",
+  price: { perPerson: 349, total: 698, currency: "USD" },
+  rating: { score: 4.9, reviewCount: 1842 },
+  highlights: [
+    "Guaranteed marathon entry",
+    "Race-day finish-line spectator pass for one guest",
+    "Pre-race pasta dinner",
+  ],
+  included: ["Marathon bib + chip", "Three nights at a Midtown 4-star", "Pre-race pasta dinner", "Race-morning Staten Island ferry transfer"],
+  excluded: ["International flights to JFK", "Recovery massage", "Travel insurance"],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Solo runner package" },
+    { iconKey: "activity", title: "Activity level", value: "Endurance" },
+    { iconKey: "languages", title: "Language", value: "English" },
+    { iconKey: "calendar-check", title: "Min age", value: "18+" },
+  ],
+  itineraryDays: [
+    { dayNumber: 1, title: "Arrival + race expo", location: "Manhattan",
+      items: [
+        { type: "highlight", label: "Race-pack collection", description: "Pick up your bib + finisher's tee at the Javits Center expo." },
+        { type: "hotel", label: "The Bryant Park Hotel **** or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=1200&q=80" },
+    { dayNumber: 2, title: "Carb-load + course recce", location: "Central Park",
+      items: [
+        { type: "highlight", label: "Easy 3km shake-out run", description: "Optional group jog through Central Park." },
+        { type: "highlight", label: "Pre-race pasta dinner", description: "Together with your fellow runners." },
+      ],
+      image: "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=1200&q=80" },
+    { dayNumber: 3, title: "Race day", location: "All five boroughs",
+      items: [
+        { type: "highlight", label: "26.2 miles", description: "Staten Island to Central Park via Brooklyn, Queens, the Bronx, and Manhattan." },
+        { type: "highlight", label: "Finish-line celebration", description: "Recovery food and medal at the finisher's village." },
+      ],
+      image: "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=1200&q=80" },
+    { dayNumber: 4, title: "Departure", location: "JFK",
+      items: [
+        { type: "highlight", label: "Recovery breakfast", description: "Easy morning before your flight home." },
+      ],
+      image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=1200&q=80" },
+  ],
+};
+
+// 17. MUNICH OKTOBERFEST
+export const OKTOBERFEST_PACKAGE: Activity = {
+  activityId: "oktoberfest-package",
+  type: "multi-day-tour",
+  title: "Munich Oktoberfest — Beer Tent Package",
+  subtitle:
+    "The world's biggest beer festival — 14 vast tents, lederhosen and brass bands.",
+  mainImage: "https://images.unsplash.com/photo-1601057344679-2d2f1c0e9bf8?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1601057344679-2d2f1c0e9bf8?w=1200&q=80",
+    "https://images.unsplash.com/photo-1568274656915-5d83d29f5cdb?w=1200&q=80",
+  ],
+  location: "Munich, Germany",
+  durationDays: 3,
+  startDate: "Sep 26, 2026",
+  endDate: "Sep 28, 2026",
+  price: { perPerson: 690, total: 1380, currency: "EUR" },
+  rating: { score: 4.7, reviewCount: 982 },
+  highlights: [
+    "Reserved table in a Hofbräu tent",
+    "Two-litre stein and pretzel welcome",
+    "Theresienwiese fairground tickets",
+  ],
+  included: ["Three-day tent reservation", "Two nights at a Munich 4-star", "Welcome stein + pretzel", "Optional traditional lederhosen rental"],
+  excluded: ["International flights to Munich", "Additional drinks beyond welcome stein"],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Tables of 8" },
+    { iconKey: "activity", title: "Activity level", value: "Easy" },
+    { iconKey: "languages", title: "Language", value: "English, German" },
+    { iconKey: "calendar-check", title: "Min age", value: "18+" },
+  ],
+  itineraryDays: [
+    { dayNumber: 1, title: "Arrival + welcome stein", location: "Munich",
+      items: [
+        { type: "highlight", label: "Hotel check-in", description: "Drop bags in the Altstadt." },
+        { type: "highlight", label: "Welcome reception", description: "Stein and pretzel at the Hofbräuhaus." },
+        { type: "hotel", label: "Platzl Hotel **** or similar" },
+      ],
+      image: "https://images.unsplash.com/photo-1601057344679-2d2f1c0e9bf8?w=1200&q=80" },
+    { dayNumber: 2, title: "Festival day", location: "Theresienwiese",
+      items: [
+        { type: "highlight", label: "Tent reservation", description: "Reserved table in a Hofbräu Festzelt — brass bands and a litre of Oktoberfestbier." },
+        { type: "highlight", label: "Fairground rides", description: "Wooden rollercoasters, Ferris wheel, and traditional games." },
+      ],
+      image: "https://images.unsplash.com/photo-1568274656915-5d83d29f5cdb?w=1200&q=80" },
+    { dayNumber: 3, title: "Departure", location: "Munich",
+      items: [
+        { type: "highlight", label: "Slow morning + Viktualienmarkt", description: "Bavarian breakfast before flying home." },
+      ],
+      image: "https://images.unsplash.com/photo-1601057344679-2d2f1c0e9bf8?w=1200&q=80" },
+  ],
+};
+
+// 18. RIO DE JANEIRO CARNIVAL
+export const RIO_CARNIVAL_PACKAGE: Activity = {
+  activityId: "rio-carnival-package",
+  type: "multi-day-tour",
+  title: "Rio de Janeiro Carnival",
+  subtitle:
+    "Samba parades at the Sambódromo and city-wide street blocos — the week before Lent.",
+  mainImage: "https://images.unsplash.com/photo-1518963272958-29c5e2dafde6?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1518963272958-29c5e2dafde6?w=1200&q=80",
+    "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1200&q=80",
+  ],
+  location: "Rio de Janeiro, Brazil",
+  durationDays: 4,
+  startDate: "Feb 14, 2026",
+  endDate: "Feb 17, 2026",
+  price: { perPerson: 1290, total: 2580, currency: "USD" },
+  rating: { score: 4.8, reviewCount: 526 },
+  highlights: [
+    "Sambódromo grandstand for the main parade night",
+    "Street bloco passes",
+    "Sugarloaf Mountain cable car",
+  ],
+  included: ["Sambódromo ticket", "Three nights at a Copacabana beachfront 4-star", "Street bloco guide", "Sugarloaf cable car"],
+  excluded: ["International flights to GIG", "Costume rental for parading"],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 12 guests" },
+    { iconKey: "activity", title: "Activity level", value: "Moderate (lots of dancing)" },
+    { iconKey: "languages", title: "Language", value: "English, Portuguese" },
+    { iconKey: "calendar-check", title: "Min age", value: "16+" },
+  ],
+  itineraryDays: [
+    { dayNumber: 1, title: "Arrival on Copacabana", location: "Rio",
+      items: [
+        { type: "hotel", label: "Sofitel Rio Copacabana ***** or similar" },
+        { type: "highlight", label: "Beach welcome", description: "Caipirinha at sunset on Copacabana." },
+      ],
+      image: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1200&q=80" },
+    { dayNumber: 2, title: "Street blocos", location: "Centro + Lapa",
+      items: [
+        { type: "highlight", label: "Daytime bloco crawl", description: "Three of Rio's most loved street parties with a local guide." },
+        { type: "highlight", label: "Sugarloaf at dusk", description: "Two-stage cable car for sunset views." },
+      ],
+      image: "https://images.unsplash.com/photo-1518963272958-29c5e2dafde6?w=1200&q=80" },
+    { dayNumber: 3, title: "Sambódromo parade night", location: "Sambódromo",
+      items: [
+        { type: "highlight", label: "Grandstand seats", description: "Watch the top samba schools parade — show runs until dawn." },
+      ],
+      image: "https://images.unsplash.com/photo-1518963272958-29c5e2dafde6?w=1200&q=80" },
+    { dayNumber: 4, title: "Slow day + departure", location: "Rio",
+      items: [
+        { type: "highlight", label: "Beach recovery", description: "Lazy morning on Ipanema before flying home." },
+      ],
+      image: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1200&q=80" },
+  ],
+};
+
+// 19. EDINBURGH FESTIVAL FRINGE
+export const EDINBURGH_FRINGE_PACKAGE: Activity = {
+  activityId: "edinburgh-fringe-package",
+  type: "multi-day-tour",
+  title: "Edinburgh Festival Fringe",
+  subtitle:
+    "The world's largest arts festival — comedy, theatre, and street performers take over the city every August.",
+  mainImage: "https://images.unsplash.com/photo-1506377585622-bedcbb027afc?w=1600&q=80",
+  gallery: [
+    "https://images.unsplash.com/photo-1506377585622-bedcbb027afc?w=1200&q=80",
+    "https://images.unsplash.com/photo-1543393470-b2f8d5c166b1?w=1200&q=80",
+  ],
+  location: "Edinburgh, United Kingdom",
+  durationDays: 5,
+  startDate: "Aug 10, 2026",
+  endDate: "Aug 14, 2026",
+  price: { perPerson: 540, total: 1080, currency: "GBP" },
+  rating: { score: 4.8, reviewCount: 743 },
+  highlights: [
+    "Tickets to four headline Fringe shows",
+    "Free Royal Mile street performances",
+    "Edinburgh Castle skip-the-line entry",
+  ],
+  included: ["Four show tickets (curated mix)", "Four nights at an Old Town 4-star", "Castle entry", "Welcome whisky tasting"],
+  excluded: ["Additional show tickets", "Travel to/from Edinburgh"],
+  attributes: [
+    { iconKey: "users", title: "Group size", value: "Up to 10 guests" },
+    { iconKey: "activity", title: "Activity level", value: "Easy walking" },
+    { iconKey: "languages", title: "Language", value: "English" },
+    { iconKey: "calendar-check", title: "Min age", value: "12+" },
+  ],
+  itineraryDays: [
+    { dayNumber: 1, title: "Arrival + welcome whisky", location: "Edinburgh Old Town",
+      items: [
+        { type: "hotel", label: "The Witchery by the Castle **** or similar" },
+        { type: "highlight", label: "Whisky tasting", description: "Five-dram tasting in a tucked-away Old Town cellar." },
+      ],
+      image: "https://images.unsplash.com/photo-1543393470-b2f8d5c166b1?w=1200&q=80" },
+    { dayNumber: 2, title: "Royal Mile + headline show", location: "Edinburgh",
+      items: [
+        { type: "highlight", label: "Royal Mile street performers", description: "Free outdoor performances all day." },
+        { type: "highlight", label: "Headline comedy show", description: "Reserved seat at the Pleasance Courtyard." },
+      ],
+      image: "https://images.unsplash.com/photo-1506377585622-bedcbb027afc?w=1200&q=80" },
+    { dayNumber: 3, title: "Castle + theatre night", location: "Edinburgh",
+      items: [
+        { type: "highlight", label: "Edinburgh Castle entry", description: "Skip-the-line entry to the castle and crown jewels." },
+        { type: "highlight", label: "Theatre show", description: "Underground stage at a Fringe favourite venue." },
+      ],
+      image: "https://images.unsplash.com/photo-1543393470-b2f8d5c166b1?w=1200&q=80" },
+    { dayNumber: 4, title: "Two more shows + cabaret", location: "Edinburgh",
+      items: [
+        { type: "highlight", label: "Afternoon show", description: "Curated pick from this year's hottest tickets." },
+        { type: "highlight", label: "Late-night cabaret", description: "Spiegeltent under the stars." },
+      ],
+      image: "https://images.unsplash.com/photo-1506377585622-bedcbb027afc?w=1200&q=80" },
+    { dayNumber: 5, title: "Departure", location: "Edinburgh",
+      items: [
+        { type: "highlight", label: "Slow morning + brunch", description: "Easy departure after a final Edinburgh breakfast." },
+      ],
+      image: "https://images.unsplash.com/photo-1543393470-b2f8d5c166b1?w=1200&q=80" },
+  ],
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Combined dataset — everything ActivityListPage shows by default.
 // Add/remove from this list to change what shows up in search results.
@@ -767,6 +1393,20 @@ export const ALL_ACTIVITIES: Activity[] = [
   LOIRE_BICYCLE_TOUR,
   KENYA_SAFARI,
   ANTARCTICA_EXPEDITION,
+  // One-day experiences featured on Discovery
+  ROME_NIGHT_WALK,
+  KYOTO_FOOD_CRAWL,
+  LAKE_GENEVA_CRUISE,
+  GRAND_CANYON_HELI,
+  CHAMPAGNE_DAY_TRIP,
+  CAPPADOCIA_BALLOON,
+  // Iconic events featured on Discovery
+  WIMBLEDON_PACKAGE,
+  MONACO_GP_PACKAGE,
+  NYC_MARATHON_PACKAGE,
+  OKTOBERFEST_PACKAGE,
+  RIO_CARNIVAL_PACKAGE,
+  EDINBURGH_FRINGE_PACKAGE,
 ];
 
 // Quick lookup — ActivityListPage / DiscoveryPage can resolve clicks by id.
