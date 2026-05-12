@@ -4845,7 +4845,7 @@ export const LAKE_GARDA_BUS_TOUR: Tour = {
     "4★ Hotel Bella Lazise",
   ],
   // Lake Garda hero shot (Unsplash)
-  mainImage: "https://images.unsplash.com/photo-1583266093066-fbe43d9caa83?w=1200&q=80",
+  mainImage: "https://images.unsplash.com/photo-1530538095376-a4936b35b5f0?w=1200&q=80",
   price: {
     perPerson: 649,
     total: 1298,
@@ -4873,10 +4873,10 @@ export const LAKE_GARDA_BUS_TOUR: Tour = {
   // ── Photo gallery ─────────────────────────────────────────────────────────
   // Six landscape photos of Lake Garda, Sirmione, Bardolino, and the wine festival
   gallery: [
-    "https://images.unsplash.com/photo-1583266093066-fbe43d9caa83?w=800&q=80", // Lake Garda
+    "https://images.unsplash.com/photo-1530538095376-a4936b35b5f0?w=800&q=80", // Lake Garda
     "https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=800&q=80", // Sirmione
     "https://images.unsplash.com/photo-1568213816046-0ee1c42bd559?w=800&q=80", // Wine tasting / Bardolino
-    "https://images.unsplash.com/photo-1505976058322-6b1e1d8045b9?w=800&q=80", // Vineyards
+    "https://images.unsplash.com/photo-1473773508845-188df298d2d1?w=800&q=80", // Vineyards
     "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80", // Italian lakeside town
     "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80", // Alpine lake scenery
   ],
@@ -4970,7 +4970,7 @@ export const LAKE_GARDA_BUS_TOUR: Tour = {
           description: "Comfortable return journey to your original pickup point.",
         },
       ],
-      image: "https://images.unsplash.com/photo-1505976058322-6b1e1d8045b9?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1473773508845-188df298d2d1?w=800&q=80",
     },
   ],
 

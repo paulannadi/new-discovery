@@ -293,13 +293,13 @@ export const DISNEY_CRUISE: Cruise = {
     "https://images.unsplash.com/photo-1583416750470-965b2707b355?w=1600&q=80",
   gallery: [
     // Bahamas turquoise water — Castaway-style private island
-    "https://images.unsplash.com/photo-1591456983933-0aa3afc6b9e7?w=1200&q=80",
+    "https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?w=1200&q=80",
     // Nassau pastel colonial houses
-    "https://images.unsplash.com/photo-1568554350082-3c66e7b08bb1?w=1200&q=80",
+    "https://images.unsplash.com/photo-1546484959-f9a381d1330d?w=1200&q=80",
     // White-sand beach with palm
     "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
     // Big cruise ship at sea
-    "https://images.unsplash.com/photo-1565627088170-1d18d40c0e90?w=1200&q=80",
+    "https://images.unsplash.com/photo-1556881286-fc6915169721?w=1200&q=80",
   ],
 
   durationNights: 4,
@@ -575,7 +575,7 @@ export const ALASKA_CRUISE: Cruise = {
     "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600&q=80",
   gallery: [
     // Seattle skyline / Space Needle — embarkation port
-    "https://images.unsplash.com/photo-1502175353174-a7a153c3a27f?w=1200&q=80",
+    "https://images.unsplash.com/photo-1542223189-67a03fa0f0bd?w=1200&q=80",
     // Alaska mountains & forest — Inside Passage scenery
     "https://images.unsplash.com/photo-1473448912268-2022ce9509d8?w=1200&q=80",
     // Whale breaching — Juneau whale-watching highlight

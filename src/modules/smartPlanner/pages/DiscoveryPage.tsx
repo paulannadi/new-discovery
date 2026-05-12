@@ -192,13 +192,13 @@ const tourImg = (id: number) => DISCOVERY_TOUR_MAP[id]?.mainImage ?? "";
 const TOUR_CARDS = [
   { id: 1, country: "Thailand", flag: "th", title: "Classic Thailand Explorer", desc: "Perfect introduction to Thailand with Bangkok temples, cultural experiences, and island hopping.", duration: "8 days", price: "from $1,650", image: tourImg(1) },
   { id: 2, country: "Indonesia", flag: "id", title: "Cultural Bali Discovery", desc: "Immerse yourself in Balinese culture with traditional villages, temples, and artisan workshops.", duration: "8 days", price: "from $1,980", image: tourImg(2) },
+  // Bus tour — also surfaced under the "Bus Tours" tab in "Travel the way you like".
+  // Lives here so it appears in the Culture & History travel style carousel too.
+  { id: 22, country: "Italy", flag: "it", title: "Lake Garda Wine Festival Bus Tour", desc: "4-day coach tour from Germany to Italy's Lake Garda with the Bardolino wine festival.", duration: "4 days", price: "from €649", image: tourImg(22) },
   { id: 3, country: "Peru", flag: "pe", title: "Classic Peru Adventure", desc: "The ultimate Peru experience with Machu Picchu, Sacred Valley, and Lima exploration.", duration: "8 days", price: "from $1,980", image: tourImg(3) },
   { id: 4, country: "Thailand", flag: "th", title: "Island Paradise", desc: "Focus on Thailand's stunning islands with beach time, snorkeling, and tropical adventures.", duration: "9 days", price: "from $1,790", image: tourImg(4) },
   { id: 5, country: "Peru", flag: "pe", title: "Inca Trail Adventure", desc: "For the adventurous traveler: trek the classic Inca Trail to Machu Picchu.", duration: "8 days", price: "from $2,450", image: tourImg(5) },
   { id: 6, country: "Peru", flag: "pe", title: "Amazon & Andes", desc: "Experience Peru's diverse landscapes from Amazon rainforest to high-altitude lakes.", duration: "10 days", price: "from $2,180", image: tourImg(6) },
-  // Bus tour — also surfaced under the "Bus Tours" tab in "Travel the way you like".
-  // Lives here so it appears in the Culture & History travel style carousel too.
-  { id: 22, country: "Italy", flag: "it", title: "Lake Garda Wine Festival Bus Tour", desc: "4-day coach tour from Germany to Italy's Lake Garda with the Bardolino wine festival.", duration: "4 days", price: "from €649", image: tourImg(22) },
 ];
 
 // ─── Experiences tab — sample data ────────────────────────────────────────────
@@ -481,7 +481,7 @@ const TRIP_TYPE_CARDS: Record<TripTypeId, { id: number; title: string; destinati
   ],
   "bus-tour": [
     // `tourId: 22` jumps the click handler straight to the matching tour in DISCOVERY_TOUR_MAP.
-    { id: 16, tourId: 22, title: "Lake Garda Wine Festival Bus Tour", destination: "Lazise, Italy", flag: "it", desc: "4-day coach tour from Germany to Italy's Lake Garda with the Bardolino wine festival.", image: "https://images.unsplash.com/photo-1583266093066-fbe43d9caa83?w=800&q=80", duration: "4 days", price: "from €649" },
+    { id: 16, tourId: 22, title: "Lake Garda Wine Festival Bus Tour", destination: "Lazise, Italy", flag: "it", desc: "4-day coach tour from Germany to Italy's Lake Garda with the Bardolino wine festival.", image: "https://images.unsplash.com/photo-1530538095376-a4936b35b5f0?w=800&q=80", duration: "4 days", price: "from €649" },
   ],
 };
 
