@@ -362,32 +362,43 @@ export function SeatChartDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      {/* Width strategy:
-            • Mobile (<sm): w-full — the chart needs every horizontal pixel
-              and full-screen feels like a natural mobile drawer.
-            • sm+:  capped at max-w-2xl (672px) so it doesn't span huge
-              desktop monitors.
-            • lg+:  bumped to max-w-3xl (768px) for extra breathing room.
-          We also override the default w-3/4 (which would only give 75% on
-          mobile — too cramped for a 5-wide back row). */}
+      {/* Width strategy — matches the production TripBuilder `DrawerLayout`
+          pattern (`w-full md:w-[70%] max-w-[1200px]`):
+            • Mobile (<md): w-full — full-screen takeover. The seat chart
+              needs every horizontal pixel on a phone, and full-screen feels
+              like a natural mobile drawer.
+            • Tablet/Desktop (md+): w-[70%] of the viewport — substantial
+              presence without dominating the screen.
+            • Capped at max-w-[1200px] so it doesn't stretch absurdly wide
+              on ultra-wide monitors.
+          The `sm:max-w-[1200px]` override is needed to defeat the default
+          `sm:max-w-sm` (384px) in the shared Sheet component. */}
       <SheetContent
         side="right"
-        className="w-full sm:max-w-2xl lg:max-w-3xl flex flex-col gap-0 p-0 bg-grey-lightest"
+        className="w-full md:w-[70%] sm:max-w-[1200px] flex flex-col gap-0 p-0 bg-grey-lightest"
       >
-        <SheetHeader className="px-5 sm:px-8 md:px-10 pt-6 sm:pt-8 pb-2">
-          <SheetTitle className="text-2xl md:text-3xl font-extrabold text-foreground">
-            Select seats
-          </SheetTitle>
-          {/* sr-only description keeps Radix happy (a11y) without showing
-              extra copy in the drawer header. */}
-          <SheetDescription className="sr-only">
-            Pick {passengerCount} seat{passengerCount !== 1 ? "s" : ""} for your coach journey.
-          </SheetDescription>
+        {/* Header + body + footer all wrap their inner content in a
+            `max-w-3xl mx-auto` band. The drawer itself can be ~1200px wide
+            (matching production), but pulling the content to a comfortable
+            reading column keeps everything cohesive — the seat chart isn't
+            stranded in the middle of a huge expanse. */}
+        <SheetHeader className="px-5 sm:px-8 md:px-12 lg:px-16 pt-6 sm:pt-8 pb-2">
+          <div className="max-w-3xl mx-auto w-full">
+            <SheetTitle className="text-2xl md:text-3xl font-extrabold text-foreground">
+              Select seats
+            </SheetTitle>
+            {/* sr-only description keeps Radix happy (a11y) without showing
+                extra copy in the drawer header. */}
+            <SheetDescription className="sr-only">
+              Pick {passengerCount} seat{passengerCount !== 1 ? "s" : ""} for your coach journey.
+            </SheetDescription>
+          </div>
         </SheetHeader>
 
         {/* Scrollable body — trip context + the seat chart card.
             flex-1 lets the footer stay pinned to the bottom. */}
-        <div className="flex-1 overflow-y-auto px-5 sm:px-8 md:px-10 pb-6 space-y-4">
+        <div className="flex-1 overflow-y-auto px-5 sm:px-8 md:px-12 lg:px-16 pb-6">
+          <div className="max-w-3xl mx-auto space-y-4">
 
           {/* Trip context — matches the SmartPlanner card header style.
               We also show progress towards the seat-count cap so users
@@ -446,19 +457,24 @@ export function SeatChartDrawer({
               )}
             </div>
           </div>
+          </div>{/* /max-w-3xl content band */}
         </div>
 
         {/* Footer — primary action right-aligned, like the Figma reference.
-            Disabled until the user has picked the right number of seats. */}
-        <SheetFooter className="px-5 sm:px-8 md:px-10 pb-6 sm:pb-8 pt-4 bg-grey-lightest border-t border-border flex-row justify-end">
-          <Button
-            onClick={handleConfirm}
-            size="lg"
-            className="min-w-40"
-            disabled={!isComplete}
-          >
-            Confirm selection
-          </Button>
+            Disabled until the user has picked the right number of seats.
+            We re-apply the same max-w-3xl band so the Confirm button lines
+            up with the content above it inside the wide drawer. */}
+        <SheetFooter className="px-5 sm:px-8 md:px-12 lg:px-16 pb-6 sm:pb-8 pt-4 bg-grey-lightest border-t border-border">
+          <div className="max-w-3xl mx-auto w-full flex justify-end">
+            <Button
+              onClick={handleConfirm}
+              size="lg"
+              className="min-w-40"
+              disabled={!isComplete}
+            >
+              Confirm selection
+            </Button>
+          </div>
         </SheetFooter>
       </SheetContent>
     </Sheet>

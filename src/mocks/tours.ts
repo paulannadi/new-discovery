@@ -1593,7 +1593,7 @@ export const CANCUN_RIVIERA_TOUR: Tour = {
     "Tulum Mayan ruins",
     "Playa del Carmen",
   ],
-  mainImage: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80",
+  mainImage: "https://images.unsplash.com/photo-1561577101-aa749bffbb70?w=1600&q=80",
   price: { perPerson: 1899, total: 3798, currency: "GBP", paidBefore: 999, paidAtDestination: 900 },
   startDate: "Apr 28, 2026",
   endDate: "May 08, 2026",
@@ -1605,10 +1605,10 @@ export const CANCUN_RIVIERA_TOUR: Tour = {
     { iconKey: "calendar-check",  title: "Min age",     value: "16+" },
   ],
   gallery: [
-    "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80",
-    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
-    "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80",
-    "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80",
+    "https://images.unsplash.com/photo-1561577101-aa749bffbb70?w=1200&q=80",
+    "https://images.unsplash.com/photo-1565358720137-55235e0878a2?w=1200&q=80",
+    "https://images.unsplash.com/photo-1522093243371-296c79a66df4?w=1200&q=80",
+    "https://images.unsplash.com/photo-1597351183340-ebd88b18ed6b?w=1200&q=80",
   ],
   days: [
     {
@@ -1618,7 +1618,7 @@ export const CANCUN_RIVIERA_TOUR: Tour = {
         { type: "highlight", label: "Arrive at Cancún International Airport", description: "Welcome briefing and check-in at your Hotel Zone resort." },
         { type: "hotel", label: "Moon Palace or similar" },
       ],
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1565358720137-55235e0878a2?w=1200&q=80",
     },
     {
       dayNumber: 2,
@@ -1627,7 +1627,7 @@ export const CANCUN_RIVIERA_TOUR: Tour = {
         { type: "highlight", label: "Hotel Zone beaches", description: "Free day to explore Cancún's famous turquoise beaches and Hotel Zone." },
         { type: "hotel", label: "Moon Palace or similar" },
       ],
-      image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1565358720137-55235e0878a2?w=1200&q=80",
     },
     {
       dayNumber: 3,
@@ -1637,7 +1637,7 @@ export const CANCUN_RIVIERA_TOUR: Tour = {
         { type: "transport", label: "Coach transfer", description: "3h each way · Air-conditioned coach" },
         { type: "hotel", label: "Moon Palace or similar" },
       ],
-      image: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1518638150340-f706e86654de?w=1200&q=80",
     },
     {
       dayNumber: 4,
@@ -1646,7 +1646,7 @@ export const CANCUN_RIVIERA_TOUR: Tour = {
         { type: "highlight", label: "Playa del Carmen stop", description: "Stroll along 5th Avenue for shopping and lunch." },
         { type: "hotel", label: "Azulik Tulum or similar" },
       ],
-      image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1597351183340-ebd88b18ed6b?w=1200&q=80",
     },
   ],
   included: [
