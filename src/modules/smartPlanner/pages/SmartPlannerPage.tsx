@@ -209,7 +209,7 @@ export default function SmartPlannerPage({
   const aiPrompt = startingContext.type === "ai" ? startingContext.prompt : undefined;
 
   // Hard-coded for the prototype — real app reads from passenger context
-  const adults = 2;
+  const adults: number = 2;
   const totalPriceLabel = "from €2,499";
 
   return (
