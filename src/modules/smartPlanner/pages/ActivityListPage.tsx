@@ -36,7 +36,7 @@ import LeafletMap, {
 } from "../../../shared/components/LeafletMap";
 import type { Activity, ActivitySearchCriteria } from "../../../types";
 import { ALL_ACTIVITIES } from "../../../mocks/activities";
-import ActivitySearchForm from "../components/ActivitySearchForm";
+import ActivitySearchForm, { CRUISE_DESTINATION_GROUPS } from "../components/ActivitySearchForm";
 import { ActivityCard } from "../components/ActivityCard";
 // Loading kit — vertical SkeletonCards while activities "load" briefly
 // (matches the doc's 1s–3s tier), then a 60ms staggered reveal.
@@ -243,11 +243,23 @@ export default function ActivityListPage({
   // Order: destination match → type → duration → difficulty → price → sort.
   const filteredActivities = useMemo(() => {
     const destQuery = searchCriteria.destination.trim().toLowerCase();
+    // If the user picked a cruise region from the Destination dropdown, the
+    // destination field carries the region label. Translate that to the set of
+    // allowed activityIds — substring-matching against the label wouldn't hit
+    // any individual activity's location (e.g. "Mediterranean & Greek Isles"
+    // is not a substring of "Barcelona → Marseille → …").
+    const regionMatch = CRUISE_DESTINATION_GROUPS.find(
+      (g) => g.label.toLowerCase() === destQuery
+    );
+    const regionAllowedIds = regionMatch ? new Set(regionMatch.activityIds) : null;
 
     let list = ALL_ACTIVITIES.filter((a) => {
-      // Destination match — substring search against location/title.
+      // Destination match — region filter (when a cruise region was picked)
+      // takes precedence; otherwise substring search against location/title.
       // If the user left it blank the filter is a no-op.
-      if (destQuery) {
+      if (regionAllowedIds) {
+        if (!regionAllowedIds.has(a.activityId)) return false;
+      } else if (destQuery) {
         const haystack = `${a.location} ${a.title}`.toLowerCase();
         if (!haystack.includes(destQuery)) return false;
       }

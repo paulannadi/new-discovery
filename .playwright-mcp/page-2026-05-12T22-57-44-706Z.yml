@@ -1,0 +1,183 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - img "Discover the world" [ref=e7]
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - generic [ref=e12]:
+            - generic [ref=e13]: AI Experience
+            - switch [ref=e14]
+          - generic [ref=e15]:
+            - heading "Explore the world's hidden gems" [level=1] [ref=e16]
+            - heading "You dream it. We'll plan it." [level=1]
+        - generic [ref=e17]:
+          - generic [ref=e20]:
+            - generic [ref=e22]:
+              - button "Holidays" [ref=e23]:
+                - img [ref=e25]
+                - generic [ref=e31]: Holidays
+              - button "Hotels" [ref=e32]:
+                - img [ref=e34]
+                - generic [ref=e38]: Hotels
+              - button "Flights" [ref=e39]:
+                - img [ref=e41]
+                - generic [ref=e43]: Flights
+              - button "Experiences" [active] [ref=e44]:
+                - img [ref=e46]
+                - generic [ref=e49]: Experiences
+            - generic [ref=e462]:
+              - button "Activity type Any activity" [ref=e464] [cursor=pointer]:
+                - img [ref=e465]
+                - generic [ref=e468]:
+                  - generic [ref=e469]: Activity type
+                  - generic [ref=e470]: Any activity
+                - img [ref=e471]
+              - generic [ref=e474]:
+                - img [ref=e475]
+                - generic [ref=e478]:
+                  - generic [ref=e479]: Destination
+                  - textbox "Anywhere" [ref=e480]
+              - button "When Any time" [ref=e482] [cursor=pointer]:
+                - img [ref=e483]
+                - generic [ref=e485]:
+                  - generic [ref=e486]: When
+                  - generic [ref=e487]: Any time
+                - img [ref=e488]
+              - button "Travellers 2 Travellers" [ref=e491] [cursor=pointer]:
+                - img [ref=e492]
+                - generic [ref=e497]:
+                  - generic [ref=e498]: Travellers
+                  - generic [ref=e499]: 2 Travellers
+                - img [ref=e500]
+              - button "Search activities" [ref=e502]:
+                - img [ref=e503]
+                - text: Search activities
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - textbox "Describe your ideal trip — destination, dates, budget, travel style…"
+                - generic:
+                  - button "Attach files":
+                    - img
+                    - generic: Attach files
+                  - button "Plan my trip":
+                    - img
+                    - text: Plan my trip
+            - generic:
+              - generic: "Try asking:"
+              - generic:
+                - button "Find me a beach resort in Bali for next month"
+                - button "Plan a 5-day family trip to Paris"
+                - button "Weekend getaway in the Alps under €500"
+                - button "Luxury honeymoon in the Maldives"
+    - generic [ref=e104]:
+      - generic [ref=e508]:
+        - generic [ref=e509]:
+          - generic [ref=e510]:
+            - img [ref=e511]
+            - heading "Experience what you like" [level=2] [ref=e514]
+          - paragraph [ref=e515]: Browse hand-picked activities by the kind of trip you love
+        - generic [ref=e516]:
+          - button "Cruise ship" [ref=e517]
+          - button "River cruise" [ref=e518]
+          - button "Multi-day tour" [ref=e519]
+          - button "Walking tour" [ref=e520]
+          - button "Bicycle tour" [ref=e521]
+          - button "Safari" [ref=e522]
+          - button "Expedition" [ref=e523]
+          - button "Events" [ref=e524]
+        - generic [ref=e525]:
+          - generic [ref=e527] [cursor=pointer]:
+            - img "Norwegian Fjords Ocean Cruise" [ref=e529]
+            - generic [ref=e530]:
+              - generic [ref=e531]:
+                - img "Norway" [ref=e532]
+                - text: Norway
+              - generic [ref=e533]: Norwegian Fjords Ocean Cruise
+              - generic [ref=e534]: Seven nights through UNESCO-listed Geirangerfjord with midnight-sun cruising and onboard Michelin-trained dining.
+              - generic [ref=e535]:
+                - generic [ref=e536]:
+                  - img [ref=e537]
+                  - text: 7 days
+                - generic [ref=e540]:
+                  - generic [ref=e541]: Per person
+                  - generic [ref=e542]: from £1,899
+          - generic [ref=e544] [cursor=pointer]:
+            - img "Western Mediterranean Explorer" [ref=e546]
+            - generic [ref=e547]:
+              - generic [ref=e548]:
+                - img "Spain" [ref=e549]
+                - text: Spain
+              - generic [ref=e550]: Western Mediterranean Explorer
+              - generic [ref=e551]: Barcelona, Marseille, Rome, and Palma in one eight-day Mediterranean loop aboard a mega-ship.
+              - generic [ref=e552]:
+                - generic [ref=e553]:
+                  - img [ref=e554]
+                  - text: 8 days
+                - generic [ref=e557]:
+                  - generic [ref=e558]: Per person
+                  - generic [ref=e559]: from $899
+          - generic [ref=e561] [cursor=pointer]:
+            - img "Caribbean Island Hopping" [ref=e563]
+            - generic [ref=e564]:
+              - generic [ref=e565]:
+                - img "Bahamas" [ref=e566]
+                - text: Bahamas
+              - generic [ref=e567]: Caribbean Island Hopping
+              - generic [ref=e568]: Eight days of turquoise water with stops at CocoCay, St. Thomas, and St. Maarten from Miami.
+              - generic [ref=e569]:
+                - generic [ref=e570]:
+                  - img [ref=e571]
+                  - text: 8 days
+                - generic [ref=e574]:
+                  - generic [ref=e575]: Per person
+                  - generic [ref=e576]: from $999
+          - generic [ref=e578] [cursor=pointer]:
+            - img "Alaska Inside Passage" [ref=e580]
+            - generic [ref=e581]:
+              - generic [ref=e582]:
+                - img "USA" [ref=e583]
+                - text: USA
+              - generic [ref=e584]: Alaska Inside Passage
+              - generic [ref=e585]: Glacier Bay, Juneau, Skagway, and Ketchikan on a classic Inside Passage round-trip from Seattle.
+              - generic [ref=e586]:
+                - generic [ref=e587]:
+                  - img [ref=e588]
+                  - text: 8 days
+                - generic [ref=e591]:
+                  - generic [ref=e592]: Per person
+                  - generic [ref=e593]: from $1,299
+          - generic [ref=e595] [cursor=pointer]:
+            - img "Greek Islands & Turkey" [ref=e597]
+            - generic [ref=e598]:
+              - generic [ref=e599]:
+                - img "Greece" [ref=e600]
+                - text: Greece
+              - generic [ref=e601]: Greek Islands & Turkey
+              - generic [ref=e602]: Mykonos, Santorini, Rhodes, and Kusadasi over eight days of whitewashed villages and Aegean blue.
+              - generic [ref=e603]:
+                - generic [ref=e604]:
+                  - img [ref=e605]
+                  - text: 8 days
+                - generic [ref=e608]:
+                  - generic [ref=e609]: Per person
+                  - generic [ref=e610]: from $1,349
+          - generic [ref=e612] [cursor=pointer]:
+            - img "Disney Magic at Sea" [ref=e614]
+            - generic [ref=e615]:
+              - generic [ref=e616]:
+                - img "USA" [ref=e617]
+                - text: USA
+              - generic [ref=e618]: Disney Magic at Sea
+              - generic [ref=e619]: Five nights of family-friendly fun from Port Canaveral with a private day on Castaway Cay.
+              - generic [ref=e620]:
+                - generic [ref=e621]:
+                  - img [ref=e622]
+                  - text: 5 days
+                - generic [ref=e625]:
+                  - generic [ref=e626]: Per person
+                  - generic [ref=e627]: from $1,299
+        - button "View all Cruise ship activities" [ref=e629]
+      - paragraph [ref=e461]: © 2026 Nezasa · TripBuilder · Over 500,000 hotels worldwide

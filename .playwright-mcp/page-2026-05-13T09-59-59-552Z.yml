@@ -1,0 +1,174 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - img "Discover the world" [ref=e7]
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - generic [ref=e12]:
+            - generic [ref=e13]: AI Experience
+            - switch [ref=e14]
+          - generic [ref=e15]:
+            - heading "Explore the world's hidden gems" [level=1] [ref=e16]
+            - heading "You dream it. We'll plan it." [level=1]
+        - generic [ref=e17]:
+          - generic [ref=e20]:
+            - generic [ref=e22]:
+              - button "Holidays" [ref=e23]:
+                - img [ref=e25]
+                - generic [ref=e31]: Holidays
+              - button "Hotels" [ref=e32]:
+                - img [ref=e34]
+                - generic [ref=e38]: Hotels
+              - button "Flights" [ref=e39]:
+                - img [ref=e41]
+                - generic [ref=e43]: Flights
+              - button "Experiences" [ref=e44]:
+                - img [ref=e46]
+                - generic [ref=e49]: Experiences
+              - button "Cruises" [ref=e50]:
+                - img [ref=e52]
+                - generic [ref=e56]: Cruises
+              - button "Events" [active] [ref=e57]:
+                - img [ref=e59]
+                - generic [ref=e61]: Events
+            - generic [ref=e663]:
+              - generic [ref=e665]:
+                - img [ref=e666]
+                - generic [ref=e669]:
+                  - generic [ref=e670]: Destination
+                  - textbox "Anywhere" [ref=e671]
+              - button "When Any time" [ref=e673] [cursor=pointer]:
+                - img [ref=e674]
+                - generic [ref=e676]:
+                  - generic [ref=e677]: When
+                  - generic [ref=e678]: Any time
+                - img [ref=e679]
+              - button "Travellers 2 Travellers" [ref=e682] [cursor=pointer]:
+                - img [ref=e683]
+                - generic [ref=e688]:
+                  - generic [ref=e689]: Travellers
+                  - generic [ref=e690]: 2 Travellers
+                - img [ref=e691]
+              - button "Search activities" [ref=e693]:
+                - img [ref=e694]
+                - text: Search activities
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - textbox "Describe your ideal trip — destination, dates, budget, travel style…"
+                - generic:
+                  - button "Attach files":
+                    - img
+                    - generic: Attach files
+                  - button "Plan my trip":
+                    - img
+                    - text: Plan my trip
+            - generic:
+              - generic: "Try asking:"
+              - generic:
+                - button "Find me a beach resort in Bali for next month"
+                - button "Plan a 5-day family trip to Paris"
+                - button "Weekend getaway in the Alps under €500"
+                - button "Luxury honeymoon in the Maldives"
+    - generic [ref=e116]:
+      - generic [ref=e698]:
+        - generic [ref=e699]:
+          - generic [ref=e700]:
+            - img [ref=e701]
+            - heading "Trips built around an event" [level=2] [ref=e703]
+          - paragraph [ref=e704]: Be there for festivals, finals, and once-a-year occasions
+        - generic [ref=e705]:
+          - generic [ref=e707] [cursor=pointer]:
+            - img "Wimbledon Championships" [ref=e709]
+            - generic [ref=e710]:
+              - generic [ref=e711]:
+                - img "United Kingdom" [ref=e712]
+                - text: United Kingdom
+              - generic [ref=e713]: Wimbledon Championships
+              - generic [ref=e714]: Centre Court grass-court tennis with strawberries and cream — late June to mid-July.
+              - generic [ref=e715]:
+                - generic [ref=e716]:
+                  - img [ref=e717]
+                  - text: Match day
+                - generic [ref=e720]:
+                  - generic [ref=e721]: Per person
+                  - generic [ref=e722]: from £180
+          - generic [ref=e724] [cursor=pointer]:
+            - img "Monaco Grand Prix" [ref=e726]
+            - generic [ref=e727]:
+              - generic [ref=e728]:
+                - img "Monaco" [ref=e729]
+                - text: Monaco
+              - generic [ref=e730]: Monaco Grand Prix
+              - generic [ref=e731]: Formula 1 racing through the streets of Monte-Carlo — the crown jewel of the F1 calendar, every May.
+              - generic [ref=e732]:
+                - generic [ref=e733]:
+                  - img [ref=e734]
+                  - text: Race weekend
+                - generic [ref=e737]:
+                  - generic [ref=e738]: Per person
+                  - generic [ref=e739]: from €1,250
+          - generic [ref=e741] [cursor=pointer]:
+            - img "TCS New York City Marathon" [ref=e743]
+            - generic [ref=e744]:
+              - generic [ref=e745]:
+                - img "USA" [ref=e746]
+                - text: USA
+              - generic [ref=e747]: TCS New York City Marathon
+              - generic [ref=e748]: 26.2 miles through all five boroughs on the first Sunday of November — 50,000 runners, two million spectators.
+              - generic [ref=e749]:
+                - generic [ref=e750]:
+                  - img [ref=e751]
+                  - text: Race day
+                - generic [ref=e754]:
+                  - generic [ref=e755]: Per person
+                  - generic [ref=e756]: from $349
+          - generic [ref=e758] [cursor=pointer]:
+            - img "Munich Oktoberfest" [ref=e760]
+            - generic [ref=e761]:
+              - generic [ref=e762]:
+                - img "Germany" [ref=e763]
+                - text: Germany
+              - generic [ref=e764]: Munich Oktoberfest
+              - generic [ref=e765]: The world's biggest beer festival — 14 vast tents, lederhosen and brass bands, mid-September to early October.
+              - generic [ref=e766]:
+                - generic [ref=e767]:
+                  - img [ref=e768]
+                  - text: 3 days
+                - generic [ref=e771]:
+                  - generic [ref=e772]: Per person
+                  - generic [ref=e773]: from €690
+          - generic [ref=e775] [cursor=pointer]:
+            - img "Rio de Janeiro Carnival" [ref=e777]
+            - generic [ref=e778]:
+              - generic [ref=e779]:
+                - img "Brazil" [ref=e780]
+                - text: Brazil
+              - generic [ref=e781]: Rio de Janeiro Carnival
+              - generic [ref=e782]: Samba parades at the Sambódromo and city-wide street blocos — the week before Lent in February or March.
+              - generic [ref=e783]:
+                - generic [ref=e784]:
+                  - img [ref=e785]
+                  - text: 4 nights
+                - generic [ref=e788]:
+                  - generic [ref=e789]: Per person
+                  - generic [ref=e790]: from $1,290
+          - generic [ref=e792] [cursor=pointer]:
+            - img "Edinburgh Festival Fringe" [ref=e794]
+            - generic [ref=e795]:
+              - generic [ref=e796]:
+                - img "United Kingdom" [ref=e797]
+                - text: United Kingdom
+              - generic [ref=e798]: Edinburgh Festival Fringe
+              - generic [ref=e799]: The world's largest arts festival — comedy, theatre, and street performers take over the city every August.
+              - generic [ref=e800]:
+                - generic [ref=e801]:
+                  - img [ref=e802]
+                  - text: 5 nights
+                - generic [ref=e805]:
+                  - generic [ref=e806]: Per person
+                  - generic [ref=e807]: from £540
+        - button "View all events" [ref=e809]
+      - paragraph [ref=e473]: © 2026 Nezasa · TripBuilder · Over 500,000 hotels worldwide

@@ -14,7 +14,7 @@
 //   4. Travellers         (counter)
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   MapPin,
   Calendar as CalendarIcon,
@@ -39,6 +39,10 @@ import { format, parseISO } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { cn } from "../../../shared/components/ui/utils";
 import type { ActivitySearchCriteria, ActivityType } from "../../../types";
+// Pull real mock data so the Destination dropdown only shows places we
+// actually have activities for. Keeps the prototype honest: clicking a
+// suggestion always lands the user on a populated results list.
+import { ALL_ACTIVITIES } from "../../../mocks/activities";
 
 // ── Activity type metadata ───────────────────────────────────────────────────
 // Single source of truth for the activity-type icon + label mapping.
@@ -48,7 +52,7 @@ export const ACTIVITY_TYPE_OPTIONS: {
   label: string;
   icon: React.ReactNode;
 }[] = [
-  { id: "cruise-ship",    label: "Cruise ship",     icon: <Ship       size={14} aria-hidden="true" /> },
+  { id: "cruise-ship",    label: "Ocean Cruise",    icon: <Ship       size={14} aria-hidden="true" /> },
   { id: "river-cruise",   label: "River cruise",    icon: <Anchor     size={14} aria-hidden="true" /> },
   { id: "multi-day-tour", label: "Multi-day tour",  icon: <MapIcon    size={14} aria-hidden="true" /> },
   { id: "walking-tour",   label: "Walking tour",    icon: <Footprints size={14} aria-hidden="true" /> },
@@ -61,18 +65,49 @@ export const ACTIVITY_TYPE_OPTIONS: {
   { id: "event",          label: "Events",          icon: <Ticket     size={14} aria-hidden="true" /> },
 ];
 
+// ── Cruise destination groupings ─────────────────────────────────────────────
+// When the form is locked to cruise types (the Cruises tab on Discovery), the
+// Destination dropdown shows these regions as the selectable options. Picking
+// a region populates the destination input with the region label and submits
+// it as the search criteria — ActivityListPage recognises the label and filters
+// to activities whose activityId is in the region's list.
+// Exported so the list page can share the same mapping (single source of truth).
+export const CRUISE_DESTINATION_GROUPS: { label: string; activityIds: string[] }[] = [
+  {
+    label: "Mediterranean & Greek Isles",
+    activityIds: ["western-mediterranean-explorer", "greek-islands-turkey"],
+  },
+  {
+    label: "The Caribbean & Bahamas",
+    activityIds: ["caribbean-island-hopping", "disney-magic-at-sea"],
+  },
+  {
+    label: "Fjords & Alaska",
+    activityIds: ["norwegian-fjords-cruise", "alaska-inside-passage"],
+  },
+  {
+    label: "European rivers & lakes",
+    activityIds: ["rhine-river-cruise", "lake-geneva-sunset-cruise"],
+  },
+];
+
 type OpenPanel = "type" | "destination" | "dates" | "guests" | null;
 
 type Props = {
   variant: "hero" | "compact";
   initialValues?: Partial<ActivitySearchCriteria>;
   onSearch: (criteria: ActivitySearchCriteria) => void;
+  // When set, the Activity-type field is hidden and the form always submits
+  // these types in the criteria. Used by the Cruises / Events tabs on
+  // Discovery, where the tab itself is the activity type.
+  lockedActivityTypes?: ActivityType[];
 };
 
 export default function ActivitySearchForm({
   variant,
   initialValues,
   onSearch,
+  lockedActivityTypes,
 }: Props) {
   // ── Form state — initialised from any criteria passed in ───────────────────
   const [destination, setDestination] = useState(initialValues?.destination ?? "");
@@ -113,11 +148,53 @@ export default function ActivitySearchForm({
     );
   };
 
+  // ── Destination dropdown options ──────────────────────────────────────────
+  // The "in-scope" activity types decide which destinations show up:
+  //   • Cruises / Events tabs   → use the locked types passed in by Discovery
+  //   • Experiences tab w/ user selection → use the user's selected types
+  //   • Experiences tab, no selection → all destinations from every activity
+  // Deduped so two cruises in "Bergen → Geiranger → Ålesund → Bergen" only
+  // show once, and sorted for predictable scanning.
+  const availableDestinations = useMemo(() => {
+    const types =
+      lockedActivityTypes ?? (activityTypes.length > 0 ? activityTypes : null);
+    const pool = types
+      ? ALL_ACTIVITIES.filter((a) => types.includes(a.type))
+      : ALL_ACTIVITIES;
+    return Array.from(new Set(pool.map((a) => a.location))).sort();
+  }, [lockedActivityTypes, activityTypes]);
+
+  // Type-ahead filter on the dropdown. Substring match keeps it forgiving —
+  // typing "Bergen" still surfaces the Norwegian Fjords cruise even though
+  // the location starts with "Bergen → …".
+  const filteredDestinations = useMemo(() => {
+    const q = destination.trim().toLowerCase();
+    if (!q) return availableDestinations;
+    return availableDestinations.filter((d) => d.toLowerCase().includes(q));
+  }, [availableDestinations, destination]);
+
+  // When the form is locked to cruise types, the dropdown shows the region
+  // groups themselves as the selectable options (Mediterranean & Greek Isles,
+  // The Caribbean & Bahamas, Fjords & Alaska, European rivers & lakes) — no
+  // drill-down into individual routes. Returns null otherwise so the dropdown
+  // falls back to the flat alphabetical list. Falls back to the typed-query
+  // filter as soon as the user starts typing.
+  const cruiseRegions = useMemo(() => {
+    const isCruiseMode = lockedActivityTypes?.some(
+      (t) => t === "cruise-ship" || t === "river-cruise"
+    );
+    if (!isCruiseMode) return null;
+    return CRUISE_DESTINATION_GROUPS.map((g) => g.label);
+  }, [lockedActivityTypes]);
+
   const handleSearch = () => {
     setOpenPanel(null);
     onSearch({
       destination: destination.trim(),
-      activityTypes,
+      // When the Activity-type field is hidden (Cruises/Events tabs), the tab
+      // itself dictates the type — submit those locked types instead of the
+      // (empty) local state.
+      activityTypes: lockedActivityTypes ?? activityTypes,
       dateFrom: dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
       dateTo: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
       travellers,
@@ -171,6 +248,8 @@ export default function ActivitySearchForm({
       className={`flex flex-col lg:flex-row ${fieldGap} w-full`}
     >
       {/* ── ACTIVITY TYPE ─────────────────────────────────────────────────── */}
+      {/* Hidden when the parent locks the activity types (Cruises/Events tabs) */}
+      {!lockedActivityTypes && (
       <div className="relative flex-1">
         <button
           className={cn(fieldBase(openPanel === "type"), "cursor-pointer")}
@@ -245,6 +324,7 @@ export default function ActivitySearchForm({
           </div>
         )}
       </div>
+      )}
 
       {/* ── DESTINATION ──────────────────────────────────────────────────── */}
       <div className="relative flex-1">
@@ -275,6 +355,54 @@ export default function ActivitySearchForm({
             />
           </div>
         </div>
+
+        {/* Suggestion dropdown — populated from real activity mock data so the
+            list reflects the actual content available for the current tab.
+            In cruise mode (no typed query) the dropdown shows the four region
+            groups as the selectable options. Typing switches to the flat
+            substring-filtered list so free-text search still works. */}
+        {openPanel === "destination" && (cruiseRegions || availableDestinations.length > 0) && (
+          <div className="absolute top-[calc(100%+8px)] left-0 right-0 lg:right-auto z-50 bg-card rounded-xl shadow-xl border border-border p-2 min-w-[280px] max-h-[320px] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+            {cruiseRegions && !destination.trim() ? (
+              // Region-only view for cruises — one row per region, no routes.
+              cruiseRegions.map((region) => (
+                <button
+                  key={region}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDestination(region);
+                    setOpenPanel(null);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm font-medium text-foreground hover:bg-grey-light transition-colors"
+                >
+                  <MapPin size={14} className="text-grey shrink-0" aria-hidden="true" />
+                  <span className="truncate">{region}</span>
+                </button>
+              ))
+            ) : filteredDestinations.length === 0 ? (
+              <p className="px-3 py-2 text-xs text-muted-foreground">
+                No matching destinations
+              </p>
+            ) : (
+              filteredDestinations.map((dest) => (
+                <button
+                  key={dest}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDestination(dest);
+                    setOpenPanel(null);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm text-foreground hover:bg-grey-light transition-colors"
+                >
+                  <MapPin size={14} className="text-grey shrink-0" aria-hidden="true" />
+                  <span className="truncate">{dest}</span>
+                </button>
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── DATES (optional) ──────────────────────────────────────────────── */}

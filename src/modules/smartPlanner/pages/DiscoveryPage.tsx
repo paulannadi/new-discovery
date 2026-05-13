@@ -50,6 +50,9 @@ import {
   Compass,
   Footprints,
   Bus,
+  // Cruises tab icon (Ship for ocean) and Events tab icon (Ticket for ticketed events)
+  Ship,
+  Ticket,
 } from "lucide-react";
 import { Switch } from "../../../shared/components/ui/switch";
 import { DayPicker, DateRange } from "react-day-picker";
@@ -67,7 +70,7 @@ import { ACTIVITY_BY_ID } from "../../../mocks/activities";
 
 // --- Types ---
 
-type TabId = "hotels" | "flights" | "holidays" | "activities";
+type TabId = "hotels" | "flights" | "holidays" | "activities" | "cruises" | "events";
 
 type RoomConfig = {
   id: number;
@@ -113,6 +116,12 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "flights", label: "Flights", icon: <Plane size={20} /> },
   // Compass icon evokes the experience-led "explore by activity" framing
   { id: "activities", label: "Experiences", icon: <Compass size={20} /> },
+  // Promoted out of Experiences — Cruises and Events are headline categories
+  // travellers should be able to discover straight from the hero. Search inside
+  // these tabs uses the same form as Experiences but with the Activity-type
+  // field hidden, since the tab itself dictates the type.
+  { id: "cruises", label: "Cruises", icon: <Ship size={20} /> },
+  { id: "events", label: "Events", icon: <Ticket size={20} /> },
 ];
 
 // --- Section data ---
@@ -1649,6 +1658,27 @@ export default function DiscoveryPage({
                   <ActivitySearchForm variant="hero" onSearch={onActivitySearch} />
                 )}
 
+                {/* CRUISES PANEL — same form as Activities, but the Activity-type
+                    field is hidden (the tab itself implies the type). Submitting
+                    sends the user to ActivityListPage already filtered to ocean
+                    + river cruises. */}
+                {activeTab === "cruises" && (
+                  <ActivitySearchForm
+                    variant="hero"
+                    onSearch={onActivitySearch}
+                    lockedActivityTypes={["cruise-ship", "river-cruise"]}
+                  />
+                )}
+
+                {/* EVENTS PANEL — same idea, locked to ticketed events. */}
+                {activeTab === "events" && (
+                  <ActivitySearchForm
+                    variant="hero"
+                    onSearch={onActivitySearch}
+                    lockedActivityTypes={["event"]}
+                  />
+                )}
+
               </div>
             </div>
             </div>
@@ -1817,6 +1847,114 @@ export default function DiscoveryPage({
                   View all {ACTIVITY_TYPE_OPTIONS.find((o) => o.id === activeActivityType)?.label} activities
                 </button>
               </div>
+            </div>
+
+          </div>
+        </section>
+      )}
+
+      {/* ── CRUISES ─────────────────────────────────────────────────────────
+          One single carousel combining ocean + river cruises — travellers
+          discover the type of cruise from the card itself rather than from a
+          section header. Region/destination filtering happens in the search
+          dropdown above. */}
+      {activeTab === "cruises" && (
+        <section className="py-10 md:py-16 px-4 md:px-6 lg:px-12">
+          <div className="max-w-[1200px] mx-auto">
+
+            <div className="mb-6 md:mb-8">
+              <div className="flex items-center gap-2.5 mb-2">
+                <Ship size={24} className="text-primary md:size-7" />
+                <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
+                  Set sail
+                </h2>
+              </div>
+              <p className="text-muted-foreground text-sm md:text-lg">
+                Hand-picked cruises for memorable voyages
+              </p>
+            </div>
+
+            <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {[
+                ...ACTIVITY_CARDS_BY_TYPE["cruise-ship"],
+                ...ACTIVITY_CARDS_BY_TYPE["river-cruise"],
+              ].map((card) => (
+                <div key={card.id} className="shrink-0 w-[320px] snap-start">
+                  <TourCard
+                    tour={card}
+                    onSelect={() => onActivityDirectSelect(ACTIVITY_BY_ID[card.activityId])}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* View-all CTA — same locked criteria as the search panel */}
+            <div className="mt-5 md:mt-6 flex justify-end">
+              <button
+                onClick={() =>
+                  onActivitySearch({
+                    destination: "",
+                    activityTypes: ["cruise-ship", "river-cruise"],
+                    travellers: 2,
+                    dateFrom: "",
+                    dateTo: "",
+                  })
+                }
+                className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
+              >
+                View all cruises
+              </button>
+            </div>
+
+          </div>
+        </section>
+      )}
+
+      {/* ── EVENTS ──────────────────────────────────────────────────────────
+          Single carousel of ticketed events — Wimbledon, Oktoberfest, etc. —
+          again sourced from the existing ACTIVITY_CARDS_BY_TYPE mock data. */}
+      {activeTab === "events" && (
+        <section className="py-10 md:py-16 px-4 md:px-6 lg:px-12">
+          <div className="max-w-[1200px] mx-auto">
+
+            <div className="mb-6 md:mb-8">
+              <div className="flex items-center gap-2.5 mb-2">
+                <Ticket size={24} className="text-primary md:size-7" />
+                <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
+                  Trips built around an event
+                </h2>
+              </div>
+              <p className="text-muted-foreground text-sm md:text-lg">
+                Be there for festivals, finals, and once-a-year occasions
+              </p>
+            </div>
+
+            <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {ACTIVITY_CARDS_BY_TYPE["event"].map((card) => (
+                <div key={card.id} className="shrink-0 w-[320px] snap-start">
+                  <TourCard
+                    tour={card}
+                    onSelect={() => onActivityDirectSelect(ACTIVITY_BY_ID[card.activityId])}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 md:mt-6 flex justify-end">
+              <button
+                onClick={() =>
+                  onActivitySearch({
+                    destination: "",
+                    activityTypes: ["event"],
+                    travellers: 2,
+                    dateFrom: "",
+                    dateTo: "",
+                  })
+                }
+                className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
+              >
+                View all events
+              </button>
             </div>
 
           </div>

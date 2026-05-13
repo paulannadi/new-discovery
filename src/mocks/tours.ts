@@ -4844,8 +4844,9 @@ export const LAKE_GARDA_BUS_TOUR: Tour = {
     "Lake Garda boat trip",
     "4★ Hotel Bella Lazise",
   ],
-  // Lake Garda hero shot (Unsplash)
-  mainImage: "https://images.unsplash.com/photo-1530538095376-a4936b35b5f0?w=1200&q=80",
+  // Sirmione's Rocca Scaligera — Lake Garda's iconic castle, matches the
+  // Sirmione excursion in the itinerary. Used as the SmartPlanner hero.
+  mainImage: "https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=1600&q=80",
   price: {
     perPerson: 649,
     total: 1298,

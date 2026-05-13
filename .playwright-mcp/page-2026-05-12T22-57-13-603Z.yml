@@ -1,0 +1,270 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e819]:
+    - group "View mode" [ref=e820]:
+      - button "Timeline view" [pressed] [ref=e821] [cursor=pointer]:
+        - img
+        - generic [ref=e822]: Timeline
+      - button "Map view (coming soon)" [disabled]:
+        - img
+    - generic [ref=e824]:
+      - banner [ref=e825]:
+        - button "Back" [ref=e826] [cursor=pointer]:
+          - img
+          - text: Back
+      - generic [ref=e827]:
+        - img "Individual trip to Bangkok" [ref=e829]
+        - generic [ref=e831]:
+          - paragraph [ref=e832]:
+            - text: 2 adults·
+            - generic [ref=e833]: 7 nights
+          - generic [ref=e834]:
+            - heading "Individual trip to Bangkok" [level=1] [ref=e835]
+            - button "Share itinerary" [ref=e836] [cursor=pointer]:
+              - img
+        - generic [ref=e837]:
+          - generic [ref=e838]:
+            - generic [ref=e839]:
+              - generic [ref=e840]: Depart
+              - generic [ref=e841]: 11 Jun
+            - img [ref=e843]
+            - generic [ref=e845]:
+              - generic [ref=e846]: Return
+              - generic [ref=e847]: 18 Jun
+          - button "Book · from €2,499" [ref=e850] [cursor=pointer]
+    - generic [ref=e851]:
+      - generic [ref=e852]:
+        - generic [ref=e853]:
+          - generic [ref=e855]:
+            - img [ref=e856]
+            - heading "Outbound Flight" [level=2] [ref=e858]
+          - generic [ref=e860]:
+            - paragraph [ref=e861]: Outbound · Sun, 04 Oct 2026
+            - generic [ref=e863]:
+              - generic [ref=e864]:
+                - generic [ref=e865]:
+                  - generic [ref=e867]:
+                    - img [ref=e868]
+                    - text: British Airways
+                  - generic [ref=e870]:
+                    - generic [ref=e871]: 08:35
+                    - generic [ref=e872]: London
+                  - generic [ref=e873]:
+                    - paragraph [ref=e874]: Non-stop
+                    - paragraph [ref=e876]: 8h 25m · Economy
+                  - generic [ref=e877]:
+                    - generic [ref=e878]: 14:10
+                    - generic [ref=e879]: Bangkok
+                - separator [ref=e880]
+                - generic [ref=e881]:
+                  - generic [ref=e882]:
+                    - img [ref=e883]
+                    - generic [ref=e886]: 1 checked bag included
+                  - button "More details" [ref=e887] [cursor=pointer]
+              - button "Change Flight" [ref=e889] [cursor=pointer]
+        - button "Add Stop" [ref=e891] [cursor=pointer]:
+          - img
+          - text: Add Stop
+        - generic [ref=e893]:
+          - generic [ref=e895]:
+            - img [ref=e896]
+            - heading "Stay in Bangkok" [level=2] [ref=e900]
+          - generic [ref=e902]:
+            - paragraph [ref=e903]:
+              - text: Mon, 05 Oct 2026 – 07 Oct 2026
+              - generic [ref=e904]: · 2 nights
+            - generic [ref=e906]:
+              - img "Chatrium Hotel Riverside" [ref=e908]
+              - generic [ref=e909]:
+                - generic [ref=e910]:
+                  - generic [ref=e911]:
+                    - generic [ref=e912]:
+                      - img [ref=e913]
+                      - img [ref=e915]
+                      - img [ref=e917]
+                      - img [ref=e919]
+                    - heading "Chatrium Hotel Riverside" [level=3] [ref=e921]
+                    - generic [ref=e922]:
+                      - img [ref=e923]
+                      - text: Bangkok
+                    - paragraph [ref=e926]: 1 Superior Room
+                  - generic [ref=e928]:
+                    - paragraph [ref=e929]: Buffet breakfast
+                    - paragraph [ref=e930]: Free cancellation
+                - generic [ref=e931]:
+                  - button "Change Hotel" [ref=e932] [cursor=pointer]
+                  - button "View Room Options" [ref=e933] [cursor=pointer]
+        - button "Add Stop" [ref=e935] [cursor=pointer]:
+          - img
+          - text: Add Stop
+        - generic [ref=e937]:
+          - generic [ref=e939]:
+            - img [ref=e940]
+            - heading "Transfer" [level=2] [ref=e944]
+          - generic [ref=e946]:
+            - paragraph [ref=e947]: Wed, 07 Oct 2026
+            - generic [ref=e949]:
+              - img [ref=e951]
+              - generic [ref=e955]:
+                - paragraph [ref=e956]:
+                  - generic [ref=e957]: Bangkok
+                  - img [ref=e958]
+                  - generic [ref=e960]: Chiang Mai
+                - paragraph [ref=e961]: 1h 15m included domestic flight
+              - button "Change" [ref=e962] [cursor=pointer]
+        - button "Add Stop" [ref=e964] [cursor=pointer]:
+          - img
+          - text: Add Stop
+        - generic [ref=e966]:
+          - generic [ref=e968]:
+            - img [ref=e969]
+            - heading "Stay in Chiang Mai" [level=2] [ref=e973]
+          - generic [ref=e975]:
+            - paragraph [ref=e976]:
+              - text: Wed, 07 Oct 2026 – 10 Oct 2026
+              - generic [ref=e977]: · 3 nights
+            - generic [ref=e979]:
+              - img "Anantara Chiang Mai Resort" [ref=e981]
+              - generic [ref=e982]:
+                - generic [ref=e983]:
+                  - generic [ref=e984]:
+                    - generic [ref=e985]:
+                      - img [ref=e986]
+                      - img [ref=e988]
+                      - img [ref=e990]
+                      - img [ref=e992]
+                      - img [ref=e994]
+                    - heading "Anantara Chiang Mai Resort" [level=3] [ref=e996]
+                    - generic [ref=e997]:
+                      - img [ref=e998]
+                      - text: Chiang Mai
+                    - paragraph [ref=e1001]: 1 Deluxe Room
+                  - generic [ref=e1003]:
+                    - paragraph [ref=e1004]: Buffet breakfast
+                    - paragraph [ref=e1005]: Free cancellation
+                - generic [ref=e1006]:
+                  - button "Change Hotel" [ref=e1007] [cursor=pointer]
+                  - button "View Room Options" [ref=e1008] [cursor=pointer]
+        - button "Add Stop" [ref=e1010] [cursor=pointer]:
+          - img
+          - text: Add Stop
+        - generic [ref=e1012]:
+          - generic [ref=e1014]:
+            - img [ref=e1015]
+            - heading "Transfer" [level=2] [ref=e1019]
+          - generic [ref=e1021]:
+            - paragraph [ref=e1022]: Sat, 10 Oct 2026
+            - generic [ref=e1024]:
+              - img [ref=e1026]
+              - generic [ref=e1030]:
+                - paragraph [ref=e1031]:
+                  - generic [ref=e1032]: Chiang Mai
+                  - img [ref=e1033]
+                  - generic [ref=e1035]: Koh Samui
+                - paragraph [ref=e1036]: Approx. 2h domestic flight
+              - button "Change" [ref=e1037] [cursor=pointer]
+        - button "Add Stop" [ref=e1039] [cursor=pointer]:
+          - img
+          - text: Add Stop
+        - generic [ref=e1041]:
+          - generic [ref=e1043]:
+            - img [ref=e1044]
+            - heading "Stay in Koh Samui" [level=2] [ref=e1048]
+          - generic [ref=e1050]:
+            - paragraph [ref=e1051]:
+              - text: Sat, 10 Oct 2026 – 12 Oct 2026
+              - generic [ref=e1052]: · 2 nights
+            - generic [ref=e1054]:
+              - img "Samui Palm Beach Resort" [ref=e1056]
+              - generic [ref=e1057]:
+                - generic [ref=e1058]:
+                  - generic [ref=e1059]:
+                    - generic [ref=e1060]:
+                      - img [ref=e1061]
+                      - img [ref=e1063]
+                      - img [ref=e1065]
+                      - img [ref=e1067]
+                    - heading "Samui Palm Beach Resort" [level=3] [ref=e1069]
+                    - generic [ref=e1070]:
+                      - img [ref=e1071]
+                      - text: Koh Samui
+                    - paragraph [ref=e1074]: 1 Pool View Room
+                  - generic [ref=e1076]:
+                    - paragraph [ref=e1077]: Buffet breakfast
+                    - paragraph [ref=e1078]: Free cancellation
+                - generic [ref=e1079]:
+                  - button "Change Hotel" [ref=e1080] [cursor=pointer]
+                  - button "View Room Options" [ref=e1081] [cursor=pointer]
+        - button "Add Stop" [ref=e1083] [cursor=pointer]:
+          - img
+          - text: Add Stop
+        - generic [ref=e1085]:
+          - generic [ref=e1087]:
+            - img [ref=e1088]
+            - heading "Return Flight" [level=2] [ref=e1090]
+          - generic [ref=e1092]:
+            - paragraph [ref=e1093]: Return · Mon, 12 Oct 2026
+            - generic [ref=e1095]:
+              - generic [ref=e1096]:
+                - generic [ref=e1097]:
+                  - generic [ref=e1099]:
+                    - img [ref=e1100]
+                    - text: British Airways
+                  - generic [ref=e1102]:
+                    - generic [ref=e1103]: 08:35
+                    - generic [ref=e1104]: Koh Samui
+                  - generic [ref=e1105]:
+                    - paragraph [ref=e1106]: Non-stop
+                    - paragraph [ref=e1108]: 8h 25m · Economy
+                  - generic [ref=e1109]:
+                    - generic [ref=e1110]: 14:10
+                    - generic [ref=e1111]: London
+                - separator [ref=e1112]
+                - generic [ref=e1113]:
+                  - generic [ref=e1114]:
+                    - img [ref=e1115]
+                    - generic [ref=e1118]: 1 checked bag included
+                  - button "More details" [ref=e1119] [cursor=pointer]
+              - button "Change Flight" [ref=e1121] [cursor=pointer]
+        - button "Add Stop" [ref=e1123] [cursor=pointer]:
+          - img
+          - text: Add Stop
+      - generic [ref=e1125]:
+        - button "Back" [ref=e1126] [cursor=pointer]:
+          - img
+          - text: Back
+        - button "Book · from €2,499" [ref=e1127] [cursor=pointer]
+    - generic [ref=e1129]:
+      - generic [ref=e1130]:
+        - button "Open trip summary" [ref=e1131] [cursor=pointer]:
+          - img [ref=e1132]
+          - generic [ref=e1134]: Trip summary
+          - img [ref=e1135]
+        - generic [ref=e1137]: 7 nights · 2 adults
+        - button "Book · from €2,499" [ref=e1138] [cursor=pointer]
+      - region [ref=e1139]:
+        - generic [ref=e1140]:
+          - heading [level=3] [ref=e1141]: Your trip at a glance
+          - list [ref=e1142]:
+            - listitem [ref=e1143]:
+              - img [ref=e1144]
+              - generic [ref=e1146]: London → Bangkok
+            - listitem [ref=e1147]:
+              - img [ref=e1148]
+              - generic [ref=e1152]: Chatrium Hotel Riverside · 2 nights
+            - listitem [ref=e1153]:
+              - img [ref=e1154]
+              - generic [ref=e1156]: Bangkok → Chiang Mai
+            - listitem [ref=e1157]:
+              - img [ref=e1158]
+              - generic [ref=e1162]: Anantara Chiang Mai Resort · 3 nights
+            - listitem [ref=e1163]:
+              - img [ref=e1164]
+              - generic [ref=e1166]: Chiang Mai → Koh Samui
+            - listitem [ref=e1167]:
+              - img [ref=e1168]
+              - generic [ref=e1172]: Samui Palm Beach Resort · 2 nights
+            - listitem [ref=e1173]:
+              - img [ref=e1174]
+              - generic [ref=e1176]: Koh Samui → London
+          - paragraph [ref=e1177]: 11 Jun – 18 Jun 2026 · 7 nights · 2 adults

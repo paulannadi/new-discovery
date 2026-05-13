@@ -247,7 +247,7 @@ export default function App() {
   // ── HotelDetailPage: user finishes room selection → SmartPlanner ─────────
   // Now we have the full hotel + room choices. Build the StartingContext
   // and send the user to SmartPlanner.
-  const handleHotelDetailBook = (hotel: any) => {
+  const handleHotelDetailBook = (hotel: any, roomSelections?: any) => {
     // Work out how many nights from the date range (default to 7 if not set)
     const nights =
       searchCriteria.dateRange?.from && searchCriteria.dateRange?.to
@@ -260,6 +260,15 @@ export default function App() {
             )
           )
         : 7;
+
+    // Pull the first selected room's name + cancellation policy through so the
+    // AccommodationCard on SmartPlanner shows the user's actual choice rather
+    // than the generic "1 Standard Room / Breakfast included" placeholder.
+    const firstSelection: any = roomSelections
+      ? Object.values(roomSelections).find((v) => v)
+      : undefined;
+    const roomType = firstSelection?.room?.name;
+    const boardType = firstSelection?.cancelOption || firstSelection?.extraOption;
 
     setStartingContext({
       type: "hotel",
@@ -279,6 +288,8 @@ export default function App() {
         checkOut: searchCriteria.dateRange?.to
           ? format(searchCriteria.dateRange.to, "yyyy-MM-dd")
           : undefined,
+        roomType,
+        boardType,
       },
       nights,
     });
@@ -492,7 +503,7 @@ export default function App() {
             setCurrentPage(hotelDetailBackPage);
             window.scrollTo(0, 0);
           }}
-          onBook={(hotel) => handleHotelDetailBook(hotel)}
+          onBook={(hotel, roomSelections) => handleHotelDetailBook(hotel, roomSelections)}
         />
       )}
 
@@ -530,7 +541,22 @@ export default function App() {
             setCurrentPage(tourDetailBackPage);
             window.scrollTo(0, 0);
           }}
-          onBook={(tour, _travelDate, _adults, _hotelPreference) => {
+          onBook={(tour, _travelDate, _adults, hotelPreference) => {
+            // Pass the full route through so SmartPlanner can render every
+            // stop (hotel + per-stop activities) and inter-stop transfer the
+            // detail page promised, not just a single tour card.
+            // tour.startDate is a display string ("Mar 31, 2026") — convert
+            // to ISO for date math in seedTimeline.
+            const startISO = (() => {
+              const d = new Date(tour.startDate);
+              return isNaN(d.getTime()) ? undefined : d.toISOString().slice(0, 10);
+            })();
+            // Coach / bus tours: the TourDetailPage repurposes the "hotel
+            // preference" dropdown as a "departure point" picker when
+            // `departurePoints` is set, so the value coming back here is the
+            // pickup town. Forward it so seedTimeline can render bus transfer
+            // cards instead of flights.
+            const isCoachTour = (tour.departurePoints?.length ?? 0) > 0;
             setStartingContext({
               type: "tour",
               tour: {
@@ -541,6 +567,10 @@ export default function App() {
                 duration: `${tour.duration} days`,
                 price: `${tour.price.currency} ${tour.price.perPerson.toLocaleString()}`,
                 image: tour.mainImage,
+                stops: tour.stops,
+                transfers: tour.transfers,
+                startDateISO: startISO,
+                departurePoint: isCoachTour ? hotelPreference : undefined,
               },
             });
             setCurrentPage("smart-planner");

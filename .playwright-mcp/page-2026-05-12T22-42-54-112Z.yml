@@ -1,0 +1,168 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T":
+    - alert [ref=e1856]:
+      - img [ref=e1858]
+      - text: "Booking confirmed for 1 room(s) - Total: 163€"
+      - button "close" [ref=e1861] [cursor=pointer]:
+        - img [ref=e1862]
+      - progressbar "notification timer" [ref=e1866]
+  - generic [ref=e1867]:
+    - group "View mode" [ref=e1868]:
+      - button "Timeline view" [pressed] [ref=e1869] [cursor=pointer]:
+        - img
+        - generic [ref=e1870]: Timeline
+      - button "Map view (coming soon)" [disabled]:
+        - img
+    - generic [ref=e1872]:
+      - banner [ref=e1873]:
+        - button "Back" [ref=e1874] [cursor=pointer]:
+          - img
+          - text: Back
+      - generic [ref=e1875]:
+        - img "Individual trip to Cagliari" [ref=e1877]
+        - generic [ref=e1879]:
+          - paragraph [ref=e1880]:
+            - text: 2 adults·
+            - generic [ref=e1881]: 7 nights
+          - generic [ref=e1882]:
+            - heading "Individual trip to Cagliari" [level=1] [ref=e1883]
+            - button "Share itinerary" [ref=e1884] [cursor=pointer]:
+              - img
+        - generic [ref=e1885]:
+          - generic [ref=e1886]:
+            - generic [ref=e1887]:
+              - generic [ref=e1888]: Depart
+              - generic [ref=e1889]: 19 May
+            - img [ref=e1891]
+            - generic [ref=e1893]:
+              - generic [ref=e1894]: Return
+              - generic [ref=e1895]: 26 May
+          - button "Book · from €2,499" [ref=e1898] [cursor=pointer]
+    - generic [ref=e1899]:
+      - generic [ref=e1900]:
+        - generic [ref=e1901]:
+          - generic [ref=e1903]:
+            - img [ref=e1904]
+            - heading "Outbound Flight" [level=2] [ref=e1906]
+          - generic [ref=e1908]:
+            - paragraph [ref=e1909]: Outbound · Tue, 19 May 2026
+            - generic [ref=e1911]:
+              - generic [ref=e1912]:
+                - generic [ref=e1913]:
+                  - generic [ref=e1915]:
+                    - img [ref=e1916]
+                    - text: British Airways
+                  - generic [ref=e1918]:
+                    - generic [ref=e1919]: 08:35
+                    - generic [ref=e1920]: London
+                  - generic [ref=e1921]:
+                    - paragraph [ref=e1922]: Non-stop
+                    - paragraph [ref=e1924]: 8h 25m · Economy
+                  - generic [ref=e1925]:
+                    - generic [ref=e1926]: 14:10
+                    - generic [ref=e1927]: Cagliari
+                - separator [ref=e1928]
+                - generic [ref=e1929]:
+                  - generic [ref=e1930]:
+                    - img [ref=e1931]
+                    - generic [ref=e1934]: 1 checked bag included
+                  - button "More details" [ref=e1935] [cursor=pointer]
+              - button "Change Flight" [ref=e1937] [cursor=pointer]
+        - button "Add Stop" [ref=e1939] [cursor=pointer]:
+          - img
+          - text: Add Stop
+        - generic [ref=e1941]:
+          - generic [ref=e1943]:
+            - img [ref=e1944]
+            - heading "Stay in Cagliari, Italy" [level=2] [ref=e1948]
+          - generic [ref=e1950]:
+            - paragraph [ref=e1951]:
+              - text: Tue, 19 May 2026 – 26 May 2026
+              - generic [ref=e1952]: · 7 nights
+            - generic [ref=e1954]:
+              - img "Hotel Palazzo Doglio" [ref=e1956]
+              - generic [ref=e1957]:
+                - generic [ref=e1958]:
+                  - generic [ref=e1959]:
+                    - generic [ref=e1960]:
+                      - img [ref=e1961]
+                      - img [ref=e1963]
+                      - img [ref=e1965]
+                      - img [ref=e1967]
+                      - img [ref=e1969]
+                    - heading "Hotel Palazzo Doglio" [level=3] [ref=e1971]
+                    - generic [ref=e1972]:
+                      - img [ref=e1973]
+                      - text: Cagliari, Italy
+                    - paragraph [ref=e1976]: 1 Standard Room
+                  - generic [ref=e1977]:
+                    - generic [ref=e1978]:
+                      - paragraph [ref=e1979]: Breakfast included
+                      - paragraph [ref=e1980]: Free cancellation
+                    - generic [ref=e1981]:
+                      - generic [ref=e1982]: From
+                      - generic [ref=e1983]: €125/night
+                - generic [ref=e1984]:
+                  - button "Change Hotel" [ref=e1985] [cursor=pointer]
+                  - button "View Room Options" [ref=e1986] [cursor=pointer]
+        - button "Add Stop" [ref=e1988] [cursor=pointer]:
+          - img
+          - text: Add Stop
+        - generic [ref=e1990]:
+          - generic [ref=e1992]:
+            - img [ref=e1993]
+            - heading "Return Flight" [level=2] [ref=e1995]
+          - generic [ref=e1997]:
+            - paragraph [ref=e1998]: Return · Tue, 26 May 2026
+            - generic [ref=e2000]:
+              - generic [ref=e2001]:
+                - generic [ref=e2002]:
+                  - generic [ref=e2004]:
+                    - img [ref=e2005]
+                    - text: British Airways
+                  - generic [ref=e2007]:
+                    - generic [ref=e2008]: 08:35
+                    - generic [ref=e2009]: Cagliari
+                  - generic [ref=e2010]:
+                    - paragraph [ref=e2011]: Non-stop
+                    - paragraph [ref=e2013]: 8h 25m · Economy
+                  - generic [ref=e2014]:
+                    - generic [ref=e2015]: 14:10
+                    - generic [ref=e2016]: London
+                - separator [ref=e2017]
+                - generic [ref=e2018]:
+                  - generic [ref=e2019]:
+                    - img [ref=e2020]
+                    - generic [ref=e2023]: 1 checked bag included
+                  - button "More details" [ref=e2024] [cursor=pointer]
+              - button "Change Flight" [ref=e2026] [cursor=pointer]
+        - button "Add Stop" [ref=e2028] [cursor=pointer]:
+          - img
+          - text: Add Stop
+      - generic [ref=e2030]:
+        - button "Back" [ref=e2031] [cursor=pointer]:
+          - img
+          - text: Back
+        - button "Book · from €2,499" [ref=e2032] [cursor=pointer]
+    - generic [ref=e2034]:
+      - generic [ref=e2035]:
+        - button "Open trip summary" [ref=e2036] [cursor=pointer]:
+          - img [ref=e2037]
+          - generic [ref=e2039]: Trip summary
+          - img [ref=e2040]
+        - generic [ref=e2042]: 7 nights · 2 adults
+        - button "Book · from €2,499" [ref=e2043] [cursor=pointer]
+      - region [ref=e2044]:
+        - generic [ref=e2045]:
+          - heading [level=3] [ref=e2046]: Your trip at a glance
+          - list [ref=e2047]:
+            - listitem [ref=e2048]:
+              - img [ref=e2049]
+              - generic [ref=e2051]: London → Cagliari
+            - listitem [ref=e2052]:
+              - img [ref=e2053]
+              - generic [ref=e2057]: Hotel Palazzo Doglio · 7 nights
+            - listitem [ref=e2058]:
+              - img [ref=e2059]
+              - generic [ref=e2061]: Cagliari → London
+          - paragraph [ref=e2062]: 19 May – 26 May 2026 · 7 nights · 2 adults
