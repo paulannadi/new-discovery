@@ -8,9 +8,10 @@ import TourDetailPage from "./modules/smartPlanner/pages/TourDetailPage";
 import { SWISS_WINTER_TOUR, DISCOVERY_TOUR_MAP } from "./mocks/tours";
 import type { Tour } from "./types";
 import FlightListPage from "./modules/smartPlanner/pages/FlightListPage";
-import SmartPlannerPage, {
-  type StartingContext,
-} from "./modules/smartPlanner/pages/SmartPlannerPage";
+import { type StartingContext } from "./modules/smartPlanner/pages/SmartPlannerPage";
+// Wrap Smart Planner with the DISCOVER video-fill loader so every entry to
+// the planner gets a 5s branded intro before the itinerary appears.
+import SmartPlannerWithIntro from "./modules/smartPlanner/components/SmartPlannerWithIntro";
 import type { UnifiedPackage } from "./types";
 // Activities — new entry point added alongside Holidays / Hotels / Flights.
 import ActivityListPage from "./modules/smartPlanner/pages/ActivityListPage";
@@ -633,9 +634,11 @@ export default function App() {
         />
       )}
 
-      {/* Screen 6: Smart Planner — the itinerary view, reached from any tab */}
+      {/* Screen 6: Smart Planner — the itinerary view, reached from any tab.
+          Rendered inside SmartPlannerWithIntro so we get the DISCOVER
+          video-fill loader for the first 5 seconds on every entry. */}
       {currentPage === "smart-planner" && startingContext && (
-        <SmartPlannerPage
+        <SmartPlannerWithIntro
           startingContext={startingContext}
           onBack={() => {
             // If we came from a holiday package, go back to the package detail page.

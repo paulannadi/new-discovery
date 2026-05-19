@@ -1,1 +1,5 @@
+/* Oi — heavy fat-face display font used by the DISCOVER video-fill loader.
+   Loading it at the document level (not inside the SVG mask) is what lets
+   the same-document <text> inside <mask> render with the correct typeface. */
+@import url('https://fonts.googleapis.com/css2?family=Oi&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700;800&display=swap');
