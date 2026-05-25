@@ -421,16 +421,7 @@ export default function ActivityDetailPage({
                 <span>{activity.location}</span>
               </div>
 
-              {/* Difficulty + distance — only present on walking / bicycle */}
-              {activity.difficulty && (
-                <>
-                  <span className="text-border hidden md:block">|</span>
-                  <div className="flex items-center gap-1.5">
-                    <Mountain size={15} className="text-foreground shrink-0" aria-hidden="true" />
-                    <span>{activity.difficulty}</span>
-                  </div>
-                </>
-              )}
+              {/* Distance — only present on walking / bicycle */}
               {activity.distanceKm != null && (
                 <>
                   <span className="text-border hidden md:block">|</span>
@@ -653,7 +644,7 @@ export default function ActivityDetailPage({
                 >
                   <h3 className="text-xl font-bold text-foreground">Trail route</h3>
 
-                  {/* Stat tiles — distance + difficulty */}
+                  {/* Stat tiles — distance */}
                   <div className="grid grid-cols-2 gap-3">
                     {activity.distanceKm != null && (
                       <div className="bg-card rounded-xl shadow-sm p-5 flex items-center gap-3">
@@ -666,21 +657,6 @@ export default function ActivityDetailPage({
                           </p>
                           <p className="text-lg font-bold text-foreground">
                             {activity.distanceKm} km
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    {activity.difficulty && (
-                      <div className="bg-card rounded-xl shadow-sm p-5 flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <Mountain size={18} className="text-primary" aria-hidden="true" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-grey uppercase tracking-wide">
-                            Difficulty
-                          </p>
-                          <p className="text-lg font-bold text-foreground">
-                            {activity.difficulty}
                           </p>
                         </div>
                       </div>
