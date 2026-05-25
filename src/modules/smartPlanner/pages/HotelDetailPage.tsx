@@ -432,7 +432,13 @@ const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelecte
           <Button
             onClick={handleBookClick}
             variant={isSelected ? "secondary" : "default"}
-            className="w-full"
+            // Selected = solid light-gray bg + dark text (the secondary token's
+            // own colours), pinned across hover so it stays stable.
+            className={cn(
+              "w-full",
+              isSelected &&
+                "bg-secondary text-secondary-foreground hover:bg-secondary hover:text-secondary-foreground"
+            )}
           >
             {isSelected && <Check size={16} />}
             {isSelected ? "Selected" : "Select"}

@@ -2,18 +2,20 @@
 // InfoList — bullet list used by the Highlights / Included / Excluded sections
 // on detail pages (TourDetailPage and ActivityDetailPage).
 //
-// Three visual variants drive the bullet icon:
-//   • "highlight" / "check" → green check on a soft success background
-//   • "cross"               → red X on a soft danger background
+// Three visual variants drive the bullet icon (16px, no background):
+//   • "highlight" → primary-coloured star
+//   • "check"     → success-coloured check
+//   • "cross"     → red X
 //
 // Layout: 2 columns on md+, single column on mobile.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { Check, X } from "lucide-react";
-import { cn } from "../../../shared/components/ui/utils";
+import { Check, X, Asterisk } from "lucide-react";
 
 interface InfoListProps {
-  title: string;
+  // Optional: when the section already has a heading above it (as on
+  // ActivityDetailPage), omit this so we don't render a duplicate subtitle.
+  title?: string;
   items: string[];
   variant: "highlight" | "check" | "cross";
 }
@@ -21,22 +23,20 @@ interface InfoListProps {
 export function InfoList({ title, items, variant }: InfoListProps) {
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-base font-bold text-foreground">{title}</p>
+      {/* Only render the subtitle when one is passed */}
+      {title && <p className="text-base font-bold text-foreground">{title}</p>}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
         {items.map((item) => (
           <div key={item} className="flex items-start gap-3">
-            <div
-              className={cn(
-                "w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5",
-                variant === "cross" ? "bg-danger/10" : "bg-success/10"
-              )}
-            >
-              {variant === "cross" ? (
-                <X size={11} className="text-danger" aria-hidden="true" />
-              ) : (
-                <Check size={11} className="text-success" aria-hidden="true" />
-              )}
-            </div>
+            {/* Bullet icon — no background circle, 16px (w-4 h-4).
+                highlight → primary star · check → success check · cross → red X */}
+            {variant === "cross" ? (
+              <X className="w-4 h-4 text-red-600 shrink-0 mt-0.75" aria-hidden="true" />
+            ) : variant === "highlight" ? (
+              <Asterisk className="w-4 h-4 text-foreground shrink-0 mt-0.75" aria-hidden="true" />
+            ) : (
+              <Check className="w-4 h-4 text-success shrink-0 mt-0.75" aria-hidden="true" />
+            )}
             <p className="text-sm text-foreground leading-normal">{item}</p>
           </div>
         ))}

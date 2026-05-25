@@ -55,6 +55,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../../shared/components/ui/dialog";
+import { Button } from "../../../shared/components/ui/button";
 import { cn } from "../../../shared/components/ui/utils";
 import type { Activity, ActivityCabin, ActivityPort, TourAttribute } from "../../../types";
 import { DayByDaySection } from "../components/DayByDaySection";
@@ -698,11 +699,10 @@ export default function ActivityDetailPage({
                 className="scroll-mt-[120px] flex flex-col gap-6"
               >
                 <h3 className="text-xl font-bold text-foreground">
-                  Why you'll love it
+                  Activity highlights
                 </h3>
                 <div className="bg-card rounded-xl shadow-sm p-5">
                   <InfoList
-                    title="Activity highlights"
                     items={activity.highlights}
                     variant="highlight"
                   />
@@ -716,10 +716,10 @@ export default function ActivityDetailPage({
                 className="scroll-mt-[120px] flex flex-col gap-6"
               >
                 <h3 className="text-xl font-bold text-foreground">
-                  Everything included
+                  What's included
                 </h3>
                 <div className="bg-card rounded-xl shadow-sm p-5">
-                  <InfoList title="What's included" items={activity.included} variant="check" />
+                  <InfoList items={activity.included} variant="check" />
                 </div>
               </section>
 
@@ -730,10 +730,10 @@ export default function ActivityDetailPage({
                 className="scroll-mt-[120px] flex flex-col gap-6"
               >
                 <h3 className="text-xl font-bold text-foreground">
-                  Good to know before you book
+                  Not included
                 </h3>
                 <div className="bg-card rounded-xl shadow-sm p-5">
-                  <InfoList title="Not included" items={activity.excluded} variant="cross" />
+                  <InfoList items={activity.excluded} variant="cross" />
                 </div>
               </section>
 
@@ -1317,16 +1317,18 @@ function CabinGrid({
           <div
             key={cabin.name}
             className={cn(
-              // `relative` so the absolute-positioned "Best value" badge anchors here
-              "relative bg-card rounded-xl shadow-sm overflow-hidden flex flex-col transition-all",
-              isSelected ? "border-2 border-primary" : "border border-border"
+              // `relative` so the absolute-positioned "Best value" badge anchors here.
+              // Selection styling mirrors the room cards on HotelDetailPage: always
+              // border-2 (so selecting doesn't shift layout), with a black outline
+              // and a lifted shadow when selected, transparent border otherwise.
+              "relative bg-card rounded-xl shadow-sm hover:shadow-md overflow-hidden flex flex-col transition-all border-2",
+              isSelected ? "border-foreground shadow-lg" : "border-transparent"
             )}
           >
             {/* "Best value" badge — only shown on the cheapest cabin */}
             {isCheapest && (
               <span
-                className="absolute top-2 left-2 z-10 text-white text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-md"
-                style={{ backgroundColor: CRUISE_ACCENT }}
+                className="absolute top-2 left-2 z-10 text-green-700 bg-green-50 text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-md"
               >
                 Best value
               </span>
@@ -1353,17 +1355,24 @@ function CabinGrid({
                     {currency}{cabin.pricePerPerson.toLocaleString()}
                   </span>
                 </div>
-                <button
+                {/* default = main action, secondary = already-selected
+                    confirmation state — same pattern as the room cards */}
+                <Button
                   onClick={() => onSelect(cabin.name)}
+                  variant={isSelected ? "secondary" : "default"}
+                  size="sm"
+                  // Selected = solid light-gray bg + dark text (the secondary
+                  // token's own colours). The bare secondary variant is
+                  // transparent-until-hover, so we pin both bg and text here —
+                  // including the hover states — so it stays stable.
                   className={cn(
-                    "text-xs font-bold px-4 py-2 rounded-md transition-colors",
-                    isSelected
-                      ? "bg-primary text-white"
-                      : "border border-primary text-primary hover:bg-primary hover:text-white"
+                    isSelected &&
+                      "bg-secondary text-secondary-foreground hover:bg-secondary hover:text-secondary-foreground"
                   )}
                 >
+                  {isSelected && <Check size={16} aria-hidden="true" />}
                   {isSelected ? "Selected" : "Choose cabin"}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
