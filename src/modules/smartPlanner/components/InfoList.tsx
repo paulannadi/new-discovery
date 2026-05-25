@@ -10,7 +10,7 @@
 // Layout: 2 columns on md+, single column on mobile.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { Check, X, Asterisk } from "lucide-react";
+import { Check, X, CircleCheckBig } from "lucide-react";
 
 interface InfoListProps {
   // Optional: when the section already has a heading above it (as on
@@ -33,7 +33,7 @@ export function InfoList({ title, items, variant }: InfoListProps) {
             {variant === "cross" ? (
               <X className="w-4 h-4 text-red-600 shrink-0 mt-0.75" aria-hidden="true" />
             ) : variant === "highlight" ? (
-              <Asterisk className="w-4 h-4 text-foreground shrink-0 mt-0.75" aria-hidden="true" />
+              <CircleCheckBig className="w-4 h-4 text-foreground shrink-0 mt-0.75" aria-hidden="true" />
             ) : (
               <Check className="w-4 h-4 text-success shrink-0 mt-0.75" aria-hidden="true" />
             )}

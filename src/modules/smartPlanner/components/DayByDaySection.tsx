@@ -13,7 +13,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState } from "react";
-import { MapPinned, Hotel, Bus } from "lucide-react";
+import { MapPinned, MapPin, Hotel, Bus, ChevronDown } from "lucide-react";
 import type { TourDay, TourDayItem } from "../../../types";
 import { cn } from "../../../shared/components/ui/utils";
 
@@ -34,8 +34,11 @@ function DayItemIcon({ type }: { type: TourDayItem["type"] }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // DayCard — single day row with click-to-expand behaviour.
 //
-// Header shows a "Day N" pill, the day title, and the location (right-aligned).
-// Active day shows a primary border AND its expanded body (photo + items).
+// The header mirrors the Ports-of-call cards: a bold stacked "Day N" badge on
+// the left, the day title as the hero, then a location chip + a chevron on the
+// right. The chevron rotates 180° to signal open/closed, and the body expands
+// with a smooth height animation.
+//
 // `slug` is used to build a deterministic placeholder image when the day has
 // no `image` set — keeps the layout stable for partial mock data.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -56,59 +59,93 @@ export function DayCard({
   return (
     <div
       className={cn(
-        "bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow",
-        isActive ? "border border-primary" : ""
+        // Card shell — matches the Ports cards (rounded, bordered, soft shadow).
+        // The border turns primary while open; otherwise it's the neutral border.
+        "bg-card rounded-xl border shadow-sm transition-shadow hover:shadow-md",
+        isActive ? "border-primary" : "border-border"
       )}
     >
-      {/* Header — click anywhere to expand this day */}
+      {/* Header — click anywhere to expand this day. aria-expanded tells
+          screen readers whether the body is open. */}
       <button
-        className="w-full flex items-center gap-3 px-5 py-3.5 text-left"
+        className="w-full flex items-center gap-4 p-4 text-left cursor-pointer"
         onClick={onSelect}
+        aria-expanded={isActive}
       >
-        <span className="bg-primary/10 text-primary text-xs font-bold px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap capitalize">
-          Day {day.dayNumber}
-        </span>
-        <span
-          className={cn(
-            "flex-1 text-sm text-foreground",
-            isActive ? "font-bold" : "font-medium"
+        {/* Day badge — the emphasised anchor, identical to the Ports cards:
+            a stacked "DAY" label over a large bold number. */}
+        <div className="flex min-w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-primary/10 px-2 pt-1.5 pb-0.5 text-center leading-none text-primary">
+          <span className="text-[10px] font-bold uppercase tracking-wider">Day</span>
+          <span className="text-2xl font-bold">{day.dayNumber}</span>
+        </div>
+
+        <div className="flex-1">
+          {/* Title — the hero of the card. */}
+          <h4 className="min-w-0 flex-1 text-base font-bold text-foreground">
+            {day.title}
+          </h4>
+          {day.location && (
+            <p className="mt-1 text-sm">{day.location}</p>
           )}
-        >
-          {day.title}
-        </span>
-        {day.location && (
-          <span className="text-xs text-muted-foreground shrink-0">{day.location}</span>
-        )}
+        </div>
+
+        {/* Right cluster: a location chip (same shape as the Ports time chip)
+            plus the chevron, vertically centred against the title. */}
+        <div className="flex shrink-0 items-center gap-2.5">
+          {/* Chevron — rotates 180° when open; the transition makes it spin.
+              Turns primary while open to reinforce the active state. The
+              colour transition is animated too for a smooth swap. */}
+          <ChevronDown
+            size={20}
+            className={cn(
+              "transition-[transform,color] duration-300",
+              isActive ? "rotate-180 text-primary" : "text-muted-foreground"
+            )}
+            aria-hidden="true"
+          />
+        </div>
       </button>
 
-      {/* Expanded body — photo + items list, only for the active day */}
-      {isActive && (
-        <div className="flex flex-col md:flex-row">
-          <div className="md:w-[200px] shrink-0 p-4 md:pr-0">
-            <div className="rounded-xl overflow-hidden h-[140px] md:h-full">
-              <img
-                src={dayImage}
-                alt={`Day ${day.dayNumber}: ${day.title}`}
-                className="w-full h-full object-cover"
-              />
+      {/* Collapsible body — photo + items list.
+          Smooth height animation via the CSS grid-rows trick: the outer grid
+          animates its single row between 0fr (collapsed) and 1fr (full content
+          height), and the inner div clips the overflow while it's shrinking.
+          This animates to the content's natural height without us having to
+          measure it in JS. */}
+      <div
+        className={cn(
+          "grid transition-[grid-template-rows] duration-300 ease-in-out",
+          isActive ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        )}
+      >
+        <div className="overflow-hidden">
+          <div className="flex flex-col md:flex-row">
+            <div className="md:w-[200px] shrink-0">
+              <div className="rounded-bl-lg overflow-hidden h-[140px] md:h-full">
+                <img
+                  src={dayImage}
+                  alt={`Day ${day.dayNumber}: ${day.title}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <div className="flex-1 px-4 py-4 flex flex-col gap-3 border-t">
+              {day.items.map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <DayItemIcon type={item.type} />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                    {item.description && (
+                      <p className="text-xs text-foreground mt-0.5">{item.description}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-
-          <div className="flex-1 px-5 py-4 flex flex-col gap-3">
-            {day.items.map((item, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <DayItemIcon type={item.type} />
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{item.label}</p>
-                  {item.description && (
-                    <p className="text-xs text-foreground mt-0.5">{item.description}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

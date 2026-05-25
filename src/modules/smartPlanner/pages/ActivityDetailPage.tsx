@@ -29,7 +29,6 @@ import {
   Activity as ActivityIcon,
   CalendarCheck,
   Check,
-  MapPinned,
   Hotel,
   Bike,
   Footprints,
@@ -544,21 +543,15 @@ export default function ActivityDetailPage({
                       route stop data on the activity. */}
                   {activity.routeStops && activity.routeStops.length > 0 && (
                     <>
-                      <div className="border-t border-border mx-5" />
-                      <div className="p-5 pb-0">
-                        <p className="text-sm font-bold text-foreground mb-4">
-                          {activity.type === "cruise-ship" || activity.type === "river-cruise"
-                            ? "Cruise route"
-                            : "Activity route"}
-                        </p>
-                      </div>
                       <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr]">
-                        <div className="h-[260px] md:h-[300px] relative z-0 m-5 mt-0 rounded-xl overflow-hidden border border-border">
+                        <div className="h-[260px] md:h-[300px] relative z-0 mt-0 rounded-bl-lg overflow-hidden border border-border">
                           <TourRouteMapInline stops={activity.routeStops} />
                         </div>
-                        <div className="px-5 pb-5 md:pl-0">
-                          <p className="text-xs font-bold text-grey uppercase tracking-wide mb-3">
-                            Stops
+                        <div className="p-5 border-t">
+                          <p className="text-sm font-bold text-foreground mb-4">
+                            {activity.type === "cruise-ship" || activity.type === "river-cruise"
+                              ? "Cruise route"
+                              : "Activity route"}
                           </p>
                           <div className="flex flex-col gap-3">
                             {activity.routeStops.map((stop, i) => (
@@ -612,9 +605,7 @@ export default function ActivityDetailPage({
                   className="scroll-mt-[120px] flex flex-col gap-6"
                 >
                   <h3 className="text-xl font-bold text-foreground">Ports of call</h3>
-                  <div className="bg-card rounded-xl shadow-sm p-5">
-                    <PortsTable ports={activity.cruise.ports} />
-                  </div>
+                  <PortsTable ports={activity.cruise.ports} />
                 </section>
               )}
 
@@ -1168,96 +1159,93 @@ export default function ActivityDetailPage({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PortsTable — list of ports of call shown on cruise / river-cruise pages.
-// Sea days (port.isSeaDay) get a distinct wave-tinted row with a Waves icon
-// and "At sea — relaxation day" label — a deliberate visual cue that this is
-// a non-port day, not a missing destination.
+// PortsTable — the ports of call shown on cruise / river-cruise pages.
+//
+// Each stop is its own small CARD in a vertical stack. The DAY TAG is the
+// anchor of each card: a bold "Day N" badge on the left that the eye catches
+// first, so the route reads as a clear sequence of days. The rest of the card
+// layers down from there:
+//
+//   • Day badge   → the emphasised left-hand anchor ("DAY" + big number)
+//   • Port name   → the bold hero of each card
+//   • right chip  → arrival/departure times, OR an ocean "At sea" chip on a
+//                   sea day (port.isSeaDay) using the cruise feature colour
+//   • description → relaxed muted body text
 // ─────────────────────────────────────────────────────────────────────────────
 function PortsTable({ ports }: { ports: ActivityPort[] }) {
   return (
-    <div className="flex flex-col">
-      {ports.map((port, i) => {
-        // ── Sea day variant ────────────────────────────────────────────────
-        // Replaces the port name + arrival/departure times with a single
-        // "at sea" label so the row doesn't look like it's missing data.
-        if (port.isSeaDay) {
-          return (
-            <div
-              key={`${port.name}-${port.day}`}
-              className={cn(
-                "grid grid-cols-[auto_1fr] gap-4 items-center py-3 px-3 rounded-md",
-                i < ports.length - 1 && "border-b border-border",
-              )}
-              // 0D = 5% opacity wash — subtle ocean tint, not a hard fill
-              style={{ backgroundColor: `${CRUISE_ACCENT}0D` }}
-            >
-              <span
-                className="text-white text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap"
-                style={{ backgroundColor: CRUISE_ACCENT }}
-              >
-                Day {port.day}
-              </span>
-              <div className="flex items-center gap-2 min-w-0">
-                <Waves size={16} className="shrink-0" style={{ color: CRUISE_ACCENT }} aria-hidden="true" />
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-foreground">
-                    At sea — relaxation day
-                  </p>
-                  {port.description && (
-                    <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
-                      {port.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        }
+    // <ol> because the order of stops is meaningful (it's a route, day 1 → day N).
+    // gap-3 puts a little air between the individual cards.
+    <ol className="flex flex-col gap-3">
+      {ports.map((port) => {
+        const isSeaDay = !!port.isSeaDay;
 
-        // ── Standard port-of-call row ──────────────────────────────────────
         return (
-          <div
+          <li
             key={`${port.name}-${port.day}`}
-            className={cn(
-              "grid grid-cols-[auto_1fr_auto] gap-4 items-start py-3",
-              i < ports.length - 1 && "border-b border-border"
-            )}
+            // The card shell — rounded, bordered, soft shadow. Every card looks
+            // the same now; the "At sea" chip alone signals a sea day.
+            className="flex items-start gap-4 rounded-xl border border-border bg-card p-4 shadow-sm"
           >
-            {/* Day pill */}
-            <span className="bg-primary/10 text-primary text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
-              Day {port.day}
-            </span>
+            {/* Day badge — the emphasised anchor of the card. A stacked "DAY"
+                label over a large bold number, in a tinted rounded box. min-w
+                keeps every badge the same width so the cards line up neatly. */}
+            <div className="flex min-w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-primary/10 px-2 pt-1.5 pb-0.5 text-center leading-none text-primary">
+              <span className="text-[10px] font-bold uppercase tracking-wider">Day</span>
+              <span className="text-2xl font-bold">{port.day}</span>
+            </div>
 
-            {/* Name + description */}
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                <MapPinned size={13} className="text-foreground shrink-0" aria-hidden="true" />
-                {port.name}
-              </p>
+            {/* Card content. */}
+            <div className="min-w-0 flex-1">
+              {/* Header row — port name on the left; the chip on the right, on
+                  one line so this reads across in a single glance. items-center
+                  keeps the chip vertically aligned with the port name. */}
+              <div className="flex items-center justify-between gap-3">
+                {/* Port name — the hero of each card. Sea days have no port, so
+                    we show a friendly label instead of a blank line. */}
+                <h4 className="min-w-0 text-base font-bold text-foreground">
+                  {isSeaDay ? "Relaxation day at sea" : port.name}
+                </h4>
+
+                {isSeaDay ? (
+                  /* "At sea" chip — same shape as the time chip but in the
+                     cruise feature colour with a wave icon, so a rest day reads
+                     at a glance. */
+                  <span
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-xs font-semibold"
+                    style={{ backgroundColor: `${CRUISE_ACCENT}1A`, color: CRUISE_ACCENT }} // 1A ≈ 10% opacity
+                  >
+                    <Waves size={12} aria-hidden="true" />
+                    At sea
+                  </span>
+                ) : (
+                  /* Time chip — one compact badge instead of two stacked lines.
+                     Shows a range when the ship both arrives and departs, or a
+                     single "Departs/Arrives" label for embark/disembark days. */
+                  (port.arrives || port.departs) && (
+                    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-muted px-2 py-1 text-xs font-medium text-foreground">
+                      <Clock size={12} className="text-muted-foreground" aria-hidden="true" />
+                      {port.arrives && port.departs
+                        ? `${port.arrives} → ${port.departs}`
+                        : port.departs
+                          ? `Departs ${port.departs}`
+                          : `Arrives ${port.arrives}`}
+                    </span>
+                  )
+                )}
+              </div>
+
+              {/* Description — relaxed, muted body text. */}
               {port.description && (
-                <p className="text-xs text-foreground mt-1 leading-snug">
+                <p className="mt-1 text-sm">
                   {port.description}
                 </p>
               )}
             </div>
-
-            {/* Times — right aligned */}
-            <div className="text-right text-xs text-muted-foreground whitespace-nowrap">
-              {port.arrives && (
-                <p>
-                  <span className="font-semibold text-foreground">Arrives</span> {port.arrives}
-                </p>
-              )}
-              {port.departs && (
-                <p>
-                  <span className="font-semibold text-foreground">Departs</span> {port.departs}
-                </p>
-              )}
-            </div>
-          </div>
+          </li>
         );
       })}
-    </div>
+    </ol>
   );
 }
 
