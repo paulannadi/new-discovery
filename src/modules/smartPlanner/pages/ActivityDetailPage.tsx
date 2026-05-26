@@ -29,7 +29,6 @@ import {
   Activity as ActivityIcon,
   CalendarCheck,
   Check,
-  MapPinned,
   Hotel,
   Bike,
   Footprints,
@@ -55,6 +54,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../../shared/components/ui/dialog";
+import { Button } from "../../../shared/components/ui/button";
 import { cn } from "../../../shared/components/ui/utils";
 import type { Activity, ActivityCabin, ActivityPort, TourAttribute } from "../../../types";
 import { DayByDaySection } from "../components/DayByDaySection";
@@ -394,7 +394,7 @@ export default function ActivityDetailPage({
 
             {/* Activity-type badge — sits above the title to set context */}
             {typeMeta && (
-              <span className="self-start flex items-center gap-1.5 bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full">
+              <span className="self-start flex items-center gap-1.5 text-foreground text-xs font-bold">
                 {typeMeta.icon}
                 {typeMeta.label}
               </span>
@@ -420,16 +420,7 @@ export default function ActivityDetailPage({
                 <span>{activity.location}</span>
               </div>
 
-              {/* Difficulty + distance — only present on walking / bicycle */}
-              {activity.difficulty && (
-                <>
-                  <span className="text-border hidden md:block">|</span>
-                  <div className="flex items-center gap-1.5">
-                    <Mountain size={15} className="text-foreground shrink-0" aria-hidden="true" />
-                    <span>{activity.difficulty}</span>
-                  </div>
-                </>
-              )}
+              {/* Distance — only present on walking / bicycle */}
               {activity.distanceKm != null && (
                 <>
                   <span className="text-border hidden md:block">|</span>
@@ -552,21 +543,15 @@ export default function ActivityDetailPage({
                       route stop data on the activity. */}
                   {activity.routeStops && activity.routeStops.length > 0 && (
                     <>
-                      <div className="border-t border-border mx-5" />
-                      <div className="p-5 pb-0">
-                        <p className="text-sm font-bold text-foreground mb-4">
-                          {activity.type === "cruise-ship" || activity.type === "river-cruise"
-                            ? "Cruise route"
-                            : "Activity route"}
-                        </p>
-                      </div>
                       <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr]">
-                        <div className="h-[260px] md:h-[300px] relative z-0 m-5 mt-0 rounded-xl overflow-hidden border border-border">
+                        <div className="h-[260px] md:h-[300px] relative z-0 mt-0 rounded-bl-lg overflow-hidden border border-border">
                           <TourRouteMapInline stops={activity.routeStops} />
                         </div>
-                        <div className="px-5 pb-5 md:pl-0">
-                          <p className="text-xs font-bold text-grey uppercase tracking-wide mb-3">
-                            Stops
+                        <div className="p-5 border-t">
+                          <p className="text-sm font-bold text-foreground mb-4">
+                            {activity.type === "cruise-ship" || activity.type === "river-cruise"
+                              ? "Cruise route"
+                              : "Activity route"}
                           </p>
                           <div className="flex flex-col gap-3">
                             {activity.routeStops.map((stop, i) => (
@@ -620,9 +605,7 @@ export default function ActivityDetailPage({
                   className="scroll-mt-[120px] flex flex-col gap-6"
                 >
                   <h3 className="text-xl font-bold text-foreground">Ports of call</h3>
-                  <div className="bg-card rounded-xl shadow-sm p-5">
-                    <PortsTable ports={activity.cruise.ports} />
-                  </div>
+                  <PortsTable ports={activity.cruise.ports} />
                 </section>
               )}
 
@@ -652,7 +635,7 @@ export default function ActivityDetailPage({
                 >
                   <h3 className="text-xl font-bold text-foreground">Trail route</h3>
 
-                  {/* Stat tiles — distance + difficulty */}
+                  {/* Stat tiles — distance */}
                   <div className="grid grid-cols-2 gap-3">
                     {activity.distanceKm != null && (
                       <div className="bg-card rounded-xl shadow-sm p-5 flex items-center gap-3">
@@ -665,21 +648,6 @@ export default function ActivityDetailPage({
                           </p>
                           <p className="text-lg font-bold text-foreground">
                             {activity.distanceKm} km
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    {activity.difficulty && (
-                      <div className="bg-card rounded-xl shadow-sm p-5 flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <Mountain size={18} className="text-primary" aria-hidden="true" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-grey uppercase tracking-wide">
-                            Difficulty
-                          </p>
-                          <p className="text-lg font-bold text-foreground">
-                            {activity.difficulty}
                           </p>
                         </div>
                       </div>
@@ -698,11 +666,10 @@ export default function ActivityDetailPage({
                 className="scroll-mt-[120px] flex flex-col gap-6"
               >
                 <h3 className="text-xl font-bold text-foreground">
-                  Why you'll love it
+                  Activity highlights
                 </h3>
                 <div className="bg-card rounded-xl shadow-sm p-5">
                   <InfoList
-                    title="Activity highlights"
                     items={activity.highlights}
                     variant="highlight"
                   />
@@ -716,10 +683,10 @@ export default function ActivityDetailPage({
                 className="scroll-mt-[120px] flex flex-col gap-6"
               >
                 <h3 className="text-xl font-bold text-foreground">
-                  Everything included
+                  What's included
                 </h3>
                 <div className="bg-card rounded-xl shadow-sm p-5">
-                  <InfoList title="What's included" items={activity.included} variant="check" />
+                  <InfoList items={activity.included} variant="check" />
                 </div>
               </section>
 
@@ -730,10 +697,10 @@ export default function ActivityDetailPage({
                 className="scroll-mt-[120px] flex flex-col gap-6"
               >
                 <h3 className="text-xl font-bold text-foreground">
-                  Good to know before you book
+                  Not included
                 </h3>
                 <div className="bg-card rounded-xl shadow-sm p-5">
-                  <InfoList title="Not included" items={activity.excluded} variant="cross" />
+                  <InfoList items={activity.excluded} variant="cross" />
                 </div>
               </section>
 
@@ -1192,96 +1159,93 @@ export default function ActivityDetailPage({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PortsTable — list of ports of call shown on cruise / river-cruise pages.
-// Sea days (port.isSeaDay) get a distinct wave-tinted row with a Waves icon
-// and "At sea — relaxation day" label — a deliberate visual cue that this is
-// a non-port day, not a missing destination.
+// PortsTable — the ports of call shown on cruise / river-cruise pages.
+//
+// Each stop is its own small CARD in a vertical stack. The DAY TAG is the
+// anchor of each card: a bold "Day N" badge on the left that the eye catches
+// first, so the route reads as a clear sequence of days. The rest of the card
+// layers down from there:
+//
+//   • Day badge   → the emphasised left-hand anchor ("DAY" + big number)
+//   • Port name   → the bold hero of each card
+//   • right chip  → arrival/departure times, OR an ocean "At sea" chip on a
+//                   sea day (port.isSeaDay) using the cruise feature colour
+//   • description → relaxed muted body text
 // ─────────────────────────────────────────────────────────────────────────────
 function PortsTable({ ports }: { ports: ActivityPort[] }) {
   return (
-    <div className="flex flex-col">
-      {ports.map((port, i) => {
-        // ── Sea day variant ────────────────────────────────────────────────
-        // Replaces the port name + arrival/departure times with a single
-        // "at sea" label so the row doesn't look like it's missing data.
-        if (port.isSeaDay) {
-          return (
-            <div
-              key={`${port.name}-${port.day}`}
-              className={cn(
-                "grid grid-cols-[auto_1fr] gap-4 items-center py-3 px-3 rounded-md",
-                i < ports.length - 1 && "border-b border-border",
-              )}
-              // 0D = 5% opacity wash — subtle ocean tint, not a hard fill
-              style={{ backgroundColor: `${CRUISE_ACCENT}0D` }}
-            >
-              <span
-                className="text-white text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap"
-                style={{ backgroundColor: CRUISE_ACCENT }}
-              >
-                Day {port.day}
-              </span>
-              <div className="flex items-center gap-2 min-w-0">
-                <Waves size={16} className="shrink-0" style={{ color: CRUISE_ACCENT }} aria-hidden="true" />
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-foreground">
-                    At sea — relaxation day
-                  </p>
-                  {port.description && (
-                    <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
-                      {port.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        }
+    // <ol> because the order of stops is meaningful (it's a route, day 1 → day N).
+    // gap-3 puts a little air between the individual cards.
+    <ol className="flex flex-col gap-3">
+      {ports.map((port) => {
+        const isSeaDay = !!port.isSeaDay;
 
-        // ── Standard port-of-call row ──────────────────────────────────────
         return (
-          <div
+          <li
             key={`${port.name}-${port.day}`}
-            className={cn(
-              "grid grid-cols-[auto_1fr_auto] gap-4 items-start py-3",
-              i < ports.length - 1 && "border-b border-border"
-            )}
+            // The card shell — rounded, bordered, soft shadow. Every card looks
+            // the same now; the "At sea" chip alone signals a sea day.
+            className="flex items-start gap-4 rounded-xl border border-border bg-card p-4 shadow-sm"
           >
-            {/* Day pill */}
-            <span className="bg-primary/10 text-primary text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
-              Day {port.day}
-            </span>
+            {/* Day badge — the emphasised anchor of the card. A stacked "DAY"
+                label over a large bold number, in a tinted rounded box. min-w
+                keeps every badge the same width so the cards line up neatly. */}
+            <div className="flex min-w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-primary/10 px-2 pt-1.5 pb-0.5 text-center leading-none text-primary">
+              <span className="text-[10px] font-bold uppercase tracking-wider">Day</span>
+              <span className="text-2xl font-bold">{port.day}</span>
+            </div>
 
-            {/* Name + description */}
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                <MapPinned size={13} className="text-foreground shrink-0" aria-hidden="true" />
-                {port.name}
-              </p>
+            {/* Card content. */}
+            <div className="min-w-0 flex-1">
+              {/* Header row — port name on the left; the chip on the right, on
+                  one line so this reads across in a single glance. items-center
+                  keeps the chip vertically aligned with the port name. */}
+              <div className="flex items-center justify-between gap-3">
+                {/* Port name — the hero of each card. Sea days have no port, so
+                    we show a friendly label instead of a blank line. */}
+                <h4 className="min-w-0 text-base font-bold text-foreground">
+                  {isSeaDay ? "Relaxation day at sea" : port.name}
+                </h4>
+
+                {isSeaDay ? (
+                  /* "At sea" chip — same shape as the time chip but in the
+                     cruise feature colour with a wave icon, so a rest day reads
+                     at a glance. */
+                  <span
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-xs font-semibold"
+                    style={{ backgroundColor: `${CRUISE_ACCENT}1A`, color: CRUISE_ACCENT }} // 1A ≈ 10% opacity
+                  >
+                    <Waves size={12} aria-hidden="true" />
+                    At sea
+                  </span>
+                ) : (
+                  /* Time chip — one compact badge instead of two stacked lines.
+                     Shows a range when the ship both arrives and departs, or a
+                     single "Departs/Arrives" label for embark/disembark days. */
+                  (port.arrives || port.departs) && (
+                    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-muted px-2 py-1 text-xs font-medium text-foreground">
+                      <Clock size={12} className="text-muted-foreground" aria-hidden="true" />
+                      {port.arrives && port.departs
+                        ? `${port.arrives} → ${port.departs}`
+                        : port.departs
+                          ? `Departs ${port.departs}`
+                          : `Arrives ${port.arrives}`}
+                    </span>
+                  )
+                )}
+              </div>
+
+              {/* Description — relaxed, muted body text. */}
               {port.description && (
-                <p className="text-xs text-foreground mt-1 leading-snug">
+                <p className="mt-1 text-sm">
                   {port.description}
                 </p>
               )}
             </div>
-
-            {/* Times — right aligned */}
-            <div className="text-right text-xs text-muted-foreground whitespace-nowrap">
-              {port.arrives && (
-                <p>
-                  <span className="font-semibold text-foreground">Arrives</span> {port.arrives}
-                </p>
-              )}
-              {port.departs && (
-                <p>
-                  <span className="font-semibold text-foreground">Departs</span> {port.departs}
-                </p>
-              )}
-            </div>
-          </div>
+          </li>
         );
       })}
-    </div>
+    </ol>
   );
 }
 
@@ -1317,16 +1281,18 @@ function CabinGrid({
           <div
             key={cabin.name}
             className={cn(
-              // `relative` so the absolute-positioned "Best value" badge anchors here
-              "relative bg-card rounded-xl shadow-sm overflow-hidden flex flex-col transition-all",
-              isSelected ? "border-2 border-primary" : "border border-border"
+              // `relative` so the absolute-positioned "Best value" badge anchors here.
+              // Selection styling mirrors the room cards on HotelDetailPage: always
+              // border-2 (so selecting doesn't shift layout), with a black outline
+              // and a lifted shadow when selected, transparent border otherwise.
+              "relative bg-card rounded-xl shadow-sm hover:shadow-md overflow-hidden flex flex-col transition-all border-2",
+              isSelected ? "border-foreground shadow-lg" : "border-transparent"
             )}
           >
             {/* "Best value" badge — only shown on the cheapest cabin */}
             {isCheapest && (
               <span
-                className="absolute top-2 left-2 z-10 text-white text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-md"
-                style={{ backgroundColor: CRUISE_ACCENT }}
+                className="absolute top-2 left-2 z-10 text-green-700 bg-green-50 text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-md"
               >
                 Best value
               </span>
@@ -1353,17 +1319,24 @@ function CabinGrid({
                     {currency}{cabin.pricePerPerson.toLocaleString()}
                   </span>
                 </div>
-                <button
+                {/* default = main action, secondary = already-selected
+                    confirmation state — same pattern as the room cards */}
+                <Button
                   onClick={() => onSelect(cabin.name)}
+                  variant={isSelected ? "secondary" : "default"}
+                  size="sm"
+                  // Selected = solid light-gray bg + dark text (the secondary
+                  // token's own colours). The bare secondary variant is
+                  // transparent-until-hover, so we pin both bg and text here —
+                  // including the hover states — so it stays stable.
                   className={cn(
-                    "text-xs font-bold px-4 py-2 rounded-md transition-colors",
-                    isSelected
-                      ? "bg-primary text-white"
-                      : "border border-primary text-primary hover:bg-primary hover:text-white"
+                    isSelected &&
+                      "bg-secondary text-secondary-foreground hover:bg-secondary hover:text-secondary-foreground"
                   )}
                 >
+                  {isSelected && <Check size={16} aria-hidden="true" />}
                   {isSelected ? "Selected" : "Choose cabin"}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

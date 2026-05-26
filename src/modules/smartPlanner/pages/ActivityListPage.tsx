@@ -10,8 +10,6 @@
 // Filter pills:
 //   • Sort           — Recommended / Price ↑ / Price ↓ / Top rated
 //   • Duration       — 1–3 / 4–7 / 8–14 / 15+ days
-//   • Difficulty     — Easy / Moderate / Challenging (only meaningful for
-//                      walking + bicycle, but harmless on other types)
 //   • Price          — dual-handle slider over the per-person price range
 //
 // Note: Activity type is not exposed as a filter here — it's already a search
@@ -26,7 +24,6 @@ import {
   Check,
   ArrowUpDown,
   Clock,
-  Mountain,
   Tag,
 } from "lucide-react";
 import { BackButton } from "../../../shared/components/BackButton";
@@ -61,14 +58,10 @@ const DURATION_OPTIONS = [
   { id: "epic",    label: "15+ days",   min: 15, max: 999 },
 ] as const;
 
-const DIFFICULTY_OPTIONS = ["Easy", "Moderate", "Challenging"] as const;
-type Difficulty = typeof DIFFICULTY_OPTIONS[number];
-
 // Which dropdown is open. Only one open at a time, like in HolidayListPage.
 type FilterDropdown =
   | "sort"
   | "duration"
-  | "difficulty"
   | "price"
   | null;
 
@@ -179,9 +172,6 @@ export default function ActivityListPage({
   // Duration buckets are stored by id ("short" | "week" | …)
   const [selectedDurations, setSelectedDurations] = useState<string[]>([]);
 
-  // Difficulty is multi-select since "Easy" + "Moderate" is a sensible combo
-  const [selectedDifficulties, setSelectedDifficulties] = useState<Difficulty[]>([]);
-
   // Price slider — defaults span the full dataset, recomputed below
   const priceBounds = useMemo(() => {
     const prices = ALL_ACTIVITIES.map((a) => a.price.perPerson);
@@ -240,7 +230,7 @@ export default function ActivityListPage({
   const [highlightedActivityId, setHighlightedActivityId] = useState<string | null>(null);
 
   // ── Filtering pipeline ─────────────────────────────────────────────────
-  // Order: destination match → type → duration → difficulty → price → sort.
+  // Order: destination match → type → duration → price → sort.
   const filteredActivities = useMemo(() => {
     const destQuery = searchCriteria.destination.trim().toLowerCase();
     // If the user picked a cruise region from the Destination dropdown, the
@@ -279,17 +269,6 @@ export default function ActivityListPage({
         if (!matchesAnyBucket) return false;
       }
 
-      // Difficulty — only excludes activities with a `difficulty` set that
-      // doesn't match. Activities without a difficulty (cruises, tours)
-      // are still included unless someone explicitly only wanted graded
-      // walking/bicycle results — we treat the filter as additive so
-      // an empty selection doesn't exclude anything.
-      if (selectedDifficulties.length > 0) {
-        if (!a.difficulty || !selectedDifficulties.includes(a.difficulty)) {
-          return false;
-        }
-      }
-
       // Price range
       if (
         a.price.perPerson < priceRange[0] ||
@@ -315,7 +294,6 @@ export default function ActivityListPage({
     searchCriteria.destination,
     selectedTypes,
     selectedDurations,
-    selectedDifficulties,
     priceRange,
     sortBy,
   ]);
@@ -351,12 +329,6 @@ export default function ActivityListPage({
   const toggleDuration = (id: string) => {
     setSelectedDurations((prev) =>
       prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id]
-    );
-  };
-
-  const toggleDifficulty = (d: Difficulty) => {
-    setSelectedDifficulties((prev) =>
-      prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]
     );
   };
 
@@ -405,24 +377,6 @@ export default function ActivityListPage({
               label={opt.label}
               checked={selectedDurations.includes(opt.id)}
               onChange={() => toggleDuration(opt.id)}
-            />
-          ))}
-        </div>
-      );
-    }
-
-    if (openDropdown === "difficulty") {
-      return (
-        <div
-          style={{ left: `${dropdownLeft}px` }}
-          className="absolute top-full mt-2 z-30 bg-card rounded-xl shadow-xl border border-border p-3 min-w-[220px] flex flex-col gap-1 animate-in fade-in zoom-in-95 duration-150"
-        >
-          {DIFFICULTY_OPTIONS.map((d) => (
-            <CheckboxRow
-              key={d}
-              label={d}
-              checked={selectedDifficulties.includes(d)}
-              onChange={() => toggleDifficulty(d)}
             />
           ))}
         </div>
@@ -496,7 +450,6 @@ export default function ActivityListPage({
 
   // ── Selection-count helpers — drive the "active" pill state ──────────────
   const durationCount   = selectedDurations.length;
-  const difficultyCount = selectedDifficulties.length;
   const priceActive =
     priceRange[0] !== priceBounds.min || priceRange[1] !== priceBounds.max;
 
@@ -508,7 +461,7 @@ export default function ActivityListPage({
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <div
-      className="min-h-screen bg-grey-lightest"
+      className="bg-grey-lightest min-h-screen flex flex-col relative"
       style={{ fontFamily: "'Mulish', sans-serif" }}
     >
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;900&display=swap');`}</style>
@@ -518,7 +471,7 @@ export default function ActivityListPage({
           (same shape as HolidayListPage's header card)
       ══════════════════════════════════════════════════════════════════ */}
       <div className="bg-card border-b border-border">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 md:px-10 pt-5 pb-5 flex flex-col gap-4">
+        <div className="max-w-[1920px] mx-auto px-4 md:px-6 pt-5 pb-5 flex flex-col gap-4">
           <BackButton label="Back to discovery" onClick={onBack} />
           <ActivitySearchForm
             variant="compact"
@@ -529,12 +482,18 @@ export default function ActivityListPage({
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
-          BODY — filter pills + split layout (cards left, map right)
+          STICKY FILTER BAR — full-width grey bar that pins under the header
+          as the list scrolls. Mirrors HotelListPage's desktop filter bar.
       ══════════════════════════════════════════════════════════════════ */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8">
-
-        {/* ── Filter pills row — horizontal, scrollable on mobile ── */}
-        <div ref={filtersRef} className="relative mb-5 md:mb-6">
+      <div className="bg-grey-lightest sticky top-0 z-30">
+        {/* filtersRef stays `relative` so the dropdown panel can anchor under
+            its button. It sits OUTSIDE the scrollable pill row, so the
+            overflow-x on the pills never clips the open dropdown. */}
+        <div
+          ref={filtersRef}
+          className="relative max-w-[1920px] mx-auto px-4 md:px-6 py-3"
+        >
+          {/* Filter pills — horizontal, scrollable on mobile */}
           <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <FilterButton
               label={`Sort: ${SORT_OPTIONS.find((o) => o.id === sortBy)?.label ?? ""}`}
@@ -550,13 +509,6 @@ export default function ActivityListPage({
               onClick={(e) => handleFilterClick("duration", e)}
             />
             <FilterButton
-              label={difficultyCount > 0 ? `Difficulty (${difficultyCount})` : "Difficulty"}
-              icon={<Mountain size={14} aria-hidden="true" />}
-              active={openDropdown === "difficulty"}
-              hasSelection={difficultyCount > 0}
-              onClick={(e) => handleFilterClick("difficulty", e)}
-            />
-            <FilterButton
               label="Price"
               icon={<Tag size={14} aria-hidden="true" />}
               active={openDropdown === "price"}
@@ -568,20 +520,26 @@ export default function ActivityListPage({
           {/* The actual dropdown panel — positioned absolute to the filters row */}
           {renderDropdown()}
         </div>
+      </div>
 
-        {/* ── Result count headline ── */}
-        <div className="mb-4 flex items-center justify-between">
-          <p className="text-sm text-foreground">
-            <span className="font-bold">{filteredActivities.length}</span>{" "}
+      {/* ══════════════════════════════════════════════════════════════════
+          MAIN SPLIT — scrollable card list (left) + sticky map (right).
+          Mirrors HotelListPage: the outer row is `overflow-hidden` and fills
+          the leftover viewport height, so the PAGE doesn't scroll — only the
+          left column does (overflow-y-auto). The map fills its column.
+      ══════════════════════════════════════════════════════════════════ */}
+      <div className="flex flex-1 max-w-[1920px] mx-auto w-full overflow-hidden relative">
+
+        {/* LEFT — scrollable list column (65% on md+, full width below) */}
+        <div className="w-full md:w-[65%] min-w-0 h-[calc(100vh-130px)] overflow-y-auto p-4 md:p-6 flex flex-col gap-6">
+
+          {/* Result count headline */}
+          <h2 className="text-foreground font-extrabold text-xl">
+            {filteredActivities.length}{" "}
             {filteredActivities.length === 1 ? "activity" : "activities"} found
-          </p>
-        </div>
+          </h2>
 
-        {/* ── Split layout: cards left, map right ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 lg:gap-8 items-start">
-
-          {/* LEFT — list of result cards */}
-          <div className="flex flex-col gap-4 min-w-0">
+          <div className="flex flex-col gap-4 pb-24 md:pb-10">
             {/* Loading skeletons — vertical variant matches the ActivityCard
                 layout (image on top, content below). 4 placeholders is enough
                 to fill the visible area without noisy excess. */}
@@ -617,28 +575,27 @@ export default function ActivityListPage({
               </StaggeredList>
             )}
           </div>
-
-          {/* RIGHT — sticky map column, hidden on mobile */}
-          <div className="hidden lg:block sticky top-[32px]">
-            <div className="rounded-xl overflow-hidden border border-border h-[calc(100vh-120px)] min-h-[500px]">
-              <LeafletMap
-                markers={mapMarkers}
-                center={fallbackCenter}
-                zoom={3}
-                centerKey={`activities-${selectedTypes.join("|")}-${searchCriteria.destination}`}
-                onMarkerHover={setHighlightedActivityId}
-                onMarkerClick={(id) => {
-                  const activity = filteredActivities.find(
-                    (a) => a.activityId === id
-                  );
-                  if (activity) onViewDetail(activity);
-                }}
-                onMarkerDeselect={() => setHighlightedActivityId(null)}
-              />
-            </div>
-          </div>
-
         </div>
+
+        {/* RIGHT — sticky full-height map column (35% on md+), hidden on mobile.
+            Full-bleed like HotelListPage — LeafletMap fills the column. */}
+        <div className="hidden md:block w-full md:w-[35%] min-w-0 h-[calc(100vh-130px)] sticky top-0">
+          <LeafletMap
+            markers={mapMarkers}
+            center={fallbackCenter}
+            zoom={3}
+            centerKey={`activities-${selectedTypes.join("|")}-${searchCriteria.destination}`}
+            onMarkerHover={setHighlightedActivityId}
+            onMarkerClick={(id) => {
+              const activity = filteredActivities.find(
+                (a) => a.activityId === id
+              );
+              if (activity) onViewDetail(activity);
+            }}
+            onMarkerDeselect={() => setHighlightedActivityId(null)}
+          />
+        </div>
+
       </div>
     </div>
   );

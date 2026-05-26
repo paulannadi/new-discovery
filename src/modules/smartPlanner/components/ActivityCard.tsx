@@ -17,7 +17,7 @@ import {
   Calendar,
   Clock,
   Star,
-  Users,
+  ArrowRight,
 } from "lucide-react";
 import type { Activity } from "../../../types";
 import { cn } from "../../../shared/components/ui/utils";
@@ -101,10 +101,10 @@ export function ActivityCard({
             alt={activity.title}
             containerClassName="absolute inset-0 w-full h-full"
           />
-
-          {/* Activity-type badge — lucide icon + label, matches TourCard chip style */}
+          {/* Activity-type badge — pinned to the top-left of the image so the
+              type reads at a glance without competing with the card body. */}
           {typeMeta && (
-            <span className="absolute top-2 left-2 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-normal bg-card text-foreground shadow-sm">
+            <span className="absolute top-3 left-3 inline-flex items-center gap-1 bg-white text-foreground text-xs font-medium px-2.5 py-1 rounded-full shadow-sm">
               {typeMeta.icon}
               {typeMeta.label}
             </span>
@@ -112,83 +112,94 @@ export function ActivityCard({
         </div>
 
         {/* ── Right side ──────────────────────────────────────────────────── */}
-        <div className="flex-1 p-4 lg:p-6 flex flex-col @[680px]:flex-row gap-4">
-          {/* Col 1 — title, location, dates, highlight chips */}
+        {/* Single column now: text content on top, price + CTA footer pinned
+            at the bottom — mirrors HotelCard's content layout. */}
+        <div className="flex-1 p-4 lg:p-6 flex flex-col gap-3">
+          {/* Top — title, location, dates, type chip */}
           <div className="flex-1 flex flex-col gap-3">
-            <h3 className="text-lg font-bold text-foreground leading-snug">
-              {activity.title}
-            </h3>
 
-            <div className="flex items-center gap-1.5 text-xs text-foreground">
-              <MapPin size={13} className="shrink-0" aria-hidden="true" />
-              <span className="font-medium">{activity.location}</span>
-            </div>
+            {/* Title + location + dates grouped into one tight block.
+                gap-1.5 keeps these three lines close together so they read as
+                a single unit, separate from the type chip below. */}
+            <div className="flex flex-col gap-1.5">
 
-            {/* Duration + dates row */}
-            <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-foreground">
-              <span className="flex items-center gap-1.5">
-                <Clock size={12} className="shrink-0" aria-hidden="true" />
-                {activity.durationDays === 1
-                  ? "1 day"
-                  : `${activity.durationDays} days`}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Calendar size={12} className="shrink-0" aria-hidden="true" />
-                {activity.startDate} – {activity.endDate}
-              </span>
-              {/* Difficulty pill — only present for walking/bicycle */}
-              {activity.difficulty && (
+              {/* Title row — title on the left, rating block top-right.
+                  items-start keeps the rating aligned to the first line of the
+                  title; min-w-0 lets a long title shrink instead of shoving the
+                  rating off the card. */}
+              <div className="flex justify-between items-start gap-3">
+                <h3 className="text-lg font-extrabold text-foreground leading-snug min-w-0">
+                  {activity.title}
+                </h3>
+
+                {/* Rating — star + score on one line, review count beneath,
+                    the whole block right-aligned. shrink-0 protects it from
+                    being squeezed by a long title. */}
+                <div className="shrink-0 flex flex-col items-end">
+                  <div className="flex items-center gap-1.5 text-xs text-foreground">
+                    <Star
+                      size={13}
+                      className="text-warning shrink-0"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    />
+                    <span className="font-bold">
+                      {activity.rating.score.toFixed(1)}
+                    </span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {activity.rating.reviewCount.toLocaleString()} reviews
+                  </span>
+                </div>
+              </div>
+
+              {/* Location */}
+              <div className="flex items-center gap-1.5 text-xs text-foreground">
+                <MapPin size={13} className="shrink-0" aria-hidden="true" />
+                <span className="font-medium">{activity.location}</span>
+              </div>
+
+              {/* Duration + dates row */}
+              <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-foreground">
                 <span className="flex items-center gap-1.5">
-                  <Users size={12} className="shrink-0" aria-hidden="true" />
-                  {activity.difficulty}
+                  <Clock size={12} className="shrink-0" aria-hidden="true" />
+                  {activity.durationDays === 1
+                    ? "1 day"
+                    : `${activity.durationDays} days`}
                 </span>
-              )}
-            </div>
-
-            {/* Rating row */}
-            <div className="flex items-center gap-1.5 text-xs text-foreground">
-              <Star
-                size={13}
-                className="text-warning shrink-0"
-                fill="currentColor"
-                aria-hidden="true"
-              />
-              <span className="font-semibold">{activity.rating.score.toFixed(1)}</span>
-              <span className="text-muted-foreground">
-                ({activity.rating.reviewCount.toLocaleString()} reviews)
-              </span>
-            </div>
-
-            {/* Up to 3 highlight chips */}
-            <div className="flex flex-wrap gap-2">
-              {activity.highlights.slice(0, 3).map((highlight) => (
-                <span
-                  key={highlight}
-                  className="bg-primary/10 text-primary text-xs font-medium px-2.5 py-1 rounded-full"
-                >
-                  {highlight}
+                <span className="flex items-center gap-1.5">
+                  <Calendar size={12} className="shrink-0" aria-hidden="true" />
+                  {activity.startDate} – {activity.endDate}
                 </span>
-              ))}
+              </div>
             </div>
           </div>
 
-          {/* Col 2 — price + CTA, pinned to bottom-right */}
-          <div className="shrink-0 flex flex-col items-end justify-end gap-2">
-            <div className="flex items-baseline gap-1.5">
+          {/* Footer — price on the left, "View details" on the right.
+              Stacks (price above, full-width button below) when the card is
+              narrow; sits side-by-side once the card is ≥680px wide. Matches
+              HotelCard's footer. */}
+          <div className="flex flex-col @[680px]:flex-row @[680px]:justify-between @[680px]:items-end gap-3">
+            {/* Price — mobile: label + amount inline on one baseline (gap-1.5),
+                right-aligned when stacked. Desktop (≥680px): stacks into a
+                column with no gap so the label sits tight above the amount. */}
+            <div className="flex items-baseline gap-1.5 self-end @[680px]:self-auto @[680px]:flex-col @[680px]:gap-0">
               <span className="text-xs text-foreground">Per person from</span>
               <span className="text-2xl font-extrabold text-foreground leading-none">
                 {sym}
                 {activity.price.perPerson.toLocaleString()}
               </span>
             </div>
+            {/* CTA — full-width on narrow cards for an easy tap target, auto-width at ≥680px */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onSelect?.(activity);
               }}
-              className="w-full justify-center bg-primary hover:brightness-85 text-primary-foreground font-bold text-sm px-5 py-2.5 rounded-md transition-all flex items-center gap-2"
+              className="w-full @[680px]:w-auto justify-center bg-primary hover:brightness-85 text-primary-foreground font-extrabold text-sm px-5 py-2.5 rounded-lg transition-all flex items-center gap-2"
             >
               View details
+              <ArrowRight size={15} aria-hidden="true" />
             </button>
           </div>
         </div>
