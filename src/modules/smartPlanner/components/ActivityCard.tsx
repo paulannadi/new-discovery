@@ -101,6 +101,14 @@ export function ActivityCard({
             alt={activity.title}
             containerClassName="absolute inset-0 w-full h-full"
           />
+          {/* Activity-type badge — pinned to the top-left of the image so the
+              type reads at a glance without competing with the card body. */}
+          {typeMeta && (
+            <span className="absolute top-3 left-3 inline-flex items-center gap-1 bg-white text-foreground text-xs font-medium px-2.5 py-1 rounded-full shadow-sm">
+              {typeMeta.icon}
+              {typeMeta.label}
+            </span>
+          )}
         </div>
 
         {/* ── Right side ──────────────────────────────────────────────────── */}
@@ -165,17 +173,6 @@ export function ActivityCard({
                 </span>
               </div>
             </div>
-
-            {/* Activity-type chip — reuses the highlight-chip styling but shows
-                the type icon + label (e.g. 🚢 Cruise) in place of highlights */}
-            {typeMeta && (
-              <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs font-medium px-2.5 py-1 rounded-full">
-                  {typeMeta.icon}
-                  {typeMeta.label}
-                </span>
-              </div>
-            )}
           </div>
 
           {/* Footer — price on the left, "View details" on the right.

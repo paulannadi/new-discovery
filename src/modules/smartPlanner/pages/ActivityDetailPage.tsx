@@ -394,7 +394,7 @@ export default function ActivityDetailPage({
 
             {/* Activity-type badge — sits above the title to set context */}
             {typeMeta && (
-              <span className="self-start flex items-center gap-1.5 bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full">
+              <span className="self-start flex items-center gap-1.5 text-foreground text-xs font-bold">
                 {typeMeta.icon}
                 {typeMeta.label}
               </span>
