@@ -17,6 +17,10 @@ import type { UnifiedPackage } from "./types";
 import ActivityListPage from "./modules/smartPlanner/pages/ActivityListPage";
 import ActivityDetailPage from "./modules/smartPlanner/pages/ActivityDetailPage";
 import type { Activity, ActivitySearchCriteria } from "./types";
+// AI Itinerary flow — Conversation + Canvas screen reached from the "Plan
+// my trip" CTA inside Discovery's AI Experience mode. The previous Agent
+// path is documented in AGENT_PATH.md at repo root and no longer reachable.
+import AiItineraryPage from "./modules/smartPlanner/pages/AiItineraryPage";
 import { Toast } from "./shared/components/ui/toast";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toastify.css";
@@ -136,7 +140,15 @@ export default function App() {
     // ── Activities flow ──
     | "activity-list"
     | "activity-detail"
+    // ── AI Itinerary flow (3-screen prototype) ──
+    | "ai-itinerary"
   >("discovery");
+
+  // ── AI Itinerary entry state ─────────────────────────────────────────────
+  // When the user enters the AI Itinerary flow from Discovery, we carry the
+  // typed prompt (if any) and the chosen audience (traveller/agent) across
+  // so the new page can start in the right state.
+  const [aiInitialPrompt, setAiInitialPrompt] = useState<string>("");
 
   // The "how did you get here" context passed into SmartPlanner.
   // It tells SmartPlanner which product(s) to pre-load in the itinerary.
@@ -445,6 +457,15 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
+  // ── AI Itinerary entry — from Discovery's "Plan my trip" CTA ─────────────
+  // Carries the brief composed in the moodboard composer (may be empty)
+  // into AiItineraryPage as the first user message in the conversation.
+  const handleAiPlannerStart = (prompt: string) => {
+    setAiInitialPrompt(prompt);
+    setCurrentPage("ai-itinerary");
+    window.scrollTo(0, 0);
+  };
+
   // ── Back → Discovery ─────────────────────────────────────────────────────
   // Called from the SmartPlanner "Back" button and the HotelList "← New Search".
   const handleBack = () => {
@@ -471,6 +492,7 @@ export default function App() {
           onHolidaySearch={handleHolidaySearch}
           onActivitySearch={handleActivitySearch}
           onActivityDirectSelect={handleActivityDirectSelect}
+          onAiPlannerStart={handleAiPlannerStart}
         />
       )}
 
@@ -631,6 +653,16 @@ export default function App() {
             window.scrollTo(0, 0);
           }}
           onBook={handlePackageDetailBook}
+        />
+      )}
+
+      {/* Screen: AI Itinerary — split-view Conversation + Canvas. Reached
+          from Discovery's "Plan my trip" CTA inside the AI Experience hero
+          mode. See AGENT_PATH.md for the previous agent flow we dropped. */}
+      {currentPage === "ai-itinerary" && (
+        <AiItineraryPage
+          initialPrompt={aiInitialPrompt}
+          onBack={handleBack}
         />
       )}
 

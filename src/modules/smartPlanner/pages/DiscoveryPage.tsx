@@ -45,8 +45,6 @@ import {
   RotateCcw,
   Zap,
   User,
-  Paperclip,
-  Send,
   Compass,
   Footprints,
   Bus,
@@ -67,6 +65,9 @@ import type { Activity, ActivitySearchCriteria, ActivityType } from "../../../ty
 // Full Activity mock lookup — Discovery cards resolve their activityId here to
 // open the right ActivityDetailPage when clicked.
 import { ACTIVITY_BY_ID } from "../../../mocks/activities";
+// AI Experience entry — pill-shaped moodboard composer with vibes, places,
+// inspirations, and a single-line text input. Replaces the old textarea card.
+import AiMoodboardComposer from "../components/aiItinerary/AiMoodboardComposer";
 
 // --- Types ---
 
@@ -104,6 +105,10 @@ type DiscoveryPageProps = {
   // Called when the user clicks a one-day experience or iconic event card on
   // the Experiences tab → leads straight to ActivityDetailPage, skipping the list.
   onActivityDirectSelect: (activity: Activity) => void;
+  // Called when the user submits the AI Experience "Plan my trip" prompt
+  // (or taps a suggestion chip) → leads to the new AI Itinerary flow.
+  // Optional so existing callers stay compiling; defaults to a no-op if absent.
+  onAiPlannerStart?: (prompt: string) => void;
 };
 
 // --- Tab Definitions ---
@@ -521,6 +526,7 @@ export default function DiscoveryPage({
   onHolidaySearch,
   onActivitySearch,
   onActivityDirectSelect,
+  onAiPlannerStart,
 }: DiscoveryPageProps) {
   const [activeTab, setActiveTab] = useState<TabId>("holidays");
   // Controls whether the hero shows the normal search card or the AI Experience mode
@@ -776,30 +782,12 @@ export default function DiscoveryPage({
 
   // Holidays panel — state now lives inside PackageSearchForm
 
-  const [aiPrompt, setAiPrompt] = useState("");
-
-  // Tracks the height of the white search card while AI mode is OFF.
-  // Frozen when AI mode turns on — used to size the AI white card to match.
-  const [lockedCardHeight, setLockedCardHeight] = useState<number | null>(null);
+  // The AI Experience entry composer owns its own draft state. Discovery
+  // just receives the composed brief on submit.
 
   // Close hotel dropdowns when clicking outside the search card
   const searchCardRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Stop updating while AI mode is on — we keep the last measured value
-    if (aiExperienceMode) return;
-
-    const el = searchCardRef.current;
-    if (!el) return;
-
-    setLockedCardHeight(el.offsetHeight);
-
-    const observer = new ResizeObserver(() => {
-      setLockedCardHeight(el.offsetHeight);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [aiExperienceMode]);
   useEffect(() => {
     const handleOutside = (e: MouseEvent) => {
       if (
@@ -842,63 +830,25 @@ export default function DiscoveryPage({
           transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
           style={{ pointerEvents: aiExperienceMode ? "auto" : "none" }}
         >
-              {/* Base — cool grey from the design theme */}
-              <div className="absolute inset-0 bg-grey-light" />
-
-              {/* Sky zone — wide flat oval, cool grey-blue at the top (matches sky) */}
+              {/*
+                Animated gradient — based on nezasa.com's hero (40deg, white → soft pink → mauve)
+                plus the color cycle from their `.pop` keyframes (peach → mint → periwinkle).
+                We swap the gradient itself on a 14s loop so the whole canvas breathes
+                without needing separate blob elements. Framer Motion tweens between
+                gradient strings, so it cross-fades smoothly.
+              */}
               <motion.div
-                className="absolute"
-                style={{
-                  width: 1600, height: 500,
-                  borderRadius: "50%",
-                  background: "radial-gradient(ellipse, #c8cfe0 0%, transparent 70%)",
-                  filter: "blur(80px)",
-                  top: -180, left: -150,
+                className="absolute inset-0"
+                animate={{
+                  background: [
+                    "linear-gradient(40deg, #FFFFFF, #F5B9BF, #C896BF)",
+                    "linear-gradient(120deg, #FBDCA8, #F5B9BF, #C896BF)",
+                    "linear-gradient(200deg, #D0E8D0, #C896BF, #7C94C6)",
+                    "linear-gradient(280deg, #FFFFFF, #F5B9BF, #7C94C6)",
+                    "linear-gradient(40deg, #FFFFFF, #F5B9BF, #C896BF)",
+                  ],
                 }}
-                animate={{ x: [0, 140, -90, 0], y: [0, 70, -50, 0] }}
-                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-              />
-
-              {/* Ocean zone — tall wide oval, brand blue, middle band (matches water) */}
-              <motion.div
-                className="absolute"
-                style={{
-                  width: 1300, height: 480,
-                  borderRadius: "50%",
-                  background: "radial-gradient(ellipse, #5ba8ff 0%, transparent 65%)",
-                  filter: "blur(75px)",
-                  top: "28%", left: -80,
-                }}
-                animate={{ x: [0, 120, -80, 0], y: [0, 60, -40, 0] }}
-                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              />
-
-              {/* Cool grey zone — wide oval at the bottom (replaces sand) */}
-              <motion.div
-                className="absolute"
-                style={{
-                  width: 1500, height: 550,
-                  borderRadius: "50%",
-                  background: "radial-gradient(ellipse, #e4e7f2 0%, transparent 65%)",
-                  filter: "blur(85px)",
-                  bottom: -180, left: -80,
-                }}
-                animate={{ x: [0, 100, -120, 0], y: [0, -60, 40, 0] }}
-                transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-              />
-
-              {/* Transition zone — soft teal oval bridging ocean into base, center */}
-              <motion.div
-                className="absolute"
-                style={{
-                  width: 900, height: 380,
-                  borderRadius: "50%",
-                  background: "radial-gradient(ellipse, #7dcfcc 0%, transparent 65%)",
-                  filter: "blur(65px)",
-                  top: "48%", left: "18%",
-                }}
-                animate={{ x: [0, 160, -100, 0], y: [0, 70, -50, 0] }}
-                transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+                transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
               />
         </motion.div>
 
@@ -1684,65 +1634,21 @@ export default function DiscoveryPage({
             </div>
             </div>
 
-            {/* AI content wrapper — fades in when the "Try AI Experience" switch is on */}
+            {/* AI content wrapper — fades in when the "Try AI Experience" switch is on.
+                Hosts the new moodboard composer: a single pill input with [+] / mic
+                / send, plus three progressive-disclosure bubbles for vibes, links,
+                and trending places. The gradient + AI tagline above are untouched. */}
             <div
               className={`transition-opacity duration-500 ${
                 aiExperienceMode
-                  ? "opacity-100 flex flex-col justify-center"
+                  ? "opacity-100 flex flex-col"
                   : "opacity-0 pointer-events-none absolute inset-0 overflow-hidden"
               }`}
             >
-              {/* AI search card */}
-              <div className="px-4 md:px-6 lg:px-12 pb-6 lg:pb-[128px] flex justify-center">
-                <div
-                  className="bg-card rounded-2xl shadow-2xl w-full max-w-[860px] flex flex-col"
-                  // lockedCardHeight keeps the AI card the same size as the search card it replaced.
-                  // Using minHeight (not height) so the card can grow on mobile when the stacked
-                  // (flex-col) button row needs extra space — prevents the CTA from overflowing.
-                  style={{ minHeight: lockedCardHeight ?? undefined }}
-                >
-                  <div className="flex-1 p-6">
-                    <textarea
-                      placeholder="Describe your ideal trip — destination, dates, budget, travel style…"
-                      className="w-full h-full bg-transparent text-base text-foreground outline-none placeholder:text-grey resize-none leading-relaxed"
-                      value={aiPrompt}
-                      onChange={(e) => setAiPrompt(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex items-center px-6 pb-6 border-t border-border pt-4 shrink-0 gap-3 md:justify-between">
-                    {/* Attachment — icon-only on mobile, text label on md+ */}
-                    <button className="flex items-center justify-center gap-2 shrink-0 h-[52px] rounded-xl border border-border text-grey hover:text-muted-foreground hover:border-muted-foreground transition-colors w-[52px] md:w-auto md:px-4 md:font-bold md:text-sm">
-                      <Paperclip size={18} />
-                      <span className="hidden md:inline">Attach files</span>
-                    </button>
-                    {/* CTA — fills remaining space on mobile, auto width on md+ */}
-                    <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-primary hover:brightness-85 text-white font-extrabold text-base h-[52px] px-6 rounded-xl transition-all shadow-md">
-                      <Send size={18} />
-                      Plan my trip
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Suggestion prompts */}
-              <div className="flex flex-col items-center gap-3 px-6 pb-16 lg:pb-[128px] relative z-10">
-                <span className="text-white/70 text-sm">Try asking:</span>
-                <div className="flex flex-wrap gap-3 justify-center max-w-[860px]">
-                  {[
-                    "Find me a beach resort in Bali for next month",
-                    "Plan a 5-day family trip to Paris",
-                    "Weekend getaway in the Alps under €500",
-                    "Luxury honeymoon in the Maldives",
-                  ].map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      className="bg-white/15 backdrop-blur-sm hover:bg-white/25 text-white text-sm px-4 py-2 rounded-full border border-white/30 transition-colors"
-                      onClick={() => setAiPrompt(suggestion)}
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
+              <div className="px-4 md:px-6 lg:px-12 pb-16 lg:pb-[128px] flex justify-center">
+                <AiMoodboardComposer
+                  onSubmit={(brief) => onAiPlannerStart?.(brief.summary)}
+                />
               </div>
             </div>
 
