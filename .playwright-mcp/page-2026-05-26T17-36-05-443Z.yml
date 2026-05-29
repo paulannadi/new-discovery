@@ -1,0 +1,374 @@
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e513]:
+    - generic [ref=e514]:
+      - button "Back" [ref=e515] [cursor=pointer]:
+        - img
+        - generic [ref=e516]: Back
+      - generic [ref=e518]:
+        - img [ref=e519]
+        - text: AI Experience
+      - generic [ref=e522]:
+        - img [ref=e523]
+        - strong [ref=e527]: Lisbon city break
+      - button "New trip" [ref=e528] [cursor=pointer]:
+        - img
+        - generic [ref=e529]: New trip
+      - button "Share" [ref=e530] [cursor=pointer]:
+        - img
+        - generic [ref=e531]: Share
+    - generic [ref=e532]:
+      - region "Conversation" [ref=e533]:
+        - generic [ref=e534]:
+          - generic [ref=e539]: AI Trip Concierge
+          - generic [ref=e540]: Planning your Lisbon city break
+          - generic [ref=e541]: 2 adults · 6 nights · €2,400 budget
+        - generic [ref=e542]:
+          - generic [ref=e543]:
+            - generic [ref=e544]: You
+            - paragraph [ref=e546]: 8-day Lisbon trip in mid-June
+          - generic [ref=e547]:
+            - img [ref=e549]
+            - generic [ref=e551]:
+              - paragraph [ref=e552]:
+                - text: Got it. I've sketched a
+                - strong [ref=e553]: 6-night Lisbon city break
+                - text: for Fri Jun 12 — Sat Jun 20.
+              - paragraph
+              - paragraph [ref=e554]:
+                - text: Flights and the hotel are locked. Days 1–3 are filled with food-led picks.
+                - strong [ref=e555]: Days 4–6 are open
+                - text: — pick a chip below or just ask me anything.
+              - generic [ref=e556]:
+                - img [ref=e557]
+                - text: "Updated on canvas:"
+                - strong [ref=e560]: Trip summary & Days 1–3
+          - generic [ref=e942]:
+            - generic [ref=e943]: You
+            - paragraph [ref=e945]: Can we keep day 4 free for a Sintra day-trip?
+          - generic [ref=e946]:
+            - img [ref=e948]
+            - generic [ref=e950]:
+              - paragraph [ref=e951]:
+                - strong [ref=e952]: Done — Day 4 is Sintra.
+                - text: I've added the Pena Palace + Quinta da Regaleira combo and a return train ticket. The €38 cost is reflected in the running total.
+              - paragraph
+              - paragraph [ref=e953]: Want me to lock days 5 and 6 next, or shift the budget toward a Michelin dinner?
+              - generic [ref=e954]:
+                - img [ref=e955]
+                - text: "Updated on canvas:"
+                - strong [ref=e958]: Day 4 · Sintra
+        - generic [ref=e561]:
+          - button "Lock days 5 & 6" [ref=e563]
+          - button "Add a Michelin dinner" [ref=e564]
+          - button "Show cheaper hotel options" [ref=e565]
+          - button "Continue to checkout" [ref=e566]
+        - generic [ref=e568]:
+          - button "Attach" [ref=e569]:
+            - img [ref=e570]
+          - textbox "Reply to the AI…" [ref=e573]
+          - button "Voice (coming soon)" [ref=e574]:
+            - img [ref=e575]
+          - button "Send" [ref=e578] [cursor=pointer]:
+            - img
+      - region "Itinerary canvas" [ref=e579]:
+        - generic [ref=e580]:
+          - generic [ref=e581]:
+            - img "Lisbon city break" [ref=e583]
+            - generic [ref=e585]:
+              - paragraph [ref=e586]: 2 adults·6 nights
+              - heading "Lisbon city break" [level=1] [ref=e587]
+            - generic [ref=e588]:
+              - generic [ref=e589]:
+                - generic [ref=e590]: Depart
+                - generic [ref=e591]: 12 Jun
+              - img [ref=e593]
+              - generic [ref=e595]:
+                - generic [ref=e596]: Return
+                - generic [ref=e597]: 20 Jun
+              - generic [ref=e599]:
+                - generic [ref=e600]: Total
+                - generic [ref=e601]:
+                  - text: €2,140
+                  - generic [ref=e602]: / €2,400
+              - button "Continue" [ref=e603] [cursor=pointer]
+          - generic [ref=e604]:
+            - generic [ref=e605]:
+              - generic [ref=e607]:
+                - img [ref=e608]
+                - heading "Outbound Flight" [level=2] [ref=e610]
+              - generic [ref=e613]:
+                - paragraph [ref=e614]: Outbound · Fri, 12 Jun 2026
+                - generic [ref=e616]:
+                  - generic [ref=e617]:
+                    - generic [ref=e618]:
+                      - generic [ref=e620]:
+                        - img [ref=e621]
+                        - text: TAP TP933
+                      - generic [ref=e623]:
+                        - generic [ref=e624]: 08:35
+                        - generic [ref=e625]: Zurich
+                      - generic [ref=e626]:
+                        - paragraph [ref=e627]: Non-stop
+                        - paragraph [ref=e629]: 4h 25m · Economy
+                      - generic [ref=e630]:
+                        - generic [ref=e631]: 14:10
+                        - generic [ref=e632]: Lisbon
+                    - separator [ref=e633]
+                    - generic [ref=e634]:
+                      - generic [ref=e635]:
+                        - img [ref=e636]
+                        - generic [ref=e639]: 1 checked bag included
+                      - button "More details" [ref=e640] [cursor=pointer]
+                  - button "Change Flight" [ref=e642] [cursor=pointer]
+            - generic [ref=e643]:
+              - generic [ref=e645]:
+                - img [ref=e646]
+                - heading "Stay in Alfama, Lisbon" [level=2] [ref=e650]
+              - generic [ref=e653]:
+                - paragraph [ref=e654]:
+                  - text: Fri, 12 Jun 2026 – 18 Jun 2026
+                  - generic [ref=e655]: · 6 nights
+                - generic [ref=e657]:
+                  - img "Memmo Alfama" [ref=e659]
+                  - generic [ref=e660]:
+                    - generic [ref=e661]:
+                      - generic [ref=e662]:
+                        - generic [ref=e663]:
+                          - img [ref=e664]
+                          - img [ref=e666]
+                          - img [ref=e668]
+                          - img [ref=e670]
+                        - heading "Memmo Alfama" [level=3] [ref=e672]
+                        - generic [ref=e673]:
+                          - img [ref=e674]
+                          - text: Alfama, Lisbon
+                        - paragraph [ref=e677]: 1 Deluxe Room
+                      - generic [ref=e678]:
+                        - generic [ref=e679]:
+                          - paragraph [ref=e680]: Breakfast included
+                          - paragraph [ref=e681]: Free cancellation
+                        - generic [ref=e682]:
+                          - generic [ref=e683]: From
+                          - generic [ref=e684]: €220/night
+                    - generic [ref=e685]:
+                      - button "Change Hotel" [ref=e686] [cursor=pointer]
+                      - button "View Room Options" [ref=e687] [cursor=pointer]
+            - generic [ref=e688]:
+              - generic [ref=e690]:
+                - img [ref=e691]
+                - heading "Dinner at Cervejaria Ramiro" [level=2] [ref=e694]
+              - generic [ref=e697]:
+                - paragraph [ref=e698]: Fri, 12 Jun 2026
+                - generic [ref=e700]:
+                  - img "Dinner at Cervejaria Ramiro" [ref=e702]
+                  - generic [ref=e703]:
+                    - generic [ref=e704]:
+                      - generic [ref=e705]:
+                        - heading "Dinner at Cervejaria Ramiro" [level=3] [ref=e706]
+                        - paragraph [ref=e707]: Cult Lisbon seafood institution — start with the prawns and don't skip the steak sandwich for dessert.
+                      - generic [ref=e708]:
+                        - generic [ref=e709]:
+                          - generic [ref=e710]:
+                            - img [ref=e711]
+                            - text: 2 hours
+                          - generic [ref=e714]:
+                            - img [ref=e715]
+                            - text: Intendente, Lisbon
+                        - generic [ref=e718]:
+                          - generic [ref=e719]: From
+                          - generic [ref=e720]: €85 for two
+                    - generic [ref=e721]:
+                      - button "Change" [ref=e722] [cursor=pointer]
+                      - button "View Details" [ref=e723] [cursor=pointer]
+            - generic [ref=e724]:
+              - generic [ref=e726]:
+                - img [ref=e727]
+                - heading "Belém Tower & Jerónimos walking tour" [level=2] [ref=e730]
+              - generic [ref=e733]:
+                - paragraph [ref=e734]: Sat, 13 Jun 2026
+                - generic [ref=e736]:
+                  - img "Belém Tower & Jerónimos walking tour" [ref=e738]
+                  - generic [ref=e739]:
+                    - generic [ref=e740]:
+                      - generic [ref=e741]:
+                        - heading "Belém Tower & Jerónimos walking tour" [level=3] [ref=e742]
+                        - paragraph [ref=e743]: Half-day, English-guided walk through Belém — the tower, the monastery, and pastéis from the original Casa Pastéis de Belém.
+                      - generic [ref=e744]:
+                        - generic [ref=e745]:
+                          - generic [ref=e746]:
+                            - img [ref=e747]
+                            - text: 3 hours
+                          - generic [ref=e750]:
+                            - img [ref=e751]
+                            - text: Belém, Lisbon
+                        - generic [ref=e754]:
+                          - generic [ref=e755]: From
+                          - generic [ref=e756]: €42 pp
+                    - generic [ref=e757]:
+                      - button "Change" [ref=e758] [cursor=pointer]
+                      - button "View Details" [ref=e759] [cursor=pointer]
+            - generic [ref=e760]:
+              - generic [ref=e762]:
+                - img [ref=e763]
+                - heading "Lunch at A Margem" [level=2] [ref=e766]
+              - generic [ref=e769]:
+                - paragraph [ref=e770]: Sat, 13 Jun 2026
+                - generic [ref=e772]:
+                  - img "Lunch at A Margem" [ref=e774]
+                  - generic [ref=e775]:
+                    - generic [ref=e776]:
+                      - generic [ref=e777]:
+                        - heading "Lunch at A Margem" [level=3] [ref=e778]
+                        - paragraph [ref=e779]: Riverside terrace lunch under the Padrão dos Descobrimentos — the spot with the best Tagus view in Belém.
+                      - generic [ref=e780]:
+                        - generic [ref=e781]:
+                          - generic [ref=e782]:
+                            - img [ref=e783]
+                            - text: 1.5 hours
+                          - generic [ref=e786]:
+                            - img [ref=e787]
+                            - text: Belém, Lisbon
+                        - generic [ref=e790]:
+                          - generic [ref=e791]: From
+                          - generic [ref=e792]: €55 for two
+                    - generic [ref=e793]:
+                      - button "Change" [ref=e794] [cursor=pointer]
+                      - button "View Details" [ref=e795] [cursor=pointer]
+            - generic [ref=e796]:
+              - generic [ref=e798]:
+                - img [ref=e799]
+                - heading "LX Factory & Time Out Market crawl" [level=2] [ref=e802]
+              - generic [ref=e805]:
+                - paragraph [ref=e806]: Sun, 14 Jun 2026
+                - generic [ref=e808]:
+                  - img "LX Factory & Time Out Market crawl" [ref=e810]
+                  - generic [ref=e811]:
+                    - generic [ref=e812]:
+                      - generic [ref=e813]:
+                        - heading "LX Factory & Time Out Market crawl" [level=3] [ref=e814]
+                        - paragraph [ref=e815]: Self-guided afternoon through the converted print-works at LX Factory, then dinner stops at Time Out Market.
+                      - generic [ref=e816]:
+                        - generic [ref=e817]:
+                          - generic [ref=e818]:
+                            - img [ref=e819]
+                            - text: Half day
+                          - generic [ref=e822]:
+                            - img [ref=e823]
+                            - text: Alcântara, Lisbon
+                        - generic [ref=e826]:
+                          - generic [ref=e827]: From
+                          - generic [ref=e828]: Self-guided
+                    - generic [ref=e829]:
+                      - button "Change" [ref=e830] [cursor=pointer]
+                      - button "View Details" [ref=e831] [cursor=pointer]
+            - generic [ref=e832]:
+              - generic [ref=e834]:
+                - img [ref=e835]
+                - heading "Fado dinner at Mesa de Frades" [level=2] [ref=e838]
+              - generic [ref=e841]:
+                - paragraph [ref=e842]: Sun, 14 Jun 2026
+                - generic [ref=e844]:
+                  - img "Fado dinner at Mesa de Frades" [ref=e846]
+                  - generic [ref=e847]:
+                    - generic [ref=e848]:
+                      - generic [ref=e849]:
+                        - heading "Fado dinner at Mesa de Frades" [level=3] [ref=e850]
+                        - paragraph [ref=e851]: Reservation-only fado house in a converted chapel — three sets, traditional Lisbon menu.
+                      - generic [ref=e852]:
+                        - generic [ref=e853]:
+                          - generic [ref=e854]:
+                            - img [ref=e855]
+                            - text: 3 hours
+                          - generic [ref=e858]:
+                            - img [ref=e859]
+                            - text: Alfama, Lisbon
+                        - generic [ref=e862]:
+                          - generic [ref=e863]: From
+                          - generic [ref=e864]: €140 for two
+                    - generic [ref=e865]:
+                      - button "Change" [ref=e866] [cursor=pointer]
+                      - button "View Details" [ref=e867] [cursor=pointer]
+            - generic [ref=e959]:
+              - generic [ref=e961]:
+                - img [ref=e962]
+                - heading "Pena Palace + Quinta da Regaleira" [level=2] [ref=e965]
+                - generic [ref=e966]: Just added
+              - generic [ref=e970]:
+                - paragraph [ref=e971]: Mon, 15 Jun 2026
+                - generic [ref=e973]:
+                  - img "Pena Palace + Quinta da Regaleira" [ref=e975]
+                  - generic [ref=e976]:
+                    - generic [ref=e977]:
+                      - generic [ref=e978]:
+                        - heading "Pena Palace + Quinta da Regaleira" [level=3] [ref=e979]
+                        - paragraph [ref=e980]: Train round-trip to Sintra with timed tickets — the Pena Palace in the morning, Quinta da Regaleira after lunch.
+                      - generic [ref=e981]:
+                        - generic [ref=e982]:
+                          - generic [ref=e983]:
+                            - img [ref=e984]
+                            - text: Full day
+                          - generic [ref=e987]:
+                            - img [ref=e988]
+                            - text: Sintra
+                        - generic [ref=e991]:
+                          - generic [ref=e992]: From
+                          - generic [ref=e993]: €38 pp
+                    - generic [ref=e994]:
+                      - button "Change" [ref=e995] [cursor=pointer]
+                      - button "View Details" [ref=e996] [cursor=pointer]
+            - generic [ref=e868]:
+              - generic [ref=e870]:
+                - img [ref=e871]
+                - heading "Half-day cooking class with Chef Sara" [level=2] [ref=e874]
+              - generic [ref=e877]:
+                - paragraph [ref=e878]: Thu, 18 Jun 2026
+                - generic [ref=e880]:
+                  - img "Half-day cooking class with Chef Sara" [ref=e882]
+                  - generic [ref=e883]:
+                    - generic [ref=e884]:
+                      - generic [ref=e885]:
+                        - heading "Half-day cooking class with Chef Sara" [level=3] [ref=e886]
+                        - paragraph [ref=e887]: Market visit at Mercado da Ribeira, then a hands-on class — bacalhau à brás, custard tarts, and a long lunch.
+                      - generic [ref=e888]:
+                        - generic [ref=e889]:
+                          - generic [ref=e890]:
+                            - img [ref=e891]
+                            - text: 3 hours
+                          - generic [ref=e894]:
+                            - img [ref=e895]
+                            - text: Cais do Sodré, Lisbon
+                        - generic [ref=e898]:
+                          - generic [ref=e899]: From
+                          - generic [ref=e900]: €95 pp
+                    - generic [ref=e901]:
+                      - button "Change" [ref=e902] [cursor=pointer]
+                      - button "View Details" [ref=e903] [cursor=pointer]
+            - generic [ref=e904]:
+              - generic [ref=e906]:
+                - img [ref=e907]
+                - heading "Return Flight" [level=2] [ref=e909]
+              - generic [ref=e912]:
+                - paragraph [ref=e913]: Return · Sat, 20 Jun 2026
+                - generic [ref=e915]:
+                  - generic [ref=e916]:
+                    - generic [ref=e917]:
+                      - generic [ref=e919]:
+                        - img [ref=e920]
+                        - text: TAP TP934
+                      - generic [ref=e922]:
+                        - generic [ref=e923]: 08:35
+                        - generic [ref=e924]: Lisbon
+                      - generic [ref=e925]:
+                        - paragraph [ref=e926]: Non-stop
+                        - paragraph [ref=e928]: 3h 15m · Economy
+                      - generic [ref=e929]:
+                        - generic [ref=e930]: 14:10
+                        - generic [ref=e931]: Zurich
+                    - separator [ref=e932]
+                    - generic [ref=e933]:
+                      - generic [ref=e934]:
+                        - img [ref=e935]
+                        - generic [ref=e938]: 1 checked bag included
+                      - button "More details" [ref=e939] [cursor=pointer]
+                  - button "Change Flight" [ref=e941] [cursor=pointer]

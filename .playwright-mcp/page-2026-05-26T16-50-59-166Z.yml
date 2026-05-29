@@ -1,0 +1,306 @@
+- generic:
+  - generic:
+    - region "Notifications Alt+T"
+    - generic:
+      - generic:
+        - generic:
+          - button:
+            - img
+            - generic: Back
+          - generic:
+            - img
+            - text: AI Experience
+          - generic:
+            - img
+            - generic:
+              - strong: Lisbon city break
+          - button:
+            - img
+            - generic: New trip
+          - button:
+            - img
+            - generic: Share
+        - generic:
+          - region:
+            - generic:
+              - generic:
+                - generic: AI Trip Concierge
+              - generic: Planning your Lisbon city break
+              - generic: 2 adults · Fri 12 Jun – Sat 20 Jun · €2,400 budget
+            - generic:
+              - generic:
+                - generic: You
+                - generic:
+                  - paragraph: A relaxing 8 day trip in Lisbon
+              - generic:
+                - generic:
+                  - img
+                - generic:
+                  - paragraph:
+                    - text: Got it. I've sketched a
+                    - strong: 6-night Lisbon city break
+                    - text: for Fri Jun 12 — Sat Jun 20.
+                  - paragraph:
+                    - text: Flights and the hotel are locked. Days 1–3 are filled with food-led picks.
+                    - strong: Days 4–6 are open
+                    - text: — pick a chip below or just ask me anything.
+                  - generic:
+                    - img
+                    - text: "Updated on canvas:"
+                    - strong: Trip summary & Days 1–3
+            - generic:
+              - button: Add a Sintra day-trip
+              - button: Lock days 5 & 6
+              - button: Add a Michelin dinner
+              - button: Show cheaper hotel options
+              - button: Continue to checkout
+            - generic:
+              - generic:
+                - button:
+                  - img
+                - textbox:
+                  - /placeholder: Reply to the AI…
+                - button:
+                  - img
+                - button:
+                  - img
+          - region:
+            - generic:
+              - generic:
+                - generic:
+                  - generic: Trip in progress
+                  - generic: Lisbon city break
+                  - generic: Fri 12 Jun – Sat 20 Jun · 8 days, 6 nights · 2 adults
+                - generic:
+                  - generic: Budget
+                  - generic:
+                    - generic: €2,102
+                    - generic: / €2,400
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Lisbon centre
+                    - generic: 6 nights
+                - generic:
+                  - generic:
+                    - generic: Sintra day-trip
+                    - generic: Day 4
+                - generic:
+                  - generic:
+                    - generic: Belém
+                    - generic: Day 2
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: DAY
+                      - generic: "1"
+                    - generic:
+                      - generic: Arrival & Alfama dinner
+                      - generic: Fri 12 Jun
+                  - generic:
+                    - generic:
+                      - generic:
+                        - img
+                      - generic:
+                        - generic: Flight
+                        - generic: Zurich → Lisbon (TAP TP933)
+                        - generic: 09:25 → 11:50 · Direct · 4h 25m
+                      - generic: €189
+                      - button:
+                        - img
+                      - button:
+                        - img
+                    - generic:
+                      - generic:
+                        - img
+                      - generic:
+                        - generic: Hotel
+                        - generic: Memmo Alfama
+                        - generic: Boutique · Rooftop pool
+                      - generic: €220/nt
+                      - button:
+                        - img
+                      - button:
+                        - img
+                    - generic:
+                      - generic:
+                        - img
+                      - generic:
+                        - generic: Dining
+                        - generic: Dinner at Ramiro
+                        - generic: Seafood · 19:30 · 2 covers
+                      - generic: €85
+                      - button:
+                        - img
+                      - button:
+                        - img
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: DAY
+                      - generic: "2"
+                    - generic:
+                      - generic: Belém & pastéis crawl
+                      - generic: Sat 13 Jun
+                  - generic:
+                    - generic:
+                      - generic:
+                        - img
+                      - generic:
+                        - generic: Activity
+                        - generic: Belém Tower & Jerónimos walking tour
+                        - generic: 10:00 · 3h · English guide
+                      - generic: €42
+                      - button:
+                        - img
+                      - button:
+                        - img
+                    - generic:
+                      - generic:
+                        - img
+                      - generic:
+                        - generic: Dining
+                        - generic: Lunch at A Margem
+                        - generic: 12:30 · River terrace
+                      - generic: €55
+                      - button:
+                        - img
+                      - button:
+                        - img
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: DAY
+                      - generic: "3"
+                    - generic:
+                      - generic: Chiado & Bairro Alto
+                      - generic: Sun 14 Jun
+                  - generic:
+                    - generic:
+                      - generic:
+                        - img
+                      - generic:
+                        - generic: Activity
+                        - generic: LX Factory & Time Out Market crawl
+                        - generic: Self-guided
+                      - generic: —
+                      - button:
+                        - img
+                      - button:
+                        - img
+                    - generic:
+                      - generic:
+                        - img
+                      - generic:
+                        - generic: Dining
+                        - generic: Fado dinner at Mesa de Frades
+                        - generic: 21:00 · Reservation
+                      - generic: €140
+                      - button:
+                        - img
+                      - button:
+                        - img
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: DAY
+                      - generic: "4"
+                    - generic:
+                      - generic: Day 4 — awaiting your call
+                      - generic: Mon 15 Jun
+                    - button: Suggest options
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: DAY
+                      - generic: "5"
+                    - generic:
+                      - generic: Day 5 — awaiting your call
+                      - generic: Tue 16 Jun
+                    - button: Suggest options
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: DAY
+                      - generic: "6"
+                    - generic:
+                      - generic: Day 6 — awaiting your call
+                      - generic: Wed 17 Jun
+                    - button: Suggest options
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: DAY
+                      - generic: "7"
+                    - generic:
+                      - generic: Free day in town
+                      - generic: Thu 18 Jun
+                  - generic:
+                    - generic:
+                      - generic:
+                        - img
+                      - generic:
+                        - generic: Activity
+                        - generic: Half-day cooking class with Chef Sara
+                        - generic: 15:00 · 3h · Market visit
+                      - generic: €95
+                      - button:
+                        - img
+                      - button:
+                        - img
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: DAY
+                      - generic: "8"
+                    - generic:
+                      - generic: Departure
+                      - generic: Sat 20 Jun
+                  - generic:
+                    - generic:
+                      - generic:
+                        - img
+                      - generic:
+                        - generic: Flight
+                        - generic: Lisbon → Zurich (TAP TP934)
+                        - generic: 14:10 → 18:25 · Direct · 3h 15m
+                      - generic: €176
+                      - button:
+                        - img
+                      - button:
+                        - img
+              - generic:
+                - generic:
+                  - generic: Running total
+                  - generic:
+                    - text: €2,102
+                    - generic: of €2,400 budget
+                - button: Continue to checkout
+  - dialog "Booking confirmed" [active] [ref=e869]:
+    - generic [ref=e870]:
+      - generic [ref=e871]:
+        - heading "Booking confirmed" [level=2] [ref=e872]
+        - paragraph [ref=e873]: Your Lisbon trip is booked.
+      - img [ref=e875]
+      - generic [ref=e877]: You're going to Lisbon.
+      - generic [ref=e878]:
+        - text: Confirmation
+        - strong [ref=e879]: "#WB-941122"
+        - text: is on its way to your inbox.
+        - text: We'll send check-in details 7 days before you fly.
+      - generic [ref=e880]:
+        - generic [ref=e881]:
+          - img [ref=e882]
+          - generic [ref=e884]: Fri 12 Jun – Sat 20 Jun
+        - generic [ref=e885]:
+          - img [ref=e886]
+          - generic [ref=e889]: €2,102 charged to your card
+      - generic [ref=e890]:
+        - button "Back to itinerary" [ref=e891] [cursor=pointer]
+        - button "Plan another trip" [ref=e892] [cursor=pointer]:
+          - img
+          - text: Plan another trip
+    - button "Close" [ref=e867]:
+      - img
+      - generic [ref=e868]: Close
