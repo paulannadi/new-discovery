@@ -1,0 +1,4 @@
+[    1947ms] [WARNING] Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading @ https://maps.googleapis.com/maps/api/js?key=AIzaSyB5sNOe1wpatV8GKRqp-qY7oWJAkcWtpJc:332
+[    1966ms] [LOG] JQMIGRATE: Migrate is installed, version 3.4.1 @ https://nezasa.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1:1
+[    8105ms] [LOG] %c[Happierleads]%c pixel 6.18.0 initialised color:#1E4EFF;font-weight:600 color:inherit {clientId: okqdsujjNsx5cV7v1zFvDx, mode: Full} @ https://rest.happierleads.com/v3/script?clientId=okqdsujjNsx5cV7v1zFvDx&version=4.0.0:1
+[    8107ms] [LOG] Tracking Pixel with clientId: okqdsujjNsx5cV7v1zFvDx is on the Page: 6.18.0 @ https://rest.happierleads.com/v3/script?clientId=okqdsujjNsx5cV7v1zFvDx&version=4.0.0:1

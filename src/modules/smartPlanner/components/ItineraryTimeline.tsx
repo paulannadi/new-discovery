@@ -41,6 +41,14 @@ interface ItineraryTimelineProps {
   // need a per-passenger count (e.g. TransferCard's seat-chart drawer).
   // Defaults to 1 if unset so single-passenger flows still work.
   passengerCount?: number;
+  // Ids of items the AI flow has just added/changed — drawn with a primary
+  // ring + "Just added" pulse so the user can see what just happened on
+  // the canvas in response to a chat action. Other (non-AI) callers just
+  // omit this prop and the rows render normally.
+  highlightedIds?: ReadonlySet<string>;
+  // Hide the inline "Add Stop" buttons. The AI flow drives additions via
+  // chat suggestions, so the manual Add Stop button is noise there.
+  hideAddStops?: boolean;
 }
 
 // Map each item kind to its icon + section heading. Centralising this keeps
@@ -80,7 +88,15 @@ function getHeader(item: TimelineItem): { icon: React.ReactNode; title: string }
 }
 
 // Renders a single timeline row: connector → header → card behind dashed rail.
-function TimelineRow({ item, passengerCount }: { item: TimelineItem; passengerCount: number }) {
+function TimelineRow({
+  item,
+  passengerCount,
+  highlighted,
+}: {
+  item: TimelineItem;
+  passengerCount: number;
+  highlighted?: boolean;
+}) {
   const { icon, title } = getHeader(item);
 
   return (
@@ -88,22 +104,38 @@ function TimelineRow({ item, passengerCount }: { item: TimelineItem; passengerCo
       {/* Short vertical dashed connector above the header — links sections */}
       <div className="w-px ml-3 md:ml-4 mb-1 h-6 border-l border-dashed border-foreground" />
 
-      {/* Icon + heading row */}
+      {/* Icon + heading row. When this row is highlighted (AI just added /
+          changed it), append a small pulse pill to the right of the title. */}
       <div className="flex mb-1 items-center gap-1.5 md:gap-3">
         {icon}
         <h2 className="font-extrabold text-lg md:text-2xl leading-tight text-foreground mr-3">
           {title}
         </h2>
+        {highlighted && (
+          <span className="inline-flex items-center gap-1.5 bg-primary/10 text-primary text-[11px] font-extrabold px-2.5 py-1 rounded-full">
+            <span className="size-1.5 rounded-full bg-primary animate-pulse" />
+            Just added
+          </span>
+        )}
       </div>
 
-      {/* Dashed left "rail" — the card hangs off it */}
+      {/* Dashed left "rail" — the card hangs off it. When highlighted, we
+          wrap the card in a primary ring so the user can spot the change. */}
       <div className="pl-4 ml-3 md:pl-7 md:ml-4 border-l border-dashed border-foreground pb-6">
-        {item.kind === "flight" && <FlightCard item={item} />}
-        {item.kind === "accommodation" && <AccommodationCard item={item} />}
-        {item.kind === "activity" && <ActivityCard item={item} />}
-        {/* TransferCard needs the passenger count so the seat-chart drawer
-            knows how many seats the traveller must pick. */}
-        {item.kind === "transfer" && <TransferCard item={item} passengerCount={passengerCount} />}
+        <div
+          className={
+            highlighted
+              ? "rounded-lg md:rounded-3xl ring-2 ring-primary ring-offset-2 ring-offset-background"
+              : undefined
+          }
+        >
+          {item.kind === "flight" && <FlightCard item={item} />}
+          {item.kind === "accommodation" && <AccommodationCard item={item} />}
+          {item.kind === "activity" && <ActivityCard item={item} />}
+          {/* TransferCard needs the passenger count so the seat-chart drawer
+              knows how many seats the traveller must pick. */}
+          {item.kind === "transfer" && <TransferCard item={item} passengerCount={passengerCount} />}
+        </div>
       </div>
     </div>
   );
@@ -124,7 +156,13 @@ function AddStopRow() {
   );
 }
 
-export function ItineraryTimeline({ items, aiPrompt, passengerCount = 1 }: ItineraryTimelineProps) {
+export function ItineraryTimeline({
+  items,
+  aiPrompt,
+  passengerCount = 1,
+  highlightedIds,
+  hideAddStops = false,
+}: ItineraryTimelineProps) {
   return (
     <div>
       {/* Optional AI attribution banner — shown when the trip came from a prompt */}
@@ -140,16 +178,21 @@ export function ItineraryTimeline({ items, aiPrompt, passengerCount = 1 }: Itine
         </div>
       )}
 
-      {/* Timeline rows — interleave each item with an Add Stop button */}
+      {/* Timeline rows — interleave each item with an Add Stop button (unless
+          we're in the AI canvas, where additions come from chat suggestions). */}
       {items.map((item, idx) => (
         <Fragment key={item.id}>
-          <TimelineRow item={item} passengerCount={passengerCount} />
-          {idx < items.length - 1 && <AddStopRow />}
+          <TimelineRow
+            item={item}
+            passengerCount={passengerCount}
+            highlighted={highlightedIds?.has(item.id)}
+          />
+          {!hideAddStops && idx < items.length - 1 && <AddStopRow />}
         </Fragment>
       ))}
 
       {/* Trailing Add Stop at the very end of the timeline */}
-      {items.length > 0 && <AddStopRow />}
+      {!hideAddStops && items.length > 0 && <AddStopRow />}
     </div>
   );
 }
