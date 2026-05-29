@@ -28,8 +28,10 @@ import {
   Map as MapIcon,
   MessageCircle,
   Mic,
+  PanelLeftClose,
   Paperclip,
   Send,
+  Sparkles,
 } from "lucide-react";
 
 import {
@@ -44,6 +46,8 @@ import { Button } from "../../../../shared/components/ui/button";
 import { showToast } from "../../../../shared/utils/toast";
 
 import { ItineraryTimeline } from "../ItineraryTimeline";
+import { ItineraryHero } from "../ItineraryHero";
+import { StickySummaryBar } from "../StickySummaryBar";
 
 import AiTopBar from "./AiTopBar";
 import AiChatBubble from "./AiChatBubble";
@@ -82,6 +86,11 @@ export default function ConversationScreen({
   // about, then can swipe over once the canvas starts filling.
   const [mobileTab, setMobileTab] = useState<MobileTab>("chat");
 
+  // Desktop-only: lets the user minimize the chat so the Smart Planner
+  // canvas takes the full page like the canonical SmartPlannerPage.
+  // Mobile keeps the tab switcher above.
+  const [chatMinimized, setChatMinimized] = useState(false);
+
   // Composer text — local state so we don't push every keystroke through
   // the plan reducer.
   const [composer, setComposer] = useState("");
@@ -118,13 +127,6 @@ export default function ConversationScreen({
     showToast.success("Hotel updated");
   };
 
-  const handleShare = () => {
-    navigator.clipboard
-      ?.writeText("https://nezasa.example/trips/lisbon-jun26")
-      .catch(() => {});
-    showToast.success("Shareable link copied to clipboard");
-  };
-
   const handleNewTripClick = () => setConfirmNew(true);
   const confirmStartOver = () => {
     setConfirmNew(false);
@@ -141,12 +143,10 @@ export default function ConversationScreen({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-grey-lightest">
-      <AiTopBar
-        tripTitle={state.trip.title}
-        onNewTrip={handleNewTripClick}
-        onShare={handleShare}
-        onBack={handleNewTripClick}
-      />
+      {/* AiTopBar hides when chat is minimized on desktop — in that mode
+          the canvas renders the canonical Smart Planner layout, which has
+          its own back button inside ItineraryHero. */}
+      {!chatMinimized && <AiTopBar onBack={handleNewTripClick} />}
 
       {/* Mobile tab switcher — hidden on md+ */}
       <div
@@ -169,33 +169,56 @@ export default function ConversationScreen({
         />
       </div>
 
-      {/* Split — desktop is 40/60, mobile is one column showing the active tab */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-[40%_60%]">
+      {/* Split — desktop is 40/60 (or 100% canvas when chat is minimized),
+          mobile is one column showing the active tab */}
+      <div
+        className={[
+          "flex-1 min-h-0 grid grid-cols-1",
+          chatMinimized ? "md:grid-cols-1" : "md:grid-cols-[40%_60%]",
+        ].join(" ")}
+      >
         {/* ── Conversation panel ──────────────────────────────────── */}
         <section
           aria-label="Conversation"
           className={[
             "flex flex-col min-h-0 bg-card md:border-r md:border-border",
             mobileTab === "chat" ? "flex" : "hidden md:flex",
+            chatMinimized ? "md:hidden" : "",
           ].join(" ")}
         >
           <div className="px-5 pt-4 pb-3.5 border-b border-border">
-            <div className="flex items-center gap-2.5 mb-1.5">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex size-full rounded-full bg-primary opacity-50 animate-ping" />
-                <span className="relative inline-flex size-2 rounded-full bg-primary" />
-              </span>
-              <div className="text-[10px] font-extrabold uppercase tracking-wider text-grey">
-                AI Trip Concierge
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <span className="relative flex size-2">
+                    <span className="absolute inline-flex size-full rounded-full bg-primary opacity-50 animate-ping" />
+                    <span className="relative inline-flex size-2 rounded-full bg-primary" />
+                  </span>
+                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-grey">
+                    AI Trip Concierge
+                  </div>
+                </div>
+                <div className="text-base font-extrabold tracking-tight">
+                  Planning your {state.trip.title}
+                </div>
+                <div className="text-xs text-grey mt-1">
+                  {state.trip.travelersLabel} · {state.trip.nights} night
+                  {state.trip.nights !== 1 ? "s" : ""} · €
+                  {state.trip.budget.toLocaleString("en")} budget
+                </div>
               </div>
-            </div>
-            <div className="text-base font-extrabold tracking-tight">
-              Planning your {state.trip.title}
-            </div>
-            <div className="text-xs text-grey mt-1">
-              {state.trip.travelersLabel} · {state.trip.nights} night
-              {state.trip.nights !== 1 ? "s" : ""} · €
-              {state.trip.budget.toLocaleString("en")} budget
+              {/* Minimize button — desktop only. Mobile uses the tab
+                  switcher above instead. */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setChatMinimized(true)}
+                aria-label="Minimize chat"
+                title="Minimize chat"
+                className="hidden md:inline-flex size-8 rounded-lg text-grey hover:text-foreground shrink-0"
+              >
+                <PanelLeftClose className="size-4" aria-hidden="true" />
+              </Button>
             </div>
           </div>
 
@@ -268,49 +291,110 @@ export default function ConversationScreen({
             mobileTab === "canvas" ? "flex" : "hidden md:flex",
           ].join(" ")}
         >
-          <div className="overflow-y-auto h-full px-4 md:px-6 py-5 pb-20">
-            {/* Compact hero card — same visual vocabulary as ItineraryHero
-                (image, gradient, title, ticket capsule), shrunk so the
-                timeline below has room to breathe in the 60% panel. */}
-            <AiCanvasHeader
-              title={state.trip.title}
-              travelersLabel={state.trip.travelersLabel}
-              nights={state.trip.nights}
-              startDate={state.trip.startDate}
-              endDate={state.trip.endDate}
-              heroImage={state.trip.heroImage}
-              spent={spent}
-              budget={state.trip.budget}
-              onCheckout={() => setCheckout("open")}
-            />
-
-            {/* In-canvas hotel alternatives drawer — only when toggled by
-                the "Show cheaper hotel options" chat action. Sits above
-                the timeline so the user can see the connection between
-                the chat suggestion and the hotel card it'll swap. */}
-            {state.hotelDrawer && (
-              <div className="mb-6">
-                <AiCanvasHotelAlternatives
-                  onPick={handlePickHotelAlt}
-                  onClose={closeHotelDrawer}
+          {chatMinimized ? (
+            // ─── CANONICAL SMART PLANNER LAYOUT ─────────────────────
+            // Same building blocks as SmartPlannerPage so the page reads
+            // as "the regular Smart Planner" once the AI chat is out of
+            // the way: full ItineraryHero, max-w-5xl timeline column,
+            // Back/Book footer, and StickySummaryBar pinned to the
+            // viewport bottom. The data still comes from the AI plan
+            // state so any items the AI added/changed remain visible
+            // and highlighted via `state.justAddedIds`.
+            <div className="overflow-y-auto h-full relative">
+              <ItineraryHero
+                title={state.trip.title}
+                travelersLabel={state.trip.travelersLabel}
+                nights={state.trip.nights}
+                startDate={state.trip.startDate}
+                endDate={state.trip.endDate}
+                heroImageUrl={state.trip.heroImage}
+                totalPriceLabel={`€${spent.toLocaleString("en")}`}
+                onOpenMap={() => {}}
+                onShareItinerary={() => {}}
+                onToggleExpertMode={() => {}}
+              />
+              <div className="max-w-5xl mx-auto pl-1 pr-4 md:px-4 pt-5 md:pt-8 pb-32 box-content">
+                <ItineraryTimeline
+                  items={state.items}
+                  passengerCount={2}
+                  highlightedIds={state.justAddedIds}
                 />
+                {/* Footer — Book CTA only. AiTopBar's "Back to discovery"
+                    link at the top of the page handles back-nav. */}
+                <div className="flex justify-end items-center mt-8 pt-6 border-t border-border">
+                  <Button size="lg" onClick={() => setCheckout("open")}>
+                    Book · €{spent.toLocaleString("en")}
+                  </Button>
+                </div>
               </div>
-            )}
+              <StickySummaryBar
+                startDate={state.trip.startDate}
+                endDate={state.trip.endDate}
+                adults={2}
+                nights={state.trip.nights}
+                totalPriceLabel={`€${spent.toLocaleString("en")}`}
+                items={state.items}
+              />
+            </div>
+          ) : (
+            // ─── COMPACT AI CANVAS LAYOUT ───────────────────────────
+            // Used when the chat panel is open and the canvas is sharing
+            // the screen at ~60% width. The hero is shrunk and the hotel
+            // alternatives drawer is allowed so chat suggestions have an
+            // in-canvas surface to drop into.
+            <div className="overflow-y-auto h-full px-4 md:px-6 py-5 pb-20">
+              <AiCanvasHeader
+                title={state.trip.title}
+                travelersLabel={state.trip.travelersLabel}
+                nights={state.trip.nights}
+                startDate={state.trip.startDate}
+                endDate={state.trip.endDate}
+                heroImage={state.trip.heroImage}
+                spent={spent}
+                budget={state.trip.budget}
+                onCheckout={() => setCheckout("open")}
+              />
 
-            {/* THE Smart Planner timeline. Same component the canonical
-                SmartPlannerPage uses — same FlightCard / AccommodationCard
-                / ActivityCard / TransferCard. We pass `highlightedIds` so
-                items the AI just added get a primary ring + "Just added"
-                pulse on the timeline. */}
-            <ItineraryTimeline
-              items={state.items}
-              passengerCount={2}
-              highlightedIds={state.justAddedIds}
-              hideAddStops
-            />
-          </div>
+              {state.hotelDrawer && (
+                <div className="mb-6">
+                  <AiCanvasHotelAlternatives
+                    onPick={handlePickHotelAlt}
+                    onClose={closeHotelDrawer}
+                  />
+                </div>
+              )}
+
+              <ItineraryTimeline
+                items={state.items}
+                passengerCount={2}
+                highlightedIds={state.justAddedIds}
+                hideAddStops
+              />
+            </div>
+          )}
         </section>
       </div>
+
+      {/* Floating "Open AI chat" button — only shows when the chat panel
+          is minimized on desktop. Sits above the StickySummaryBar with
+          `bottom-24` so it isn't hidden behind it, and pulses a small dot
+          when new AI suggestions are waiting so they don't get missed. */}
+      {chatMinimized && (
+        <Button
+          onClick={() => setChatMinimized(false)}
+          aria-label="Open AI chat"
+          className="hidden md:inline-flex fixed bottom-24 left-6 z-40 h-11 rounded-full shadow-lg gap-2 pl-3.5 pr-4"
+        >
+          <Sparkles className="size-4" aria-hidden="true" />
+          Open AI chat
+          {state.pendingActions.length > 0 && (
+            <span className="relative flex size-2 ml-0.5">
+              <span className="absolute inline-flex size-full rounded-full bg-primary-foreground opacity-60 animate-ping" />
+              <span className="relative inline-flex size-2 rounded-full bg-primary-foreground" />
+            </span>
+          )}
+        </Button>
+      )}
 
       {/* ── Modals ──────────────────────────────────────────────────── */}
       <AiCanvasCheckoutModal

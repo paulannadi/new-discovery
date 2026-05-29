@@ -150,6 +150,12 @@ export default function App() {
   // so the new page can start in the right state.
   const [aiInitialPrompt, setAiInitialPrompt] = useState<string>("");
 
+  // AI Experience hero toggle — lifted out of DiscoveryPage so it survives
+  // the Discovery → AI Itinerary → Back round trip. `handleAiPlannerStart`
+  // flips this on so the back link from the conversation lands on the AI
+  // version of the hero, not the default search card.
+  const [aiExperienceMode, setAiExperienceMode] = useState(false);
+
   // The "how did you get here" context passed into SmartPlanner.
   // It tells SmartPlanner which product(s) to pre-load in the itinerary.
   const [startingContext, setStartingContext] = useState<StartingContext | null>(null);
@@ -462,6 +468,9 @@ export default function App() {
   // into AiItineraryPage as the first user message in the conversation.
   const handleAiPlannerStart = (prompt: string) => {
     setAiInitialPrompt(prompt);
+    // Ensure that hitting Back from the conversation returns the user to the
+    // AI version of the Discovery hero — never the default search card.
+    setAiExperienceMode(true);
     setCurrentPage("ai-itinerary");
     window.scrollTo(0, 0);
   };
@@ -493,6 +502,8 @@ export default function App() {
           onActivitySearch={handleActivitySearch}
           onActivityDirectSelect={handleActivityDirectSelect}
           onAiPlannerStart={handleAiPlannerStart}
+          aiExperienceMode={aiExperienceMode}
+          onAiExperienceModeChange={setAiExperienceMode}
         />
       )}
 

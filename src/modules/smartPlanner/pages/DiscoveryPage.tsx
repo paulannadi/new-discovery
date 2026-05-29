@@ -109,6 +109,12 @@ type DiscoveryPageProps = {
   // (or taps a suggestion chip) → leads to the new AI Itinerary flow.
   // Optional so existing callers stay compiling; defaults to a no-op if absent.
   onAiPlannerStart?: (prompt: string) => void;
+  // Controlled AI Experience toggle state — lifted to App.tsx so it survives
+  // the Discovery → AI Itinerary → Back round trip. When `aiExperienceMode`
+  // is set to `true` by App.tsx before navigating back here, the user lands
+  // on the AI version of the hero instead of the default search card.
+  aiExperienceMode: boolean;
+  onAiExperienceModeChange: (mode: boolean) => void;
 };
 
 // --- Tab Definitions ---
@@ -527,10 +533,12 @@ export default function DiscoveryPage({
   onActivitySearch,
   onActivityDirectSelect,
   onAiPlannerStart,
+  aiExperienceMode,
+  onAiExperienceModeChange: setAiExperienceMode,
 }: DiscoveryPageProps) {
   const [activeTab, setActiveTab] = useState<TabId>("holidays");
-  // Controls whether the hero shows the normal search card or the AI Experience mode
-  const [aiExperienceMode, setAiExperienceMode] = useState(false);
+  // `aiExperienceMode` is controlled by App.tsx so the toggle persists across
+  // the Discovery → AI Itinerary → Back round trip. See DiscoveryPageProps.
 
   // Pill pulse — fires only when the toggle actually changes, not on first mount
   const toggleControls = useAnimation();

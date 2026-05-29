@@ -64,25 +64,25 @@ const VIBES: Array<{ key: string; label: string; Icon: typeof Sun }> = [
   { key: "Wellness", label: "Wellness", Icon: Coffee },
 ];
 
-// Trending places — nine destinations, each with a flag emoji (used only as
-// a tiny ornament — not as the primary icon) and an Unsplash thumbnail URL.
-// Flags are allowed because they're metadata, not UI icons; per the design
-// system rule, lucide-react still owns every actual icon on the screen.
+// Trending places — nine destinations. `flag` is a two-letter ISO country code
+// (matching the Discovery page convention) that we feed into flagcdn.com to
+// render a small circular flag image. Flags are metadata, not UI icons, so
+// they don't conflict with the lucide-only rule from the design system.
 const PLACES: Array<{
   key: string;
   label: string;
   flag: string;
   image: string;
 }> = [
-  { key: "lisbon", label: "Lisbon", flag: "🇵🇹", image: "https://images.unsplash.com/photo-1513735492246-483525079686?auto=format&fit=crop&w=700&q=70" },
-  { key: "bali", label: "Bali", flag: "🇮🇩", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=700&q=70" },
-  { key: "santorini", label: "Santorini", flag: "🇬🇷", image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=700&q=70" },
-  { key: "tokyo", label: "Tokyo", flag: "🇯🇵", image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=700&q=70" },
-  { key: "iceland", label: "Iceland", flag: "🇮🇸", image: "https://images.unsplash.com/photo-1504829857797-ddff29c27927?auto=format&fit=crop&w=700&q=70" },
-  { key: "morocco", label: "Morocco", flag: "🇲🇦", image: "https://images.unsplash.com/photo-1539020140153-e479b8c5fec0?auto=format&fit=crop&w=700&q=70" },
-  { key: "patagonia", label: "Patagonia", flag: "🇦🇷", image: "https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?auto=format&fit=crop&w=700&q=70" },
-  { key: "capetown", label: "Cape Town", flag: "🇿🇦", image: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=700&q=70" },
-  { key: "newyork", label: "New York", flag: "🇺🇸", image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=700&q=70" },
+  { key: "lisbon", label: "Lisbon", flag: "pt", image: "https://images.unsplash.com/photo-1513735492246-483525079686?auto=format&fit=crop&w=700&q=70" },
+  { key: "bali", label: "Bali", flag: "id", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=700&q=70" },
+  { key: "santorini", label: "Santorini", flag: "gr", image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=700&q=70" },
+  { key: "tokyo", label: "Tokyo", flag: "jp", image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=700&q=70" },
+  { key: "iceland", label: "Iceland", flag: "is", image: "https://images.unsplash.com/photo-1504829857797-ddff29c27927?auto=format&fit=crop&w=700&q=70" },
+  { key: "morocco", label: "Morocco", flag: "ma", image: "https://images.unsplash.com/photo-1539020140153-e479b8c5fec0?auto=format&fit=crop&w=700&q=70" },
+  { key: "patagonia", label: "Patagonia", flag: "ar", image: "https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?auto=format&fit=crop&w=700&q=70" },
+  { key: "capetown", label: "Cape Town", flag: "za", image: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=700&q=70" },
+  { key: "newyork", label: "New York", flag: "us", image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=700&q=70" },
 ];
 
 const placeLabel = (key: string) =>
@@ -251,46 +251,100 @@ export default function AiMoodboardComposer({
               : "px-4 py-2.5",
           ].join(" ")}
         >
-          {/* Chip row — only renders when something is selected */}
-          {hasChips && (
-            <div className="flex flex-wrap gap-2 items-center px-1 pb-3">
-              {/* Inspirations: 56x56 image thumbs with kind badge + remove */}
-              {inspirations.map((ins) => (
-                <ChipThumb
-                  key={ins.id}
-                  imageKey={ins.imageKey}
-                  kind={ins.kind}
-                  onRemove={() => removeInspiration(ins.id)}
-                  title={ins.name}
-                />
-              ))}
+          {/* Chip row — grows smoothly from height 0 when the first chip is
+              added, collapses back when the last chip is removed.
+              Follows the design system's Framer Motion expand/collapse pattern
+              (height 0 → auto, opacity 0 → 1, 0.2s). */}
+          <AnimatePresence initial={false}>
+            {hasChips && (
+              <motion.div
+                key="chip-row"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                // overflow-hidden lets the height animation clip the inner row
+                // cleanly while it grows/shrinks — otherwise chips would
+                // briefly overflow the collapsing pill.
+                className="overflow-hidden"
+              >
+                <div className="flex flex-wrap gap-2 items-center px-1 pb-3">
+                  {/* Inner AnimatePresence tracks individual chip entries and
+                      exits so adding/removing a single chip animates while
+                      the row itself stays visible. `popLayout` removes the
+                      exiting chip from layout immediately so its siblings
+                      reflow smoothly via the `layout` prop on each chip. */}
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    {/* Inspirations: 56x56 image thumbs with kind badge + remove */}
+                    {inspirations.map((ins) => (
+                      <motion.div
+                        key={`insp-${ins.id}`}
+                        layout
+                        initial={{ opacity: 0, scale: 0.85 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.85 }}
+                        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                      >
+                        <ChipThumb
+                          imageKey={ins.imageKey}
+                          kind={ins.kind}
+                          onRemove={() => removeInspiration(ins.id)}
+                          title={ins.name}
+                        />
+                      </motion.div>
+                    ))}
 
-              {/* Selected places */}
-              {places.map((k) => {
-                const place = PLACES.find((p) => p.key === k);
-                if (!place) return null;
-                return (
-                  <ChipPill key={k} onRemove={() => togglePlace(k)}>
-                    <span className="text-sm leading-none">{place.flag}</span>
-                    <span>{place.label}</span>
-                  </ChipPill>
-                );
-              })}
+                    {/* Selected places */}
+                    {places.map((k) => {
+                      const place = PLACES.find((p) => p.key === k);
+                      if (!place) return null;
+                      return (
+                        <motion.div
+                          key={`place-${k}`}
+                          layout
+                          initial={{ opacity: 0, scale: 0.85 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.85 }}
+                          transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                        >
+                          <ChipPill onRemove={() => togglePlace(k)}>
+                            <img
+                              src={`https://flagcdn.com/w160/${place.flag}.png`}
+                              alt={place.label}
+                              className="w-4 h-4 rounded-full object-cover shrink-0"
+                            />
+                            <span>{place.label}</span>
+                          </ChipPill>
+                        </motion.div>
+                      );
+                    })}
 
-              {/* Selected vibes */}
-              {themes.map((t) => {
-                const vibe = VIBES.find((v) => v.key === t);
-                if (!vibe) return null;
-                const VibeIcon = vibe.Icon;
-                return (
-                  <ChipPill key={t} onRemove={() => toggleTheme(t)}>
-                    <VibeIcon className="size-3" aria-hidden="true" />
-                    <span>{vibe.label}</span>
-                  </ChipPill>
-                );
-              })}
-            </div>
-          )}
+                    {/* Selected vibes */}
+                    {themes.map((t) => {
+                      const vibe = VIBES.find((v) => v.key === t);
+                      if (!vibe) return null;
+                      const VibeIcon = vibe.Icon;
+                      return (
+                        <motion.div
+                          key={`vibe-${t}`}
+                          layout
+                          initial={{ opacity: 0, scale: 0.85 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.85 }}
+                          transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                        >
+                          <ChipPill onRemove={() => toggleTheme(t)}>
+                            <VibeIcon className="size-3" aria-hidden="true" />
+                            <span>{vibe.label}</span>
+                          </ChipPill>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Typing row */}
           <div className="flex items-center gap-2.5">
@@ -363,12 +417,9 @@ export default function AiMoodboardComposer({
       </div>
 
       {/* ── Suggestion actions ────────────────────────────────────────── */}
-      {/* Three inverted buttons that open the vibes/places panels or the
-          link modal. The "inverted" variant is a frosted-glass style
-          (translucent white + backdrop blur) designed to sit on top of an
-          image or coloured background — it picks up the gradient behind it
-          rather than fighting it. The count badge inside each button
-          surfaces the current number of selections for that category. */}
+      {/* Three inverted (frosted-glass) buttons that open the vibes/places
+          panels or the link modal. Font matches the AI Experience toggle
+          above: text-sm font-bold so the chrome reads as one family. */}
       <div className="mt-4 flex flex-wrap gap-2.5 justify-center">
         <Button
           type="button"
@@ -377,6 +428,7 @@ export default function AiMoodboardComposer({
           onClick={() =>
             setOpenPanel((p) => (p === "vibes" ? null : "vibes"))
           }
+          className="text-sm font-bold rounded-full px-5 py-2.5 h-auto"
         >
           <Sparkles className="size-3.5" aria-hidden="true" />
           Pick a vibe
@@ -390,6 +442,7 @@ export default function AiMoodboardComposer({
           type="button"
           variant="inverted"
           onClick={() => setLinkOpen(true)}
+          className="text-sm font-bold rounded-full px-5 py-2.5 h-auto"
         >
           <LinkIcon className="size-3.5" aria-hidden="true" />
           Paste a link for inspiration
@@ -401,6 +454,7 @@ export default function AiMoodboardComposer({
           onClick={() =>
             setOpenPanel((p) => (p === "places" ? null : "places"))
           }
+          className="text-sm font-bold rounded-full px-5 py-2.5 h-auto"
         >
           <Compass className="size-3.5" aria-hidden="true" />
           Show me trending places
@@ -474,7 +528,11 @@ export default function AiMoodboardComposer({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-1.5">
                     <div className="text-white text-[11px] font-extrabold inline-flex items-center gap-1">
-                      <span>{place.flag}</span>
+                      <img
+                        src={`https://flagcdn.com/w160/${place.flag}.png`}
+                        alt={place.label}
+                        className="w-4 h-4 rounded-full object-cover shrink-0"
+                      />
                       <span>{place.label}</span>
                     </div>
                   </div>

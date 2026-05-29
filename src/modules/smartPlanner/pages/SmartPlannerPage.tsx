@@ -15,9 +15,10 @@
 // App.tsx imports them — don't touch the type names or shapes here.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { ChevronLeft } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { addDays, parseISO } from "date-fns";
 import { Button } from "../../../shared/components/ui/button";
+import { BackButton } from "../../../shared/components/BackButton";
 // Activity and tour types — passed straight through from the detail pages so
 // the timeline can render the actual stops/days/ports rather than mock data.
 import type { Activity, TourStop, TourTransfer } from "../../../types";
@@ -25,7 +26,6 @@ import type { Activity, TourStop, TourTransfer } from "../../../types";
 import { ItineraryHero } from "../components/ItineraryHero";
 import { ItineraryTimeline } from "../components/ItineraryTimeline";
 import { StickySummaryBar } from "../components/StickySummaryBar";
-import { ViewModeToggle } from "../components/ViewModeToggle";
 import { seedTimeline } from "../utils/seedTimeline";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -172,6 +172,20 @@ function getTitle(cityName: string): string {
   return `Individual trip to ${cityName}`;
 }
 
+// Builds the page-top BackButton label based on where the user came from.
+// Matches the contextual labels used on other detail pages (TourDetailPage,
+// HotelDetailPage, etc.) so the back link always names a real destination.
+function getBackLabel(ctx: StartingContext): string {
+  switch (ctx.type) {
+    case "tour":     return "Back to tour";
+    case "hotel":    return "Back to hotel";
+    case "flight":   return "Back to flights";
+    case "holiday":  return "Back to package";
+    case "activity": return "Back to activity";
+    case "ai":       return "Back to discovery";
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -212,12 +226,45 @@ export default function SmartPlannerPage({
   const adults: number = 2;
   const totalPriceLabel = "from €2,499";
 
+  // Track whether the user has scrolled past the hero's dates+price capsule.
+  // Until they have, the sticky bottom bar stays hidden (avoids duplicating
+  // information they can already see on screen). The moment the sentinel below
+  // the hero exits the top of the viewport, we show the bar with a slide-up.
+  const heroSentinelRef = useRef<HTMLDivElement>(null);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  useEffect(() => {
+    const sentinel = heroSentinelRef.current;
+    if (!sentinel) return;
+
+    // IntersectionObserver fires whenever the sentinel enters/leaves the
+    // viewport. We only want to show the bar when the sentinel has passed
+    // ABOVE the viewport (i.e. user scrolled down past the hero), not when
+    // it's below (initial state on tall screens).
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const scrolledPastHero =
+          !entry.isIntersecting && entry.boundingClientRect.top < 0;
+        setShowStickyBar(scrolledPastHero);
+      },
+      { threshold: 0 },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="min-h-screen bg-grey-lightest">
-      {/* Fixed top-right pill toggle — sits above everything else */}
-      <ViewModeToggle isMapView={false} onSelectTimeline={() => {}} />
+      {/* Page-top back link — same shared BackButton style as every other page
+          (TourDetailPage, HotelDetailPage, etc.). The label adapts to where the
+          user came from, so they always know which screen "Back" leads to. */}
+      <div className="max-w-5xl mx-auto px-4 lg:px-0 pt-5">
+        <BackButton label={getBackLabel(startingContext)} onClick={onBack} />
+      </div>
 
-      {/* Immersive hero — image + overlay title + ticket capsule */}
+      {/* Immersive hero — image + overlay title + 3 icon buttons + ticket capsule.
+          Map / Share / Expert-mode callbacks are stubs for now — we'll wire each
+          to its real surface (map takeover, share modal, expert toggle) next. */}
       <ItineraryHero
         title={getTitle(cityName)}
         travelersLabel={`${adults} adult${adults !== 1 ? "s" : ""}`}
@@ -226,29 +273,39 @@ export default function SmartPlannerPage({
         endDate={endDate}
         heroImageUrl={heroImageUrl}
         totalPriceLabel={totalPriceLabel}
-        onBack={onBack}
+        onOpenMap={() => {
+          // TODO: open the map-mode takeover (cards on left + map on right)
+        }}
+        onShareItinerary={() => {
+          // TODO: open ShareItineraryModal
+        }}
+        onToggleExpertMode={() => {
+          // TODO: toggle Expert mode
+        }}
       />
+
+      {/* Invisible sentinel — watched by IntersectionObserver above.
+          Sits directly below the hero, so once it scrolls off the top of the
+          viewport we know the user has passed the dates+price capsule and we
+          can reveal the sticky summary bar. Zero-height + aria-hidden so it
+          never affects layout or screen readers. */}
+      <div ref={heroSentinelRef} aria-hidden className="h-0 w-0" />
 
       {/* Content area — single unified timeline.
           pl-1 on mobile so the dashed timeline rail is visible at the screen edge. */}
       <div className="max-w-5xl mx-auto pl-1 pr-4 md:px-4 pt-5 md:pt-8 pb-32 box-content">
         <ItineraryTimeline items={timelineItems} aiPrompt={aiPrompt} passengerCount={adults} />
 
-        {/* Footer — back (text) on the left, Book (primary) on the right */}
-        <div className="flex justify-between items-center mt-8 pt-6 border-t border-border">
-          <Button
-            variant="ghost"
-            className="px-0 gap-1 hover:bg-transparent"
-            onClick={onBack}
-          >
-            <ChevronLeft size={18} aria-hidden="true" />
-            Back
-          </Button>
+        {/* Footer — Book CTA only. The top-of-page BackButton handles
+            back-nav; no need for a second one down here. */}
+        <div className="flex justify-end items-center mt-8 pt-6 border-t border-border">
           <Button size="lg">Book · {totalPriceLabel}</Button>
         </div>
       </div>
 
-      {/* Sticky bottom bar with expandable trip-summary panel */}
+      {/* Sticky bottom bar with expandable trip-summary panel.
+          Slides up only once the user has scrolled past the hero capsule —
+          driven by the sentinel + IntersectionObserver above. */}
       <StickySummaryBar
         startDate={startDate}
         endDate={endDate}
@@ -256,6 +313,7 @@ export default function SmartPlannerPage({
         nights={nights}
         totalPriceLabel={totalPriceLabel}
         items={timelineItems}
+        show={showStickyBar}
       />
     </div>
   );

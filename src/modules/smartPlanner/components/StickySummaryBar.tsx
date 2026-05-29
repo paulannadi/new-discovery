@@ -14,15 +14,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  Binoculars,
   Building2,
   CalendarDays,
+  Car,
   ChevronUp,
   ListCheck,
-  MapPin,
   Plane,
   User,
 } from "lucide-react";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { Button } from "../../../shared/components/ui/button";
 import { cn } from "../../../shared/components/ui/utils";
 import type { TimelineItem } from "../utils/seedTimeline";
@@ -34,32 +35,81 @@ interface StickySummaryBarProps {
   nights: number;
   totalPriceLabel: string;             // e.g. "from €2,499"
   items: TimelineItem[];               // Used to build the expanded breakdown
+  // Controls visibility — typically driven by an IntersectionObserver on the
+  // page that hides the bar while the hero's dates+price capsule is still in
+  // view, and shows it once the user has scrolled past. The bar slides in/out
+  // from the bottom rather than appearing/disappearing instantly.
+  show?: boolean;
 }
 
-// Map each item kind to a small icon for the day-by-day breakdown
+// Map each item kind to a small line-style icon used in the expanded panel.
+// Mid-grey color so they read as supporting glyphs, not primary actions.
 function ItemIcon({ kind }: { kind: TimelineItem["kind"] }) {
-  const className = "size-3.5 text-primary shrink-0";
+  const className = "size-5 text-grey shrink-0";
   if (kind === "flight") return <Plane className={className} aria-hidden="true" />;
   if (kind === "accommodation") return <Building2 className={className} aria-hidden="true" />;
-  if (kind === "activity") return <MapPin className={className} aria-hidden="true" />;
+  if (kind === "activity") return <Binoculars className={className} aria-hidden="true" />;
+  if (kind === "transfer") return <Car className={className} aria-hidden="true" />;
   return <CalendarDays className={className} aria-hidden="true" />;
 }
 
-// Short one-line label for an item in the breakdown panel
-function describeItem(item: TimelineItem): string {
-  switch (item.kind) {
-    case "flight":
-      return `${item.flight.from} → ${item.flight.to}`;
-    case "accommodation":
-      return `${item.hotel.name} · ${item.nights} night${item.nights !== 1 ? "s" : ""}`;
-    case "activity":
-      return item.title;
-    case "transfer":
-      return `${item.from} → ${item.to}`;
+// Section label shown above each category group in the expanded panel.
+// Returns null for unknown kinds so the section gets skipped.
+function sectionLabel(kind: TimelineItem["kind"]): string {
+  switch (kind) {
+    case "flight":         return "Flights";
+    case "accommodation":  return "Stay";
+    case "activity":       return "Activities";
+    case "transfer":       return "Transfers";
   }
 }
 
-// The pill-shaped "Trip summary" toggle on the left of the bar
+// Order categories appear in the panel — matches a natural trip-flow:
+// transport first, then where you're staying, then what you're doing there.
+const CATEGORY_ORDER: TimelineItem["kind"][] = [
+  "flight",
+  "accommodation",
+  "activity",
+  "transfer",
+];
+
+// Each item row needs: title, subtitle, date-or-range string.
+// These small helpers keep the JSX clean and the per-kind logic in one place.
+function itemTitle(item: TimelineItem): string {
+  switch (item.kind) {
+    case "flight":         return `${item.flight.from} → ${item.flight.to}`;
+    case "accommodation":  return item.hotel.location;
+    case "activity":       return item.title;
+    case "transfer":       return `${item.from} → ${item.to}`;
+  }
+}
+
+function itemSubtitle(item: TimelineItem): string {
+  switch (item.kind) {
+    case "flight":
+      return `${item.flight.airline} · ${item.flight.duration}`;
+    case "accommodation":
+      return `${item.hotel.name} · ${item.nights} night${item.nights !== 1 ? "s" : ""}`;
+    case "activity":
+      return item.location;
+    case "transfer":
+      return item.vehicle;
+  }
+}
+
+function itemDateText(item: TimelineItem): string {
+  if (item.kind === "accommodation") {
+    // Stay shows the date range — "7 Jul – 8 Jul" — matching the screenshot.
+    const checkOut = addDays(item.checkIn, item.nights);
+    return `${format(item.checkIn, "d MMM")} – ${format(checkOut, "d MMM")}`;
+  }
+  // Everything else is a single-day item — just the day it happens on.
+  return format(item.date, "d MMM");
+}
+
+// The "Trip summary" toggle on the left of the bar.
+// Uses the shared Button "link" variant — that's the project's text-only
+// button style (primary-blue text, underlines on hover, no background).
 function TripSummaryToggle({
   isOpen,
   onToggle,
@@ -68,19 +118,17 @@ function TripSummaryToggle({
   onToggle: () => void;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant="link"
+      size="sm"
       onClick={onToggle}
       aria-expanded={isOpen}
       aria-controls="trip-summary-panel"
       aria-label={isOpen ? "Close trip summary" : "Open trip summary"}
-      className={cn(
-        "inline-flex items-center gap-2 px-3.5 py-2 rounded-full border text-sm font-bold transition-colors cursor-pointer",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
-        isOpen
-          ? "bg-primary/10 border-primary text-primary"
-          : "bg-white border-grey-light text-foreground hover:bg-grey-lightest hover:border-grey",
-      )}
+      // `px-0` strips the default horizontal padding so the text sits flush
+      // with the left edge of the bar — like a text link rather than a pill.
+      className="px-0"
     >
       <ListCheck className="size-3.5" aria-hidden="true" />
       <span className="hidden sm:inline">Trip summary</span>
@@ -88,7 +136,7 @@ function TripSummaryToggle({
         className={cn("size-3 transition-transform duration-200", isOpen && "rotate-180")}
         aria-hidden="true"
       />
-    </button>
+    </Button>
   );
 }
 
@@ -99,9 +147,17 @@ export function StickySummaryBar({
   nights,
   totalPriceLabel,
   items,
+  show = true,
 }: StickySummaryBarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // When the bar gets hidden (e.g. user scrolls back up to the hero), also
+  // collapse the expanded panel so it doesn't pop open again when the bar
+  // slides back in.
+  useEffect(() => {
+    if (!show) setIsOpen(false);
+  }, [show]);
 
   // Close on outside click
   useEffect(() => {
@@ -131,7 +187,14 @@ export function StickySummaryBar({
   return (
     <div
       ref={containerRef}
-      className="fixed bottom-0 left-0 w-full bg-card shadow-2xl rounded-t-3xl z-30"
+      aria-hidden={!show}
+      className={cn(
+        // Slide-up animation: pushed below the viewport when hidden,
+        // settles at the bottom when shown.
+        "fixed bottom-0 left-0 w-full bg-card shadow-2xl rounded-t-3xl z-30",
+        "transition-transform duration-300 ease-out",
+        show ? "translate-y-0" : "translate-y-full pointer-events-none",
+      )}
     >
       <div className="max-w-5xl mx-auto">
         {/* COLLAPSED ROW — toggle + summary text (mobile compact) + Book */}
@@ -166,7 +229,9 @@ export function StickySummaryBar({
 
         {/* EXPANDABLE PANEL — slides up from the bar.
             max-height transition gives a smooth open/close.
-            aria-hidden + pointer-events keep it inert when closed. */}
+            aria-hidden + pointer-events keep it inert when closed.
+            max-h is bumped to fit the two-column layout comfortably; if the
+            content is taller, the inner list scrolls. */}
         <section
           id="trip-summary-panel"
           aria-label="Trip summary"
@@ -174,33 +239,89 @@ export function StickySummaryBar({
           className={cn(
             "overflow-hidden transition-[max-height] duration-300 ease-out",
             isOpen
-              ? "max-h-[420px] border-t border-grey-light"
+              ? "max-h-[520px] border-t border-grey-light"
               : "max-h-0 border-t border-transparent",
           )}
         >
-          <div className="px-4 lg:px-5 py-4 lg:py-5">
-            {/* Section title */}
-            <h3 className="text-sm font-bold text-foreground mb-3">Your trip at a glance</h3>
+          {/* Two-column layout on desktop (items | price breakdown).
+              On mobile they stack and the divider becomes a horizontal line. */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_minmax(220px,280px)] gap-y-6 lg:gap-x-10 px-4 lg:px-6 py-5 lg:py-6 max-h-[460px] overflow-y-auto">
 
-            {/* Item list */}
-            <ul className="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
-              {items.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex items-center gap-3 bg-grey-lightest rounded-lg px-3 py-2"
-                >
-                  <ItemIcon kind={item.kind} />
-                  <span className="text-sm text-foreground flex-1 min-w-0 truncate">
-                    {describeItem(item)}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {/* ── LEFT COLUMN: items grouped by category ────────────────── */}
+            <div className="flex flex-col gap-6">
+              {CATEGORY_ORDER.map((kind) => {
+                // Filter items down to this category — skip the section
+                // entirely if there are none of this kind in the trip.
+                const groupItems = items.filter((it) => it.kind === kind);
+                if (groupItems.length === 0) return null;
 
-            {/* Footer summary line */}
-            <p className="mt-4 text-xs text-muted-foreground">
-              {format(startDate, "dd MMM")} – {format(endDate, "dd MMM yyyy")} · {summaryLine}
-            </p>
+                return (
+                  <div key={kind} className="flex flex-col gap-3">
+                    {/* Section header — uppercase, light grey, tracked-out.
+                        Matches the "DEPART / RETURN" labels in the hero. */}
+                    <h3 className="text-xs font-bold uppercase tracking-[0.08em] text-grey">
+                      {sectionLabel(kind)}
+                    </h3>
+
+                    {/* Items in this category */}
+                    <ul className="flex flex-col gap-3">
+                      {groupItems.map((item) => (
+                        <li
+                          key={item.id}
+                          className="flex items-start gap-3"
+                        >
+                          <ItemIcon kind={item.kind} />
+
+                          {/* Title + subtitle stack on the left, flex-1 so it
+                              takes available room; min-w-0 lets the text
+                              truncate inside this flex child. */}
+                          <div className="flex-1 min-w-0 flex flex-col leading-tight">
+                            <span className="text-sm font-semibold text-foreground truncate">
+                              {itemTitle(item)}
+                            </span>
+                            <span className="text-xs text-muted-foreground truncate mt-0.5">
+                              {itemSubtitle(item)}
+                            </span>
+                          </div>
+
+                          {/* Date — right-aligned, doesn't shrink */}
+                          <span className="text-sm text-foreground shrink-0 mt-0.5">
+                            {itemDateText(item)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ── DIVIDER ───────────────────────────────────────────────
+                Desktop: vertical line between columns.
+                Mobile: horizontal line between stacked sections. */}
+            <div
+              aria-hidden
+              className="hidden lg:block w-px bg-grey-light"
+            />
+            <div
+              aria-hidden
+              className="lg:hidden h-px bg-grey-light"
+            />
+
+            {/* ── RIGHT COLUMN: price breakdown ─────────────────────────
+                For the prototype we show a single "Paid before departure"
+                line using the trip total. Real app would itemize this. */}
+            <div className="flex flex-col gap-3">
+              <h3 className="text-xs font-bold uppercase tracking-[0.08em] text-grey">
+                Price breakdown
+              </h3>
+              <div className="flex items-baseline justify-between gap-4">
+                <span className="text-sm text-foreground">Paid before departure</span>
+                <span className="text-sm font-semibold text-foreground shrink-0">
+                  {totalPriceLabel}
+                </span>
+              </div>
+            </div>
           </div>
         </section>
       </div>
