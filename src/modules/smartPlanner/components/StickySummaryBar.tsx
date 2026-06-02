@@ -40,6 +40,13 @@ interface StickySummaryBarProps {
   // view, and shows it once the user has scrolled past. The bar slides in/out
   // from the bottom rather than appearing/disappearing instantly.
   show?: boolean;
+  // Override for the bar's positioning. Default is "fixed bottom-0 left-0
+  // w-full" which spans the full viewport (canonical full-page Smart Planner).
+  // Callers that render this inside a split-screen layout (e.g. the AI
+  // conversation canvas that only owns the right 60% of the page) can pass
+  // their own positioning to constrain the bar to their column — e.g.
+  // "fixed bottom-0 left-0 w-full md:left-[40%] md:w-[60%]".
+  positionClassName?: string;
 }
 
 // Map each item kind to a small line-style icon used in the expanded panel.
@@ -148,6 +155,7 @@ export function StickySummaryBar({
   totalPriceLabel,
   items,
   show = true,
+  positionClassName = "fixed bottom-0 left-0 w-full",
 }: StickySummaryBarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -189,9 +197,13 @@ export function StickySummaryBar({
       ref={containerRef}
       aria-hidden={!show}
       className={cn(
+        // Positioning is caller-controlled so the same bar can either span
+        // the full viewport (canonical full-page Smart Planner) or be
+        // constrained to a canvas column (compact AI mode).
+        positionClassName,
         // Slide-up animation: pushed below the viewport when hidden,
         // settles at the bottom when shown.
-        "fixed bottom-0 left-0 w-full bg-card shadow-2xl rounded-t-3xl z-30",
+        "bg-card shadow-2xl rounded-t-3xl z-30",
         "transition-transform duration-300 ease-out",
         show ? "translate-y-0" : "translate-y-full pointer-events-none",
       )}

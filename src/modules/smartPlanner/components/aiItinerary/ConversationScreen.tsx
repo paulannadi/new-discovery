@@ -109,6 +109,40 @@ export default function ConversationScreen({
     }
   }, [state.messages.length]);
 
+  // Sticky-summary visibility — mirrors SmartPlannerPage:
+  // hide the bar while the hero's dates+price capsule is still on screen
+  // (the user can already see that info up top), then slide it up once the
+  // user has scrolled past the hero. An invisible sentinel placed below the
+  // hero is watched by an IntersectionObserver. Because the canvas has its
+  // own scroll container (not the viewport), we point the observer's `root`
+  // at that container.
+  const heroSentinelRef = useRef<HTMLDivElement>(null);
+  const canvasScrollRef = useRef<HTMLDivElement>(null);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  useEffect(() => {
+    const sentinel = heroSentinelRef.current;
+    const root = canvasScrollRef.current;
+    if (!sentinel || !root) return;
+
+    // Sentinel sits just below the hero. We only want to show the bar when
+    // it has scrolled ABOVE the top of the scroll container (i.e. the user
+    // has actually moved past the hero) — not when it's below (initial
+    // state on tall screens).
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const scrolledPastHero =
+          !entry.isIntersecting && entry.boundingClientRect.top < 0;
+        setShowStickyBar(scrolledPastHero);
+      },
+      { root, threshold: 0 },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+    // Re-runs when the layout swaps (chatMinimized) because the scroll
+    // container and sentinel are inside the conditional branch and remount.
+  }, [chatMinimized]);
+
   const spent = computeSpent(state);
 
   // Mobile-tab dot — show on canvas tab when there's a fresh canvas change.
@@ -143,10 +177,10 @@ export default function ConversationScreen({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-grey-lightest">
-      {/* AiTopBar hides when chat is minimized on desktop — in that mode
-          the canvas renders the canonical Smart Planner layout, which has
-          its own back button inside ItineraryHero. */}
-      {!chatMinimized && <AiTopBar onBack={handleNewTripClick} />}
+      {/* AiTopBar stays visible in both modes so "Back to discovery" is
+          always one click away — including when the chat is minimized and
+          the canvas takes the full page. */}
+      <AiTopBar onBack={handleNewTripClick} />
 
       {/* Mobile tab switcher — hidden on md+ */}
       <div
@@ -300,7 +334,7 @@ export default function ConversationScreen({
             // viewport bottom. The data still comes from the AI plan
             // state so any items the AI added/changed remain visible
             // and highlighted via `state.justAddedIds`.
-            <div className="overflow-y-auto h-full relative">
+            <div ref={canvasScrollRef} className="overflow-y-auto h-full relative">
               <ItineraryHero
                 title={state.trip.title}
                 travelersLabel={state.trip.travelersLabel}
@@ -313,6 +347,9 @@ export default function ConversationScreen({
                 onShareItinerary={() => {}}
                 onToggleExpertMode={() => {}}
               />
+              {/* Invisible sentinel — see useEffect above. Drives the
+                  sticky bar's slide-up once it scrolls off the top. */}
+              <div ref={heroSentinelRef} aria-hidden="true" className="h-0 w-0" />
               <div className="max-w-5xl mx-auto pl-1 pr-4 md:px-4 pt-5 md:pt-8 pb-32 box-content">
                 <ItineraryTimeline
                   items={state.items}
@@ -334,6 +371,7 @@ export default function ConversationScreen({
                 nights={state.trip.nights}
                 totalPriceLabel={`€${spent.toLocaleString("en")}`}
                 items={state.items}
+                show={showStickyBar}
               />
             </div>
           ) : (
@@ -341,36 +379,59 @@ export default function ConversationScreen({
             // Used when the chat panel is open and the canvas is sharing
             // the screen at ~60% width. The hero is shrunk and the hotel
             // alternatives drawer is allowed so chat suggestions have an
-            // in-canvas surface to drop into.
-            <div className="overflow-y-auto h-full px-4 md:px-6 py-5 pb-20">
-              <AiCanvasHeader
-                title={state.trip.title}
-                travelersLabel={state.trip.travelersLabel}
-                nights={state.trip.nights}
+            // in-canvas surface to drop into. The StickySummaryBar below
+            // is constrained to the canvas column so it doesn't overlap
+            // the chat panel on the left.
+            <>
+              <div
+                ref={canvasScrollRef}
+                className="overflow-y-auto h-full px-4 md:px-6 py-5 pb-32"
+              >
+                <AiCanvasHeader
+                  title={state.trip.title}
+                  travelersLabel={state.trip.travelersLabel}
+                  nights={state.trip.nights}
+                  startDate={state.trip.startDate}
+                  endDate={state.trip.endDate}
+                  heroImage={state.trip.heroImage}
+                  spent={spent}
+                  budget={state.trip.budget}
+                  onCheckout={() => setCheckout("open")}
+                />
+                {/* Invisible sentinel — drives the sticky bar's slide-up
+                    once it scrolls off the top of this scroll container. */}
+                <div ref={heroSentinelRef} aria-hidden="true" className="h-0 w-0" />
+
+                {state.hotelDrawer && (
+                  <div className="mb-6">
+                    <AiCanvasHotelAlternatives
+                      onPick={handlePickHotelAlt}
+                      onClose={closeHotelDrawer}
+                    />
+                  </div>
+                )}
+
+                <ItineraryTimeline
+                  items={state.items}
+                  passengerCount={2}
+                  highlightedIds={state.justAddedIds}
+                  hideAddStops
+                />
+              </div>
+              <StickySummaryBar
                 startDate={state.trip.startDate}
                 endDate={state.trip.endDate}
-                heroImage={state.trip.heroImage}
-                spent={spent}
-                budget={state.trip.budget}
-                onCheckout={() => setCheckout("open")}
-              />
-
-              {state.hotelDrawer && (
-                <div className="mb-6">
-                  <AiCanvasHotelAlternatives
-                    onPick={handlePickHotelAlt}
-                    onClose={closeHotelDrawer}
-                  />
-                </div>
-              )}
-
-              <ItineraryTimeline
+                adults={2}
+                nights={state.trip.nights}
+                totalPriceLabel={`€${spent.toLocaleString("en")}`}
                 items={state.items}
-                passengerCount={2}
-                highlightedIds={state.justAddedIds}
-                hideAddStops
+                show={showStickyBar}
+                // Mobile (single-column tab view): full width. Desktop split:
+                // start at 40% (where the chat panel ends) and span 60% so the
+                // bar sits only under the canvas, not the chat composer.
+                positionClassName="fixed bottom-0 left-0 w-full md:left-[40%] md:w-[60%]"
               />
-            </div>
+            </>
           )}
         </section>
       </div>
