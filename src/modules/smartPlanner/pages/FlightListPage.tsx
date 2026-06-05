@@ -178,7 +178,9 @@ export default function FlightListPage({
 
           {/* 2. Trip summary ↔ inline editor. Clicking any criteria box or the
                 Edit search button swaps this row for <FlightSearchForm>;
-                submitting or cancelling brings the summary back. */}
+                submitting brings the summary back. We don't pass `onCancel`
+                here, so the form's Cancel button is hidden — submitting the
+                search is the only way out, which keeps the row uncluttered. */}
           {isEditingSearch ? (
             <FlightSearchForm
               initialCriteria={searchCriteria}
@@ -187,7 +189,6 @@ export default function FlightListPage({
                 onSearchCriteriaChange(next);
                 setIsEditingSearch(false);
               }}
-              onCancel={() => setIsEditingSearch(false)}
             />
           ) : (
             <FlightTripSummary

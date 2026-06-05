@@ -16,8 +16,16 @@
 import { format } from "date-fns";
 import { Pencil } from "lucide-react";
 import { Button } from "../../../../shared/components/ui/button";
-import { Separator } from "../../../../shared/components/ui/separator";
 import type { FlightSearchCriteria } from "../../../../App";
+
+// A small, explicit light-grey divider. We render a plain <span> rather than the
+// shared <Separator> here because that component forces `h-full` on vertical
+// dividers (via a higher-specificity data-variant class), and inside this
+// center-aligned flex row `h-full` collapses to 0 height — so the divider would
+// be invisible. A fixed `h-5` + `w-px` + the `grey-light` token avoids all that.
+function Divider() {
+  return <span aria-hidden="true" className="h-5 w-px shrink-0 bg-grey-light" />;
+}
 
 type FlightTripSummaryProps = {
   criteria: FlightSearchCriteria;
@@ -48,14 +56,14 @@ export function FlightTripSummary({ criteria, onEditSearch }: FlightTripSummaryP
       {/* Trip type — bold */}
       <span className="text-sm font-extrabold text-foreground">{tripTypeLabel}</span>
 
-      <Separator orientation="vertical" className="h-5" />
+      <Divider />
 
       {/* Number of flights */}
       <span className="text-sm text-foreground">{legsLabel}</span>
 
       {dateLabel && (
         <>
-          <Separator orientation="vertical" className="h-5" />
+          <Divider />
           {/* Date range */}
           <span className="text-sm text-foreground">{dateLabel}</span>
         </>
