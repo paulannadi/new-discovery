@@ -16,6 +16,14 @@ const buttonVariants = cva(
           "border bg-background text-foreground hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:
           "border border-primary bg-background text-primary shadow-xs hover:bg-primary hover:text-primary-foreground dark:bg-input/30 dark:border-primary dark:hover:bg-primary",
+        // tertiary — quieter still than secondary. Neutral grey border
+        // (the default `border` colour token) with primary text, no shadow,
+        // and a soft grey-light fill on hover. Spec'd in
+        // DESIGN_SYSTEM.md §2.1 — was previously referenced in code
+        // (e.g. <Button variant="tertiary">) but never implemented, so it
+        // rendered as unstyled plain text.
+        tertiary:
+          "border bg-background text-primary hover:bg-grey-light dark:bg-input/30",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",

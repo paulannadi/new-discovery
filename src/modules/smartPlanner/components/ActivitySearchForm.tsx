@@ -10,7 +10,7 @@
 // destination caching, so the form has just four inputs:
 //   1. Activity type      (multi-select pill chips inside a dropdown)
 //   2. Destination        (free-text)
-//   3. When               (DayPicker date range — optional)
+//   3. When               (single-date Calendar — optional)
 //   4. Travellers         (counter)
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -34,10 +34,11 @@ import {
   Mountain,
   Ticket,
 } from "lucide-react";
-import { DayPicker, DateRange } from "react-day-picker";
 import { format, parseISO } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { cn } from "../../../shared/components/ui/utils";
+// Shared design-system date picker (token-based, no hardcoded colors).
+import { Calendar } from "../../../shared/components/ui/calendar";
 import type { ActivitySearchCriteria, ActivityType } from "../../../types";
 // Pull real mock data so the Destination dropdown only shows places we
 // actually have activities for. Keeps the prototype honest: clicking a
@@ -116,15 +117,12 @@ export default function ActivitySearchForm({
   );
   const [travellers, setTravellers] = useState(initialValues?.travellers ?? 2);
 
-  // We accept dates as ISO strings on the way in/out (so the type stays
-  // serialisable) but store them as Date objects internally for DayPicker.
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
-    if (!initialValues?.dateFrom) return undefined;
-    return {
-      from: parseISO(initialValues.dateFrom),
-      to: initialValues.dateTo ? parseISO(initialValues.dateTo) : undefined,
-    };
-  });
+  // Activities happen on a single day, so we track one date (not a range). We
+  // accept it as an ISO string on the way in/out (so the type stays
+  // serialisable) but store it as a Date object internally for the Calendar.
+  const [date, setDate] = useState<Date | undefined>(() =>
+    initialValues?.dateFrom ? parseISO(initialValues.dateFrom) : undefined
+  );
 
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -195,8 +193,9 @@ export default function ActivitySearchForm({
       // itself dictates the type — submit those locked types instead of the
       // (empty) local state.
       activityTypes: lockedActivityTypes ?? activityTypes,
-      dateFrom: dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
-      dateTo: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
+      // Single day → dateFrom carries the chosen date; dateTo stays undefined.
+      dateFrom: date ? format(date, "yyyy-MM-dd") : undefined,
+      dateTo: undefined,
       travellers,
     });
   };
@@ -209,11 +208,7 @@ export default function ActivitySearchForm({
       ? ACTIVITY_TYPE_OPTIONS.find((o) => o.id === activityTypes[0])?.label ?? ""
       : `${activityTypes.length} activity types`;
 
-  const dateSummary = dateRange?.from
-    ? dateRange.to
-      ? `${format(dateRange.from, "MMM d")} – ${format(dateRange.to, "MMM d, yyyy")}`
-      : format(dateRange.from, "MMM d, yyyy")
-    : "Any time";
+  const dateSummary = date ? format(date, "MMM d, yyyy") : "Any time";
 
   const guestSummary = `${travellers} ${travellers === 1 ? "Traveller" : "Travellers"}`;
 
@@ -418,7 +413,7 @@ export default function ActivitySearchForm({
               className={cn(
                 valueCls,
                 "truncate",
-                dateRange?.from ? "text-foreground" : "text-grey font-normal"
+                date ? "text-foreground" : "text-grey font-normal"
               )}
             >
               {dateSummary}
@@ -436,24 +431,29 @@ export default function ActivitySearchForm({
 
         {openPanel === "dates" && (
           <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-xl border border-border p-4 animate-in fade-in zoom-in-95 duration-150">
-            {/* Match the rdp colour vars with the rest of the app */}
-            <style>{`.rdp-root { --rdp-accent-color: hsl(var(--primary)); --rdp-accent-background-color: hsl(var(--primary) / 0.10); --rdp-day_button-border-radius: 6px; margin: 0; }`}</style>
-            <DayPicker
-              mode="range"
-              selected={dateRange}
-              onSelect={setDateRange}
+            {/* Shared design-system Calendar in single-date mode (token-based, no
+                hardcoded hex). Picking a day sets it and closes the panel — the
+                same flow as the other pickers, just completed in one click. */}
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={(picked) => {
+                setDate(picked);
+                if (picked) setOpenPanel(null);
+              }}
               numberOfMonths={1}
               disabled={{ before: new Date() }}
+              className="p-0"
             />
-            {dateRange?.from && (
+            {date && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setDateRange(undefined);
+                  setDate(undefined);
                 }}
                 className="mt-2 text-xs text-grey hover:text-foreground"
               >
-                Clear dates
+                Clear date
               </button>
             )}
           </div>

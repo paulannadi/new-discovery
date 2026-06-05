@@ -551,6 +551,13 @@ export default function App() {
           currentLegIndex={currentFlightLegIndex}
           selectedLegs={selectedFlightLegs}
           onFlightLegSelect={handleFlightLegSelect}
+          // Edit Search modal commits via this — reset selection and leg
+          // index so the user starts the new search from leg 1.
+          onSearchCriteriaChange={(next) => {
+            setFlightSearchCriteria(next);
+            setSelectedFlightLegs([]);
+            setCurrentFlightLegIndex(0);
+          }}
           onBack={handleBack}
         />
       )}

@@ -34,7 +34,11 @@ import {
 } from "lucide-react";
 import * as Slider from "@radix-ui/react-slider";
 import { showToast } from "../../../shared/utils/toast";
-import { DayPicker, DateRange } from "react-day-picker";
+// Shared design-system date picker (token-based). DateRange is just the {from,to} type.
+import { Calendar } from "../../../shared/components/ui/calendar";
+import { type DateRange } from "react-day-picker";
+// Shared range-picker logic: 1st click = from, 2nd = to, re-open restarts.
+import { stepRange, isRangeComplete } from "../../../shared/utils/dateRange";
 import { format, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
 import LeafletMap, { type MapMarkerData } from "../../../shared/components/LeafletMap";
@@ -812,14 +816,24 @@ export default function HotelListPage({
       case 'date':
         return (
            <div style={style} className="bg-card rounded-xl shadow-xl border border-border p-4 animate-in fade-in zoom-in-95 duration-200">
-             {/* --rdp-accent-color: the selected day fill. --rdp-background-color: the range-middle + hover tint. Both must be set or the range highlight defaults to react-day-picker's own blue. */}
-             <style>{`.rdp { --rdp-accent-color: #2681ff; --rdp-background-color: rgba(38, 129, 255, 0.1); margin: 0; } .rdp-day_selected:not([disabled]) { font-weight: bold; }`}</style>
-             <DayPicker
+             {/* Shared design-system Calendar — same token-driven component the
+                 flight edit-search panel uses, so both results editors match. */}
+             <Calendar
                mode="range"
                defaultMonth={new Date()}
                selected={dateRange}
-               onSelect={setDateRange}
+               // 1st click = check-in, 2nd = check-out, then auto-close.
+               // Re-opening restarts on the first click (see stepRange).
+               onSelect={(_range, day) => {
+                 const next = stepRange(dateRange, day);
+                 setDateRange(next);
+                 if (isRangeComplete(next)) {
+                   setTimeout(() => setOpenDropdown(null), 200);
+                 }
+               }}
                numberOfMonths={1}
+               disabled={{ before: new Date() }}
+               className="p-0"
              />
              <div className="flex justify-end mt-4 pt-4 border-t border-muted">
                <button

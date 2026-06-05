@@ -12,12 +12,25 @@ function Calendar({
   className,
   classNames,
   showOutsideDays = true,
+  style,
   ...props
 }: React.ComponentProps<typeof DayPicker>) {
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
+      // react-day-picker v9 themes itself through these CSS variables (its
+      // default --rdp-accent-color is literally "blue"). We remap them to our
+      // design tokens so every calendar in the app is on-brand. This uses
+      // var(--token) — token-based per design system §1.1, never hardcoded hex.
+      // `...style` is spread last so individual callers can still override.
+      style={{
+        "--rdp-accent-color": "var(--primary)",
+        "--rdp-accent-background-color":
+          "color-mix(in srgb, var(--primary) 10%, transparent)",
+        "--rdp-day_button-border-radius": "var(--radius-md)",
+        ...style,
+      } as React.CSSProperties}
       classNames={{
         months: "flex flex-col sm:flex-row gap-2",
         month: "flex flex-col gap-4",

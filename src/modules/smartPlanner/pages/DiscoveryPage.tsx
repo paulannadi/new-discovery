@@ -53,10 +53,17 @@ import {
   Ticket,
 } from "lucide-react";
 import { Switch } from "../../../shared/components/ui/switch";
-import { DayPicker, DateRange } from "react-day-picker";
+// Shared design-system date picker (token-based). DateRange is just the {from,to} type.
+import { Calendar } from "../../../shared/components/ui/calendar";
+import { type DateRange } from "react-day-picker";
+// Shared range-picker logic: 1st click = from, 2nd = to, re-open restarts.
+import { stepRange, isRangeComplete } from "../../../shared/utils/dateRange";
 import { format, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
 import type { FlightSearchCriteria, FlightLeg, HolidaySearchCriteria } from "../../../App";
+// Searchable city/airport picker — replaces the plain From/To text inputs in
+// the Flights tab so users can pick a city by name and we store the IATA code.
+import { FlightSearchForm } from "../components/flightSearch/FlightSearchForm";
 // Activities tab uses a self-contained search form, mirroring how Holidays
 // uses PackageSearchForm. The form is the only "Activities" UI on the
 // discovery hero; results live on a separate page.
@@ -732,61 +739,15 @@ export default function DiscoveryPage({
     setHotelRooms(updated);
   };
 
-  // Flights panel state
-  const [flightTripType, setFlightTripType] = useState<"roundtrip" | "multicity">("roundtrip");
-  const [flightTripTypeOpen, setFlightTripTypeOpen] = useState(false);
-
-  // Unified legs array — round trip always has exactly 2 legs, multi-city has 2–6.
-  // leg[0].date = outbound, leg[1].date = return (for round trip).
-  const [flightLegs, setFlightLegs] = useState<FlightLeg[]>([
-    { id: 1, from: "", to: "", date: undefined },
-    { id: 2, from: "", to: "", date: undefined },
-  ]);
-
-  // For the round-trip date range picker — we sync this into the legs on change.
-  const [flightDateRange, setFlightDateRange] = useState<DateRange | undefined>(undefined);
-  const [flightDatesOpen, setFlightDatesOpen] = useState(false);
-
-  // For multi-city: which leg's date picker is open (by leg id, or null)
-  const [openLegDateId, setOpenLegDateId] = useState<number | null>(null);
-
-  // Travellers + cabin class (shared between round trip and multi-city)
-  const [flightPassengers, setFlightPassengers] = useState({ adults: 2, children: 0 });
-  const [flightCabinClass, setFlightCabinClass] = useState<"economy" | "premium-economy" | "business" | "first">("economy");
-  const [flightPassengersOpen, setFlightPassengersOpen] = useState(false);
-
-  // Helper: update a single field on one leg
-  const updateLeg = (id: number, field: keyof FlightLeg, value: string | Date | undefined) => {
-    setFlightLegs((prev) => prev.map((l) => (l.id === id ? { ...l, [field]: value } : l)));
-  };
-
-  // Add a new empty leg (multi-city only, up to 6)
-  const addLeg = () => {
-    if (flightLegs.length < 6) {
-      setFlightLegs((prev) => [...prev, { id: Date.now(), from: "", to: "", date: undefined }]);
-    }
-  };
-
-  // Remove a leg by id (only allowed for legs beyond the first 2)
-  const removeLeg = (id: number) => {
-    setFlightLegs((prev) => prev.filter((l) => l.id !== id));
-  };
-
-  const flightDateLabel = flightDateRange?.from
-    ? flightDateRange.to
-      ? `${format(flightDateRange.from, "MMM d")} – ${format(flightDateRange.to, "MMM d, yyyy")}`
-      : format(flightDateRange.from, "MMM d, yyyy")
-    : "Select dates";
-
-  const CABIN_CLASS_LABELS: Record<typeof flightCabinClass, string> = {
-    "economy": "Economy",
-    "premium-economy": "Premium Economy",
-    "business": "Business",
-    "first": "First Class",
-  };
-
-  const flightPassengersLabel = `${flightPassengers.adults} Adult${flightPassengers.adults !== 1 ? "s" : ""}${flightPassengers.children > 0 ? `, ${flightPassengers.children} Child${flightPassengers.children !== 1 ? "ren" : ""}` : ""}`;
-  const [flightCabinClassOpen, setFlightCabinClassOpen] = useState(false);
+  // Flights panel — the form itself now lives in the shared <FlightSearchForm>
+  // component (also used on the FlightListPage edit-search panel). We only keep
+  // a lightweight mirror of the latest passengers/cabin here so the "Popular
+  // routes" quick-search cards lower down can reuse whatever the user picked.
+  const [flightQuickCriteria, setFlightQuickCriteria] = useState<{
+    adults: number;
+    children: number;
+    cabinClass: FlightSearchCriteria["cabinClass"];
+  }>({ adults: 2, children: 0, cabinClass: "economy" });
 
   // Holidays panel — state now lives inside PackageSearchForm
 
@@ -1110,14 +1071,20 @@ export default function DiscoveryPage({
 
                         {hotelOpenPanel === "dates" && (
                           <div className="absolute top-full left-0 mt-2 bg-card rounded-xl shadow-xl border border-border z-50 overflow-hidden">
-                            <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
-                            <DayPicker
+                            {/* Shared design-system Calendar — same component the
+                                Flights tab and edit-search panels use, so all date
+                                pickers are identical and theme-token driven. */}
+                            <Calendar
                               mode="range"
                               selected={hotelDateRange}
-                              onSelect={(range) => {
-                                setHotelDateRange(range);
-                                // Auto-close once both dates are picked
-                                if (range?.from && range?.to) {
+                              // Drive the range from the clicked day so it's
+                              // predictable: 1st click = check-in, 2nd = check-out,
+                              // and re-opening restarts on the first click.
+                              onSelect={(_range, day) => {
+                                const next = stepRange(hotelDateRange, day);
+                                setHotelDateRange(next);
+                                // Both dates picked → close shortly after.
+                                if (isRangeComplete(next)) {
                                   setTimeout(
                                     () => setHotelOpenPanel(null),
                                     200
@@ -1125,8 +1092,7 @@ export default function DiscoveryPage({
                                 }
                               }}
                               numberOfMonths={1}
-                              fromDate={new Date()}
-                              className="p-4"
+                              disabled={{ before: new Date() }}
                             />
                           </div>
                         )}
@@ -1275,334 +1241,16 @@ export default function DiscoveryPage({
 
                 {/* FLIGHTS PANEL */}
                 {activeTab === "flights" && (
-                  <div className="flex flex-col gap-4">
-
-                    {/* Secondary criteria row — stacks on mobile, inline pills on md+ */}
-                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:flex-wrap">
-
-                      {/* 1. Trip type dropdown */}
-                      <div className="relative w-full md:w-auto">
-                        <button
-                          onClick={() => { setFlightTripTypeOpen((o) => !o); setFlightCabinClassOpen(false); setFlightPassengersOpen(false); }}
-                          className={`w-full md:w-auto flex items-center gap-1.5 h-[52px] md:h-8 px-4 md:px-3 rounded-xl md:rounded-lg border text-sm md:text-xs font-semibold transition-all ${flightTripTypeOpen ? "border-primary bg-white text-primary" : "border-border bg-white text-foreground hover:border-primary"}`}
-                        >
-                          {flightTripType === "roundtrip" ? "Round trip" : "Multi-city"}
-                          <ChevronDown size={13} className={`shrink-0 transition-transform ${flightTripTypeOpen ? "rotate-180" : ""}`} />
-                        </button>
-                        {flightTripTypeOpen && (
-                          <div className="absolute top-full right-0 md:left-0 md:right-auto mt-1.5 z-50 bg-card rounded-xl shadow-xl border border-border p-1.5 w-[140px] flex flex-col gap-0.5">
-                            {(["roundtrip", "multicity"] as const).map((type) => (
-                              <button
-                                key={type}
-                                onClick={() => {
-                                  setFlightTripType(type);
-                                  if (type === "roundtrip") setFlightLegs((prev) => prev.slice(0, 2));
-                                  setFlightTripTypeOpen(false);
-                                }}
-                                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${flightTripType === type ? "bg-primary text-white" : "text-foreground hover:bg-grey-light"}`}
-                              >
-                                {type === "roundtrip" ? "Round trip" : "Multi-city"}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 2. Cabin class dropdown */}
-                      <div className="relative w-full md:w-auto">
-                        <button
-                          onClick={() => { setFlightCabinClassOpen((o) => !o); setFlightTripTypeOpen(false); setFlightPassengersOpen(false); }}
-                          className={`w-full md:w-auto flex items-center gap-1.5 h-[52px] md:h-8 px-4 md:px-3 rounded-xl md:rounded-lg border text-sm md:text-xs font-semibold transition-all ${flightCabinClassOpen ? "border-primary bg-white text-primary" : "border-border bg-white text-foreground hover:border-primary"}`}
-                        >
-                          {CABIN_CLASS_LABELS[flightCabinClass]}
-                          <ChevronDown size={13} className={`shrink-0 transition-transform ${flightCabinClassOpen ? "rotate-180" : ""}`} />
-                        </button>
-                        {flightCabinClassOpen && (
-                          <div className="absolute top-full right-0 md:left-0 md:right-auto mt-1.5 z-50 bg-card rounded-xl shadow-xl border border-border p-1.5 w-[180px] flex flex-col gap-0.5">
-                            {(["economy", "premium-economy", "business", "first"] as const).map((cls) => (
-                              <button
-                                key={cls}
-                                onClick={() => { setFlightCabinClass(cls); setFlightCabinClassOpen(false); }}
-                                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${flightCabinClass === cls ? "bg-primary text-white" : "text-foreground hover:bg-grey-light"}`}
-                              >
-                                {CABIN_CLASS_LABELS[cls]}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 3. Travellers dropdown — counters for adults/children */}
-                      <div className="relative w-full md:w-auto">
-                        <button
-                          onClick={() => { setFlightPassengersOpen((o) => !o); setFlightTripTypeOpen(false); setFlightCabinClassOpen(false); }}
-                          className={`w-full md:w-auto flex items-center gap-1.5 h-[52px] md:h-8 px-4 md:px-3 rounded-xl md:rounded-lg border text-sm md:text-xs font-semibold transition-all ${flightPassengersOpen ? "border-primary bg-white text-primary" : "border-border bg-white text-foreground hover:border-primary"}`}
-                        >
-                          {flightPassengersLabel}
-                          <ChevronDown size={13} className={`shrink-0 transition-transform ${flightPassengersOpen ? "rotate-180" : ""}`} />
-                        </button>
-                        {flightPassengersOpen && (
-                          <div className="absolute top-full right-0 md:left-0 md:right-auto mt-1.5 z-50 bg-card rounded-2xl shadow-xl border border-border p-5 w-[260px] flex flex-col gap-4">
-                            {[
-                              { label: "Adults", sub: "Age 12+", key: "adults" as const, min: 1 },
-                              { label: "Children", sub: "Age 2–11", key: "children" as const, min: 0 },
-                            ].map(({ label, sub, key, min }) => (
-                              <div key={key} className="flex items-center justify-between">
-                                <div>
-                                  <div className="text-sm font-semibold text-foreground">{label}</div>
-                                  <div className="text-xs text-grey">{sub}</div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                  <button
-                                    onClick={() => setFlightPassengers((p) => ({ ...p, [key]: Math.max(min, p[key] - 1) }))}
-                                    disabled={flightPassengers[key] <= min}
-                                    className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-30"
-                                  >
-                                    <Minus size={14} />
-                                  </button>
-                                  <span className="text-sm font-bold text-foreground w-4 text-center">{flightPassengers[key]}</span>
-                                  <button
-                                    onClick={() => setFlightPassengers((p) => ({ ...p, [key]: Math.min(9, p[key] + 1) }))}
-                                    className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors"
-                                  >
-                                    <Plus size={14} />
-                                  </button>
-                                </div>
-                              </div>
-                            ))}
-                            <button
-                              onClick={() => setFlightPassengersOpen(false)}
-                              className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-all"
-                            >
-                              Done
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* ── ROUND TRIP FORM ──────────────────────────────────── */}
-                    {flightTripType === "roundtrip" && (
-                      <div className="flex flex-col lg:flex-row gap-3">
-
-                        {/* From */}
-                        <div className="flex-1">
-                          <div className="w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border border-border bg-white focus-within:border-primary transition-all">
-                            <Plane size={18} className="text-primary shrink-0" />
-                            <div className="flex flex-col flex-1 min-w-0">
-                              <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">From</span>
-                              <input
-                                type="text"
-                                placeholder="Departure city"
-                                value={flightLegs[0]?.from ?? ""}
-                                onChange={(e) => {
-                                  // When origin changes, also update the return leg's destination
-                                  updateLeg(flightLegs[0].id, "from", e.target.value);
-                                  updateLeg(flightLegs[1].id, "to", e.target.value);
-                                }}
-                                className="bg-transparent text-sm font-semibold text-foreground outline-none placeholder:text-grey placeholder:font-normal"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* To */}
-                        <div className="flex-1">
-                          <div className="w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border border-border bg-white focus-within:border-primary transition-all">
-                            <Plane size={18} className="text-primary shrink-0 rotate-90" />
-                            <div className="flex flex-col flex-1 min-w-0">
-                              <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">To</span>
-                              <input
-                                type="text"
-                                placeholder="Destination city"
-                                value={flightLegs[0]?.to ?? ""}
-                                onChange={(e) => {
-                                  // Destination changes: outbound leg goes TO here, return leg comes FROM here
-                                  updateLeg(flightLegs[0].id, "to", e.target.value);
-                                  updateLeg(flightLegs[1].id, "from", e.target.value);
-                                }}
-                                className="bg-transparent text-sm font-semibold text-foreground outline-none placeholder:text-grey placeholder:font-normal"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Dates — range picker for outbound + return */}
-                        <div className="flex-1">
-                          <div className="relative w-full">
-                            <button
-                              className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border bg-white transition-all ${flightDatesOpen ? "border-primary" : "border-border hover:border-primary"}`}
-                              onClick={() => setFlightDatesOpen(!flightDatesOpen)}
-                            >
-                              <CalendarIcon size={18} className="text-primary shrink-0" />
-                              <div className="flex flex-col items-start flex-1 min-w-0">
-                                <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Depart – Return</span>
-                                <span className={cn("text-sm font-semibold", flightDateRange?.from ? "text-foreground" : "text-grey")}>
-                                  {flightDateLabel}
-                                </span>
-                              </div>
-                            </button>
-                            {flightDatesOpen && (
-                              <div className="absolute top-[60px] left-0 z-50 bg-card rounded-2xl shadow-2xl border border-border p-4">
-                                <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
-                                <DayPicker
-                                  mode="range"
-                                  selected={flightDateRange}
-                                  onSelect={(range) => {
-                                    setFlightDateRange(range);
-                                    // Mirror dates into the legs so they get passed to FlightListPage
-                                    if (range?.from) updateLeg(flightLegs[0].id, "date", range.from);
-                                    if (range?.to) updateLeg(flightLegs[1].id, "date", range.to);
-                                    if (range?.from && range?.to) setFlightDatesOpen(false);
-                                  }}
-                                  numberOfMonths={1}
-                                  disabled={{ before: new Date() }}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Search button — w-full on mobile (stacked), lg:w-auto on desktop (inline row) */}
-                        <button
-                          className="w-full lg:w-auto bg-primary hover:brightness-85 text-white font-extrabold text-base h-[52px] px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
-                          onClick={() => {
-                            setFlightDatesOpen(false);
-                            setFlightPassengersOpen(false);
-                            onFlightSearch({
-                              tripType: "roundtrip",
-                              legs: flightLegs,
-                              adults: flightPassengers.adults,
-                              children: flightPassengers.children,
-                              cabinClass: flightCabinClass,
-                            });
-                          }}
-                        >
-                          <Search size={20} />
-                          Search Flights
-                        </button>
-                      </div>
-                    )}
-
-                    {/* ── MULTI-CITY FORM ──────────────────────────────────── */}
-                    {flightTripType === "multicity" && (
-                      <div className="flex flex-col gap-3">
-
-                        {/* One row per leg */}
-                        {flightLegs.map((leg, index) => (
-                          <div key={leg.id} className="flex flex-col md:flex-row items-stretch md:items-center gap-2">
-
-                            {/* Leg label */}
-                            <span className="text-[10px] font-extrabold text-grey uppercase tracking-wide shrink-0 md:w-12 pt-3.5 md:pt-0 text-left md:text-right">
-                              {index === 0 ? "Leg 1" : index === 1 ? "Leg 2" : `Leg ${index + 1}`}
-                            </span>
-
-                            {/* From input */}
-                            <div className="flex-1 flex items-center gap-3 h-[52px] px-4 rounded-xl border border-border bg-white focus-within:border-primary transition-all">
-                              <Plane size={16} className="text-primary shrink-0" />
-                              <input
-                                type="text"
-                                placeholder="From city"
-                                value={leg.from}
-                                onChange={(e) => updateLeg(leg.id, "from", e.target.value)}
-                                className="bg-transparent text-sm font-semibold text-foreground outline-none placeholder:text-grey placeholder:font-normal w-full"
-                              />
-                            </div>
-
-                            {/* Arrow between From and To */}
-                            <ArrowRight size={14} className="text-grey shrink-0 hidden md:block" />
-
-                            {/* To input */}
-                            <div className="flex-1 flex items-center gap-3 h-[52px] px-4 rounded-xl border border-border bg-white focus-within:border-primary transition-all">
-                              <Plane size={16} className="text-primary shrink-0 rotate-90" />
-                              <input
-                                type="text"
-                                placeholder="To city"
-                                value={leg.to}
-                                onChange={(e) => updateLeg(leg.id, "to", e.target.value)}
-                                className="bg-transparent text-sm font-semibold text-foreground outline-none placeholder:text-grey placeholder:font-normal w-full"
-                              />
-                            </div>
-
-                            {/* Date picker for this leg (single date) */}
-                            <div className="relative md:w-[160px]">
-                              <button
-                                className={`w-full flex items-center gap-2 h-[52px] px-3 rounded-xl border bg-white transition-all ${openLegDateId === leg.id ? "border-primary" : "border-border hover:border-primary"}`}
-                                onClick={() => setOpenLegDateId(openLegDateId === leg.id ? null : leg.id)}
-                              >
-                                <CalendarIcon size={15} className="text-primary shrink-0" />
-                                <span className={cn("text-xs font-semibold truncate", leg.date ? "text-foreground" : "text-grey")}>
-                                  {leg.date ? format(leg.date, "d MMM yyyy") : "Select date"}
-                                </span>
-                              </button>
-                              {openLegDateId === leg.id && (
-                                <div className="absolute top-[60px] left-0 z-50 bg-card rounded-2xl shadow-2xl border border-border p-4">
-                                  <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
-                                  <DayPicker
-                                    mode="single"
-                                    selected={leg.date}
-                                    onSelect={(date) => {
-                                      updateLeg(leg.id, "date", date ?? undefined);
-                                      setOpenLegDateId(null);
-                                    }}
-                                    disabled={{ before: new Date() }}
-                                  />
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Remove button — only shown for legs beyond the first 2 */}
-                            {index >= 2 ? (
-                              <button
-                                onClick={() => removeLeg(leg.id)}
-                                className="shrink-0 w-9 h-9 rounded-full border border-border flex items-center justify-center text-grey hover:border-red-300 hover:text-red-400 transition-colors self-center"
-                                title="Remove this leg"
-                              >
-                                <X size={14} />
-                              </button>
-                            ) : (
-                              // Placeholder to keep alignment when no remove button
-                              <div className="shrink-0 w-9 hidden md:block" />
-                            )}
-                          </div>
-                        ))}
-
-                        {/* Add another flight button — up to 6 legs */}
-                        {flightLegs.length < 6 && (
-                          <button
-                            onClick={addLeg}
-                            className="mt-1 h-[44px] w-full border border-dashed border-primary rounded-lg text-primary text-xs font-bold hover:bg-primary/10 transition-colors flex items-center justify-center gap-2"
-                          >
-                            <Plus size={14} />
-                            Add another flight
-                          </button>
-                        )}
-
-                        {/* Bottom row: search button */}
-                        <div className="flex pt-1">
-
-                          {/* Search button */}
-                          <button
-                            className="flex-1 md:flex-none bg-primary hover:brightness-85 text-white font-extrabold text-base h-[52px] px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
-                            onClick={() => {
-                              setFlightPassengersOpen(false);
-                              setOpenLegDateId(null);
-                              onFlightSearch({
-                                tripType: "multicity",
-                                legs: flightLegs,
-                                adults: flightPassengers.adults,
-                                children: flightPassengers.children,
-                                cabinClass: flightCabinClass,
-                              });
-                            }}
-                          >
-                            <Search size={20} />
-                            Search Flights
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  <FlightSearchForm
+                    onSearch={onFlightSearch}
+                    onChange={(c) =>
+                      setFlightQuickCriteria({
+                        adults: c.adults,
+                        children: c.children,
+                        cabinClass: c.cabinClass,
+                      })
+                    }
+                  />
                 )}
 
                 {/* HOLIDAYS PANEL */}
@@ -2019,9 +1667,9 @@ export default function DiscoveryPage({
                       { id: 1, from: route.from, to: route.to, date: undefined },
                       { id: 2, from: route.to, to: route.from, date: undefined },
                     ],
-                    adults: flightPassengers.adults,
-                    children: flightPassengers.children,
-                    cabinClass: flightCabinClass,
+                    adults: flightQuickCriteria.adults,
+                    children: flightQuickCriteria.children,
+                    cabinClass: flightQuickCriteria.cabinClass,
                   })}
                 >
                   <div className="relative">
