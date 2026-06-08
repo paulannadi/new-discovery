@@ -27,6 +27,7 @@ import {
   Tag,
 } from "lucide-react";
 import { BackButton } from "../../../shared/components/BackButton";
+import { PageContainer } from "../../../shared/components/PageContainer";
 import { cn } from "../../../shared/components/ui/utils";
 import LeafletMap, {
   type MapMarkerData,
@@ -471,14 +472,14 @@ export default function ActivityListPage({
           (same shape as HolidayListPage's header card)
       ══════════════════════════════════════════════════════════════════ */}
       <div className="bg-card border-b border-border">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-6 pt-5 pb-5 flex flex-col gap-4">
+        <PageContainer tier="wide" className="px-4 md:px-6 pt-5 pb-5 flex flex-col gap-4">
           <BackButton label="Back to discovery" onClick={onBack} />
           <ActivitySearchForm
             variant="compact"
             initialValues={searchCriteria}
             onSearch={(c) => onRefineSearch?.(c)}
           />
-        </div>
+        </PageContainer>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
@@ -489,9 +490,11 @@ export default function ActivityListPage({
         {/* filtersRef stays `relative` so the dropdown panel can anchor under
             its button. It sits OUTSIDE the scrollable pill row, so the
             overflow-x on the pills never clips the open dropdown. */}
-        <div
+        <PageContainer
+          as="div"
+          tier="wide"
           ref={filtersRef}
-          className="relative max-w-[1920px] mx-auto px-4 md:px-6 py-3"
+          className="relative px-4 md:px-6 py-3"
         >
           {/* Filter pills — horizontal, scrollable on mobile */}
           <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -519,7 +522,7 @@ export default function ActivityListPage({
 
           {/* The actual dropdown panel — positioned absolute to the filters row */}
           {renderDropdown()}
-        </div>
+        </PageContainer>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
@@ -528,7 +531,7 @@ export default function ActivityListPage({
           the leftover viewport height, so the PAGE doesn't scroll — only the
           left column does (overflow-y-auto). The map fills its column.
       ══════════════════════════════════════════════════════════════════ */}
-      <div className="flex flex-1 max-w-[1920px] mx-auto w-full overflow-hidden relative">
+      <PageContainer tier="wide" className="flex flex-1 overflow-hidden relative">
 
         {/* LEFT — scrollable list column (65% on md+, full width below) */}
         <div className="w-full md:w-[65%] min-w-0 h-[calc(100vh-130px)] overflow-y-auto p-4 md:p-6 flex flex-col gap-6">
@@ -596,7 +599,7 @@ export default function ActivityListPage({
           />
         </div>
 
-      </div>
+      </PageContainer>
     </div>
   );
 }

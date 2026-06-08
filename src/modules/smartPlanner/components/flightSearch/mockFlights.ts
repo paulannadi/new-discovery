@@ -664,6 +664,73 @@ export function getMockFlightsForLeg(from: string, to: string): FlightOption[] {
   }));
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Stopover offers
+// ─────────────────────────────────────────────────────────────────────────────
+// When the user opts into a stopover on the search form, we surface these on
+// the chosen leg alongside the normal results. Each is a regular FlightOption
+// with the extra `stopover` field set — that's what FlightResultCard reads to
+// show the stopover treatment, and what App.tsx reads to add the hotel step.
+//
+// The two classic long-haul stopover hubs (Dubai / Singapore) are used for any
+// route — this is a prototype, so we don't try to match the real geography.
+// Each hub now carries the TWO physical flights that make up the journey —
+// origin→hub (`out`) and hub→destination (`onward`) — so the card can show
+// both legs with their own times. `arrivesNextDay` drives the "+1" marker.
+const STOPOVER_HUBS = [
+  {
+    city: "Dubai",
+    hubCode: "DXB",
+    airline: "Emirates",
+    airlineCode: "EK",
+    duration: "20h 35m", // overall journey time (used for sort / fallback)
+    price: 1180,
+    out: { depTime: "21:40", arrTime: "07:55", duration: "7h 15m", arrivesNextDay: true, note: "direct" },
+    onward: { depTime: "09:50", arrTime: "06:10", duration: "13h 20m", arrivesNextDay: true, note: "overnight" },
+  },
+  {
+    city: "Singapore",
+    hubCode: "SIN",
+    airline: "Singapore Airlines",
+    airlineCode: "SQ",
+    duration: "21h 25m",
+    price: 1295,
+    out: { depTime: "12:20", arrTime: "08:05", duration: "12h 45m", arrivesNextDay: true, note: "direct" },
+    onward: { depTime: "20:30", arrTime: "07:40", duration: "8h 10m", arrivesNextDay: true, note: "overnight" },
+  },
+];
+
+export function getStopoverOffersForLeg(
+  from: string,
+  to: string,
+  nights: number,
+): FlightOption[] {
+  const offset = ((from.length + to.length) % 5) * 20;
+  return STOPOVER_HUBS.map((hub, i) => ({
+    id: `${from}-${to}-stopover-${hub.airlineCode}`,
+    airline: hub.airline,
+    airlineCode: hub.airlineCode,
+    // Top-level times describe the overall journey (out departs → onward
+    // arrives) — kept for sorting and the simpler fallback layout.
+    departure: hub.out.depTime,
+    arrival: hub.onward.arrTime,
+    duration: hub.duration,
+    // It's still a 1-stop flight — the difference is you stay a few nights.
+    stops: "1 stop",
+    stopInfo: `via ${hub.city}`,
+    price: hub.price + offset,
+    // The second hub offers one fewer night so the list shows some variety,
+    // always clamped to at least 1.
+    stopover: {
+      city: hub.city,
+      nights: Math.max(1, nights - i),
+      hubCode: hub.hubCode,
+      out: hub.out,
+      onward: hub.onward,
+    },
+  }));
+}
+
 // Parse "13h 45m" → 825 minutes. Returns 0 if the string is malformed.
 export function parseDurationToMinutes(duration: string): number {
   const match = duration.match(/(\d+)h\s*(\d+)m/);

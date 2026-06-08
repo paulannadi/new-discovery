@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { cn } from "../../../shared/components/ui/utils";
 import { BackButton } from "../../../shared/components/BackButton";
+import { PageContainer } from "../../../shared/components/PageContainer";
 import AccommodationStar from "../../../shared/components/AccommodationStar";
 import RatingBlock from "../../../shared/components/RatingBlock";
 import {
@@ -29,8 +30,15 @@ import {
   Filter,
   SlidersHorizontal,
   ArrowUpDown,
+  // Matches the flight filter bar's pill icons (secondaryPill pattern):
+  // a "sort" glyph plus one icon per filter so every pill is self-explanatory.
+  ArrowDownWideNarrow,
+  Wallet,
+  Sparkles,
+  ShieldCheck,
   List,
-  ArrowRight
+  ArrowRight,
+  Hotel
 } from "lucide-react";
 import * as Slider from "@radix-ui/react-slider";
 import { showToast } from "../../../shared/utils/toast";
@@ -195,19 +203,30 @@ const HOTELS: Hotel[] = [
 
 // --- Components ---
 
+// FilterButton — a "secondary pill" filter trigger that mirrors the flight
+// filter bar (see secondaryPill.tsx in flightSearch). Same compact dimensions
+// (h-8, rounded-lg, white bg, 12px semibold text), a leading lucide icon, the
+// current value inline, and a chevron that rotates when the dropdown is open.
+//
+// Instead of the old solid-blue fill for the selected state, the border + text
+// turn primary on hover, when open, AND while a selection is active — the
+// inline value (e.g. "2 board types") is what tells the user it's been set.
 const FilterButton = ({ label, active, onClick, hasSelection, icon }: { label: string, active: boolean, onClick: (e: React.MouseEvent<HTMLButtonElement>) => void, hasSelection?: boolean, icon?: React.ReactNode }) => (
   <button
     className={cn(
-      "px-4 py-2 rounded-lg border text-sm font-semibold flex items-center gap-2 transition-all shrink-0",
+      "group flex items-center gap-1.5 h-8 px-3 rounded-lg border bg-white text-xs font-semibold transition-all shrink-0",
       active || hasSelection
-        ? "bg-primary border-primary text-white"
-        : "bg-card border-border text-foreground hover:border-primary"
+        ? "border-primary text-primary"
+        : "border-border text-foreground hover:border-primary"
     )}
     onClick={onClick}
   >
     {icon && icon}
-    {label}
-    <ChevronDown size={14} className={active ? "rotate-180 transition-transform" : "transition-transform"} />
+    <span className="truncate">{label}</span>
+    <ChevronDown
+      size={13}
+      className={cn("shrink-0 transition-transform", active && "rotate-180")}
+    />
   </button>
 );
 
@@ -359,6 +378,17 @@ type HotelListPageProps = {
   initialLocation?: string;             // Pre-fills the destination field
   initialDateRange?: DateRange;         // Pre-fills the date picker
   initialRooms?: {id: number, adults: number, children: number}[]; // Pre-fills room config
+  // --- Stopover-step overrides ---------------------------------------------
+  // When this page is reused as the "stopover hotel" step in the flight flow,
+  // we don't want the destination/date/guest search fields (the city + dates
+  // are already fixed by the flight choice). `hideSearch` drops that whole
+  // search row, leaving just the back button. `headerSlot` lets the caller
+  // render something else in the header instead — here, the flight stepper.
+  hideSearch?: boolean;
+  headerSlot?: React.ReactNode;
+  // Number of stopover nights — used in the stopover-step title subtitle
+  // ("2 nights in Dubai"). The city comes from `initialLocation`.
+  stopoverNights?: number;
 };
 
 export default function HotelListPage({
@@ -367,6 +397,9 @@ export default function HotelListPage({
   initialLocation,
   initialDateRange,
   initialRooms,
+  hideSearch = false,
+  headerSlot,
+  stopoverNights,
 }: HotelListPageProps) {
   // --- State ---
 
@@ -603,6 +636,44 @@ export default function HotelListPage({
       default: return "Recommended";
     }
   };
+
+  // --- Filter pill value labels ---
+  // Each desktop filter pill shows its current value inline, exactly like the
+  // flight filter bar ("Any airline" → "2 airlines"). This is what replaces
+  // the old solid-fill "active" styling: a set filter reads its own value,
+  // an unset one reads "Any …".
+  const boardLabel =
+    selectedBoardTypes.length === 0
+      ? "Any board"
+      : selectedBoardTypes.length === 1
+      ? selectedBoardTypes[0]
+      : `${selectedBoardTypes.length} board types`;
+
+  const starsLabel =
+    selectedStars.length === 0
+      ? "Any rating"
+      : selectedStars.length === 1
+      ? `${selectedStars[0]} stars`
+      : `${selectedStars.length} ratings`;
+
+  const priceLabel =
+    priceRange[0] === 0 && priceRange[1] === 500
+      ? "Any price"
+      : `$${priceRange[0]} – $${priceRange[1]}`;
+
+  const amenitiesLabel =
+    selectedAmenities.length === 0
+      ? "Any amenities"
+      : selectedAmenities.length === 1
+      ? selectedAmenities[0]
+      : `${selectedAmenities.length} amenities`;
+
+  const cancellationLabel =
+    selectedCancellation.length === 0
+      ? "Any policy"
+      : selectedCancellation.length === 1
+      ? selectedCancellation[0]
+      : `${selectedCancellation.length} policies`;
 
   const calculateDisplayPrice = (basePrice: number, hotel: Hotel) => {
     let price = basePrice;
@@ -870,7 +941,10 @@ export default function HotelListPage({
 
                   {/* Adults */}
                   <div className="flex justify-between items-center pl-2">
-                    <span className="text-sm text-muted-foreground">Adults</span>
+                    <div className="flex flex-col">
+                      <span className="text-sm text-muted-foreground">Adults</span>
+                      <span className="text-xs text-grey">Age 18+</span>
+                    </div>
                     <div className="flex items-center gap-3">
                       <button
                         className="w-7 h-7 rounded-full border border-border flex items-center justify-center hover:bg-grey-light disabled:opacity-50"
@@ -893,7 +967,7 @@ export default function HotelListPage({
                   <div className="flex justify-between items-center pl-2">
                     <div className="flex flex-col">
                       <span className="text-sm text-muted-foreground">Children</span>
-                      <span className="text-xs text-grey">Ages 0-17</span>
+                      <span className="text-xs text-grey">Under 18</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
@@ -929,6 +1003,11 @@ export default function HotelListPage({
     }
   };
 
+  // On the stopover step we drop the side map, so the content matches the
+  // narrower single-column width used by the other flight-flow pages. The
+  // normal hotel search keeps the wide, map-friendly width.
+  const containerTier = hideSearch ? "narrow" : "wide";
+
   return (
     <div className="bg-grey-lightest min-h-screen flex flex-col relative">
       {/* Overlay to close dropdowns */}
@@ -939,21 +1018,25 @@ export default function HotelListPage({
         />
       )}
 
-      {/* Header Search Bar */}
+      {/* Header Search Bar — white card strip with the back button, same as
+          everywhere else. On the stopover step the search fields are dropped
+          (see below) but the white header + back button stay. */}
       <div className="bg-card border-b border-border z-30 relative">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-6 py-4">
+        <PageContainer tier={containerTier} className="px-4 md:px-6 py-4">
 
-          {/* Back to Discovery — always visible, including on mobile */}
+          {/* Back to Discovery — always visible, including on mobile.
+              No bottom margin on the stopover step since nothing follows it
+              inside this white strip. */}
           {onBackToSearch && (
             <BackButton
               label="Back to discovery"
               onClick={onBackToSearch}
-              className="mb-3"
+              className={hideSearch ? undefined : "mb-3"}
             />
           )}
 
-          {/* Mobile Read-Only View */}
-          {!isMobileSearchExpanded && (
+          {/* Mobile Read-Only View — hidden on the stopover step (no search) */}
+          {!hideSearch && !isMobileSearchExpanded && (
             <div className="md:hidden flex items-center justify-between gap-3">
               <div
                 className="flex-1 flex flex-col cursor-pointer"
@@ -980,6 +1063,9 @@ export default function HotelListPage({
             </div>
           )}
 
+          {/* The whole search row — only on the normal hotel search, never on
+              the stopover step (where city + dates are already decided). */}
+          {!hideSearch && (
           <div className={cn(
             isMobileSearchExpanded ? 'flex' : 'hidden',
             "md:flex flex-col lg:flex-row gap-4 items-center animate-in fade-in slide-in-from-top-2 duration-200"
@@ -1015,7 +1101,7 @@ export default function HotelListPage({
             >
               <CalendarIcon size={16} className="text-primary shrink-0" aria-hidden="true" />
               <div className="flex flex-col flex-1 min-w-0">
-                <span className="text-[10px] font-extrabold text-grey uppercase tracking-wide leading-none mb-0.5">Dates</span>
+                <span className="text-[10px] font-extrabold text-grey uppercase tracking-wide leading-none mb-0.5">Check-in – Check-out</span>
                 <span className={cn(
                   "text-sm font-semibold truncate",
                   dateRange?.from ? "text-foreground" : "text-grey font-normal"
@@ -1040,7 +1126,7 @@ export default function HotelListPage({
             >
               <Users size={16} className="text-primary shrink-0" aria-hidden="true" />
               <div className="flex flex-col flex-1 min-w-0">
-                <span className="text-[10px] font-extrabold text-grey uppercase tracking-wide leading-none mb-0.5">Guests & Rooms</span>
+                <span className="text-[10px] font-extrabold text-grey uppercase tracking-wide leading-none mb-0.5">Travellers</span>
                 <span className="text-sm font-semibold text-foreground truncate">
                   {totalGuests} Guest{totalGuests !== 1 ? 's' : ''} · {rooms.length} Room{rooms.length > 1 ? 's' : ''}
                 </span>
@@ -1060,60 +1146,96 @@ export default function HotelListPage({
               Search
             </button>
           </div>
-        </div>
+          )}
+        </PageContainer>
       </div>
+
+      {/* Stopover step: the flight stepper sits on the grey page background,
+          just under the white header (not inside it). */}
+      {headerSlot && (
+        <div className="bg-grey-lightest">
+          <PageContainer tier={containerTier} className="px-4 md:px-6 pt-4 pb-3">
+            {headerSlot}
+
+            {/* Title + subtitle — same style AND spacing as the flight step's
+                heading: gap-2.5 icon↔text, mt-0.5 title↔subtitle, mb-10 from
+                the stepper above and (via pb-3 here + the filter bar's py-3)
+                ~mb-6 to the filters below. Reads: stepper → title → filters. */}
+            {hideSearch && (
+              <div className="mt-10 flex items-start gap-2.5">
+                <Hotel size={22} className="text-primary shrink-0 mt-1" aria-hidden="true" />
+                <div>
+                  <h1 className="text-lg md:text-xl font-extrabold text-foreground leading-tight">
+                    Pick your stopover hotel
+                  </h1>
+                  {stopoverNights && (
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      {stopoverNights} night{stopoverNights > 1 ? "s" : ""} in {initialLocation || location}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </PageContainer>
+        </div>
+      )}
 
       {/* Horizontal Filter Bar (Desktop) */}
       <div className="hidden md:block bg-grey-lightest sticky top-0 z-30">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-6 py-3 flex gap-3 overflow-x-auto no-scrollbar items-center">
+        <PageContainer tier={containerTier} className="px-4 md:px-6 py-3 flex gap-3 overflow-x-auto no-scrollbar items-center">
 
-          {/* Sort By */}
+          {/* Sort By — ArrowDownWideNarrow matches the flight bar's sort pill */}
            <FilterButton
-             label={`Sort: ${getSortLabel()}`}
+             label={getSortLabel()}
              active={openDropdown === 'sort'}
              hasSelection={sortOption !== 'recommended'}
              onClick={(e) => handleDropdownToggle('sort', e)}
-             icon={<ArrowUpDown size={14} aria-hidden="true" />}
+             icon={<ArrowDownWideNarrow size={14} aria-hidden="true" />}
            />
 
           {/* Board Types Filter */}
           <FilterButton
-            label="Board Type"
+            label={boardLabel}
             active={openDropdown === 'board'}
             hasSelection={selectedBoardTypes.length > 0}
             onClick={(e) => handleDropdownToggle('board', e)}
+            icon={<Utensils size={14} aria-hidden="true" />}
           />
 
            {/* Star Rating Filter */}
            <FilterButton
-            label="Star Rating"
+            label={starsLabel}
             active={openDropdown === 'stars'}
             hasSelection={selectedStars.length > 0}
             onClick={(e) => handleDropdownToggle('stars', e)}
+            icon={<Star size={14} aria-hidden="true" />}
           />
 
           {/* Price Filter */}
           <FilterButton
-            label={`Price: $${priceRange[0]} - $${priceRange[1]}`}
+            label={priceLabel}
             active={openDropdown === 'price'}
             hasSelection={priceRange[0] > 0 || priceRange[1] < 500}
             onClick={(e) => handleDropdownToggle('price', e)}
+            icon={<Wallet size={14} aria-hidden="true" />}
           />
 
           {/* Amenities Filter */}
           <FilterButton
-            label="Amenities"
+            label={amenitiesLabel}
             active={openDropdown === 'amenities'}
             hasSelection={selectedAmenities.length > 0}
             onClick={(e) => handleDropdownToggle('amenities', e)}
+            icon={<Sparkles size={14} aria-hidden="true" />}
           />
 
           {/* Cancellation Policy Filter */}
           <FilterButton
-            label="Cancellation Policy"
+            label={cancellationLabel}
             active={openDropdown === 'cancellation'}
             hasSelection={selectedCancellation.length > 0}
             onClick={(e) => handleDropdownToggle('cancellation', e)}
+            icon={<ShieldCheck size={14} aria-hidden="true" />}
           />
 
           {(selectedBoardTypes.length > 0 || selectedAmenities.length > 0 || selectedCancellation.length > 0 || selectedStars.length > 0 || priceRange[0] > 0 || priceRange[1] < 500 || sortOption !== 'recommended') && (
@@ -1124,7 +1246,7 @@ export default function HotelListPage({
               Reset all
             </button>
           )}
-        </div>
+        </PageContainer>
       </div>
 
       {/* Mobile Filter Bar (Sticky Top) */}
@@ -1150,9 +1272,10 @@ export default function HotelListPage({
              Filters
            </button>
 
-           <div className="w-[1px] h-6 bg-border" />
+           {/* Map/List Toggle — hidden on the stopover step (there's no map) */}
+           {!hideSearch && <div className="w-[1px] h-6 bg-border" />}
 
-           {/* Map/List Toggle */}
+           {!hideSearch && (
            <button
              className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-extrabold text-foreground active:bg-gray-50 transition-colors last:rounded-r-full"
              onClick={() => setMobileView(mobileView === 'list' ? 'map' : 'list')}
@@ -1160,24 +1283,51 @@ export default function HotelListPage({
              {mobileView === 'list' ? <MapIcon size={14} aria-hidden="true" /> : <List size={14} aria-hidden="true" />}
              {mobileView === 'list' ? 'Map' : 'List'}
            </button>
+           )}
         </div>
       </div>
 
-      {/* Main Content Split View */}
-      <div className="flex flex-1 max-w-[1920px] mx-auto w-full overflow-hidden relative">
+      {/* Main Content — split list+map for normal search; a single full-width
+          column (no map) on the stopover step so it matches the other pages. */}
+      <PageContainer
+        tier={containerTier}
+        className={cn("relative", hideSearch ? "block" : "flex flex-1 overflow-hidden")}
+      >
 
         {/* Hotel List */}
         <div className={cn(
-          "w-full md:w-[65%] min-w-0 h-[calc(100vh-130px)] overflow-y-auto p-4 md:p-6 flex flex-col gap-6",
-          mobileView === 'map' ? 'hidden md:flex' : 'flex'
+          // Horizontal + bottom padding is shared; top padding differs per mode
+          // (see below) so the stopover step can sit tight under the filter bar.
+          "min-w-0 flex flex-col px-4 md:px-6 pb-4 md:pb-6",
+          // Stopover step: full width, page scrolls normally (no inner scroll).
+          // Tight top padding (pt-2 = 8px) so that 8px + the filter bar's 12px
+          // bottom padding ≈ the flight list's 20px filter→results gap.
+          // Normal search: 65% column beside the map, with its own scroll and
+          // the usual generous top padding under the result-count heading.
+          hideSearch
+            ? "w-full pt-2 gap-4"
+            : cn(
+                "pt-4 md:pt-6 gap-6 w-full md:w-[65%] h-[calc(100vh-130px)] overflow-y-auto",
+                mobileView === 'map' ? 'hidden md:flex' : 'flex',
+              ),
         )}>
+          {/* Header wrapper — only rendered when it has something to show: the
+              result-count (normal search) or the loading bar (while searching).
+              On the stopover step, the count is hidden and once loading is done
+              this whole block is skipped, so it no longer eats a gap slot above
+              the cards — that was the source of the oversized stopover gap. */}
+          {(!hideSearch || showLoadingBar) && (
           <div className="flex flex-col gap-2">
-            <div className="flex justify-between items-center">
-              <h2 className="text-foreground font-extrabold text-xl">
-                {filteredAndSortedHotels.length} Hotel offer{filteredAndSortedHotels.length !== 1 ? 's' : ''}
-                {filteredAndSortedHotels.length === 0 && <span className="font-normal text-sm ml-2 text-gray-500">(Try adjusting your filters)</span>}
-              </h2>
-            </div>
+            {/* Result count — only on the normal search. The stopover step's
+                title lives above the filter bar instead (see header section). */}
+            {!hideSearch && (
+              <div className="flex justify-between items-center">
+                <h2 className="text-foreground font-extrabold text-xl">
+                  {filteredAndSortedHotels.length} Hotel offer{filteredAndSortedHotels.length !== 1 ? 's' : ''}
+                  {filteredAndSortedHotels.length === 0 && <span className="font-normal text-sm ml-2 text-muted-foreground">(Try adjusting your filters)</span>}
+                </h2>
+              </div>
+            )}
 
             {/* Loading Bar */}
             {showLoadingBar && (
@@ -1192,6 +1342,7 @@ export default function HotelListPage({
               </div>
             )}
           </div>
+          )}
 
           <div className="flex flex-col gap-4 pb-24 md:pb-10">
             {/* While the simulated 1.5s search is running, show 4 SkeletonCards
@@ -1235,7 +1386,8 @@ export default function HotelListPage({
           </div>
         </div>
 
-        {/* Map — real interactive Leaflet map replacing the old static photo */}
+        {/* Map — hidden entirely on the stopover step (single-column layout) */}
+        {!hideSearch && (
         <div className={cn(
           "w-full md:w-[35%] min-w-0 h-[calc(100vh-130px)] sticky top-0",
           mobileView === 'list' ? 'hidden md:block' : 'block'
@@ -1257,8 +1409,9 @@ export default function HotelListPage({
             onMarkerHover={(id) => setHoveredHotelId(id)}
           />
         </div>
+        )}
 
-      </div>
+      </PageContainer>
 
       {/* Render Fixed Dropdowns (Desktop) */}
       {renderDropdownContent()}

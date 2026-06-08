@@ -1,23 +1,26 @@
-// FlightResultCard — the redesigned card for one flight option.
+// FlightResultCard — the card for one flight option.
 //
-// Layout (matches the screenshot):
+// Two layouts share this component:
 //
-//   ┌──────────────────────────────────────────────────────┬──────────────┐
-//   │ Outbound – 07 Jul 2026               [American Airlines logo]       │
-//   │                                                      │  [Cheapest]  │
-//   │  08:00       ──── Non-Stop ────       11:00          │              │
-//   │   ZRH               9h 0min            JFK           │   $316       │
-//   │                                                      │  total for   │
-//   │  [Economy]                          More details →   │  all pax     │
-//   │                                                      │  [ Select ]  │
-//   └──────────────────────────────────────────────────────┴──────────────┘
+//  • NORMAL flight  → a single times bar (departure ── line ── arrival) with
+//    the airline logo top-right and the price/Select column on the right.
 //
-// Right-side column is divided from the left by a vertical border on md+
-// and stacks below on mobile.
+//  • STOPOVER offer → a richer "journey" layout that shows BOTH physical
+//    flights stacked, with the multi-night stay called out as a highlighted
+//    row between them, plus a footer with the final arrival date:
+//
+//    ┌─────────────────────────────────────────────┬──────────┐
+//    │ ✦ Stopover offer   (2 nights in Dubai)       │          │
+//    ├─────────────────────────────────────────────┤  FROM    │
+//    │ [EK] Fri 12 Jun   21:40 LHR ─✈─ 07:55 DXB⁺¹  │  $1,180  │
+//    │ [📍] ┌ 2-night stopover in Dubai · 13–15 Jun ┐│ per person│
+//    │ [EK] Mon 15 Jun   09:50 DXB ─✈─ 06:10 SYD⁺¹  │ [Select] │
+//    │ 📍 Arrive Sydney Tue 16 Jun        4 days     │          │
+//    └─────────────────────────────────────────────┴──────────┘
 
-import { useState, useEffect } from "react";
-import { format } from "date-fns";
-import { Plane } from "lucide-react";
+import { useState, useEffect, type ReactNode } from "react";
+import { format, addDays } from "date-fns";
+import { Plane, Sparkles, MapPin } from "lucide-react";
 import { Button } from "../../../../shared/components/ui/button";
 import { Badge } from "../../../../shared/components/ui/badge";
 import { cn } from "../../../../shared/components/ui/utils";
@@ -69,6 +72,96 @@ function getLegLabel(legIndex?: number, totalLegs?: number): string {
   return `Flight ${legIndex + 1}`;
 }
 
+// ── AirlineMark — the airline logo in a small rounded square, with a 2-letter
+// initials fallback when the SVG is missing. Used as the icon for each flight
+// in the stopover journey layout. Local fallback state resets if the src
+// changes so a different airline gets a fresh attempt.
+function AirlineMark({ logoSrc, code, name }: { logoSrc: string | undefined; code: string; name: string }) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [logoSrc]);
+  const show = logoSrc && !failed;
+  return (
+    <div className="size-10 shrink-0 rounded-lg border border-border bg-card flex items-center justify-center overflow-hidden">
+      {show ? (
+        <img
+          src={logoSrc}
+          alt={name}
+          className="h-5 w-auto max-w-[30px] object-contain"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <span className="text-[11px] font-extrabold text-primary tracking-wider">{code}</span>
+      )}
+    </div>
+  );
+}
+
+// ── JourneySegment — one physical flight inside the stopover layout: a date
+// line, then [airline mark] + departure ──✈── arrival times bar.
+function JourneySegment({
+  mark,
+  dateLabel,
+  depTime,
+  depCode,
+  arrTime,
+  arrCode,
+  duration,
+  note,
+  arrivesNextDay,
+}: {
+  mark: ReactNode;
+  dateLabel?: string;
+  depTime: string;
+  depCode: string;
+  arrTime: string;
+  arrCode: string;
+  duration: string;
+  note?: string;
+  arrivesNextDay?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      {/* Date sits above the times, padded to clear the icon column (40px + gap-3 = 52px). */}
+      {dateLabel && <div className="pl-[52px] text-xs text-muted-foreground">{dateLabel}</div>}
+
+      <div className="flex items-center gap-3">
+        {mark}
+        <div className="flex-1 flex items-center gap-3 md:gap-5">
+          {/* Departure */}
+          <div className="shrink-0 min-w-[52px]">
+            <div className="text-xl md:text-2xl font-extrabold text-foreground leading-none">{depTime}</div>
+            <div className="text-xs text-muted-foreground mt-1">{depCode}</div>
+          </div>
+
+          {/* Connector: duration · line with a plane · note */}
+          <div className="flex-1 flex flex-col items-center gap-1">
+            <span className="text-xs text-muted-foreground">{duration}</span>
+            <div className="w-full flex items-center gap-1">
+              <span className="size-1.5 rounded-full bg-foreground/40 shrink-0" />
+              <div className="flex-1 h-px bg-border" />
+              <Plane size={12} className="text-grey shrink-0" aria-hidden="true" />
+              <div className="flex-1 h-px bg-border" />
+              <span className="size-1.5 rounded-full bg-foreground/40 shrink-0" />
+            </div>
+            {note && <span className="text-xs text-muted-foreground">{note}</span>}
+          </div>
+
+          {/* Arrival — "+1" superscript when it lands the next day */}
+          <div className="shrink-0 min-w-[52px] text-right">
+            <div className="text-xl md:text-2xl font-extrabold text-foreground leading-none">
+              {arrTime}
+              {arrivesNextDay && (
+                <sup className="ml-0.5 align-super text-xs font-bold text-primary">+1</sup>
+              )}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">{arrCode}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function FlightResultCard({
   option,
   legDate,
@@ -93,8 +186,114 @@ export function FlightResultCard({
   }, [logoSrc]);
   const showLogoImage = logoSrc && !logoFailed;
 
+  // ── STOPOVER LAYOUT ────────────────────────────────────────────────────
+  // Only when the offer carries the two-segment breakdown. We derive every
+  // date from the leg's departure date + the number of stopover nights:
+  //   depart → (lands, maybe +1) → stay N nights → onward departs → final arrival.
+  const stop = option.stopover;
+  if (stop?.out && stop.onward) {
+    const { out, onward, nights, city, hubCode } = stop;
+
+    // Date math (only when we know the departure date). Each flight shows its
+    // own date: depart → (lands, maybe +1) → stay N nights → onward departs.
+    const depDate = legDate;
+    const outArrDate = depDate ? addDays(depDate, out.arrivesNextDay ? 1 : 0) : undefined;
+    const stayStart = outArrDate;                                   // hotel check-in
+    const stayEnd = stayStart ? addDays(stayStart, nights) : undefined; // check-out = onward departs
+    const onwardDepDate = stayEnd;
+    const hubLabel = hubCode ?? city;
+
+    const stayRange =
+      stayStart && stayEnd
+        ? `${format(stayStart, "d")}–${format(stayEnd, "d MMM")}`
+        : undefined;
+
+    return (
+      <div className="bg-card rounded-xl border-2 border-primary shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 ease-out overflow-hidden">
+        {/* Header banner */}
+        <div className="flex flex-wrap items-center gap-2 bg-primary px-4 md:px-5 py-2 text-primary-foreground">
+          <Sparkles size={15} aria-hidden="true" />
+          <span className="text-sm font-bold">Stopover offer</span>
+          <span className="rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-extrabold text-primary">
+            {nights} night{nights > 1 ? "s" : ""} in {city}
+          </span>
+        </div>
+
+        <div className="flex flex-col md:flex-row">
+          {/* LEFT: the two flights + the highlighted stay between them */}
+          <div className="flex-1 p-4 md:p-5 flex flex-col gap-3 md:gap-4">
+            {/* Flight 1 — origin → hub */}
+            <JourneySegment
+              mark={<AirlineMark logoSrc={logoSrc} code={option.airlineCode} name={option.airline} />}
+              dateLabel={depDate ? format(depDate, "EEE d MMM") : undefined}
+              depTime={out.depTime}
+              depCode={fromCode}
+              arrTime={out.arrTime}
+              arrCode={hubLabel}
+              duration={out.duration}
+              note={out.note}
+              arrivesNextDay={out.arrivesNextDay}
+            />
+
+            {/* The stopover — pin icon + dashed, tinted highlight box */}
+            <div className="flex items-center gap-3">
+              <div className="size-10 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
+                <MapPin size={18} className="text-primary" aria-hidden="true" />
+              </div>
+              <div className="flex-1 min-w-0 rounded-lg border border-dashed border-primary/40 bg-primary/5 px-4 py-2.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                <span className="text-sm font-bold text-primary">
+                  {nights}-night stopover in {city}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  {stayRange ? `${stayRange} · ` : ""}pick a hotel
+                </span>
+              </div>
+            </div>
+
+            {/* Flight 2 — hub → destination */}
+            <JourneySegment
+              mark={<AirlineMark logoSrc={logoSrc} code={option.airlineCode} name={option.airline} />}
+              dateLabel={onwardDepDate ? format(onwardDepDate, "EEE d MMM") : undefined}
+              depTime={onward.depTime}
+              depCode={hubLabel}
+              arrTime={onward.arrTime}
+              arrCode={toCode}
+              duration={onward.duration}
+              note={onward.note}
+              arrivesNextDay={onward.arrivesNextDay}
+            />
+
+            {/* Footer — cabin pill, same as the normal flight card */}
+            <div className="flex items-center justify-between mt-1">
+              <Badge variant="outline" className="rounded-full px-3 py-0.5 text-muted-foreground">
+                {cabinLabel}
+              </Badge>
+            </div>
+          </div>
+
+          {/* RIGHT: from-price + Select */}
+          <div className="md:border-l border-t md:border-t-0 border-border bg-grey-lightest/40 md:min-w-[180px] flex flex-col items-center justify-center gap-1 p-4 md:p-5">
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">From</span>
+            <div className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight">
+              ${option.price}
+            </div>
+            <div className="text-xs text-muted-foreground">per person</div>
+            <Button onClick={onSelect} size="lg" className="w-full mt-3 font-bold">
+              Select
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── NORMAL FLIGHT LAYOUT ───────────────────────────────────────────────
   return (
-    <div className="bg-card rounded-xl border border-border shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 ease-out overflow-hidden">
+    <div
+      className={cn(
+        "bg-card rounded-xl border border-border shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 ease-out overflow-hidden",
+      )}
+    >
       <div className="flex flex-col md:flex-row">
         {/* ── LEFT SIDE: trip details + times bar ───────────────────────── */}
         <div className="flex-1 p-4 md:p-5 flex flex-col gap-3">
@@ -142,8 +341,7 @@ export function FlightResultCard({
             {/* Connector — line + stops label + duration */}
             <div className="flex-1 flex flex-col items-center gap-1">
               <span className="text-xs font-semibold text-foreground">
-                {option.stops === "Direct" ? "Non-Stop" : option.stops}
-                {option.stopInfo ? ` · ${option.stopInfo}` : ""}
+                {`${option.stops === "Direct" ? "Non-Stop" : option.stops}${option.stopInfo ? ` · ${option.stopInfo}` : ""}`}
               </span>
               <div className="w-full flex items-center gap-1">
                 <div className="flex-1 h-px bg-border" />

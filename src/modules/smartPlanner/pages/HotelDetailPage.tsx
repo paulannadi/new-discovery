@@ -41,6 +41,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "../../../shared/compone
 // Loading kit — ImageWithPlaceholder for hero/thumbnails/modal photos and
 // SkeletonCard for the room-list loading state (replaces the inline pulse).
 import { ImageWithPlaceholder, SkeletonCard } from "../../../shared/components/loading";
+import { PageContainer } from "../../../shared/components/PageContainer";
 
 // --- Types ---
 
@@ -633,7 +634,7 @@ export default function HotelDetailPage({
 
       {/* ── WHITE INFO CARD — structure matches PackageDetailPage ────────── */}
       <div className="bg-card">
-        <div className="max-w-[1280px] mx-auto">
+        <PageContainer tier="standard">
 
           {/* Back button — own container with responsive horizontal padding */}
           <div className="px-4 sm:px-6 md:px-10 pt-5 pb-5">
@@ -834,11 +835,11 @@ export default function HotelDetailPage({
               </div>
             </div>
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* Select Rooms Section - Grey Background */}
-        <div id="room-selection" className="w-full max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 pt-[40px] flex flex-col gap-6">
+        <PageContainer id="room-selection" tier="standard" className="px-3 sm:px-4 md:px-8 pt-[40px] flex flex-col gap-6">
           <h2 className="font-extrabold text-foreground text-2xl">Select rooms</h2>
 
           {/* ── Inline Search Bar ──────────────────────────────────────────────
@@ -1209,7 +1210,7 @@ export default function HotelDetailPage({
               })}
             </>
           )}
-      </div>
+      </PageContainer>
 
       {/* ── HOTEL INFORMATION SECTION ──────────────────────────────────────────
           Two-column layout adapted from PackageDetailPage:
@@ -1217,7 +1218,7 @@ export default function HotelDetailPage({
           RIGHT — Location map image + "Getting around" POI pills
           This section sits above Policies, which is the operational info block.
       ─────────────────────────────────────────────────────────────────────── */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 pt-8 pb-2 flex flex-col gap-4">
+      <PageContainer tier="standard" className="px-3 sm:px-4 md:px-8 pt-8 pb-2 flex flex-col gap-4">
         <h2 className="text-2xl font-bold text-foreground">Hotel information</h2>
 
         {/* One big card wrapping both columns — same outer treatment as PoliciesSection */}
@@ -1318,17 +1319,17 @@ export default function HotelDetailPage({
 
         </div>
         </div>
-      </div>
+      </PageContainer>
 
       {/* Hotel Policies Section — renamed from "Hotel information" to "Policies" */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
+      <PageContainer tier="standard" className="px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
         <h2 className="text-2xl font-bold text-foreground">Policies</h2>
 
         <PoliciesSection />
-      </div>
+      </PageContainer>
 
       {/* Guest Reviews Section */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
+      <PageContainer tier="standard" className="px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
         <h2 className="text-2xl font-bold text-foreground">Guest Reviews</h2>
 
         <div className="bg-card rounded-xl shadow-md flex flex-col md:flex-row gap-5 md:gap-10 p-4 md:py-6 md:pl-6 md:pr-0">
@@ -1380,7 +1381,7 @@ export default function HotelDetailPage({
           </div>
 
         </div>
-      </div>
+      </PageContainer>
 
       {/* All-rooms-done banner — fades in above the sticky bar.
           Matches the real TripBuilder Alert component structure:
@@ -1389,7 +1390,7 @@ export default function HotelDetailPage({
       {/* Sticky Booking Bar */}
       {someRoomsSelected && (
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg z-50">
-          <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] py-3 md:py-4">
+          <PageContainer tier="standard" className="px-4 md:px-8 lg:px-[60px] py-3 md:py-4">
 
             {/* Mobile layout: compact room pills + price/button row */}
             <div className="flex flex-col gap-2 sm:hidden">
@@ -1514,7 +1515,7 @@ export default function HotelDetailPage({
                 </Tooltip>
               </div>
             </div>
-          </div>
+          </PageContainer>
         </div>
       )}
 

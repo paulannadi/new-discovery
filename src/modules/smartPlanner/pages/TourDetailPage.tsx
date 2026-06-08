@@ -34,6 +34,7 @@ import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { BackButton } from "../../../shared/components/BackButton";
+import { PageContainer } from "../../../shared/components/PageContainer";
 import {
   Dialog,
   DialogContent,
@@ -228,7 +229,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
           The booking widget is NOT here — it lives in the right sidebar below.
       ══════════════════════════════════════════════════════════════════════ */}
       <div className="bg-card">
-        <div className="max-w-[1280px] mx-auto">
+        <PageContainer tier="standard">
 
           {/* Back button */}
           <div className="px-4 sm:px-6 md:px-10 pt-5 pb-5">
@@ -323,13 +324,13 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
             </div>
 
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
           PAGE BODY — two-column grid, same as PackageDetailPage body
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8">
+      <PageContainer tier="standard" className="px-3 sm:px-4 md:px-8 py-5 md:py-8">
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 lg:gap-10 items-start">
 
@@ -743,7 +744,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
           {/* ╚═══════════════════════ END RIGHT COLUMN ═══════════════════╝ */}
 
         </div>
-      </div>
+      </PageContainer>
 
       {/* Spacer so the mobile footer doesn't overlap last content.
           28 = collapsed footer height (price row + CTA button + padding) */}

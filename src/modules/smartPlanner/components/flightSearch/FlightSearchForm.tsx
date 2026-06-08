@@ -34,9 +34,11 @@ import {
   ArrowRight,
   X,
   Search,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "../../../../shared/components/ui/utils";
 import { Button } from "../../../../shared/components/ui/button";
+import { Switch } from "../../../../shared/components/ui/switch";
 import { Calendar } from "../../../../shared/components/ui/calendar";
 // Shared range-picker logic: 1st click = from, 2nd = to, re-open restarts.
 import { stepRange, isRangeComplete } from "../../../../shared/utils/dateRange";
@@ -115,6 +117,14 @@ export function FlightSearchForm({
   const [flightPassengersOpen, setFlightPassengersOpen] = useState(false);
   const [flightCabinClassOpen, setFlightCabinClassOpen] = useState(false);
 
+  // ── Stopover opt-in (round trip only) ────────────────────────────────────
+  // The only NEW thing on this form. Flipping it on reveals two questions —
+  // which leg gets the stop, and up to how many nights — and tells the results
+  // page to surface stopover offers on that leg.
+  const [stopoverEnabled, setStopoverEnabled] = useState(initialCriteria?.stopover?.enabled ?? false);
+  const [stopoverLeg, setStopoverLeg] = useState<"outbound" | "return">(initialCriteria?.stopover?.leg ?? "outbound");
+  const [stopoverNights, setStopoverNights] = useState(initialCriteria?.stopover?.nights ?? 2);
+
   // ── Helpers ──────────────────────────────────────────────────────────────
   const updateLeg = (id: number, field: keyof FlightLeg, value: string | Date | undefined) => {
     setFlightLegs((prev) => prev.map((l) => (l.id === id ? { ...l, [field]: value } : l)));
@@ -147,13 +157,117 @@ export function FlightSearchForm({
     adults: flightPassengers.adults,
     children: flightPassengers.children,
     cabinClass: flightCabinClass,
+    // Stopover only applies to round trips — gate it so a multi-city search
+    // never accidentally carries an opt-in.
+    stopover:
+      flightTripType === "roundtrip"
+        ? { enabled: stopoverEnabled, leg: stopoverLeg, nights: stopoverNights }
+        : undefined,
   });
 
   // Mirror live values up to the parent whenever anything changes.
   useEffect(() => {
     onChange?.(buildCriteria());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flightTripType, flightLegs, flightPassengers, flightCabinClass]);
+  }, [flightTripType, flightLegs, flightPassengers, flightCabinClass, stopoverEnabled, stopoverLeg, stopoverNights]);
+
+  // The submit (+ optional cancel) buttons, defined ONCE here so we can drop
+  // them into EITHER the main input row (when stopover is off) or down in the
+  // stopover detail row (when it's on) — without duplicating the click logic.
+  //
+  // `heightClass` lets each caller pass the right height: the top row uses the
+  // tall h-[52px] to line up with the From/To/Dates fields, while the stopover
+  // row uses h-11 (44px) to match the shorter stopover inputs.
+  const renderActionButtons = (heightClass: string) => (
+    <>
+      {onCancel && (
+        <Button
+          variant="secondary"
+          onClick={onCancel}
+          className={cn("w-full lg:w-auto rounded-xl px-5 text-base font-bold", heightClass)}
+        >
+          Cancel
+        </Button>
+      )}
+      <Button
+        onClick={() => {
+          setFlightDatesOpen(false);
+          setFlightPassengersOpen(false);
+          onSearch(buildCriteria());
+        }}
+        className={cn("w-full lg:w-auto rounded-xl px-6 text-base font-extrabold shadow-md", heightClass)}
+      >
+        <Search />
+        {submitLabel}
+      </Button>
+    </>
+  );
+
+  // The Travellers field — adults/children counters in a dropdown. Moved out of
+  // the secondary pill row and into the main search row so it sits alongside
+  // From / To / Dates (matching how "Travellers" is a primary field in the hotel
+  // search). Defined ONCE here so both the round-trip main row and the multi-city
+  // submit row can drop it in. The caller wraps it to control its width.
+  //
+  // Styled to match the tall main-row fields (h-[52px], rounded-xl, label-on-top)
+  // — i.e. it mirrors the Dates field rather than the old short pill.
+  const renderTravellers = () => (
+    <div className="relative w-full">
+      <button
+        onClick={() => { setFlightPassengersOpen((o) => !o); setFlightTripTypeOpen(false); setFlightCabinClassOpen(false); }}
+        className={cn(
+          "w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border text-left transition-all",
+          flightPassengersOpen ? "border-primary ring-2 ring-primary/20 bg-white" : "border-border bg-white hover:border-primary",
+        )}
+      >
+        <Users size={18} className="text-primary shrink-0" />
+        <div className="flex flex-col items-start flex-1 min-w-0">
+          <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Travellers</span>
+          <span className="text-sm font-semibold truncate w-full text-foreground">{flightPassengersLabel}</span>
+        </div>
+        <ChevronDown size={16} className={cn("text-grey shrink-0 transition-transform", flightPassengersOpen && "rotate-180")} />
+      </button>
+      {flightPassengersOpen && (
+        <div className="absolute top-full left-0 mt-2 z-50 bg-card rounded-2xl shadow-xl border border-border p-5 w-[260px] flex flex-col gap-4">
+          {[
+            { label: "Adults", sub: "Age 12+", key: "adults" as const, min: 1 },
+            { label: "Children", sub: "Age 2–11", key: "children" as const, min: 0 },
+          ].map(({ label, sub, key, min }) => (
+            <div key={key} className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-semibold text-foreground">{label}</div>
+                <div className="text-xs text-grey">{sub}</div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  aria-label={`Fewer ${label.toLowerCase()}`}
+                  onClick={() => setFlightPassengers((p) => ({ ...p, [key]: Math.max(min, p[key] - 1) }))}
+                  disabled={flightPassengers[key] <= min}
+                  className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-30"
+                >
+                  <Minus size={14} />
+                </button>
+                <span className="text-sm font-bold text-foreground w-4 text-center">{flightPassengers[key]}</span>
+                <button
+                  aria-label={`More ${label.toLowerCase()}`}
+                  onClick={() => setFlightPassengers((p) => ({ ...p, [key]: Math.min(9, p[key] + 1) }))}
+                  className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
+          <button
+            onClick={() => setFlightPassengersOpen(false)}
+            className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-all"
+          >
+            Done
+          </button>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -214,60 +328,19 @@ export function FlightSearchForm({
             </div>
           )}
         </div>
-
-        {/* 3. Travellers dropdown — counters for adults/children */}
-        <div className="relative w-full md:w-auto">
-          <button
-            onClick={() => { setFlightPassengersOpen((o) => !o); setFlightTripTypeOpen(false); setFlightCabinClassOpen(false); }}
-            className={`w-full md:w-auto flex items-center gap-1.5 h-[52px] md:h-8 px-4 md:px-3 rounded-xl md:rounded-lg border text-sm md:text-xs font-semibold transition-all ${flightPassengersOpen ? "border-primary bg-white text-primary" : "border-border bg-white text-foreground hover:border-primary"}`}
-          >
-            <Users size={14} className="shrink-0" />
-            {flightPassengersLabel}
-            <ChevronDown size={13} className={`shrink-0 transition-transform ${flightPassengersOpen ? "rotate-180" : ""}`} />
-          </button>
-          {flightPassengersOpen && (
-            <div className="absolute top-full right-0 md:left-0 md:right-auto mt-1.5 z-50 bg-card rounded-2xl shadow-xl border border-border p-5 w-[260px] flex flex-col gap-4">
-              {[
-                { label: "Adults", sub: "Age 12+", key: "adults" as const, min: 1 },
-                { label: "Children", sub: "Age 2–11", key: "children" as const, min: 0 },
-              ].map(({ label, sub, key, min }) => (
-                <div key={key} className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm font-semibold text-foreground">{label}</div>
-                    <div className="text-xs text-grey">{sub}</div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setFlightPassengers((p) => ({ ...p, [key]: Math.max(min, p[key] - 1) }))}
-                      disabled={flightPassengers[key] <= min}
-                      className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-30"
-                    >
-                      <Minus size={14} />
-                    </button>
-                    <span className="text-sm font-bold text-foreground w-4 text-center">{flightPassengers[key]}</span>
-                    <button
-                      onClick={() => setFlightPassengers((p) => ({ ...p, [key]: Math.min(9, p[key] + 1) }))}
-                      className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground hover:border-primary hover:text-primary transition-colors"
-                    >
-                      <Plus size={14} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <button
-                onClick={() => setFlightPassengersOpen(false)}
-                className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-all"
-              >
-                Done
-              </button>
-            </div>
-          )}
-        </div>
+        {/* Travellers used to be a 3rd pill here — it now lives in the main
+            search row below (round trip) / the submit row (multi-city). */}
       </div>
 
       {/* ── ROUND TRIP FORM ──────────────────────────────────────────────── */}
       {flightTripType === "roundtrip" && (
-        <div className="flex flex-col lg:flex-row gap-3">
+        <>
+        {/* Main input row — same responsive pattern as the Holidays form:
+            1 column on phone → 2-up pairs on tablet (md) → a single row on wide
+            screens (xl). At xl the display flips to flex so the fields' flex-1
+            rules drive the row; the col-span on the button only acts on the
+            tablet grid (From + To, then Dates + Travellers, then full-width button). */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:flex xl:flex-row gap-3">
 
           {/* From — picking a city mirrors into the return leg's destination. */}
           <div className="flex-1">
@@ -341,33 +414,121 @@ export function FlightSearchForm({
             </div>
           </div>
 
+          {/* Travellers — now a primary field in the main row (was a pill up
+              top). flex-1 so it shares the row evenly with From / To / Dates. */}
+          <div className="flex-1">
+            {renderTravellers()}
+          </div>
+
           {/* Submit + (optional) Cancel — design-system <Button>. We keep the
               52px height / rounded-xl / bold text so they line up with the tall
               input fields, but the variants, hover, focus ring and disabled
-              states all come from the shared component now. */}
-          <div className="flex gap-2 lg:items-stretch">
-            {onCancel && (
-              <Button
-                variant="secondary"
-                onClick={onCancel}
-                className="w-full lg:w-auto h-[52px] rounded-xl px-5 text-base font-bold"
-              >
-                Cancel
-              </Button>
-            )}
-            <Button
-              onClick={() => {
-                setFlightDatesOpen(false);
-                setFlightPassengersOpen(false);
-                onSearch(buildCriteria());
-              }}
-              className="w-full lg:w-auto h-[52px] rounded-xl px-6 text-base font-extrabold shadow-md"
-            >
-              <Search />
-              {submitLabel}
-            </Button>
-          </div>
+              states all come from the shared component now.
+
+              Only shown HERE while the stopover toggle is off. When it's on, the
+              same buttons render down in the stopover row instead (see below). */}
+          {!stopoverEnabled && (
+            // md:col-span-2 → the buttons take their own full-width row 3 on the
+            // tablet grid; at xl (flex) the col-span is ignored and they sit inline.
+            <div className="flex gap-2 md:col-span-2 lg:items-stretch">
+              {renderActionButtons("h-[52px]")}
+            </div>
+          )}
         </div>
+
+        {/* ── STOPOVER OPT-IN — the one new field, sitting below the form ──── */}
+        <div className="rounded-xl border border-border bg-white p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Sparkles size={18} aria-hidden="true" />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-bold text-foreground">Open to a stopover</div>
+              <div className="text-xs text-grey">
+                Break the long haul — spend a few nights in a city along the way.
+              </div>
+            </div>
+            <Switch
+              checked={stopoverEnabled}
+              onCheckedChange={setStopoverEnabled}
+              aria-label="Add a stopover"
+            />
+          </div>
+
+          {/* The two follow-up questions appear only once the switch is on. */}
+          {stopoverEnabled && (
+            <div className="mt-4 flex flex-col gap-4 border-t border-border pt-4 md:flex-row md:items-end md:gap-8">
+              {/* Which leg gets the stopover */}
+              <div>
+                <div className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-grey">
+                  Where on your trip
+                </div>
+                <div className="inline-flex h-11 items-stretch gap-0.5 rounded-lg border border-border p-0.5">
+                  {(
+                    [
+                      ["outbound", "Departure"],
+                      ["return", "Return"],
+                    ] as const
+                  ).map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setStopoverLeg(id)}
+                      className={cn(
+                        "flex items-center rounded-md px-3 text-xs font-bold transition-colors",
+                        // Keyboard focus indicator (a11y §10.2) — same ring the stepper cards use.
+                        "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
+                        stopoverLeg === id ? "bg-primary text-white" : "text-foreground hover:bg-grey-light",
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Up to how many nights — a small −/+ stepper, clamped 1–4 */}
+              <div>
+                <div className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-grey">
+                  Up to how many nights
+                </div>
+                <div className="inline-flex h-11 items-center gap-3 rounded-lg border border-border px-2">
+                  <button
+                    type="button"
+                    aria-label="Fewer nights"
+                    disabled={stopoverNights <= 1}
+                    onClick={() => setStopoverNights((n) => Math.max(1, n - 1))}
+                    className="flex size-7 items-center justify-center rounded-md text-primary transition-colors hover:bg-grey-light disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  >
+                    <Minus size={14} />
+                  </button>
+                  <span className="w-16 text-center text-sm font-bold text-foreground">
+                    {stopoverNights} night{stopoverNights > 1 ? "s" : ""}
+                  </span>
+                  <button
+                    type="button"
+                    aria-label="More nights"
+                    disabled={stopoverNights >= 4}
+                    onClick={() => setStopoverNights((n) => Math.min(4, n + 1))}
+                    className="flex size-7 items-center justify-center rounded-md text-primary transition-colors hover:bg-grey-light disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Search button — relocated here while stopover is on. `md:ml-auto`
+                  pushes it to the far right, next to the stopover inputs. The
+                  `animate-in` classes (from tw-animate-css) fade + slide it up on
+                  appear so the move from the top row feels intentional, not a jump.
+                  h-11 matches the stopover inputs' height. */}
+              <div className="flex gap-2 md:ml-auto lg:items-stretch animate-in fade-in slide-in-from-bottom-2 duration-300">
+                {renderActionButtons("h-11")}
+              </div>
+            </div>
+          )}
+        </div>
+        </>
       )}
 
       {/* ── MULTI-CITY FORM ──────────────────────────────────────────────── */}
@@ -460,28 +621,35 @@ export function FlightSearchForm({
             </button>
           )}
 
-          {/* Bottom row: submit + (optional) Cancel — design-system <Button>. */}
-          <div className="flex gap-2 pt-1">
-            {onCancel && (
+          {/* Bottom row: Travellers + submit + (optional) Cancel. Multi-city has
+              no single "main row", so Travellers sits here on the left and the
+              buttons are pushed to the far right with md:ml-auto. */}
+          <div className="flex flex-col md:flex-row gap-2 pt-1 md:items-center">
+            <div className="w-full md:w-[220px]">
+              {renderTravellers()}
+            </div>
+            <div className="flex gap-2 md:ml-auto">
+              {onCancel && (
+                <Button
+                  variant="secondary"
+                  onClick={onCancel}
+                  className="flex-1 md:flex-none h-[52px] rounded-xl px-5 text-base font-bold"
+                >
+                  Cancel
+                </Button>
+              )}
               <Button
-                variant="secondary"
-                onClick={onCancel}
-                className="flex-1 md:flex-none h-[52px] rounded-xl px-5 text-base font-bold"
+                onClick={() => {
+                  setFlightPassengersOpen(false);
+                  setOpenLegDateId(null);
+                  onSearch(buildCriteria());
+                }}
+                className="flex-1 md:flex-none h-[52px] rounded-xl px-6 text-base font-extrabold shadow-md"
               >
-                Cancel
+                <Search />
+                {submitLabel}
               </Button>
-            )}
-            <Button
-              onClick={() => {
-                setFlightPassengersOpen(false);
-                setOpenLegDateId(null);
-                onSearch(buildCriteria());
-              }}
-              className="flex-1 md:flex-none h-[52px] rounded-xl px-6 text-base font-extrabold shadow-md"
-            >
-              <Search />
-              {submitLabel}
-            </Button>
+            </div>
           </div>
         </div>
       )}

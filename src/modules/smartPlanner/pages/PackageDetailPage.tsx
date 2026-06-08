@@ -47,6 +47,7 @@ import {
 import { UnifiedPackage } from "../../../types";
 import type { HolidaySearchCriteria } from "../../../App";
 import { BackButton } from "../../../shared/components/BackButton";
+import { PageContainer } from "../../../shared/components/PageContainer";
 import AccommodationStar from "../../../shared/components/AccommodationStar";
 import RatingBlock from "../../../shared/components/RatingBlock";
 import { RateCalendarPanel } from "../components/RateCalendarPanel";
@@ -640,7 +641,7 @@ export default function PackageDetailPage({
           It sits on the muted page background like an elevated card.
       ══════════════════════════════════════════════════════════════════════ */}
       <div className="bg-card">
-        <div className="max-w-[1280px] mx-auto">
+        <PageContainer tier="standard">
 
           {/* Back button — sits above the hero inside the white card */}
           <div className="px-4 sm:px-6 md:px-10 pt-5 pb-5">
@@ -760,7 +761,7 @@ export default function PackageDetailPage({
             </div>
 
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
@@ -769,7 +770,7 @@ export default function PackageDetailPage({
           Right column: sticky rate calendar sidebar
           Both columns sit on the grey #F3F5F6 page background.
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8">
+      <PageContainer tier="standard" className="px-3 sm:px-4 md:px-8 py-5 md:py-8">
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 lg:gap-10 items-start">
 
@@ -1281,7 +1282,7 @@ export default function PackageDetailPage({
           {/* ╚═══════════════════════ END RIGHT COLUMN ═══════════════════╝ */}
 
         </div>
-      </div>
+      </PageContainer>
 
       {/* Spacer so the sticky sheet doesn't overlap the last content section
           on mobile. h-28 matches TourDetailPage — same two-line collapsed bar. */}

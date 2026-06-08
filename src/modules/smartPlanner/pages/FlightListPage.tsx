@@ -18,6 +18,7 @@ import { useState, useMemo, useEffect } from "react";
 import { format } from "date-fns";
 import { Plane } from "lucide-react";
 import { BackButton } from "../../../shared/components/BackButton";
+import { PageContainer } from "../../../shared/components/PageContainer";
 import { Skeleton } from "../../../shared/components/ui/skeleton";
 import {
   StaggeredList,
@@ -39,7 +40,7 @@ import { FlightResultCard } from "../components/flightSearch/FlightResultCard";
 // the user clicks "Edit search" it replaces the trip summary row in-place,
 // pre-filled with the current criteria.
 import { FlightSearchForm } from "../components/flightSearch/FlightSearchForm";
-import { getMockFlightsForLeg } from "../components/flightSearch/mockFlights";
+import { getMockFlightsForLeg, getStopoverOffersForLeg } from "../components/flightSearch/mockFlights";
 import { applyFilters } from "../components/flightSearch/filterFlights";
 import { DEFAULT_FILTERS, type FlightFilters } from "../components/flightSearch/types";
 
@@ -55,6 +56,8 @@ type FlightListPageProps = {
   // New — Edit Search modal commits via this callback. The parent (App.tsx)
   // updates searchCriteria, clears selected legs, and resets the leg index.
   onSearchCriteriaChange: (next: FlightSearchCriteria) => void;
+  // Click a completed step in the stepper to jump back to that flight leg.
+  onStepSelect?: (legIndex: number) => void;
   onBack: () => void;
 };
 
@@ -97,6 +100,7 @@ export default function FlightListPage({
   selectedLegs,
   onFlightLegSelect,
   onSearchCriteriaChange,
+  onStepSelect,
   onBack,
 }: FlightListPageProps) {
   // ── Edit Search inline-editor open state ───────────────────────────────
@@ -139,16 +143,39 @@ export default function FlightListPage({
   const totalLegs = searchCriteria.legs.length;
   const cabinLabel = CABIN_LABELS[searchCriteria.cabinClass];
 
-  // Raw mock results for this leg
+  // Is THIS the leg the user opted into a stopover on? (round trip only —
+  // leg 0 = outbound, leg 1 = return). If so, we surface stopover offers
+  // alongside the normal results for this connection.
+  const stop = searchCriteria.stopover;
+  const isStopoverLeg =
+    searchCriteria.tripType === "roundtrip" &&
+    !!stop?.enabled &&
+    ((stop.leg === "outbound" && currentLegIndex === 0) ||
+      (stop.leg === "return" && currentLegIndex === 1));
+
+  // Raw mock results for this leg (the normal flights, unchanged).
   const flights = useMemo(
     () => getMockFlightsForLeg(currentLeg?.from || "", currentLeg?.to || ""),
     [currentLeg?.from, currentLeg?.to],
   );
 
-  // Apply the active filters + sort
+  // Stopover offers for the chosen leg. Kept separate from `flights` so they
+  // aren't reordered by the price/duration sort or hidden by the airline
+  // filters — they're the whole reason the user opted in, so they stay pinned
+  // at the top of the list.
+  const stopoverOffers = useMemo(
+    () =>
+      isStopoverLeg && stop
+        ? getStopoverOffersForLeg(currentLeg?.from || "", currentLeg?.to || "", stop.nights)
+        : [],
+    [isStopoverLeg, currentLeg?.from, currentLeg?.to, stop?.nights],
+  );
+
+  // Apply the active filters + sort to the normal flights, then pin the
+  // stopover offers on top.
   const filteredFlights = useMemo(
-    () => applyFilters(flights, filters),
-    [flights, filters],
+    () => [...stopoverOffers, ...applyFilters(flights, filters)],
+    [stopoverOffers, flights, filters],
   );
 
   // List of airlines available in the current result set — feeds the
@@ -171,7 +198,7 @@ export default function FlightListPage({
             criteria. Full-bleed background, inner content constrained to the
             same max-w-5xl as the results below so everything stays aligned. */}
       <header className="bg-card border-b border-border">
-        <div className="max-w-5xl mx-auto px-4 py-4">
+        <PageContainer tier="narrow" className="px-4 py-4">
 
           {/* 1. Back to discovery */}
           <BackButton label="Back to discovery" onClick={onBack} className="mb-3" />
@@ -196,19 +223,28 @@ export default function FlightListPage({
               onEditSearch={() => setIsEditingSearch(true)}
             />
           )}
-        </div>
+        </PageContainer>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-6 md:py-8">
+      <PageContainer as="main" tier="narrow" className="px-4 py-6 md:py-8">
 
-        {/* 4. Stepper — legs + Summary */}
-        <div className="mb-6 pb-5 border-b border-border">
-          <FlightStepper legs={searchCriteria.legs} currentLegIndex={currentLegIndex} />
+        {/* 4. Stepper — one card per flight leg (+ a stopover-hotel card when
+            the round trip opted into a stopover).
+            No divider here — we rely on generous whitespace (`mb-10`) to
+            separate the stepper from the title below instead of a border line. */}
+        <div className="mb-10">
+          <FlightStepper
+            legs={searchCriteria.legs}
+            currentLegIndex={currentLegIndex}
+            tripType={searchCriteria.tripType}
+            stopover={searchCriteria.stopover}
+            onStepSelect={onStepSelect}
+          />
         </div>
 
         {/* 5. Per-leg sub-heading row */}
         {currentLeg && (
-          <div className="flex flex-wrap items-start justify-between gap-2 mb-4">
+          <div className="flex flex-wrap items-start justify-between gap-2 mb-6">
             <div className="flex items-start gap-2.5">
               <Plane size={22} className="text-primary shrink-0 mt-1" aria-hidden="true" />
               <div>
@@ -234,6 +270,7 @@ export default function FlightListPage({
             filters={filters}
             onChange={setFilters}
             availableAirlines={availableAirlines}
+            resultCount={filteredFlights.length}
           />
         </div>
 
@@ -316,7 +353,7 @@ export default function FlightListPage({
             </div>
           </div>
         )}
-      </main>
+      </PageContainer>
     </div>
   );
 }
