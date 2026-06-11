@@ -12,14 +12,16 @@
 //   └──────────────────────┘   └────────────────────┘   └──────────────────┘
 //        ^current (blue)             ^future (grey)            ^future (grey)
 //
-// The stopover step is only shown for round trips that opted into a stopover,
-// and it always comes LAST — flights first, then the hotel: fly out → fly
-// back → stopover stay.
+// The stopover step is only shown for round trips that opted into a stopover
+// AND where the chosen leg's route has a geographically sensible hub (so it
+// stays in sync with the stopover offers in the results list). It always comes
+// LAST — flights first, then the hotel: fly out → fly back → stopover stay.
 
 import { Fragment } from "react";
 import { ChevronRight, Check } from "lucide-react";
 import { cn } from "../../../../shared/components/ui/utils";
 import { findAirportByCode } from "./airports";
+import { routeHasStopover } from "./mockFlights";
 import type { FlightLeg } from "../../../../App";
 
 // Format a leg endpoint as "City (CODE)" — e.g. "London (LHR)" — falling back
@@ -167,7 +169,17 @@ export function FlightStepper({
   //    lists the flights first and the hotel last: outbound flight → return
   //    flight → stopover hotel. (push, not splice, so it lands at the end
   //    regardless of which leg the offer was attached to.)
-  if (isRoundtrip && stopover?.enabled) {
+  //
+  //    Only show it when the opted-in leg actually HAS a sensible stopover hub
+  //    — the offer is dynamic/opt-in, so on a route with no good hub there are
+  //    no offers to pick and the hotel step would dangle. We always show it on
+  //    the stopover-hotel page itself (stopoverStatus === "current"), since
+  //    being there means an offer was already chosen.
+  const stopLeg = stopover?.leg === "return" ? legs[1] : legs[0];
+  const hasStopoverOffers =
+    stopoverStatus === "current" ||
+    (!!stopLeg && routeHasStopover(stopLeg.from, stopLeg.to));
+  if (isRoundtrip && stopover?.enabled && hasStopoverOffers) {
     steps.push({
       key: "stopover",
       category: "Stopover hotel",

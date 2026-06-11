@@ -947,6 +947,14 @@ function getHubsForRoute(from: string, to: string): StopoverHub[] {
   return [];
 }
 
+// True when this route has at least one geographically sensible stopover hub.
+// The stepper uses this to decide whether to show the "Stopover hotel" step —
+// it must agree with getStopoverOffersForLeg (both build on getHubsForRoute) so
+// the step never appears for a route that surfaces no offers.
+export function routeHasStopover(from: string, to: string): boolean {
+  return getHubsForRoute(from, to).length > 0;
+}
+
 export function getStopoverOffersForLeg(
   from: string,
   to: string,
