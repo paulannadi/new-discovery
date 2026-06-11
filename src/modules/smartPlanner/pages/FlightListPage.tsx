@@ -40,7 +40,9 @@ import { FlightResultCard } from "../components/flightSearch/FlightResultCard";
 // the user clicks "Edit search" it replaces the trip summary row in-place,
 // pre-filled with the current criteria.
 import { FlightSearchForm } from "../components/flightSearch/FlightSearchForm";
-import { getMockFlightsForLeg, getStopoverOffersForLeg } from "../components/flightSearch/mockFlights";
+// Banner that nudges the traveller to add a stopover when they didn't opt in.
+import { StopoverPromoBanner } from "../components/flightSearch/StopoverPromoBanner";
+import { getMockFlightsForLeg, getStopoverOffersForLeg, routeHasStopover } from "../components/flightSearch/mockFlights";
 import { applyFilters } from "../components/flightSearch/filterFlights";
 import { DEFAULT_FILTERS, type FlightFilters } from "../components/flightSearch/types";
 
@@ -111,6 +113,11 @@ export default function FlightListPage({
   // ── Filters state — single object so resets are one line ──────────────
   const [filters, setFilters] = useState<FlightFilters>(DEFAULT_FILTERS);
 
+  // ── Stopover suggestion banner ─────────────────────────────────────────
+  // Once the traveller dismisses the "add a stopover" nudge, we keep it hidden
+  // for the rest of the session so we don't keep pestering them.
+  const [stopoverPromoDismissed, setStopoverPromoDismissed] = useState(false);
+
   // ── Simulated streaming search ─────────────────────────────────────────
   // Real queries take several seconds across multiple carriers. We mimic
   // that with two phases (isSearching → cards arrive, then streaming
@@ -152,6 +159,34 @@ export default function FlightListPage({
     !!stop?.enabled &&
     ((stop.leg === "outbound" && currentLegIndex === 0) ||
       (stop.leg === "return" && currentLegIndex === 1));
+
+  // Should we show the "add a stopover" nudge? Only when ALL of these hold:
+  //   • it's a round trip (stopovers only apply to round trips)
+  //   • the traveller hasn't already opted into a stopover
+  //   • they haven't dismissed the banner this session
+  //   • the outbound route actually HAS a sensible stopover hub — otherwise
+  //     enabling the option would surface zero offers, so the nudge would be a
+  //     dead end. `routeHasStopover` is the same gate the stepper uses.
+  const outboundLeg = searchCriteria.legs[0];
+  const showStopoverPromo =
+    searchCriteria.tripType === "roundtrip" &&
+    !stop?.enabled &&
+    !stopoverPromoDismissed &&
+    !!outboundLeg &&
+    routeHasStopover(outboundLeg.from, outboundLeg.to);
+
+  // CTA handler — re-run the SAME search with the stopover option turned on.
+  // We hand the updated criteria to the parent (App.tsx), which clears the
+  // selected legs and resets to leg 0; the effect above then re-runs the
+  // simulated search, so the results refresh with stopover offers mixed in.
+  // We default to a 2-night stopover on the OUTBOUND leg — the most common
+  // choice, and the one the traveller lands back on after the reset.
+  const handleEnableStopover = () => {
+    onSearchCriteriaChange({
+      ...searchCriteria,
+      stopover: { enabled: true, leg: "outbound", nights: 2 },
+    });
+  };
 
   // Raw mock results for this leg (the normal flights, unchanged).
   const flights = useMemo(
@@ -241,6 +276,18 @@ export default function FlightListPage({
             onStepSelect={onStepSelect}
           />
         </div>
+
+        {/* 4b. Stopover nudge — sits directly below the stepper. Only for round
+            trips where the traveller hasn't opted into a stopover and the route
+            has a sensible hub. The CTA re-runs the search with stopovers on. */}
+        {showStopoverPromo && (
+          <div className="mb-8">
+            <StopoverPromoBanner
+              onEnableStopover={handleEnableStopover}
+              onDismiss={() => setStopoverPromoDismissed(true)}
+            />
+          </div>
+        )}
 
         {/* 5. Per-leg sub-heading row */}
         {currentLeg && (

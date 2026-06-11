@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { cn } from "../../../shared/components/ui/utils";
 import { BackButton } from "../../../shared/components/BackButton";
 import { PageContainer } from "../../../shared/components/PageContainer";
+import { SearchSummary } from "../components/SearchSummary";
 import AccommodationStar from "../../../shared/components/AccommodationStar";
 import RatingBlock from "../../../shared/components/RatingBlock";
 import {
@@ -1035,32 +1036,25 @@ export default function HotelListPage({
             />
           )}
 
-          {/* Mobile Read-Only View — hidden on the stopover step (no search) */}
+          {/* Mobile Read-Only View — hidden on the stopover step (no search).
+              Now uses the shared <SearchSummary> so it matches the flight
+              header's structure exactly (bold destination → dates → guests,
+              with a secondary "Edit search" button). `md:hidden` keeps this
+              collapse-to-summary behaviour scoped to small screens — desktop
+              still shows the full search row below. */}
           {!hideSearch && !isMobileSearchExpanded && (
-            <div className="md:hidden flex items-center justify-between gap-3">
-              <div
-                className="flex-1 flex flex-col cursor-pointer"
-                onClick={() => setIsMobileSearchExpanded(true)}
-              >
-                <div className="font-extrabold text-foreground text-sm flex items-center gap-2">
-                  <MapPin size={16} className="text-primary" aria-hidden="true" />
-                  <span className="truncate">{location}</span>
-                </div>
-                <div className="text-grey text-xs mt-0.5 ml-6 flex items-center gap-1">
-                  <span>{dateRange?.from ? format(dateRange.from, "MMM dd") : "Select"}</span>
-                  <span>-</span>
-                  <span>{dateRange?.to ? format(dateRange.to, "MMM dd") : "Select"}</span>
-                  <span>•</span>
-                  <span>{totalGuests} Guests, {rooms.length} Room{rooms.length > 1 ? 's' : ''}</span>
-                </div>
-              </div>
-              <button
-                className="text-primary font-extrabold text-sm px-4 py-2 bg-grey-light rounded-full shrink-0"
-                onClick={() => setIsMobileSearchExpanded(true)}
-              >
-                Edit
-              </button>
-            </div>
+            <SearchSummary
+              className="md:hidden"
+              onEdit={() => setIsMobileSearchExpanded(true)}
+              items={[
+                location,
+                // Optional date range — skipped by SearchSummary when not set.
+                dateRange?.from && dateRange?.to
+                  ? `${format(dateRange.from, "d MMM")} – ${format(dateRange.to, "d MMM yyyy")}`
+                  : null,
+                `${totalGuests} Guest${totalGuests !== 1 ? "s" : ""}, ${rooms.length} Room${rooms.length > 1 ? "s" : ""}`,
+              ]}
+            />
           )}
 
           {/* The whole search row — only on the normal hotel search, never on
@@ -1251,10 +1245,10 @@ export default function HotelListPage({
 
       {/* Mobile Filter Bar (Sticky Top) */}
       <div className="md:hidden bg-grey-lightest sticky top-0 z-30 px-4 py-3">
-        <div className="bg-card border border-border rounded-full flex items-center h-[48px] w-full">
+        <div className="bg-card border border-border rounded-xl flex items-center h-[48px] w-full">
            {/* Sort Button */}
            <button
-             className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-extrabold text-foreground active:bg-gray-50 transition-colors first:rounded-l-full"
+             className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground active:bg-gray-50 transition-colors first:rounded-l-xl"
              onClick={() => setIsMobileSortOpen(true)}
            >
              <ArrowUpDown size={14} aria-hidden="true" />
@@ -1265,7 +1259,7 @@ export default function HotelListPage({
 
            {/* Filters Button */}
            <button
-             className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-extrabold text-foreground active:bg-gray-50 transition-colors"
+             className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground active:bg-gray-50 transition-colors"
              onClick={() => setIsMobileFiltersOpen(true)}
            >
              <SlidersHorizontal size={14} aria-hidden="true" />
@@ -1277,7 +1271,7 @@ export default function HotelListPage({
 
            {!hideSearch && (
            <button
-             className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-extrabold text-foreground active:bg-gray-50 transition-colors last:rounded-r-full"
+             className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground active:bg-gray-50 transition-colors last:rounded-r-xl"
              onClick={() => setMobileView(mobileView === 'list' ? 'map' : 'list')}
            >
              {mobileView === 'list' ? <MapIcon size={14} aria-hidden="true" /> : <List size={14} aria-hidden="true" />}

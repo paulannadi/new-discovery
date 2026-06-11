@@ -371,13 +371,15 @@ export function FlightFilterBar({ filters, onChange, availableAirlines, resultCo
       </div>
 
       {/* ── MOBILE: segmented "Sort | Filters" bar (<md) ─────────────────────
-          Same rounded-full segmented control HotelListPage uses on mobile,
-          without the Map toggle (flights have no map). */}
+          Segmented control without the Map toggle (flights have no map).
+          Radius (rounded-xl), the lighter font-semibold label, and the
+          primary-blue icons all match a single flight-search filter pill, so
+          this bar and the search-form's secondary bar read as one family. */}
       <div className="md:hidden">
-        <div className="bg-card border border-border rounded-full flex items-center h-[48px] w-full">
+        <div className="bg-card border border-border rounded-xl flex items-center h-[48px] w-full">
           <button
             type="button"
-            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-extrabold text-foreground active:bg-grey-light transition-colors rounded-l-full"
+            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground active:bg-grey-light transition-colors rounded-l-xl"
             onClick={() => setMobileSortOpen(true)}
           >
             <ArrowDownWideNarrow size={14} aria-hidden="true" />
@@ -388,7 +390,7 @@ export function FlightFilterBar({ filters, onChange, availableAirlines, resultCo
 
           <button
             type="button"
-            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-extrabold text-foreground active:bg-grey-light transition-colors rounded-r-full"
+            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground active:bg-grey-light transition-colors rounded-r-xl"
             onClick={() => setMobileFiltersOpen(true)}
           >
             <SlidersHorizontal size={14} aria-hidden="true" />

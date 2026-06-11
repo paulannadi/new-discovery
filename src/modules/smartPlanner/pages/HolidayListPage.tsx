@@ -605,14 +605,14 @@ export default function HolidayListPage({
 
       {/* ── FILTER BAR: mobile ────────────────────────────────────────────── */}
       <div className="md:hidden bg-grey-lightest sticky top-0 z-30 px-4 py-3">
-        <div className="bg-card border border-border rounded-full flex items-center h-[48px] w-full">
-          <button className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-bold text-foreground first:rounded-l-full">
+        <div className="bg-card border border-border rounded-xl flex items-center h-[48px] w-full">
+          <button className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground first:rounded-l-xl">
             <ArrowUpDown size={14} />
             Sort
           </button>
           <div className="w-[1px] h-6 bg-border" />
           <button
-            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-bold text-foreground"
+            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground"
             onClick={() => setIsMobileFiltersOpen(true)}
           >
             <SlidersHorizontal size={14} />
@@ -625,7 +625,7 @@ export default function HolidayListPage({
           </button>
           <div className="w-[1px] h-6 bg-border" />
           <button
-            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-bold text-foreground last:rounded-r-full"
+            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground last:rounded-r-xl"
             onClick={() => setMobileView(mobileView === "list" ? "map" : "list")}
           >
             {mobileView === "list" ? <MapIcon size={14} /> : <List size={14} />}

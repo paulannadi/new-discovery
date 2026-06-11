@@ -35,6 +35,8 @@ import LeafletMap, {
 import type { Activity, ActivitySearchCriteria } from "../../../types";
 import { ALL_ACTIVITIES } from "../../../mocks/activities";
 import ActivitySearchForm, { CRUISE_DESTINATION_GROUPS } from "../components/ActivitySearchForm";
+import { SearchSummary } from "../components/SearchSummary";
+import { format, parseISO } from "date-fns";
 import { ActivityCard } from "../components/ActivityCard";
 // Loading kit — vertical SkeletonCards while activities "load" briefly
 // (matches the doc's 1s–3s tier), then a 60ms staggered reveal.
@@ -159,6 +161,13 @@ export default function ActivityListPage({
     const id = setTimeout(() => setIsSearching(false), 1200);
     return () => clearTimeout(id);
   }, [searchCriteria]);
+
+  // ── Mobile search collapse ───────────────────────────────────────────────
+  // On small screens the search form collapses to a compact <SearchSummary>
+  // (matching the flight + hotel headers); tapping "Edit search" expands the
+  // full form. On desktop the form is always shown, so this flag is ignored
+  // there (the form's wrapper is `md:block`).
+  const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
 
   // ── Filter state ────────────────────────────────────────────────────────
   // Sort defaults to "recommended" (the order from ALL_ACTIVITIES).
@@ -474,11 +483,39 @@ export default function ActivityListPage({
       <div className="bg-card border-b border-border">
         <PageContainer tier="wide" className="px-4 md:px-6 pt-5 pb-5 flex flex-col gap-4">
           <BackButton label="Back to discovery" onClick={onBack} />
-          <ActivitySearchForm
-            variant="compact"
-            initialValues={searchCriteria}
-            onSearch={(c) => onRefineSearch?.(c)}
-          />
+
+          {/* Mobile collapsed summary — flight-styled row, small screens only.
+              Shows destination → date (if set) → travellers, with an "Edit
+              search" button that expands the full form. `md:hidden` keeps this
+              scoped to small screens, exactly like the hotel header. */}
+          {!isMobileSearchExpanded && (
+            <SearchSummary
+              className="md:hidden"
+              onEdit={() => setIsMobileSearchExpanded(true)}
+              items={[
+                searchCriteria.destination.trim() || "Anywhere",
+                // Optional date — skipped by SearchSummary when "Any time".
+                searchCriteria.dateFrom
+                  ? format(parseISO(searchCriteria.dateFrom), "d MMM yyyy")
+                  : null,
+                `${searchCriteria.travellers} traveller${searchCriteria.travellers !== 1 ? "s" : ""}`,
+              ]}
+            />
+          )}
+
+          {/* Full form — always on desktop (md:block); on mobile only once the
+              summary's "Edit search" has expanded it. Submitting collapses it
+              back to the summary on mobile. */}
+          <div className={cn(isMobileSearchExpanded ? "block" : "hidden", "md:block")}>
+            <ActivitySearchForm
+              variant="compact"
+              initialValues={searchCriteria}
+              onSearch={(c) => {
+                onRefineSearch?.(c);
+                setIsMobileSearchExpanded(false);
+              }}
+            />
+          </div>
         </PageContainer>
       </div>
 
