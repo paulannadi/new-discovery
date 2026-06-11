@@ -9,13 +9,16 @@
 //    flights stacked, with the multi-night stay called out as a highlighted
 //    row between them, plus a footer with the final arrival date:
 //
+//    The hub shown depends on the route (see getStopoverOffersForLeg in
+//    mockFlights.ts) — e.g. a New York → Grenada trip breaks at Port of Spain:
+//
 //    ┌─────────────────────────────────────────────┬──────────┐
-//    │ ✦ Stopover offer   (2 nights in Dubai)       │          │
+//    │ ✦ Stopover offer   (2 nights in Port of Spain)│          │
 //    ├─────────────────────────────────────────────┤  FROM    │
-//    │ [EK] Fri 12 Jun   21:40 LHR ─✈─ 07:55 DXB⁺¹  │  $1,180  │
-//    │ [📍] ┌ 2-night stopover in Dubai · 13–15 Jun ┐│ per person│
-//    │ [EK] Mon 15 Jun   09:50 DXB ─✈─ 06:10 SYD⁺¹  │ [Select] │
-//    │ 📍 Arrive Sydney Tue 16 Jun        4 days     │          │
+//    │ [BW] Fri 12 Jun   09:30 JFK ─✈─ 14:15 POS    │  $720    │
+//    │ [📍] ┌ 2-night stopover in Port of Spain ────┐│ per person│
+//    │ [BW] Mon 15 Jun   16:10 POS ─✈─ 17:00 GND    │ [Select] │
+//    │ 📍 Arrive Grenada Mon 15 Jun       4 days     │          │
 //    └─────────────────────────────────────────────┴──────────┘
 
 import { useState, useEffect, type ReactNode } from "react";
@@ -72,26 +75,28 @@ function getLegLabel(legIndex?: number, totalLegs?: number): string {
   return `Flight ${legIndex + 1}`;
 }
 
-// ── AirlineMark — the airline logo in a small rounded square, with a 2-letter
-// initials fallback when the SVG is missing. Used as the icon for each flight
-// in the stopover journey layout. Local fallback state resets if the src
-// changes so a different airline gets a fresh attempt.
+// ── AirlineMark — the airline logo for a flight inside the stopover journey.
+// Styled to match the normal flight card's logo exactly: a wide h-6 image, with
+// a small 2-letter pill fallback when the SVG is missing or fails to load.
+// Local fallback state resets if the src changes so a different airline gets a
+// fresh attempt.
 function AirlineMark({ logoSrc, code, name }: { logoSrc: string | undefined; code: string; name: string }) {
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [logoSrc]);
   const show = logoSrc && !failed;
-  return (
-    <div className="size-10 shrink-0 rounded-lg border border-border bg-card flex items-center justify-center overflow-hidden">
-      {show ? (
-        <img
-          src={logoSrc}
-          alt={name}
-          className="h-5 w-auto max-w-[30px] object-contain"
-          onError={() => setFailed(true)}
-        />
-      ) : (
-        <span className="text-[11px] font-extrabold text-primary tracking-wider">{code}</span>
-      )}
+  return show ? (
+    <img
+      src={logoSrc}
+      alt={name}
+      className="h-6 w-auto max-w-[120px] object-contain shrink-0"
+      onError={() => setFailed(true)}
+    />
+  ) : (
+    <div
+      className="h-6 px-2 rounded-md bg-primary/10 flex items-center justify-center shrink-0"
+      aria-label={name}
+    >
+      <span className="text-[11px] font-extrabold text-primary tracking-wider">{code}</span>
     </div>
   );
 }
@@ -121,41 +126,44 @@ function JourneySegment({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      {/* Date sits above the times, padded to clear the icon column (40px + gap-3 = 52px). */}
-      {dateLabel && <div className="pl-[52px] text-xs text-muted-foreground">{dateLabel}</div>}
-
-      <div className="flex items-center gap-3">
+      {/* Top row — date on the left, airline logo on the right. This mirrors the
+          normal flight card so the logo sits in the same place: in the date row,
+          right above the times. */}
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs text-muted-foreground">{dateLabel}</span>
         {mark}
-        <div className="flex-1 flex items-center gap-3 md:gap-5">
-          {/* Departure */}
-          <div className="shrink-0 min-w-[52px]">
-            <div className="text-xl md:text-2xl font-extrabold text-foreground leading-none">{depTime}</div>
-            <div className="text-xs text-muted-foreground mt-1">{depCode}</div>
-          </div>
+      </div>
 
-          {/* Connector: duration · line with a plane · note */}
-          <div className="flex-1 flex flex-col items-center gap-1">
-            <span className="text-xs text-muted-foreground">{duration}</span>
-            <div className="w-full flex items-center gap-1">
-              <span className="size-1.5 rounded-full bg-foreground/40 shrink-0" />
-              <div className="flex-1 h-px bg-border" />
-              <Plane size={12} className="text-grey shrink-0" aria-hidden="true" />
-              <div className="flex-1 h-px bg-border" />
-              <span className="size-1.5 rounded-full bg-foreground/40 shrink-0" />
-            </div>
-            {note && <span className="text-xs text-muted-foreground">{note}</span>}
-          </div>
+      {/* Times bar — full width, no left icon column anymore. */}
+      <div className="flex items-center gap-3 md:gap-5">
+        {/* Departure */}
+        <div className="shrink-0 min-w-[60px]">
+          <div className="text-xl md:text-2xl font-extrabold text-foreground leading-none">{depTime}</div>
+          <div className="text-xs text-muted-foreground mt-1">{depCode}</div>
+        </div>
 
-          {/* Arrival — "+1" superscript when it lands the next day */}
-          <div className="shrink-0 min-w-[52px] text-right">
-            <div className="text-xl md:text-2xl font-extrabold text-foreground leading-none">
-              {arrTime}
-              {arrivesNextDay && (
-                <sup className="ml-0.5 align-super text-xs font-bold text-primary">+1</sup>
-              )}
-            </div>
-            <div className="text-xs text-muted-foreground mt-1">{arrCode}</div>
+        {/* Connector: duration · line with a plane · note */}
+        <div className="flex-1 flex flex-col items-center gap-1">
+          <span className="text-xs text-muted-foreground">{duration}</span>
+          <div className="w-full flex items-center gap-1">
+            <span className="size-1.5 rounded-full bg-foreground/40 shrink-0" />
+            <div className="flex-1 h-px bg-border" />
+            <Plane size={12} className="text-grey shrink-0" aria-hidden="true" />
+            <div className="flex-1 h-px bg-border" />
+            <span className="size-1.5 rounded-full bg-foreground/40 shrink-0" />
           </div>
+          {note && <span className="text-xs text-muted-foreground">{note}</span>}
+        </div>
+
+        {/* Arrival — "+1" superscript when it lands the next day */}
+        <div className="shrink-0 min-w-[60px] text-right">
+          <div className="text-xl md:text-2xl font-extrabold text-foreground leading-none">
+            {arrTime}
+            {arrivesNextDay && (
+              <sup className="ml-0.5 align-super text-xs font-bold text-primary">+1</sup>
+            )}
+          </div>
+          <div className="text-xs text-muted-foreground mt-1">{arrCode}</div>
         </div>
       </div>
     </div>
@@ -235,19 +243,16 @@ export function FlightResultCard({
               arrivesNextDay={out.arrivesNextDay}
             />
 
-            {/* The stopover — pin icon + dashed, tinted highlight box */}
-            <div className="flex items-center gap-3">
-              <div className="size-10 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
-                <MapPin size={18} className="text-primary" aria-hidden="true" />
-              </div>
-              <div className="flex-1 min-w-0 rounded-lg border border-dashed border-primary/40 bg-primary/5 px-4 py-2.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                <span className="text-sm font-bold text-primary">
-                  {nights}-night stopover in {city}
-                </span>
-                <span className="text-sm text-muted-foreground">
-                  {stayRange ? `${stayRange} · ` : ""}pick a hotel
-                </span>
-              </div>
+            {/* The stopover — a full-width dashed, tinted highlight box with the
+                pin inline, so its left edge lines up with the times above/below. */}
+            <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 px-4 py-2.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <MapPin size={16} className="text-primary shrink-0" aria-hidden="true" />
+              <span className="text-sm font-bold text-primary">
+                {nights}-night stopover in {city}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {stayRange ? `${stayRange} · ` : ""}pick a hotel
+              </span>
             </div>
 
             {/* Flight 2 — hub → destination */}

@@ -25,6 +25,10 @@
 //                              "Fastest" sort and the Max duration filter.
 
 import type { FlightOption } from "../../../../App";
+// We reuse the airport catalogue's `region` field to decide which stopover hub
+// makes geographic sense for a route — that way there's a single source of
+// truth and we don't duplicate "which city is in which region" lists here.
+import { findAirportByCode, type AirportRegion } from "./airports";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -672,23 +676,65 @@ export function getMockFlightsForLeg(from: string, to: string): FlightOption[] {
 // with the extra `stopover` field set — that's what FlightResultCard reads to
 // show the stopover treatment, and what App.tsx reads to add the hotel step.
 //
-// The two classic long-haul stopover hubs (Dubai / Singapore) are used for any
-// route — this is a prototype, so we don't try to match the real geography.
-// Each hub now carries the TWO physical flights that make up the journey —
+// A stopover hub is a city travellers naturally break a long journey at —
+// and crucially it has to make GEOGRAPHIC sense for the route. You'd never
+// route a New York → Grenada trip through Dubai; you'd stop in Port of Spain.
+//
+// Each hub carries the TWO physical flights that make up the journey —
 // origin→hub (`out`) and hub→destination (`onward`) — so the card can show
 // both legs with their own times. `arrivesNextDay` drives the "+1" marker.
-const STOPOVER_HUBS = [
-  {
+//
+// We keep a small catalogue of hubs keyed by their airport code, then pick the
+// right one(s) for a given route below in `getHubsForRoute`.
+type StopoverHub = {
+  city: string;
+  hubCode: string;
+  airline: string;
+  airlineCode: string;
+  duration: string; // overall journey time (used for sort / fallback)
+  price: number;
+  out: { depTime: string; arrTime: string; duration: string; arrivesNextDay?: boolean; note?: string };
+  onward: { depTime: string; arrTime: string; duration: string; arrivesNextDay?: boolean; note?: string };
+};
+
+const HUBS: Record<string, StopoverHub> = {
+  // ── Port of Spain — the natural break for Caribbean island-hopping.
+  // Caribbean Airlines (BW) hubs here; e.g. JFK/YYZ → POS → GND/BGI.
+  POS: {
+    city: "Port of Spain",
+    hubCode: "POS",
+    airline: "Caribbean Airlines",
+    airlineCode: "BW",
+    duration: "9h 05m",
+    price: 720,
+    out: { depTime: "09:30", arrTime: "14:15", duration: "4h 45m", note: "direct" },
+    onward: { depTime: "16:10", arrTime: "17:00", duration: "0h 50m", note: "short hop" },
+  },
+  // ── Nadi — the South Pacific gateway for the Americas → Australasia run.
+  // Fiji Airways (FJ) hubs here; e.g. LAX/SFO → NAN → SYD/MEL/BNE/AKL/CHC.
+  NAN: {
+    city: "Nadi",
+    hubCode: "NAN",
+    airline: "Fiji Airways",
+    airlineCode: "FJ",
+    duration: "18h 40m",
+    price: 1340,
+    out: { depTime: "22:30", arrTime: "05:50", duration: "10h 50m", arrivesNextDay: true, note: "overnight, crosses date line" },
+    onward: { depTime: "13:20", arrTime: "16:10", duration: "3h 50m", note: "direct" },
+  },
+  // ── Dubai — Emirates' hub; ideal for Europe ↔ Asia / Australasia.
+  DXB: {
     city: "Dubai",
     hubCode: "DXB",
     airline: "Emirates",
     airlineCode: "EK",
-    duration: "20h 35m", // overall journey time (used for sort / fallback)
+    duration: "20h 35m",
     price: 1180,
     out: { depTime: "21:40", arrTime: "07:55", duration: "7h 15m", arrivesNextDay: true, note: "direct" },
     onward: { depTime: "09:50", arrTime: "06:10", duration: "13h 20m", arrivesNextDay: true, note: "overnight" },
   },
-  {
+  // ── Singapore — Singapore Airlines' hub; ideal for Europe ↔ SE Asia / Australasia.
+  SIN: {
     city: "Singapore",
     hubCode: "SIN",
     airline: "Singapore Airlines",
@@ -698,7 +744,208 @@ const STOPOVER_HUBS = [
     out: { depTime: "12:20", arrTime: "08:05", duration: "12h 45m", arrivesNextDay: true, note: "direct" },
     onward: { depTime: "20:30", arrTime: "07:40", duration: "8h 10m", arrivesNextDay: true, note: "overnight" },
   },
-];
+  // ── Doha — Qatar Airways' hub; a strong Europe ↔ Asia alternative to Dubai.
+  DOH: {
+    city: "Doha",
+    hubCode: "DOH",
+    airline: "Qatar Airways",
+    airlineCode: "QR",
+    duration: "20h 10m",
+    price: 1225,
+    out: { depTime: "08:15", arrTime: "17:05", duration: "6h 50m", note: "direct" },
+    onward: { depTime: "20:40", arrTime: "08:30", duration: "8h 50m", arrivesNextDay: true, note: "overnight" },
+  },
+  // ── Istanbul — Turkish Airlines' hub; bridges Europe ↔ Asia / Africa.
+  IST: {
+    city: "Istanbul",
+    hubCode: "IST",
+    airline: "Turkish Airlines",
+    airlineCode: "TK",
+    duration: "16h 05m",
+    price: 1090,
+    out: { depTime: "14:30", arrTime: "19:45", duration: "4h 15m", note: "direct" },
+    onward: { depTime: "02:10", arrTime: "16:30", duration: "9h 20m", arrivesNextDay: true, note: "overnight" },
+  },
+  // ── Reykjavík — Icelandair's famous free transatlantic stopover (Europe ↔ N. America).
+  KEF: {
+    city: "Reykjavík",
+    hubCode: "KEF",
+    airline: "Icelandair",
+    airlineCode: "FI",
+    duration: "12h 00m",
+    price: 760,
+    out: { depTime: "08:00", arrTime: "09:45", duration: "3h 15m", note: "direct" },
+    onward: { depTime: "13:00", arrTime: "15:10", duration: "6h 10m", note: "direct" },
+  },
+  // ── São Paulo — LATAM's hub for Europe / N. America ↔ South America.
+  GRU: {
+    city: "São Paulo",
+    hubCode: "GRU",
+    airline: "LATAM",
+    airlineCode: "LA",
+    duration: "14h 30m",
+    price: 980,
+    out: { depTime: "22:00", arrTime: "05:30", duration: "10h 30m", arrivesNextDay: true, note: "overnight" },
+    onward: { depTime: "10:00", arrTime: "13:00", duration: "3h 00m", note: "direct" },
+  },
+  // ── Hong Kong — Cathay Pacific's hub for trans-Pacific N. America ↔ Asia.
+  HKG: {
+    city: "Hong Kong",
+    hubCode: "HKG",
+    airline: "Cathay Pacific",
+    airlineCode: "CX",
+    duration: "20h 00m",
+    price: 1210,
+    out: { depTime: "01:30", arrTime: "06:00", duration: "15h 30m", arrivesNextDay: true, note: "crosses date line" },
+    onward: { depTime: "09:00", arrTime: "13:00", duration: "4h 00m", note: "direct" },
+  },
+  // ── Tokyo — ANA's hub; a trans-Pacific alternative to Hong Kong.
+  NRT: {
+    city: "Tokyo",
+    hubCode: "NRT",
+    airline: "ANA",
+    airlineCode: "NH",
+    duration: "18h 30m",
+    price: 1180,
+    out: { depTime: "11:00", arrTime: "14:30", duration: "11h 30m", arrivesNextDay: true, note: "crosses date line" },
+    onward: { depTime: "17:30", arrTime: "23:00", duration: "7h 00m", note: "direct" },
+  },
+  // ── Santiago de Chile — LATAM's hub for the trans-Pacific Oceania ↔ S. America
+  //    run (e.g. Sydney → Santiago → Buenos Aires). Authored Oceania → S. America:
+  //    `out` is the long ocean crossing, `onward` the short South-American hop.
+  SCL: {
+    city: "Santiago de Chile",
+    hubCode: "SCL",
+    airline: "LATAM",
+    airlineCode: "LA",
+    duration: "17h 00m",
+    price: 1290,
+    out: { depTime: "11:00", arrTime: "10:30", duration: "12h 30m", note: "crosses date line" },
+    onward: { depTime: "13:45", arrTime: "16:00", duration: "2h 15m", note: "short hop" },
+  },
+};
+
+// Codes treated as "Americas west coast" for the Pacific (Nadi) routing — the
+// only place a simple region check isn't precise enough, because JFK → Sydney
+// realistically routes via Asia/Gulf, not Fiji, whereas LAX → Sydney goes via
+// Nadi. So we keep west-coast origins explicit; everything else uses regions.
+const AMERICAS_WEST = new Set(["LAX", "SFO", "SEA", "YVR", "SAN"]);
+
+// Which hub(s) make sense for an unordered pair of regions. Keys are the two
+// region names sorted alphabetically and joined with "|" (see regionKey). The
+// first entry is preferred; we keep a couple for variety. Pairs that involve
+// the Caribbean / Oceania are handled by the dedicated rules below, so they're
+// intentionally absent here.
+//
+// A pair is listed ONLY when a multi-night stopover genuinely makes sense for
+// it (i.e. a long-haul journey with a natural hub in the middle). Short-haul or
+// same-region pairs — intra-Europe, intra-US, Buenos Aires→São Paulo — are left
+// OUT on purpose: the feature is opt-in, so showing nothing is better than
+// inventing a pointless stopover. Unlisted pairs return no offers (see below).
+const REGION_PAIR_HUBS: Record<string, string[]> = {
+  "Asia|Europe": ["DXB", "DOH", "IST"],
+  "Africa|Europe": ["DXB", "DOH", "IST"],
+  "Europe|Middle East": ["DOH", "IST"], // DXB excluded automatically if it's the endpoint
+  "Europe|North America": ["KEF"], // Icelandair's transatlantic stopover
+  "Europe|South America": ["GRU"],
+  "Asia|North America": ["HKG", "NRT"], // trans-Pacific
+  "Asia|Middle East": ["DOH", "DXB"],
+  "Asia|Asia": ["HKG", "SIN"],
+  "Asia|South America": ["GRU", "DXB"],
+  "Africa|Asia": ["DXB", "DOH"],
+  "Africa|North America": ["DXB", "DOH"],
+  "Africa|Middle East": ["DOH"],
+  "Africa|South America": ["GRU"],
+  "Middle East|North America": ["DOH"],
+  "Middle East|South America": ["GRU"],
+  "North America|South America": ["GRU"],
+};
+
+// The order-independent key into REGION_PAIR_HUBS.
+function regionKey(a: AirportRegion, b: AirportRegion): string {
+  return [a, b].sort().join("|");
+}
+
+function regionOf(code: string): AirportRegion | undefined {
+  return findAirportByCode(code)?.region;
+}
+
+// Resolve a list of hub codes into hub objects, dropping any hub that IS one of
+// the route's endpoints (you can't stop over in the city you're flying to) and
+// any code we don't have flight data for. Caps at two so the list stays short.
+function resolveHubs(codes: string[], from: string, to: string): StopoverHub[] {
+  return codes
+    .filter((code) => code !== from && code !== to)
+    .map((code) => HUBS[code])
+    .filter(Boolean)
+    .slice(0, 2);
+}
+
+// Flip a hub's two segments. The `out`/`onward` flights are authored for the
+// canonical OUTBOUND direction (e.g. JFK → POS is the long leg, POS → GND the
+// short hop). On the RETURN leg the geography reverses — the short hop comes
+// first — so we swap the two segments to keep each leg's duration believable.
+function reverseHub(hub: StopoverHub): StopoverHub {
+  return { ...hub, out: hub.onward, onward: hub.out };
+}
+
+// Pick the geographically appropriate hub(s) for a route. We test the regions
+// of BOTH endpoints (matching is direction-AGNOSTIC — the user can opt into a
+// stopover on the outbound OR the return leg), reverse a hub's segments when
+// the leg runs "backwards" vs. the canonical direction, and exclude any hub
+// that's itself an endpoint.
+//
+// Returns an EMPTY array when no hub makes geographic sense (short-haul, same
+// region, or an unmapped/typed route). Because the stopover is opt-in, showing
+// no offers is the right answer there — the normal flight results still appear.
+function getHubsForRoute(from: string, to: string): StopoverHub[] {
+  const orient = (reversed: boolean, hubs: StopoverHub[]) =>
+    reversed ? hubs.map(reverseHub) : hubs;
+
+  const fromRegion = regionOf(from);
+  const toRegion = regionOf(to);
+
+  // A trip that stays within one region is short-haul — no stopover offered.
+  if (fromRegion && fromRegion === toRegion) return [];
+
+  // 1. Caribbean island on either end → break at Port of Spain.
+  //    Canonical = island is the destination; reverse when it's the origin.
+  if (fromRegion === "Caribbean" || toRegion === "Caribbean") {
+    return orient(fromRegion === "Caribbean", resolveHubs(["POS"], from, to));
+  }
+
+  // 2. Americas WEST coast ↔ Oceania → break at Nadi (Fiji).
+  //    Canonical = Americas is the origin; reverse when Oceania is the origin.
+  const westPacific =
+    (AMERICAS_WEST.has(from) && toRegion === "Oceania") ||
+    (fromRegion === "Oceania" && AMERICAS_WEST.has(to));
+  if (westPacific) return orient(fromRegion === "Oceania", resolveHubs(["NAN"], from, to));
+
+  // 3. Oceania ↔ South America → break at Santiago de Chile (LATAM's route).
+  //    Canonical = Oceania is the origin; reverse when S. America is the origin.
+  const oceaniaSouthAmerica =
+    (fromRegion === "Oceania" && toRegion === "South America") ||
+    (fromRegion === "South America" && toRegion === "Oceania");
+  if (oceaniaSouthAmerica) {
+    return orient(fromRegion === "South America", resolveHubs(["SCL"], from, to));
+  }
+
+  // 4. Any other Oceania route (Europe/Asia/Africa/Gulf/east-coast US ↔ AU/NZ)
+  //    → the classic "Kangaroo route" Gulf/Asia hubs. Canonical = the non-Oceania
+  //    side is the origin; reverse when Oceania is the origin.
+  if (fromRegion === "Oceania" || toRegion === "Oceania") {
+    return orient(fromRegion === "Oceania", resolveHubs(["SIN", "DXB"], from, to));
+  }
+
+  // 5. Everything else: look the region pair up in the table. The hubs here are
+  //    symmetric enough that we don't need to reverse the segments. An unmapped
+  //    pair (or a typed code we don't catalogue) yields no offers.
+  if (fromRegion && toRegion) {
+    return resolveHubs(REGION_PAIR_HUBS[regionKey(fromRegion, toRegion)] ?? [], from, to);
+  }
+
+  return [];
+}
 
 export function getStopoverOffersForLeg(
   from: string,
@@ -706,7 +953,7 @@ export function getStopoverOffersForLeg(
   nights: number,
 ): FlightOption[] {
   const offset = ((from.length + to.length) % 5) * 20;
-  return STOPOVER_HUBS.map((hub, i) => ({
+  return getHubsForRoute(from, to).map((hub, i) => ({
     id: `${from}-${to}-stopover-${hub.airlineCode}`,
     airline: hub.airline,
     airlineCode: hub.airlineCode,
