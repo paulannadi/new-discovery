@@ -75,8 +75,6 @@ type Hotel = {
   amenities: string[];
   boardTypes: string[];
   cancellationPolicy: "Free cancellation" | "Non-refundable";
-  // Real lat/lng so Leaflet can place the pin on an actual map
-  coordinates: { lat: number; lng: number };
 };
 
 type SortOption = "recommended" | "price_low" | "price_high" | "rating" | "stars";
@@ -99,8 +97,7 @@ const HOTELS: Hotel[] = [
     price: 125,
     amenities: ["Pet friendly", "Free Wifi", "Indoor pool", "Gym", "Bar", "Restaurant"],
     boardTypes: ["Room only", "Breakfast", "Half board", "Full board"],
-    cancellationPolicy: "Free cancellation",
-    coordinates: { lat: 39.2238, lng: 9.1217 } // Old Town, Cagliari
+    cancellationPolicy: "Free cancellation"
   },
   {
     id: "h2",
@@ -113,8 +110,7 @@ const HOTELS: Hotel[] = [
     price: 105,
     amenities: ["Pet friendly", "Free Wifi", "Indoor pool", "Air conditioning"],
     boardTypes: ["Room only", "Breakfast"],
-    cancellationPolicy: "Free cancellation",
-    coordinates: { lat: 39.2285, lng: 9.1068 } // Cagliari north
+    cancellationPolicy: "Free cancellation"
   },
   {
     id: "h3",
@@ -127,8 +123,7 @@ const HOTELS: Hotel[] = [
     price: 98,
     amenities: ["Free Wifi", "Outdoor pool", "Bar"],
     boardTypes: ["Room only", "Breakfast", "Half board"],
-    cancellationPolicy: "Non-refundable",
-    coordinates: { lat: 39.2254, lng: 9.1136 } // Via Roma waterfront area
+    cancellationPolicy: "Non-refundable"
   },
   {
     id: "h4",
@@ -141,8 +136,7 @@ const HOTELS: Hotel[] = [
     price: 150,
     amenities: ["Pet friendly", "Free Wifi", "Indoor pool", "Kids facilities", "Outdoor parking"],
     boardTypes: ["Room only", "Breakfast", "Full board"],
-    cancellationPolicy: "Free cancellation",
-    coordinates: { lat: 38.9986, lng: 9.0671 } // Pula, south Sardinia
+    cancellationPolicy: "Free cancellation"
   },
   {
     id: "h5",
@@ -155,8 +149,7 @@ const HOTELS: Hotel[] = [
     price: 180,
     amenities: ["Free Wifi", "Air conditioning", "Wheelchair accessible"],
     boardTypes: ["Breakfast"],
-    cancellationPolicy: "Free cancellation",
-    coordinates: { lat: 39.2194, lng: 9.1321 } // Castello district
+    cancellationPolicy: "Free cancellation"
   },
   {
     id: "h6",
@@ -169,8 +162,7 @@ const HOTELS: Hotel[] = [
     price: 75,
     amenities: ["Pet friendly", "Free Wifi"],
     boardTypes: ["Room only"],
-    cancellationPolicy: "Non-refundable",
-    coordinates: { lat: 39.2310, lng: 9.1180 } // Villanova quarter
+    cancellationPolicy: "Non-refundable"
   },
   {
     id: "h7",
@@ -183,8 +175,7 @@ const HOTELS: Hotel[] = [
     price: 85,
     amenities: ["Pet friendly", "Free Wifi", "Indoor parking"],
     boardTypes: ["Room only", "Breakfast"],
-    cancellationPolicy: "Free cancellation",
-    coordinates: { lat: 39.2160, lng: 9.0990 } // Quartucciu suburb west
+    cancellationPolicy: "Free cancellation"
   },
   {
     id: "h8",
@@ -197,9 +188,67 @@ const HOTELS: Hotel[] = [
     price: 65,
     amenities: ["Pet friendly", "Free Wifi", "Air conditioning"],
     boardTypes: ["Room only"],
-    cancellationPolicy: "Non-refundable",
-    coordinates: { lat: 39.2330, lng: 9.1250 } // Poetto beach area
+    cancellationPolicy: "Non-refundable"
   }
+];
+
+// --- Helpers ---
+
+// Turns the page's destination string into the city label shown on each hotel
+// card. The destination arrives in two different shapes depending on the flow:
+//   • Hotel search:  "Lisbon (LIS)"  → strip the airport code  → "Lisbon"
+//   • Stopover step: "Dubai"          → already clean           → "Dubai"
+// This is what lets the card location follow the chosen destination instead of
+// the hard-coded "Cagliari, Italy" baked into each mock hotel below.
+const getDisplayCity = (destination: string) =>
+  destination.replace(/\s*\(.*\)\s*$/, "").trim();
+
+// Map centre (real lat/lng) for each destination we support. Keys are the
+// lower-cased city names that getDisplayCity produces ("Lisbon (LIS)" → "lisbon").
+// When the user searches one of these, the map recentres here and the hotel
+// pins are spread around it (see HOTEL_MAP_OFFSETS), so the map matches the
+// city shown on every card.
+const CITY_CENTERS: Record<string, { lat: number; lng: number }> = {
+  // Destinations offered in the hotel-search location dropdown
+  lisbon: { lat: 38.7223, lng: -9.1393 },
+  paris: { lat: 48.8566, lng: 2.3522 },
+  london: { lat: 51.5074, lng: -0.1278 },
+  cagliari: { lat: 39.2238, lng: 9.1217 },
+  rome: { lat: 41.9028, lng: 12.4964 },
+  // Stopover hub cities. The stopover step has no map today, but keeping these
+  // here means it already works if a map is ever added to that step too.
+  "port of spain": { lat: 10.6549, lng: -61.5019 },
+  nadi: { lat: -17.7765, lng: 177.4356 },
+  dubai: { lat: 25.2048, lng: 55.2708 },
+  singapore: { lat: 1.3521, lng: 103.8198 },
+  doha: { lat: 25.2854, lng: 51.531 },
+  istanbul: { lat: 41.0082, lng: 28.9784 },
+  reykjavík: { lat: 64.1466, lng: -21.9426 },
+  "são paulo": { lat: -23.5505, lng: -46.6333 },
+  "hong kong": { lat: 22.3193, lng: 114.1694 },
+  tokyo: { lat: 35.6762, lng: 139.6503 },
+  "santiago de chile": { lat: -33.4489, lng: -70.6693 },
+};
+
+// Fallback centre (Cagliari) so the map still works for any destination that
+// isn't in the table above.
+const DEFAULT_CENTER = CITY_CENTERS.cagliari;
+
+const getCityCenter = (city: string) =>
+  CITY_CENTERS[city.trim().toLowerCase()] ?? DEFAULT_CENTER;
+
+// Small lat/lng deltas (≈1–2 km) used to fan the hotel pins out around the
+// destination centre so they don't all stack on a single point. One entry per
+// mock hotel, applied by list position — purely cosmetic for the prototype map.
+const HOTEL_MAP_OFFSETS = [
+  { lat: 0.012, lng: -0.01 },
+  { lat: 0.008, lng: 0.014 },
+  { lat: -0.006, lng: 0.009 },
+  { lat: -0.014, lng: -0.012 },
+  { lat: 0.004, lng: 0.02 },
+  { lat: 0.016, lng: 0.005 },
+  { lat: -0.01, lng: 0.016 },
+  { lat: -0.017, lng: -0.004 },
 ];
 
 // --- Components ---
@@ -277,7 +326,10 @@ const RadioRow = ({ label, checked, onChange }: { label: string, checked: boolea
   </div>
 );
 
-const HotelCard = ({ hotel, displayPrice, onSelect, onHover, isHovered }: { hotel: Hotel, displayPrice: number, onSelect: () => void, onHover?: (hovering: boolean) => void, isHovered?: boolean }) => {
+// `displayLocation` is the dynamic city (derived from the search destination)
+// shown on the card — it overrides the mock `hotel.location` so the list
+// reflects wherever the user actually searched.
+const HotelCard = ({ hotel, displayPrice, displayLocation, onSelect, onHover, isHovered }: { hotel: Hotel, displayPrice: number, displayLocation: string, onSelect: () => void, onHover?: (hovering: boolean) => void, isHovered?: boolean }) => {
   return (
     <div
       className={cn(
@@ -314,7 +366,7 @@ const HotelCard = ({ hotel, displayPrice, onSelect, onHover, isHovered }: { hote
             {/* Location sits below the name row */}
             <div className="text-foreground text-xs flex items-center gap-1.5">
               <MapPin size={12} />
-              {hotel.location}
+              {displayLocation}
             </div>
           </div>
           <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
@@ -1009,6 +1061,12 @@ export default function HotelListPage({
   // normal hotel search keeps the wide, map-friendly width.
   const containerTier = hideSearch ? "narrow" : "wide";
 
+  // The searched destination as a clean city name (e.g. "Lisbon"), and its real
+  // map centre. Both the hotel cards and the map use these, so a new search
+  // moves the whole experience — card locations AND map — to the right place.
+  const displayCity = getDisplayCity(location);
+  const mapCenter = getCityCenter(displayCity);
+
   return (
     <div className="bg-grey-lightest min-h-screen flex flex-col relative">
       {/* Overlay to close dropdowns */}
@@ -1039,12 +1097,13 @@ export default function HotelListPage({
           {/* Mobile Read-Only View — hidden on the stopover step (no search).
               Now uses the shared <SearchSummary> so it matches the flight
               header's structure exactly (bold destination → dates → guests,
-              with a secondary "Edit search" button). `md:hidden` keeps this
-              collapse-to-summary behaviour scoped to small screens — desktop
-              still shows the full search row below. */}
+              with a secondary "Edit search" button). `lg:hidden` keeps this
+              collapse-to-summary behaviour scoped to below the desktop
+              breakpoint (< 1024px) — so phones AND tablets show the compact
+              summary, and only desktop shows the full search row below. */}
           {!hideSearch && !isMobileSearchExpanded && (
             <SearchSummary
-              className="md:hidden"
+              className="lg:hidden"
               onEdit={() => setIsMobileSearchExpanded(true)}
               items={[
                 location,
@@ -1062,7 +1121,7 @@ export default function HotelListPage({
           {!hideSearch && (
           <div className={cn(
             isMobileSearchExpanded ? 'flex' : 'hidden',
-            "md:flex flex-col lg:flex-row gap-4 items-center animate-in fade-in slide-in-from-top-2 duration-200"
+            "lg:flex flex-col lg:flex-row gap-4 items-center animate-in fade-in slide-in-from-top-2 duration-200"
           )}>
 
             {/* Location Input */}
@@ -1357,6 +1416,9 @@ export default function HotelListPage({
                       key={hotel.id}
                       hotel={hotel}
                       displayPrice={displayPrice}
+                      // Show the searched destination on every card (e.g. "Lisbon"),
+                      // not the mock "Cagliari, Italy" hard-coded on each hotel.
+                      displayLocation={displayCity}
                       onSelect={() => onHotelSelect({ ...hotel, price: displayPrice }, { board: selectedBoardTypes, cancellation: selectedCancellation }, rooms)}
                       onHover={(isHovering) => setHoveredHotelId(isHovering ? hotel.id : null)}
                       isHovered={hoveredHotelId === hotel.id}
@@ -1387,18 +1449,27 @@ export default function HotelListPage({
           mobileView === 'list' ? 'hidden md:block' : 'block'
         )}>
           <LeafletMap
-            // Centre the map on Cagliari (where all our hotels are)
-            center={[39.2238, 9.1217]}
+            // Centre on the searched destination (fallback used only before pins load)
+            center={[mapCenter.lat, mapCenter.lng]}
             zoom={13}
-            // Build marker data from whichever hotels are currently visible after filtering
-            markers={filteredAndSortedHotels.map((hotel): MapMarkerData => ({
-              id: hotel.id,
-              lat: hotel.coordinates.lat,
-              lng: hotel.coordinates.lng,
-              label: hotel.name,
-              price: `$${calculateDisplayPrice(hotel.price, hotel)}`,
-              isHighlighted: hoveredHotelId === hotel.id,
-            }))}
+            // centerKey tells the map to re-fit its view whenever the destination
+            // changes — without it the map would stay put on the first city.
+            centerKey={displayCity}
+            // Build marker data from whichever hotels are currently visible after
+            // filtering. Each pin sits at the city centre plus a small fixed
+            // offset, so the cluster lands on the searched city instead of Cagliari.
+            markers={filteredAndSortedHotels.map((hotel): MapMarkerData => {
+              const offset =
+                HOTEL_MAP_OFFSETS[HOTELS.findIndex(h => h.id === hotel.id) % HOTEL_MAP_OFFSETS.length];
+              return {
+                id: hotel.id,
+                lat: mapCenter.lat + offset.lat,
+                lng: mapCenter.lng + offset.lng,
+                label: hotel.name,
+                price: `$${calculateDisplayPrice(hotel.price, hotel)}`,
+                isHighlighted: hoveredHotelId === hotel.id,
+              };
+            })}
             // When hovering a map marker, highlight the matching card in the list
             onMarkerHover={(id) => setHoveredHotelId(id)}
           />

@@ -162,11 +162,11 @@ export default function ActivityListPage({
     return () => clearTimeout(id);
   }, [searchCriteria]);
 
-  // ── Mobile search collapse ───────────────────────────────────────────────
-  // On small screens the search form collapses to a compact <SearchSummary>
-  // (matching the flight + hotel headers); tapping "Edit search" expands the
-  // full form. On desktop the form is always shown, so this flag is ignored
-  // there (the form's wrapper is `md:block`).
+  // ── Search form collapse (phone + tablet) ────────────────────────────────
+  // Below the desktop breakpoint the search form collapses to a compact
+  // <SearchSummary> (matching the flight + hotel headers); tapping "Edit
+  // search" expands the full form. On desktop (≥ 1024px) the form is always
+  // shown, so this flag is ignored there (the form's wrapper is `lg:block`).
   const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
 
   // ── Filter state ────────────────────────────────────────────────────────
@@ -484,13 +484,14 @@ export default function ActivityListPage({
         <PageContainer tier="wide" className="px-4 md:px-6 pt-5 pb-5 flex flex-col gap-4">
           <BackButton label="Back to discovery" onClick={onBack} />
 
-          {/* Mobile collapsed summary — flight-styled row, small screens only.
+          {/* Collapsed summary — flight-styled row, shown on phone + tablet.
               Shows destination → date (if set) → travellers, with an "Edit
-              search" button that expands the full form. `md:hidden` keeps this
-              scoped to small screens, exactly like the hotel header. */}
+              search" button that expands the full form. `lg:hidden` keeps this
+              scoped to below the desktop breakpoint (< 1024px), so tablets get
+              the compact summary too — matching the hotel header. */}
           {!isMobileSearchExpanded && (
             <SearchSummary
-              className="md:hidden"
+              className="lg:hidden"
               onEdit={() => setIsMobileSearchExpanded(true)}
               items={[
                 searchCriteria.destination.trim() || "Anywhere",
@@ -503,10 +504,10 @@ export default function ActivityListPage({
             />
           )}
 
-          {/* Full form — always on desktop (md:block); on mobile only once the
-              summary's "Edit search" has expanded it. Submitting collapses it
-              back to the summary on mobile. */}
-          <div className={cn(isMobileSearchExpanded ? "block" : "hidden", "md:block")}>
+          {/* Full form — always on desktop (lg:block, ≥ 1024px); on phone +
+              tablet only once the summary's "Edit search" has expanded it.
+              Submitting collapses it back to the summary below desktop. */}
+          <div className={cn(isMobileSearchExpanded ? "block" : "hidden", "lg:block")}>
             <ActivitySearchForm
               variant="compact"
               initialValues={searchCriteria}

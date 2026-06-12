@@ -635,11 +635,16 @@ export function FlightSearchForm({
               states all come from the shared component now.
 
               Only shown HERE while the stopover toggle is off. When it's on, the
-              same buttons render down in the stopover row instead (see below). */}
+              same buttons render down in the stopover row instead (see below).
+
+              `hidden xl:flex` → at xl the search bar is a single flex row and the
+              button sits INLINE at the end of the fields, which is the layout we
+              want on wide screens. Below xl we hide this copy and render the
+              button AFTER the stopover checkbox instead (see the xl:hidden block
+              below) so the "Open to a stopover" option comes before "Search
+              flights" on smaller screens. */}
           {!stopoverEnabled && (
-            // md:col-span-2 → the buttons take their own full-width row 3 on the
-            // tablet grid; at xl (flex) the col-span is ignored and they sit inline.
-            <div className="flex gap-2 md:col-span-2 lg:items-stretch">
+            <div className="hidden xl:flex gap-2 md:col-span-2 lg:items-stretch">
               {renderActionButtons("h-[52px]")}
             </div>
           )}
@@ -748,6 +753,18 @@ export function FlightSearchForm({
               <div className="flex gap-2 md:ml-auto lg:items-stretch animate-in fade-in slide-in-from-bottom-2 duration-300">
                 {renderActionButtons("h-11")}
               </div>
+            </div>
+          )}
+
+          {/* Search button for SMALLER screens (below xl). Rendered here — AFTER
+              the "Open to a stopover" checkbox — so the stopover option appears
+              before the search action on phone/tablet. `xl:hidden` because at xl
+              the button lives inline in the field row above instead. Only shown
+              while the stopover toggle is off; when it's on, the button moves
+              into the stopover detail row above. */}
+          {!stopoverEnabled && (
+            <div className="xl:hidden flex gap-2 mt-4 lg:items-stretch lg:justify-end">
+              {renderActionButtons("h-[52px]")}
             </div>
           )}
         </div>

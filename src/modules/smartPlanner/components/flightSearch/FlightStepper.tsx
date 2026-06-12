@@ -39,6 +39,15 @@ type FlightStepperProps = {
   tripType?: "roundtrip" | "multicity";
   /** When enabled (round trip only) a "Stopover hotel" step is inserted. */
   stopover?: { enabled: boolean; leg: "outbound" | "return"; nights: number };
+  /** Stopover hub city — appended to the hotel step's title ("… stay in {city}"). */
+  stopoverCity?: string;
+  /**
+   * Chosen stopover hotel name — appended to the room step's title
+   * ("Room selection in {name}"). Only known once a hotel has been picked, so
+   * it's absent on the stopover-hotel page (the room card just reads
+   * "Room selection" there).
+   */
+  stopoverHotelName?: string;
   /**
    * Status for the stopover-hotel card. Defaults to "future" (we're still on a
    * flight step). On the stopover-hotel page itself, pass "current" so that
@@ -47,11 +56,26 @@ type FlightStepperProps = {
    */
   stopoverStatus?: StepStatus;
   /**
+   * Status for the "Your room" card — the step AFTER the stopover hotel, where
+   * the traveller picks a room in the hotel they just chose. Defaults to
+   * "future". On the stopover-hotel page it stays "future"; on the room page
+   * pass "current" (and pass stopoverStatus="done" so the hotel reads as done).
+   * The room card only appears when the stopover hotel card does.
+   */
+  roomStatus?: StepStatus;
+  /**
    * Called when the user clicks a *completed* (done) flight step to jump back
    * to it. Receives that step's leg index. Steps that aren't done (the current
    * one and any not yet reached) are not clickable.
    */
   onStepSelect?: (legIndex: number) => void;
+  /**
+   * Called when the user clicks the *completed* (done) "Stopover hotel" step to
+   * jump back to it. Has no leg index of its own (it's the hotel step, not a
+   * flight), so it gets its own callback. Only clickable once it reads as done
+   * — i.e. on the room step, after a hotel has been picked.
+   */
+  onStopoverStepSelect?: () => void;
 };
 
 type StepStatus = "done" | "current" | "future";
@@ -146,8 +170,12 @@ export function FlightStepper({
   currentLegIndex,
   tripType = "roundtrip",
   stopover,
+  stopoverCity,
+  stopoverHotelName,
   stopoverStatus = "future",
+  roomStatus = "future",
   onStepSelect,
+  onStopoverStepSelect,
 }: FlightStepperProps) {
   const isRoundtrip = tripType === "roundtrip";
 
@@ -178,14 +206,31 @@ export function FlightStepper({
   const stopLeg = stopover?.leg === "return" ? legs[1] : legs[0];
   const hasStopoverOffers =
     stopoverStatus === "current" ||
+    roomStatus === "current" ||
     (!!stopLeg && routeHasStopover(stopLeg.from, stopLeg.to));
   if (isRoundtrip && stopover?.enabled && hasStopoverOffers) {
     steps.push({
       key: "stopover",
       category: "Stopover hotel",
-      title: `${stopover.nights} night${stopover.nights > 1 ? "s" : ""} stay`,
-      // "future" while choosing flights; "current" on the stopover-hotel page.
+      // "2 nights stay in Singapore" — the city is appended when known (always,
+      // in practice, since the stopover hub is fixed by the flight).
+      title: `${stopover.nights} night${stopover.nights > 1 ? "s" : ""} stay${
+        stopoverCity ? ` in ${stopoverCity}` : ""
+      }`,
+      // "future" while choosing flights; "current" on the stopover-hotel page;
+      // "done" once a hotel is picked and we're on the room step.
       status: stopoverStatus,
+    });
+    // 3. The room step always follows the hotel: pick the hotel, then pick a
+    //    room inside it. "future" until the hotel is chosen, "current" on the
+    //    room-selection page itself.
+    steps.push({
+      key: "stopover-room",
+      category: "Your room",
+      // "Room selection in Marina Bay Sands" — the hotel name is appended once
+      // a hotel has been chosen; before that it just reads "Room selection".
+      title: `Room selection${stopoverHotelName ? ` in ${stopoverHotelName}` : ""}`,
+      status: roomStatus,
     });
   }
 
@@ -194,9 +239,18 @@ export function FlightStepper({
     // of squashing or scrolling sideways.
     <div className="flex flex-wrap items-stretch gap-3">
       {steps.map((step, i) => {
-        // Only completed flight steps can be clicked to go back to them.
-        const canGoBack =
-          step.status === "done" && step.legIndex !== undefined && !!onStepSelect;
+        // Work out the "jump back" handler for this step. Only completed (done)
+        // steps are clickable. Flight legs go back via onStepSelect(legIndex);
+        // the stopover-hotel step has no leg of its own, so it uses its own
+        // onStopoverStepSelect callback.
+        let onClick: (() => void) | undefined;
+        if (step.status === "done") {
+          if (step.legIndex !== undefined && onStepSelect) {
+            onClick = () => onStepSelect(step.legIndex!);
+          } else if (step.key === "stopover" && onStopoverStepSelect) {
+            onClick = onStopoverStepSelect;
+          }
+        }
         return (
           <Fragment key={step.key}>
             {i > 0 && (
@@ -206,11 +260,7 @@ export function FlightStepper({
                 aria-hidden="true"
               />
             )}
-            <StepCard
-              step={step}
-              index={i}
-              onClick={canGoBack ? () => onStepSelect!(step.legIndex!) : undefined}
-            />
+            <StepCard step={step} index={i} onClick={onClick} />
           </Fragment>
         );
       })}

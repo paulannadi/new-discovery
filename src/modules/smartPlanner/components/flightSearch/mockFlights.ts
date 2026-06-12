@@ -651,7 +651,14 @@ export function getMockFlightsForLeg(from: string, to: string): FlightOption[] {
   const t = normalise(to);
   const offset = ((from.length + to.length) % 5) * 20;
 
-  const override = ROUTE_OVERRIDES[`${f}-${t}`];
+  // Look up the hand-tailored list for this route. The override map only
+  // stores each featured route in ONE direction (e.g. "LAX-AKL"), but a round
+  // trip also needs the RETURN leg ("AKL-LAX") to route through the same
+  // sensible hub (Nadi) instead of falling back to the generic catalogue —
+  // which is why the inbound flight was wrongly showing "via Istanbul". So we
+  // also try the reversed key. The hub (Nadi) makes geographic sense in both
+  // directions, so reusing the same list for the return leg is correct.
+  const override = ROUTE_OVERRIDES[`${f}-${t}`] ?? ROUTE_OVERRIDES[`${t}-${f}`];
   if (override) {
     return override.map((opt, i) => ({
       ...opt,
@@ -660,12 +667,40 @@ export function getMockFlightsForLeg(from: string, to: string): FlightOption[] {
     }));
   }
 
-  const catalogue = CATALOGUES[categoriseRoute(from, to)];
-  return catalogue.map((opt, i) => ({
-    ...opt,
-    id: `${from}-${to}-${i}`,
-    price: opt.price + offset,
-  }));
+  // Drop the catalogue's "Direct" options on routes where no real non-stop
+  // exists (Caribbean islands, far Oceania routes) so we don't show an
+  // impossible non-stop. Routes that DO have non-stops keep theirs.
+  const allowDirect = routeHasNonStop(from, to);
+  const catalogue = CATALOGUES[categoriseRoute(from, to)].filter(
+    (opt) => allowDirect || opt.stops !== "Direct",
+  );
+
+  // The generic catalogues bake in FIXED connection cities (e.g. "via Istanbul")
+  // that don't fit every route. Rewrite each stopping flight to connect through
+  // a hub that makes geographic sense for THIS route — and update the airline to
+  // match so "airline via city" stays believable. Direct flights, and routes
+  // with no sensible hub (short-haul / same-region), are left untouched.
+  const hubs = getConnectionHubsForRoute(from, to);
+
+  return catalogue.map((opt, i) => {
+    const base = { ...opt, id: `${from}-${to}-${i}`, price: opt.price + offset };
+    if (opt.stops === "Direct" || hubs.length === 0) return base;
+
+    // How many cities to name: "2 stops" → two, otherwise one. Cycle through the
+    // sensible-hub list (offset by the flight's index) so different flights show
+    // different connections, then de-dupe in case the list is shorter than the
+    // stop count (avoids "via Dubai + Dubai").
+    const numStops = opt.stops === "2 stops" ? 2 : 1;
+    const chosen = Array.from({ length: numStops }, (_, s) => hubs[(i + s) % hubs.length]);
+    const cities = [...new Set(chosen.map((h) => h.city))];
+
+    return {
+      ...base,
+      airline: chosen[0].airline,
+      airlineCode: chosen[0].airlineCode,
+      stopInfo: `via ${cities.join(" + ")}`,
+    };
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -945,6 +980,155 @@ function getHubsForRoute(from: string, to: string): StopoverHub[] {
   }
 
   return [];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Connection hubs for the GENERIC catalogues
+// ─────────────────────────────────────────────────────────────────────────────
+// The hand-written catalogues (SHORT/LONG/VERY_LONG_HAUL) have FIXED connection
+// cities baked into each template — e.g. "Turkish Airlines via Istanbul". That's
+// fine for a Europe↔Asia route, but nonsense for a Caribbean or trans-Pacific
+// one, which is why the inbound GND→LAX flight was showing "via Istanbul".
+//
+// To fix EVERY route (not just the few with hand-tailored overrides), we rewrite
+// each catalogue flight's connection so it makes geographic sense for the actual
+// route. This is the transit-only cousin of the stopover HUBS above: same idea
+// (pick a sensible hub for the route), but these are just pass-through layovers,
+// not multi-night stays — so each only needs a city + the carrier that really
+// connects there, so "airline via city" reads true.
+type ConnectionHub = { city: string; airline: string; airlineCode: string };
+
+const CONNECTION_HUBS: Record<string, ConnectionHub> = {
+  FRA: { city: "Frankfurt",     airline: "Lufthansa",          airlineCode: "LH" },
+  AMS: { city: "Amsterdam",     airline: "KLM",                airlineCode: "KL" },
+  LHR: { city: "London",        airline: "British Airways",    airlineCode: "BA" },
+  CDG: { city: "Paris",         airline: "Air France",         airlineCode: "AF" },
+  DXB: { city: "Dubai",         airline: "Emirates",           airlineCode: "EK" },
+  DOH: { city: "Doha",          airline: "Qatar Airways",      airlineCode: "QR" },
+  IST: { city: "Istanbul",      airline: "Turkish Airlines",   airlineCode: "TK" },
+  SIN: { city: "Singapore",     airline: "Singapore Airlines", airlineCode: "SQ" },
+  BKK: { city: "Bangkok",       airline: "Thai Airways",       airlineCode: "TG" },
+  HKG: { city: "Hong Kong",     airline: "Cathay Pacific",     airlineCode: "CX" },
+  NRT: { city: "Tokyo",         airline: "ANA",                airlineCode: "NH" },
+  KEF: { city: "Reykjavík",     airline: "Icelandair",         airlineCode: "FI" },
+  GRU: { city: "São Paulo",     airline: "LATAM",              airlineCode: "LA" },
+  SCL: { city: "Santiago",      airline: "LATAM",              airlineCode: "LA" },
+  NAN: { city: "Nadi",          airline: "Fiji Airways",       airlineCode: "FJ" },
+  HNL: { city: "Honolulu",      airline: "Hawaiian Airlines",  airlineCode: "HA" },
+  POS: { city: "Port of Spain", airline: "Caribbean Airlines", airlineCode: "BW" },
+  MIA: { city: "Miami",         airline: "American Airlines",  airlineCode: "AA" },
+};
+
+// Which connecting hub(s) make sense for an unordered region pair. Same key
+// format as REGION_PAIR_HUBS (regions sorted + joined with "|"). We list a few
+// per pair so a route's several stopping flights show some variety rather than
+// all funnelling through one city. Order = preference.
+const REGION_PAIR_CONNECTIONS: Record<string, string[]> = {
+  "Europe|Europe":              ["FRA", "AMS", "LHR", "CDG"],
+  "North America|North America":["MIA", "CDG"], // CDG dropped if not an endpoint match; mostly direct anyway
+  "Asia|Asia":                  ["HKG", "SIN", "BKK"],
+  "South America|South America":["GRU", "SCL"],
+  "Middle East|Middle East":    ["DOH", "DXB"],
+  "Asia|Europe":                ["DXB", "DOH", "IST", "FRA"],
+  "Africa|Europe":              ["DXB", "DOH", "CDG", "IST"],
+  "Europe|Middle East":         ["DOH", "IST", "FRA"],
+  "Europe|North America":       ["KEF", "LHR", "AMS"],
+  "Europe|South America":       ["GRU", "CDG", "LHR"],
+  "Asia|North America":         ["HKG", "NRT", "SIN"],
+  "Asia|Middle East":           ["DOH", "DXB"],
+  "Asia|South America":         ["GRU", "DXB"],
+  "Africa|Asia":                ["DXB", "DOH"],
+  "Africa|North America":       ["DXB", "CDG", "DOH"],
+  "Africa|Middle East":         ["DOH", "DXB"],
+  "Africa|South America":       ["GRU"],
+  "Middle East|North America":  ["DOH", "DXB"],
+  "Middle East|South America":  ["GRU", "DOH"],
+  "North America|South America":["MIA", "GRU"],
+};
+
+// Pick the geographically sensible connecting hub(s) for a route, as transit
+// layovers. Mirrors the special-case geography of getHubsForRoute (Caribbean,
+// Pacific, Oceania) and then falls back to the region-pair table. Excludes any
+// hub that's itself an endpoint (you don't connect through your destination).
+//
+// Returns an EMPTY array when nothing sensible applies (same region with no
+// entry, or an unmapped/typed route) — callers then leave the flight unchanged.
+function getConnectionHubsForRoute(from: string, to: string): ConnectionHub[] {
+  const f = normalise(from);
+  const t = normalise(to);
+
+  // Resolve a list of hub codes → hub objects, dropping endpoints + unknowns.
+  const resolve = (codes: string[]) =>
+    codes
+      .filter((code) => code !== f && code !== t)
+      .map((code) => CONNECTION_HUBS[code])
+      .filter(Boolean);
+
+  const fromRegion = regionOf(f);
+  const toRegion = regionOf(t);
+
+  // 1. Caribbean island on either end → Port of Spain (or Miami).
+  if (fromRegion === "Caribbean" || toRegion === "Caribbean") {
+    return resolve(["POS", "MIA"]);
+  }
+
+  // 2. Americas WEST coast ↔ Oceania → trans-Pacific via Nadi / Honolulu.
+  const westPacific =
+    (AMERICAS_WEST.has(f) && toRegion === "Oceania") ||
+    (fromRegion === "Oceania" && AMERICAS_WEST.has(t));
+  if (westPacific) return resolve(["NAN", "HNL"]);
+
+  // 3. Oceania ↔ South America → trans-Pacific via Santiago.
+  const oceaniaSouthAmerica =
+    (fromRegion === "Oceania" && toRegion === "South America") ||
+    (fromRegion === "South America" && toRegion === "Oceania");
+  if (oceaniaSouthAmerica) return resolve(["SCL", "GRU"]);
+
+  // 4. Any other Oceania route → the classic Gulf / Asia "Kangaroo route" hubs.
+  if (fromRegion === "Oceania" || toRegion === "Oceania") {
+    return resolve(["SIN", "DXB", "HKG"]);
+  }
+
+  // 5. Everything else: look the region pair up in the table.
+  if (fromRegion && toRegion) {
+    return resolve(REGION_PAIR_CONNECTIONS[regionKey(fromRegion, toRegion)] ?? []);
+  }
+
+  return [];
+}
+
+// Does a realistic NON-STOP flight exist for this route? When it doesn't, we
+// drop the "Direct" options from the generic catalogue so we never invent an
+// impossible non-stop (e.g. there's no direct Los Angeles → Grenada — you
+// always connect through a hub). Featured overrides hand-control their own
+// direct/connecting mix, so this only gates the generic catalogues.
+function routeHasNonStop(from: string, to: string): boolean {
+  const f = normalise(from);
+  const t = normalise(to);
+  const fromRegion = regionOf(f);
+  const toRegion = regionOf(t);
+
+  // Caribbean islands have no long-haul non-stops in this dataset — you always
+  // connect through a hub like Port of Spain.
+  if (fromRegion === "Caribbean" || toRegion === "Caribbean") return false;
+
+  // Oceania (Australia / NZ) is reachable non-stop ONLY from the US West Coast,
+  // Asia, the Gulf, or South America. From Europe / Africa / the US East Coast
+  // it always connects (the classic "Kangaroo route"), so no direct exists.
+  if (fromRegion === "Oceania" || toRegion === "Oceania") {
+    const otherRegion = fromRegion === "Oceania" ? toRegion : fromRegion;
+    const otherCode = fromRegion === "Oceania" ? t : f;
+    return (
+      AMERICAS_WEST.has(otherCode) ||      // LAX / SFO ↔ Oceania
+      otherRegion === "Asia" ||            // Singapore / Hong Kong ↔ Oceania
+      otherRegion === "Middle East" ||     // Dubai / Doha ↔ Oceania
+      otherRegion === "South America"      // Sydney ↔ Santiago
+    );
+  }
+
+  // Every other route (intra-region, transatlantic, Europe↔Asia, trans-Pacific,
+  // Europe↔South America…) has real non-stop service, so keep the directs.
+  return true;
 }
 
 // True when this route has at least one geographically sensible stopover hub.
