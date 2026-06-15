@@ -860,6 +860,11 @@ export default function DiscoveryPage({
             alt="Discover the world"
             priority
             containerClassName="w-full h-full"
+            // object-top pins the TOP of the photo in place. With the default
+            // (object-center), growing the hero re-centers the image and crops
+            // both edges at once — which looks like a "skip". Pinning the top
+            // means extra height just reveals more of the photo at the bottom.
+            className="object-top"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-foreground/25 to-black/10" />
         </motion.div>

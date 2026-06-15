@@ -704,7 +704,7 @@ export function FlightSearchForm({
             {stopoverMode ? (
               // Stopover mode: no checkbox — a stopover is always on here, so we
               // show a plain section heading instead of the opt-in toggle.
-              <span className="text-sm font-bold text-foreground">Your stopover</span>
+              <span className="text-sm font-bold text-foreground">Explore Nadi</span>
             ) : (
               // Normal Flights tab: the opt-in checkbox. <label> wraps the box +
               // words so clicking the text toggles it too — better a11y.
@@ -720,17 +720,18 @@ export function FlightSearchForm({
               </label>
             )}
 
-            {/* Short supporting line — kept inline; wraps below on small screens. */}
-            <span className="text-xs text-grey">
-              Break the long haul — spend a few nights in a city along the way.
-            </span>
-
-            {/* "Exclusive offers" chip — now after the description. Primary-tinted
-                Badge with a little sparkle to signal this unlocks special fares. */}
+            {/* "Exclusive offers" chip — sits between the heading and the
+                description. Primary-tinted Badge with a little sparkle to signal
+                this unlocks special fares. */}
             <Badge className="gap-1 border-transparent bg-primary/10 text-primary">
               <Sparkles size={12} aria-hidden="true" />
               Exclusive offers
             </Badge>
+
+            {/* Short supporting line — kept inline; wraps below on small screens. */}
+            <span className="text-xs text-grey">
+              Break the long haul — spend a few nights in a city along the way.
+            </span>
           </div>
 
           {/* The two follow-up questions appear only once the box is checked. */}
@@ -739,7 +740,7 @@ export function FlightSearchForm({
               {/* Which leg gets the stopover */}
               <div>
                 <div className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-grey">
-                  Where on your trip
+                  When on your trip
                 </div>
                 <div className="inline-flex h-11 items-stretch gap-0.5 rounded-lg border border-border p-0.5">
                   {(
