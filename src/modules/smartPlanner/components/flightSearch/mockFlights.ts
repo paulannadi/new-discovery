@@ -477,6 +477,28 @@ function buildFijiRoute(
       stopInfo: "via Nadi",
       price: 1325 + priceBias,
     },
+    // Fiji Airways — midday departure, tidy single connection at Nadi
+    {
+      airline: "Fiji Airways",
+      airlineCode: "FJ",
+      departure: "09:10",
+      arrival: "18:40",
+      duration: formatDuration(18 * 60 + 30 + fjDelta),
+      stops: "1 stop",
+      stopInfo: "via Nadi",
+      price: 1265 + priceBias,
+    },
+    // Fiji Airways — late-evening departure, arrives the next morning
+    {
+      airline: "Fiji Airways",
+      airlineCode: "FJ",
+      departure: "16:40",
+      arrival: "06:15",
+      duration: formatDuration(19 * 60 + 10 + fjDelta),
+      stops: "1 stop",
+      stopInfo: "via Nadi",
+      price: 1410 + priceBias,
+    },
     // Hawaiian via Honolulu — a different stopover for visual variety
     {
       airline: "Hawaiian Airlines",
@@ -728,6 +750,9 @@ type StopoverHub = {
   airlineCode: string;
   duration: string; // overall journey time (used for sort / fallback)
   price: number;
+  // Optional curated tag shown on the offer card (e.g. Cheapest / Fastest /
+  // Best). Lets several offers through the same hub read as distinct picks.
+  badge?: "Best" | "Cheapest" | "Fastest";
   out: { depTime: string; arrTime: string; duration: string; arrivesNextDay?: boolean; note?: string };
   onward: { depTime: string; arrTime: string; duration: string; arrivesNextDay?: boolean; note?: string };
 };
@@ -747,6 +772,9 @@ const HUBS: Record<string, StopoverHub> = {
   },
   // ── Nadi — the South Pacific gateway for the Americas → Australasia run.
   // Fiji Airways (FJ) hubs here; e.g. LAX/SFO → NAN → SYD/MEL/BNE/AKL/CHC.
+  // We keep THREE Fiji-via-Nadi routings (NAN / NAN_DAY / NAN_PREMIUM) so the
+  // stopover leg shows a curated set of distinct offers — a cheap overnight, a
+  // faster daytime hop, and a relaxed premium timing — rather than a single one.
   NAN: {
     city: "Nadi",
     hubCode: "NAN",
@@ -754,8 +782,33 @@ const HUBS: Record<string, StopoverHub> = {
     airlineCode: "FJ",
     duration: "18h 40m",
     price: 1340,
+    badge: "Cheapest",
     out: { depTime: "22:30", arrTime: "05:50", duration: "10h 50m", arrivesNextDay: true, note: "overnight, crosses date line" },
     onward: { depTime: "13:20", arrTime: "16:10", duration: "3h 50m", note: "direct" },
+  },
+  // Daytime departure, tighter connection — the quickest overall door-to-door.
+  NAN_DAY: {
+    city: "Nadi",
+    hubCode: "NAN",
+    airline: "Fiji Airways",
+    airlineCode: "FJ",
+    duration: "17h 50m",
+    price: 1465,
+    badge: "Fastest",
+    out: { depTime: "11:45", arrTime: "18:55", duration: "10h 10m", arrivesNextDay: true, note: "crosses date line" },
+    onward: { depTime: "09:40", arrTime: "12:30", duration: "3h 50m", note: "direct" },
+  },
+  // Evening departure, later onward — a more relaxed, premium-timed routing.
+  NAN_PREMIUM: {
+    city: "Nadi",
+    hubCode: "NAN",
+    airline: "Fiji Airways",
+    airlineCode: "FJ",
+    duration: "19h 25m",
+    price: 1590,
+    badge: "Best",
+    out: { depTime: "19:20", arrTime: "03:10", duration: "11h 05m", arrivesNextDay: true, note: "overnight" },
+    onward: { depTime: "16:40", arrTime: "19:30", duration: "3h 50m", note: "direct" },
   },
   // ── Dubai — Emirates' hub; ideal for Europe ↔ Asia / Australasia.
   DXB: {
@@ -907,13 +960,14 @@ function regionOf(code: string): AirportRegion | undefined {
 
 // Resolve a list of hub codes into hub objects, dropping any hub that IS one of
 // the route's endpoints (you can't stop over in the city you're flying to) and
-// any code we don't have flight data for. Caps at two so the list stays short.
+// any code we don't have flight data for. Caps at three so the list stays short
+// while still giving a few distinct offers to choose between.
 function resolveHubs(codes: string[], from: string, to: string): StopoverHub[] {
   return codes
     .filter((code) => code !== from && code !== to)
     .map((code) => HUBS[code])
     .filter(Boolean)
-    .slice(0, 2);
+    .slice(0, 3);
 }
 
 // Flip a hub's two segments. The `out`/`onward` flights are authored for the
@@ -954,7 +1008,7 @@ function getHubsForRoute(from: string, to: string): StopoverHub[] {
   const westPacific =
     (AMERICAS_WEST.has(from) && toRegion === "Oceania") ||
     (fromRegion === "Oceania" && AMERICAS_WEST.has(to));
-  if (westPacific) return orient(fromRegion === "Oceania", resolveHubs(["NAN"], from, to));
+  if (westPacific) return orient(fromRegion === "Oceania", resolveHubs(["NAN", "NAN_DAY", "NAN_PREMIUM"], from, to));
 
   // 3. Oceania ↔ South America → break at Santiago de Chile (LATAM's route).
   //    Canonical = Oceania is the origin; reverse when S. America is the origin.
@@ -1146,7 +1200,9 @@ export function getStopoverOffersForLeg(
 ): FlightOption[] {
   const offset = ((from.length + to.length) % 5) * 20;
   return getHubsForRoute(from, to).map((hub, i) => ({
-    id: `${from}-${to}-stopover-${hub.airlineCode}`,
+    // Index keeps the id unique even when several offers share an airline
+    // (e.g. the three Fiji-via-Nadi routings on the trans-Pacific run).
+    id: `${from}-${to}-stopover-${hub.airlineCode}-${i}`,
     airline: hub.airline,
     airlineCode: hub.airlineCode,
     // Top-level times describe the overall journey (out departs → onward
@@ -1158,8 +1214,11 @@ export function getStopoverOffersForLeg(
     stops: "1 stop",
     stopInfo: `via ${hub.city}`,
     price: hub.price + offset,
-    // The second hub offers one fewer night so the list shows some variety,
-    // always clamped to at least 1.
+    // Curated tag (Cheapest / Fastest / Best) so the offers read as distinct picks.
+    badge: hub.badge,
+    // The search asks for "up to N nights", so the offers span that range: the
+    // first shows the full N the traveller asked for, each subsequent one a night
+    // shorter, always clamped to at least 1. (e.g. N=4 → 4, 3, 2 nights.)
     stopover: {
       city: hub.city,
       nights: Math.max(1, nights - i),

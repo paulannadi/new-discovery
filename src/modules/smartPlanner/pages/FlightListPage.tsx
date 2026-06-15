@@ -160,6 +160,11 @@ export default function FlightListPage({
     ((stop.leg === "outbound" && currentLegIndex === 0) ||
       (stop.leg === "return" && currentLegIndex === 1));
 
+  // Dedicated Stopover-tab search (from the new Discovery "Stopover" tab). When
+  // true we show ONLY stopover offers on the chosen leg, flat flights only on
+  // the other leg, and restrict every result to Fiji Airways.
+  const stopoverOnly = !!searchCriteria.stopoverOnly;
+
   // Should we show the "add a stopover" nudge? Only when ALL of these hold:
   //   • it's a round trip (stopovers only apply to round trips)
   //   • the traveller hasn't already opted into a stopover
@@ -171,6 +176,7 @@ export default function FlightListPage({
   const showStopoverPromo =
     searchCriteria.tripType === "roundtrip" &&
     !stop?.enabled &&
+    !stopoverOnly &&
     !stopoverPromoDismissed &&
     !!outboundLeg &&
     routeHasStopover(outboundLeg.from, outboundLeg.to);
@@ -188,11 +194,13 @@ export default function FlightListPage({
     });
   };
 
-  // Raw mock results for this leg (the normal flights, unchanged).
-  const flights = useMemo(
-    () => getMockFlightsForLeg(currentLeg?.from || "", currentLeg?.to || ""),
-    [currentLeg?.from, currentLeg?.to],
-  );
+  // Raw mock results for this leg (the normal flights). In the dedicated
+  // Stopover flow we keep only Fiji Airways (FJ) flights, so the flat leg shows
+  // Fiji fares only — matching the stopover offers, which already fly Fiji.
+  const flights = useMemo(() => {
+    const all = getMockFlightsForLeg(currentLeg?.from || "", currentLeg?.to || "");
+    return stopoverOnly ? all.filter((f) => f.airlineCode === "FJ") : all;
+  }, [currentLeg?.from, currentLeg?.to, stopoverOnly]);
 
   // Stopover offers for the chosen leg. Kept separate from `flights` so they
   // aren't reordered by the price/duration sort or hidden by the airline
@@ -208,9 +216,17 @@ export default function FlightListPage({
 
   // Apply the active filters + sort to the normal flights, then pin the
   // stopover offers on top.
+  //
+  // In the dedicated Stopover flow the chosen leg shows ONLY stopover offers —
+  // no flat flights — so the traveller picks from stopover journeys alone. On
+  // the other leg `stopoverOffers` is empty and `flights` is Fiji-filtered, so
+  // the same expression naturally yields Fiji flat flights only.
   const filteredFlights = useMemo(
-    () => [...stopoverOffers, ...applyFilters(flights, filters)],
-    [stopoverOffers, flights, filters],
+    () =>
+      stopoverOnly && isStopoverLeg
+        ? stopoverOffers
+        : [...stopoverOffers, ...applyFilters(flights, filters)],
+    [stopoverOnly, isStopoverLeg, stopoverOffers, flights, filters],
   );
 
   // List of airlines available in the current result set — feeds the
@@ -246,6 +262,10 @@ export default function FlightListPage({
           {isEditingSearch ? (
             <FlightSearchForm
               initialCriteria={searchCriteria}
+              // Keep the stopover-only form (round-trip, no opt-in checkbox,
+              // Fiji-restricted airports) when editing a stopover search, so the
+              // edit can't accidentally drop back to the normal flights form.
+              stopoverMode={stopoverOnly}
               submitLabel="Search flights"
               onSearch={(next) => {
                 onSearchCriteriaChange(next);

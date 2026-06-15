@@ -66,7 +66,22 @@ type FlightSearchFormProps = {
   onCancel?: () => void;
   /** Label for the submit button. Defaults to "Search Flights". */
   submitLabel?: string;
+  /**
+   * Dedicated Stopover-tab mode. When true the form:
+   *   • locks to round trip (hides the trip-type selector),
+   *   • always treats a stopover as ON (no "Open to a stopover" checkbox — just
+   *     the "which leg" + "how many nights" controls),
+   *   • restricts the airport pickers to Fiji Airways' network, and
+   *   • tags the submitted criteria with `stopoverOnly: true`.
+   * Omitted on the normal Flights tab, which keeps the opt-in checkbox.
+   */
+  stopoverMode?: boolean;
 };
+
+// Fiji Airways' network — the only routes with Fiji mock data. Used to restrict
+// the airport pickers in stopover mode so every search returns Fiji flights.
+const FIJI_ORIGIN_CODES = ["LAX", "SFO"];
+const FIJI_DESTINATION_CODES = ["SYD", "MEL", "BNE", "AKL", "CHC"];
 
 const CABIN_CLASS_LABELS: Record<CabinClass, string> = {
   economy: "Economy",
@@ -150,10 +165,12 @@ export function FlightSearchForm({
   onChange,
   onCancel,
   submitLabel = "Search Flights",
+  stopoverMode = false,
 }: FlightSearchFormProps) {
   // ── State (initialised from `initialCriteria` when editing) ──────────────
+  // Stopover mode is round-trip only, so we never start it on multi-city.
   const [flightTripType, setFlightTripType] = useState<"roundtrip" | "multicity">(
-    initialCriteria?.tripType ?? "roundtrip",
+    stopoverMode ? "roundtrip" : initialCriteria?.tripType ?? "roundtrip",
   );
   const [flightTripTypeOpen, setFlightTripTypeOpen] = useState(false);
 
@@ -162,10 +179,17 @@ export function FlightSearchForm({
   const [flightLegs, setFlightLegs] = useState<FlightLeg[]>(
     initialCriteria?.legs && initialCriteria.legs.length > 0
       ? initialCriteria.legs
-      : [
-          { id: 1, from: "", to: "", date: undefined },
-          { id: 2, from: "", to: "", date: undefined },
-        ],
+      : stopoverMode
+        ? // Stopover mode opens demo-ready on a working Fiji route (LAX → Sydney),
+          // with the return leg mirrored, so offers show on first search.
+          [
+            { id: 1, from: "LAX", to: "SYD", date: undefined },
+            { id: 2, from: "SYD", to: "LAX", date: undefined },
+          ]
+        : [
+            { id: 1, from: "", to: "", date: undefined },
+            { id: 2, from: "", to: "", date: undefined },
+          ],
   );
 
   // Round-trip date range picker — seeded from the first/last legs' dates.
@@ -197,7 +221,8 @@ export function FlightSearchForm({
   // The only NEW thing on this form. Flipping it on reveals two questions —
   // which leg gets the stop, and up to how many nights — and tells the results
   // page to surface stopover offers on that leg.
-  const [stopoverEnabled, setStopoverEnabled] = useState(initialCriteria?.stopover?.enabled ?? false);
+  // In stopover mode a stopover is always on; otherwise it follows the checkbox.
+  const [stopoverEnabled, setStopoverEnabled] = useState(stopoverMode ? true : initialCriteria?.stopover?.enabled ?? false);
   const [stopoverLeg, setStopoverLeg] = useState<"outbound" | "return">(initialCriteria?.stopover?.leg ?? "outbound");
   const [stopoverNights, setStopoverNights] = useState(initialCriteria?.stopover?.nights ?? 2);
 
@@ -242,6 +267,9 @@ export function FlightSearchForm({
       flightTripType === "roundtrip"
         ? { enabled: stopoverEnabled, leg: stopoverLeg, nights: stopoverNights }
         : undefined,
+    // Mark stopover-tab searches so the results page shows offers-only on the
+    // chosen leg, flat-only on the other, and Fiji Airways throughout.
+    stopoverOnly: stopoverMode || undefined,
   });
 
   // Mirror live values up to the parent whenever anything changes.
@@ -351,7 +379,9 @@ export function FlightSearchForm({
           mirror the results-page "Sort / Filters / Map" control. */}
       <div className="hidden md:flex md:items-center gap-2 md:flex-wrap">
 
-        {/* 1. Trip type dropdown */}
+        {/* 1. Trip type dropdown — hidden in stopover mode, which is always a
+            round trip (it needs a departure + return leg to choose between). */}
+        {!stopoverMode && (
         <div className="relative w-full md:w-auto">
           <button
             onClick={() => { setFlightTripTypeOpen((o) => !o); setFlightCabinClassOpen(false); setFlightPassengersOpen(false); }}
@@ -383,6 +413,7 @@ export function FlightSearchForm({
             </div>
           )}
         </div>
+        )}
 
         {/* 2. Travellers pill — sits between trip type and cabin class. */}
         {renderTravellers()}
@@ -422,7 +453,9 @@ export function FlightSearchForm({
           use, and the icons are primary-blue to match the From/To/Dates fields. */}
       <div className="md:hidden">
         <div className="flex h-[48px] w-full items-center rounded-xl border border-border bg-card">
-          {/* Trip type */}
+          {/* Trip type — hidden in stopover mode (always round trip). */}
+          {!stopoverMode && (
+          <>
           <button
             type="button"
             onClick={() => { setFlightTripTypeOpen(true); setFlightPassengersOpen(false); setFlightCabinClassOpen(false); }}
@@ -433,12 +466,19 @@ export function FlightSearchForm({
           </button>
 
           <div className="h-6 w-px shrink-0 bg-border" />
+          </>
+          )}
 
           {/* Travellers */}
           <button
             type="button"
             onClick={() => { setFlightPassengersOpen(true); setFlightTripTypeOpen(false); setFlightCabinClassOpen(false); }}
-            className="flex h-full min-w-0 flex-1 items-center justify-center gap-1.5 text-sm font-semibold text-foreground transition-colors active:bg-grey-light"
+            className={cn(
+              "flex h-full min-w-0 flex-1 items-center justify-center gap-1.5 text-sm font-semibold text-foreground transition-colors active:bg-grey-light",
+              // When trip type is hidden (stopover mode) Travellers is the first
+              // segment, so it takes the rounded-left edge.
+              stopoverMode && "rounded-l-xl",
+            )}
           >
             <Users size={14} className="shrink-0" aria-hidden="true" />
             <span className="truncate">{flightTravellersCount} traveller{flightTravellersCount !== 1 ? "s" : ""}</span>
@@ -559,6 +599,8 @@ export function FlightSearchForm({
             <AirportCombobox
               label="From"
               placeholder="Departure city"
+              // Stopover mode only offers Fiji Airways' origin cities.
+              allowedCodes={stopoverMode ? FIJI_ORIGIN_CODES : undefined}
               value={flightLegs[0]?.from ?? ""}
               onChange={(code) => {
                 updateLeg(flightLegs[0].id, "from", code);
@@ -573,6 +615,8 @@ export function FlightSearchForm({
               label="To"
               placeholder="Destination city"
               iconRotated
+              // Stopover mode only offers Fiji Airways' destination cities.
+              allowedCodes={stopoverMode ? FIJI_DESTINATION_CODES : undefined}
               value={flightLegs[0]?.to ?? ""}
               onChange={(code) => {
                 updateLeg(flightLegs[0].id, "to", code);
@@ -657,18 +701,24 @@ export function FlightSearchForm({
           {/* flex-wrap so on a narrow screen the chip/description drop to the
               next line instead of squashing the control. */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-            {/* <label> wraps the checkbox + words so clicking the text toggles
-                it too — bigger hit target, better a11y. */}
-            <label className="flex cursor-pointer select-none items-center gap-2.5">
-              <Checkbox
-                checked={stopoverEnabled}
-                // Radix checkboxes can report "indeterminate"; we only ever want
-                // a real true/false here, so coerce anything else to false.
-                onCheckedChange={(checked) => setStopoverEnabled(checked === true)}
-                aria-label="Open to a stopover"
-              />
-              <span className="text-sm font-bold text-foreground">Open to a stopover</span>
-            </label>
+            {stopoverMode ? (
+              // Stopover mode: no checkbox — a stopover is always on here, so we
+              // show a plain section heading instead of the opt-in toggle.
+              <span className="text-sm font-bold text-foreground">Your stopover</span>
+            ) : (
+              // Normal Flights tab: the opt-in checkbox. <label> wraps the box +
+              // words so clicking the text toggles it too — better a11y.
+              <label className="flex cursor-pointer select-none items-center gap-2.5">
+                <Checkbox
+                  checked={stopoverEnabled}
+                  // Radix checkboxes can report "indeterminate"; we only ever want
+                  // a real true/false here, so coerce anything else to false.
+                  onCheckedChange={(checked) => setStopoverEnabled(checked === true)}
+                  aria-label="Open to a stopover"
+                />
+                <span className="text-sm font-bold text-foreground">Open to a stopover</span>
+              </label>
+            )}
 
             {/* Short supporting line — kept inline; wraps below on small screens. */}
             <span className="text-xs text-grey">

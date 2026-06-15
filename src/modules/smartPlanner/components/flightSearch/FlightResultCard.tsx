@@ -225,6 +225,13 @@ export function FlightResultCard({
           <span className="rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-extrabold text-primary">
             {nights} night{nights > 1 ? "s" : ""} in {city}
           </span>
+          {/* Curated tag (Cheapest / Fastest / Best) — pushed to the far right so
+              several offers through the same hub read as distinct picks. */}
+          {option.badge && (
+            <span className="ml-auto rounded-full border border-white/50 px-2.5 py-0.5 text-xs font-bold">
+              {option.badge}
+            </span>
+          )}
         </div>
 
         <div className="flex flex-col md:flex-row">

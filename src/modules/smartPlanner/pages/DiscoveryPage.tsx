@@ -52,6 +52,8 @@ import {
   // Cruises tab icon (Ship for ocean) and Events tab icon (Ticket for ticketed events)
   Ship,
   Ticket,
+  // Stopover tab icon — a route with waypoints evokes "break the journey".
+  Route,
 } from "lucide-react";
 import { Switch } from "../../../shared/components/ui/switch";
 // Shared design-system date picker (token-based). DateRange is just the {from,to} type.
@@ -81,7 +83,7 @@ import AiMoodboardComposer from "../components/aiItinerary/AiMoodboardComposer";
 
 // Exported so App.tsx can type the "which tab should Discovery open on" state
 // it passes back in via `initialActiveTab` (e.g. returning from the flights list).
-export type TabId = "hotels" | "flights" | "holidays" | "activities" | "cruises" | "events";
+export type TabId = "hotels" | "flights" | "stopover" | "holidays" | "activities" | "cruises" | "events";
 
 type RoomConfig = {
   id: number;
@@ -108,6 +110,9 @@ type DiscoveryPageProps = {
   onTourSelect: (tour: TourCardData) => void;
   // Called when the user submits the Flights search form → leads to FlightListPage
   onFlightSearch: (criteria: FlightSearchCriteria) => void;
+  // Called when the user submits the Stopover search form → leads to
+  // FlightListPage in stopover-only mode (offers on the chosen leg, Fiji only).
+  onStopoverSearch: (criteria: FlightSearchCriteria) => void;
   // Called when the user submits the Holidays search form → leads to HolidayListPage
   onHolidaySearch: (criteria: HolidaySearchCriteria) => void;
   // Called when the user submits the Activities search form → leads to ActivityListPage
@@ -139,6 +144,9 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "holidays", label: "Holidays", icon: <Sun size={20} /> },
   { id: "hotels", label: "Hotels", icon: <Building2 size={20} /> },
   { id: "flights", label: "Flights", icon: <Plane size={20} /> },
+  // Dedicated stopover journey — Fiji Airways routes with a multi-night stay
+  // built into one leg. Sits right after Flights as a close cousin.
+  { id: "stopover", label: "Stopover", icon: <Route size={20} /> },
   // Compass icon evokes the experience-led "explore by activity" framing
   { id: "activities", label: "Experiences", icon: <Compass size={20} /> },
   // Promoted out of Experiences — Cruises and Events are headline categories
@@ -543,6 +551,7 @@ export default function DiscoveryPage({
   onHotelDirectSelect,
   onTourSelect,
   onFlightSearch,
+  onStopoverSearch,
   onHolidaySearch,
   onActivitySearch,
   onActivityDirectSelect,
@@ -1262,6 +1271,14 @@ export default function DiscoveryPage({
                       })
                     }
                   />
+                )}
+
+                {/* STOPOVER PANEL — same flight form, but in stopover mode:
+                    no opt-in checkbox (a stopover is always on), round-trip only,
+                    airports restricted to Fiji's network. Submitting leads to the
+                    results page in stopover-only mode. */}
+                {activeTab === "stopover" && (
+                  <FlightSearchForm stopoverMode onSearch={onStopoverSearch} />
                 )}
 
                 {/* HOLIDAYS PANEL */}

@@ -98,6 +98,11 @@ export type FlightSearchCriteria = {
     leg: "outbound" | "return";
     nights: number;
   };
+  // When true, this search came from the dedicated Stopover tab. The results
+  // page then shows ONLY stopover offers on the chosen leg, flat flights only
+  // on the other leg, and restricts every result to Fiji Airways. The normal
+  // Flights tab never sets this, so its behaviour is unchanged.
+  stopoverOnly?: boolean;
 };
 
 // One physical flight in a journey (origin→hub or hub→destination). Used to
@@ -385,6 +390,18 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
+  // ── STOPOVER tab: submit search → FlightListPage (stopover-only mode) ─────
+  // Same as handleFlightSearch (the criteria already carries `stopoverOnly`),
+  // but remembers the Stopover tab so "Back to discovery" returns there.
+  const handleStopoverSearch = (criteria: FlightSearchCriteria) => {
+    setFlightSearchCriteria(criteria);
+    setSelectedFlightLegs([]);
+    setCurrentFlightLegIndex(0);
+    setDiscoveryTab("stopover");    // "Back to discovery" → Stopover tab
+    setCurrentPage("flight-results");
+    window.scrollTo(0, 0);
+  };
+
   // ── FlightListPage: user selects a flight for one leg ────────────────────
   // If there are more legs to pick, advance to the next one.
   // If this was the last leg, build the StartingContext and go to SmartPlanner.
@@ -636,6 +653,7 @@ export default function App() {
           onHotelDirectSelect={handleHotelDirectSelect}
           onTourSelect={handleTourSelect}
           onFlightSearch={handleFlightSearch}
+          onStopoverSearch={handleStopoverSearch}
           onHolidaySearch={handleHolidaySearch}
           onActivitySearch={handleActivitySearch}
           onActivityDirectSelect={handleActivityDirectSelect}
