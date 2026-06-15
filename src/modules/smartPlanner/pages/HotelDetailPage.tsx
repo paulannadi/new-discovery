@@ -10,10 +10,6 @@ import {
   Dumbbell,
   Users,
   Share,
-  Bed,
-  Armchair,
-  ChevronLeft,
-  ChevronRight,
   ChevronDown,
   Dog,
   Check,
@@ -41,41 +37,20 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "../../../shared/compone
 // Loading kit — ImageWithPlaceholder for hero/thumbnails/modal photos and
 // SkeletonCard for the room-list loading state (replaces the inline pulse).
 import { ImageWithPlaceholder, SkeletonCard } from "../../../shared/components/loading";
+import { PageContainer } from "../../../shared/components/PageContainer";
+// Room types, the mock-room generator, and the shared room photo list now live
+// in their own module so the new stopover room step can reuse them. RoomCard is
+// the per-room card component, also shared.
+import {
+  type Room,
+  type RoomConfig,
+  type RoomSelection,
+  ROOM_IMAGES,
+  generateRoomsForHotel,
+} from "../components/rooms/roomData";
+import { RoomCard } from "../components/rooms/RoomCard";
 
 // --- Types ---
-
-type PricingOption = {
-  id: string;
-  label: string;
-  priceDelta: number; // 0 for base
-  subLabel?: string;
-};
-
-type Room = {
-  id: string;
-  name: string;
-  image: string;
-  details: {
-    bedrooms: number;
-    sleeps: number;
-    bedType: string;
-  };
-  basePrice: number;
-  cancellationPolicies: PricingOption[];
-  extras: PricingOption[];
-};
-
-type RoomConfig = {
-  id: number;
-  adults: number;
-  children: number;
-};
-
-type RoomSelection = {
-  room: Room;
-  cancelOption: string;
-  extraOption: string;
-};
 
 type Hotel = {
   id: string;
@@ -92,116 +67,8 @@ type Hotel = {
   coordinates: { x: number; y: number };
 };
 
-// --- Mock Data Generators ---
-
-const ROOM_IMAGES = [
-  "https://images.unsplash.com/photo-1744534637336-6110864236fc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJvb20lMjBraW5nJTIwYmVkJTIwbW9kZXJufGVufDF8fHx8MTc3MDYzNzcxN3ww&ixlib=rb-4.1.0&q=80&w=1080",
-  "https://images.unsplash.com/photo-1648383228240-6ed939727ad6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJvb20lMjB0d2luJTIwYmVkcyUyMG1vZGVybnxlbnwxfHx8fDE3NzA2Mzc3MTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
-  "https://images.unsplash.com/photo-1766928210443-0be92ed5884a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJvb20lMjBtb2Rlcm4lMjBsdXh1cnklMjBiZWRyb29tfGVufDF8fHx8MTc3MDYzNzcxN3ww&ixlib=rb-4.1.0&q=80&w=1080",
-  "https://images.unsplash.com/photo-1759223198981-661cadbbff36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJvb20lMjBzdWl0ZSUyMGx1eHVyeSUyMGludGVyaW9yfGVufDF8fHx8MTc3MDYzNzcxN3ww&ixlib=rb-4.1.0&q=80&w=1080",
-  "https://images.unsplash.com/photo-1559414059-34fe0a59e57a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJvb20lMjBwZW50aG91c2UlMjBzdWl0ZSUyMHZpZXd8ZW58MXx8fHwxNzcwNjM3NzE3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-  "https://images.unsplash.com/photo-1590490360182-c33d57733427?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJvb20lMjBjb3p5fGVufDF8fHx8MTc3MDgwOTk3Mnww&ixlib=rb-4.1.0&q=80&w=1080",
-  "https://images.unsplash.com/photo-1618773928121-c32242e63f39?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJvb20lMjBtb2Rlcm58ZW58MXx8fHwxNzcwODA5OTcyfDA&ixlib=rb-4.1.0&q=80&w=1080"
-];
-
-const ROOM_TYPES = [
-  { name: "Single Room", sleeps: 1, bed: "1 Single Bed", basePriceFactor: 0.6 },
-  { name: "Double Room", sleeps: 2, bed: "1 Queen Bed", basePriceFactor: 0.8 },
-  { name: "Deluxe King Room", sleeps: 2, bed: "1 King Bed", basePriceFactor: 1.0 },
-  { name: "Twin Room", sleeps: 2, bed: "2 Single Beds", basePriceFactor: 0.85 },
-  { name: "Triple Room", sleeps: 3, bed: "1 Queen + 1 Single", basePriceFactor: 1.2 },
-  { name: "Family Studio", sleeps: 3, bed: "3 Single Beds", basePriceFactor: 1.3 },
-  { name: "Family Suite", sleeps: 4, bed: "1 King + 2 Singles", basePriceFactor: 1.5 },
-  { name: "Quadruple Room", sleeps: 4, bed: "2 Queen Beds", basePriceFactor: 1.6 },
-  { name: "Penthouse Suite", sleeps: 4, bed: "2 King Beds", basePriceFactor: 2.5 }
-];
-
-const BOARD_OPTIONS: PricingOption[] = [
-  { id: "room_only", label: "Room only", priceDelta: 0 },
-  { id: "breakfast", label: "Breakfast", priceDelta: 15 },
-  { id: "half_board", label: "Half board", priceDelta: 45 },
-  { id: "full_board", label: "Full board", priceDelta: 80 }
-];
-
-const CANCELLATION_OPTIONS: PricingOption[] = [
-  { id: "non_refundable", label: "Non-refundable", priceDelta: 0 },
-  { id: "free_cancellation", label: "Free cancellation", priceDelta: 25 }
-];
-
-
-// Simple pseudo-random number generator seeded by string
-const seededRandom = (seed: string) => {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    const char = seed.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  const x = Math.sin(hash++) * 10000;
-  return x - Math.floor(x);
-};
-
-const generateRoomsForHotel = (hotel: Hotel, basePrice: number): Room[] => {
-  const numRooms = 3 + Math.floor(seededRandom(hotel.id + "count") * 4); // 3 to 6 rooms
-  const rooms: Room[] = [];
-
-  for (let i = 0; i < numRooms; i++) {
-    const seed = hotel.id + "room" + i;
-
-    // Pick a room type based on seed
-    const typeIndex = Math.floor(seededRandom(seed + "type") * ROOM_TYPES.length);
-    const roomType = ROOM_TYPES[typeIndex];
-
-    // Pick an image
-    const imageIndex = Math.floor(seededRandom(seed + "image") * ROOM_IMAGES.length);
-    const image = ROOM_IMAGES[imageIndex];
-
-    // Generate Cancellation Policies based on Hotel Offerings
-    const policies: PricingOption[] = [];
-
-    // Always add non-refundable as the base option if applicable
-    policies.push(CANCELLATION_OPTIONS[0]); // Non-refundable (cheaper base)
-
-    // If hotel offers free cancellation, add it as an upgrade option
-    if (hotel.cancellationPolicy === "Free cancellation") {
-       policies.push(CANCELLATION_OPTIONS[1]); // Free cancellation
-    }
-
-    // Generate Extras (Board Types) based on Hotel Offerings
-    const extras: PricingOption[] = [];
-
-    // Map string board types to PricingOptions
-    hotel.boardTypes.forEach(type => {
-      if (type === "Room only") extras.push(BOARD_OPTIONS[0]);
-      if (type === "Breakfast") extras.push(BOARD_OPTIONS[1]);
-      if (type === "Half board") extras.push(BOARD_OPTIONS[2]);
-      if (type === "Full board") extras.push(BOARD_OPTIONS[3]);
-    });
-
-    // Ensure we have unique options and at least one
-    const uniqueExtras = Array.from(new Set(extras.map(e => e.id)))
-      .map(id => extras.find(e => e.id === id)!);
-
-    if (uniqueExtras.length === 0) uniqueExtras.push(BOARD_OPTIONS[0]); // Fallback
-
-    rooms.push({
-      id: `${hotel.id}_r${i}`,
-      name: roomType.name,
-      image: image,
-      details: {
-        bedrooms: roomType.sleeps > 2 ? 2 : 1,
-        sleeps: roomType.sleeps,
-        bedType: roomType.bed
-      },
-      basePrice: Math.round(basePrice * roomType.basePriceFactor),
-      cancellationPolicies: policies,
-      extras: uniqueExtras
-    });
-  }
-
-  // Sort by price
-  return rooms.sort((a, b) => a.basePrice - b.basePrice);
-};
+// (Room types, the mock-room generator, and ROOM_IMAGES moved to
+// ../components/rooms/roomData.ts — imported above.)
 
 // Comprehensive amenities shown in the "See all" modal, grouped by category.
 // These are static mock amenities typical of a full-service hotel.
@@ -262,192 +129,6 @@ function ratingLabel(score: number): string {
   return "Good";
 }
 
-
-// --- Components ---
-
-const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelected, nights }: {
-  room: Room,
-  initialBoard?: string[],
-  initialCancellation?: string[],
-  onSelect: (cancelOption: string, extraOption: string) => void,
-  isSelected: boolean,
-  // How many nights the stay covers — used to show the total price
-  nights: number
-}) => {
-  const [selectedCancel, setSelectedCancel] = useState(() => {
-    // If filters are passed, try to select the matching one
-    if (initialCancellation && initialCancellation.length > 0) {
-      // Logic for "Exclude non refundable" - prioritize refundable options
-      if (initialCancellation.includes("Exclude non refundable")) {
-          // Find the first option that is NOT non-refundable
-          const refundable = room.cancellationPolicies.find(p => p.id !== "non_refundable");
-          if (refundable) return refundable.id;
-      }
-
-      // Standard filter matching
-      const matching = room.cancellationPolicies.find(p => initialCancellation.includes(p.label));
-      if (matching) return matching.id;
-    }
-    return room.cancellationPolicies[0].id;
-  });
-
-  const [selectedExtra, setSelectedExtra] = useState(() => {
-    // If filters are passed, try to select the matching one
-    if (initialBoard && initialBoard.length > 0) {
-      // Find intersection
-      const matching = room.extras.find(p => initialBoard.includes(p.label));
-      if (matching) return matching.id;
-    }
-    return room.extras[0].id;
-  });
-
-  const cancelOpt = room.cancellationPolicies.find(o => o.id === selectedCancel) || room.cancellationPolicies[0];
-  const extraOpt = room.extras.find(o => o.id === selectedExtra) || room.extras[0];
-
-  const totalPrice = room.basePrice + cancelOpt.priceDelta + extraOpt.priceDelta;
-
-  const handleCancelChange = (optId: string) => {
-    setSelectedCancel(optId);
-  };
-
-  const handleExtraChange = (optId: string) => {
-    setSelectedExtra(optId);
-  };
-
-  const handleBookClick = () => {
-    onSelect(selectedCancel, selectedExtra);
-  };
-
-  return (
-    <div className={cn(
-      "bg-card rounded-xl overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all border-2",
-      isSelected ? "border-foreground shadow-lg" : "border-transparent"
-    )}>
-      {/* Image Carousel */}
-      <div className="h-[200px] relative bg-gray-100 group">
-        <ImageWithPlaceholder
-          src={room.image}
-          alt={room.name}
-          containerClassName="absolute inset-0 w-full h-full"
-        />
-        <div className="absolute inset-0 bg-foreground/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-
-        {/* Carousel Controls */}
-        {/* On mobile (touch screens) buttons are always visible; on desktop they appear on hover */}
-        <button
-          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 p-1.5 rounded-full shadow-md opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-white text-primary"
-          aria-hidden="true"
-        >
-          <ChevronLeft size={16} />
-        </button>
-        <button
-          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 p-1.5 rounded-full shadow-md opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-white text-primary"
-          aria-hidden="true"
-        >
-          <ChevronRight size={16} />
-        </button>
-      </div>
-
-      <div className="p-4 flex-1 flex flex-col">
-        {/* Title */}
-        <h3 className="text-foreground font-bold text-lg leading-tight mb-3">{room.name}</h3>
-
-        {/* Room Details */}
-        <div className="flex flex-col gap-2 mb-6">
-          <div className="flex items-center gap-2 text-foreground">
-            <Bed size={16} aria-hidden="true" />
-            <span className="text-sm">{room.details.bedrooms} bedroom{room.details.bedrooms > 1 ? 's' : ''}</span>
-          </div>
-          <div className="flex items-center gap-2 text-foreground">
-            <Users size={16} aria-hidden="true" />
-            <span className="text-sm">Sleeps {room.details.sleeps}</span>
-          </div>
-          <div className="flex items-center gap-2 text-foreground">
-            <Armchair size={16} aria-hidden="true" />
-            <span className="text-sm">{room.details.bedType}</span>
-          </div>
-        </div>
-
-        <hr className="border-border mb-4" />
-
-        {/* Cancellation Policy */}
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-bold text-foreground">Cancellation policy</span>
-            <span className="text-xs text-grey">per person, per night</span>
-          </div>
-          <div className="flex flex-col gap-2">
-            {room.cancellationPolicies.map((opt) => (
-              <label key={opt.id} className="flex items-center justify-between cursor-pointer group" onClick={() => handleCancelChange(opt.id)}>
-                <div className="flex items-center gap-2">
-                  <div className={cn(
-                    "w-4 h-4 rounded-full border flex items-center justify-center",
-                    selectedCancel === opt.id ? "border-primary" : "border-border"
-                  )}>
-                    {selectedCancel === opt.id && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
-                  </div>
-                  <span className="text-xs text-foreground">{opt.label}</span>
-                </div>
-                {opt.priceDelta > 0 && <span className="text-xs text-foreground">+ {opt.priceDelta}€</span>}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <hr className="border-border mb-4" />
-
-        {/* Extras */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-bold text-foreground">Extras</span>
-            <span className="text-xs text-grey">per person, per night</span>
-          </div>
-          <div className="flex flex-col gap-2">
-            {room.extras.map((opt) => (
-              <label key={opt.id} className="flex items-center justify-between cursor-pointer group" onClick={() => handleExtraChange(opt.id)}>
-                <div className="flex items-center gap-2">
-                   <div className={cn(
-                     "w-4 h-4 rounded-full border flex items-center justify-center",
-                     selectedExtra === opt.id ? "border-primary" : "border-border"
-                   )}>
-                    {selectedExtra === opt.id && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
-                  </div>
-                  <span className="text-xs text-foreground">{opt.label}</span>
-                </div>
-                {opt.priceDelta > 0 && <span className="text-xs text-foreground">+ {opt.priceDelta}€</span>}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-auto pt-4 border-t border-muted flex flex-col gap-2">
-          <div className="text-right text-xs text-grey">{totalPrice}€ per person, per night</div>
-          {/* Total for the full stay — calculated as per-night price × number of nights */}
-          <div className="text-right text-sm font-bold text-foreground">
-            Total for {nights} night{nights !== 1 ? 's' : ''}: {totalPrice * nights}€
-          </div>
-          {/* default = main action, secondary = already-selected confirmation state */}
-          <Button
-            onClick={handleBookClick}
-            variant={isSelected ? "secondary" : "default"}
-            // Selected = solid light-gray bg + dark text (the secondary token's
-            // own colours), pinned across hover so it stays stable.
-            className={cn(
-              "w-full",
-              isSelected &&
-                "bg-secondary text-secondary-foreground hover:bg-secondary hover:text-secondary-foreground"
-            )}
-          >
-            {isSelected && <Check size={16} />}
-            {isSelected ? "Selected" : "Select"}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default function HotelDetailPage({
   onBack,
@@ -633,7 +314,7 @@ export default function HotelDetailPage({
 
       {/* ── WHITE INFO CARD — structure matches PackageDetailPage ────────── */}
       <div className="bg-card">
-        <div className="max-w-[1280px] mx-auto">
+        <PageContainer tier="standard">
 
           {/* Back button — own container with responsive horizontal padding */}
           <div className="px-4 sm:px-6 md:px-10 pt-5 pb-5">
@@ -834,11 +515,11 @@ export default function HotelDetailPage({
               </div>
             </div>
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* Select Rooms Section - Grey Background */}
-        <div id="room-selection" className="w-full max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 pt-[40px] flex flex-col gap-6">
+        <PageContainer id="room-selection" tier="standard" className="px-3 sm:px-4 md:px-8 pt-[40px] flex flex-col gap-6">
           <h2 className="font-extrabold text-foreground text-2xl">Select rooms</h2>
 
           {/* ── Inline Search Bar ──────────────────────────────────────────────
@@ -1209,7 +890,7 @@ export default function HotelDetailPage({
               })}
             </>
           )}
-      </div>
+      </PageContainer>
 
       {/* ── HOTEL INFORMATION SECTION ──────────────────────────────────────────
           Two-column layout adapted from PackageDetailPage:
@@ -1217,7 +898,7 @@ export default function HotelDetailPage({
           RIGHT — Location map image + "Getting around" POI pills
           This section sits above Policies, which is the operational info block.
       ─────────────────────────────────────────────────────────────────────── */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 pt-8 pb-2 flex flex-col gap-4">
+      <PageContainer tier="standard" className="px-3 sm:px-4 md:px-8 pt-8 pb-2 flex flex-col gap-4">
         <h2 className="text-2xl font-bold text-foreground">Hotel information</h2>
 
         {/* One big card wrapping both columns — same outer treatment as PoliciesSection */}
@@ -1318,17 +999,17 @@ export default function HotelDetailPage({
 
         </div>
         </div>
-      </div>
+      </PageContainer>
 
       {/* Hotel Policies Section — renamed from "Hotel information" to "Policies" */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
+      <PageContainer tier="standard" className="px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
         <h2 className="text-2xl font-bold text-foreground">Policies</h2>
 
         <PoliciesSection />
-      </div>
+      </PageContainer>
 
       {/* Guest Reviews Section */}
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
+      <PageContainer tier="standard" className="px-3 sm:px-4 md:px-8 py-5 md:py-8 flex flex-col gap-6">
         <h2 className="text-2xl font-bold text-foreground">Guest Reviews</h2>
 
         <div className="bg-card rounded-xl shadow-md flex flex-col md:flex-row gap-5 md:gap-10 p-4 md:py-6 md:pl-6 md:pr-0">
@@ -1380,7 +1061,7 @@ export default function HotelDetailPage({
           </div>
 
         </div>
-      </div>
+      </PageContainer>
 
       {/* All-rooms-done banner — fades in above the sticky bar.
           Matches the real TripBuilder Alert component structure:
@@ -1389,7 +1070,7 @@ export default function HotelDetailPage({
       {/* Sticky Booking Bar */}
       {someRoomsSelected && (
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg z-50">
-          <div className="w-full max-w-[1280px] mx-auto px-4 md:px-8 lg:px-[60px] py-3 md:py-4">
+          <PageContainer tier="standard" className="px-4 md:px-8 lg:px-[60px] py-3 md:py-4">
 
             {/* Mobile layout: compact room pills + price/button row */}
             <div className="flex flex-col gap-2 sm:hidden">
@@ -1514,7 +1195,7 @@ export default function HotelDetailPage({
                 </Tooltip>
               </div>
             </div>
-          </div>
+          </PageContainer>
         </div>
       )}
 

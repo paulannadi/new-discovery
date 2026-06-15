@@ -554,10 +554,25 @@ export default function PackageSearchForm({
   return (
     <div
       ref={containerRef}
-      className={`flex flex-col lg:flex-row ${fieldGap} w-full`}
+      className={cn(
+        "w-full",
+        fieldGap,
+        variant === "hero"
+          // Holidays hero: 1 column on phone → a 6-column grid on tablet (md) →
+          // a single row on wide screens (xl). The 6 columns let each field pick
+          // how wide it is via col-span (below): two 3-wide fields on row 1,
+          // three 2-wide fields on row 2, the full-width button on row 3. At xl
+          // we flip the display back to flex so each field's existing flex-1 /
+          // flex-[1.2] / min-w / shrink-0 rules lay out the single row (the
+          // col-span classes are simply ignored once display is flex).
+          ? "grid grid-cols-1 md:grid-cols-6 xl:flex xl:flex-row"
+          // Compact edit-search bar: unchanged — stack on small, row at lg.
+          : "flex flex-col lg:flex-row",
+      )}
     >
       {/* ── FLYING FROM ───────────────────────────────────────────────────── */}
-      <div className="relative flex-1">
+      {/* md:col-span-3 → half of the 6-col tablet grid (row 1, paired with Going to). */}
+      <div className="relative flex-1 md:col-span-3">
         <div
           className={cn(fieldBase(openPanel === "from"), "cursor-pointer")}
           onClick={() => setOpenPanel(openPanel === "from" ? null : "from")}
@@ -595,7 +610,8 @@ export default function PackageSearchForm({
       </div>
 
       {/* ── GOING TO ──────────────────────────────────────────────────────── */}
-      <div className="relative flex-1">
+      {/* md:col-span-3 → the other half of row 1 on the tablet grid. */}
+      <div className="relative flex-1 md:col-span-3">
         <div
           className={cn(
             h,
@@ -712,7 +728,8 @@ export default function PackageSearchForm({
       {/* Duration comes before Dates because the monthly prices in the flexible
           dates grid are duration-dependent — pick nights first, then the right
           prices show up when you open the calendar. */}
-      <div className="relative">
+      {/* md:col-span-2 → a third of row 2 on the tablet grid (Duration · Dates · Travellers). */}
+      <div className="relative md:col-span-2">
         <div
           className={cn(fieldBase(openPanel === "duration"), "cursor-pointer min-w-[140px]")}
           onClick={() => setOpenPanel(openPanel === "duration" ? null : "duration")}
@@ -759,7 +776,8 @@ export default function PackageSearchForm({
       </div>
 
       {/* ── DATES ─────────────────────────────────────────────────────────── */}
-      <div className="relative flex-[1.2]">
+      {/* md:col-span-2 → middle of row 2 on the tablet grid. */}
+      <div className="relative flex-[1.2] md:col-span-2">
         <div
           className={cn(fieldBase(openPanel === "dates"), "cursor-pointer")}
           onClick={() => setOpenPanel(openPanel === "dates" ? null : "dates")}
@@ -819,7 +837,8 @@ export default function PackageSearchForm({
       </div>
 
       {/* ── TRAVELLERS ────────────────────────────────────────────────────── */}
-      <div className="relative">
+      {/* md:col-span-2 → end of row 2 on the tablet grid. */}
+      <div className="relative md:col-span-2">
         <div
           className={cn(fieldBase(openPanel === "guests"), "cursor-pointer min-w-[196px]")}
           onClick={() => setOpenPanel(openPanel === "guests" ? null : "guests")}
@@ -882,7 +901,8 @@ export default function PackageSearchForm({
       <button
         onClick={handleSearch}
         className={cn(
-          "shrink-0 bg-primary hover:brightness-85 text-white font-extrabold",
+          // md:col-span-6 → spans the full tablet grid width on its own row 3.
+          "shrink-0 md:col-span-6 bg-primary hover:brightness-85 text-white font-extrabold",
           variant === "hero"
             ? "text-base h-[52px] px-6 rounded-xl"
             : "text-sm h-[48px] px-5 rounded-lg",

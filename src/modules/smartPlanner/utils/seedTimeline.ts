@@ -532,13 +532,35 @@ export function seedTimeline(
           flight: ctx.flight,
         });
       }
-      items.push({
-        kind: "accommodation",
-        id: `acc-flight-${cityName}`,
-        checkIn: startDate,
-        nights,
-        hotel: mockHotel(cityName),
-      });
+      // Stopover stay — when the user added a stopover and picked a hotel,
+      // it checks in first (on the way), and the destination hotel follows for
+      // the remaining nights. Without a stopover, the destination hotel covers
+      // the whole stay as before.
+      if (ctx.flight.stopover) {
+        const s = ctx.flight.stopover;
+        items.push({
+          kind: "accommodation",
+          id: `acc-stopover-${s.city}`,
+          checkIn: startDate,
+          nights: s.nights,
+          hotel: s.hotel ?? mockHotel(s.city),
+        });
+        items.push({
+          kind: "accommodation",
+          id: `acc-flight-${cityName}`,
+          checkIn: addDays(startDate, s.nights),
+          nights: Math.max(1, nights - s.nights),
+          hotel: mockHotel(cityName),
+        });
+      } else {
+        items.push({
+          kind: "accommodation",
+          id: `acc-flight-${cityName}`,
+          checkIn: startDate,
+          nights,
+          hotel: mockHotel(cityName),
+        });
+      }
       break;
     }
 

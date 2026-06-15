@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { cn } from "../../../shared/components/ui/utils";
+import { PageContainer } from "../../../shared/components/PageContainer";
 // AccommodationStar renders the real star icons (same component as production TripBuilder)
 import AccommodationStar from "../../../shared/components/AccommodationStar";
 import RatingBlock from "../../../shared/components/RatingBlock";
@@ -51,6 +52,8 @@ import {
   // Cruises tab icon (Ship for ocean) and Events tab icon (Ticket for ticketed events)
   Ship,
   Ticket,
+  // Stopover tab icon — a route with waypoints evokes "break the journey".
+  Route,
 } from "lucide-react";
 import { Switch } from "../../../shared/components/ui/switch";
 // Shared design-system date picker (token-based). DateRange is just the {from,to} type.
@@ -78,7 +81,9 @@ import AiMoodboardComposer from "../components/aiItinerary/AiMoodboardComposer";
 
 // --- Types ---
 
-type TabId = "hotels" | "flights" | "holidays" | "activities" | "cruises" | "events";
+// Exported so App.tsx can type the "which tab should Discovery open on" state
+// it passes back in via `initialActiveTab` (e.g. returning from the flights list).
+export type TabId = "hotels" | "flights" | "stopover" | "holidays" | "activities" | "cruises" | "events";
 
 type RoomConfig = {
   id: number;
@@ -105,6 +110,9 @@ type DiscoveryPageProps = {
   onTourSelect: (tour: TourCardData) => void;
   // Called when the user submits the Flights search form → leads to FlightListPage
   onFlightSearch: (criteria: FlightSearchCriteria) => void;
+  // Called when the user submits the Stopover search form → leads to
+  // FlightListPage in stopover-only mode (offers on the chosen leg, Fiji only).
+  onStopoverSearch: (criteria: FlightSearchCriteria) => void;
   // Called when the user submits the Holidays search form → leads to HolidayListPage
   onHolidaySearch: (criteria: HolidaySearchCriteria) => void;
   // Called when the user submits the Activities search form → leads to ActivityListPage
@@ -122,6 +130,10 @@ type DiscoveryPageProps = {
   // on the AI version of the hero instead of the default search card.
   aiExperienceMode: boolean;
   onAiExperienceModeChange: (mode: boolean) => void;
+  // Which tab to open on when this page (re)mounts. App.tsx sets this to the
+  // last tab the user searched from, so returning from e.g. the flights list
+  // lands back on the Flights tab instead of the default. Defaults to "holidays".
+  initialActiveTab?: TabId;
 };
 
 // --- Tab Definitions ---
@@ -132,6 +144,9 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "holidays", label: "Holidays", icon: <Sun size={20} /> },
   { id: "hotels", label: "Hotels", icon: <Building2 size={20} /> },
   { id: "flights", label: "Flights", icon: <Plane size={20} /> },
+  // Dedicated stopover journey — Fiji Airways routes with a multi-night stay
+  // built into one leg. Sits right after Flights as a close cousin.
+  { id: "stopover", label: "Stopover", icon: <Route size={20} /> },
   // Compass icon evokes the experience-led "explore by activity" framing
   { id: "activities", label: "Experiences", icon: <Compass size={20} /> },
   // Promoted out of Experiences — Cruises and Events are headline categories
@@ -536,14 +551,19 @@ export default function DiscoveryPage({
   onHotelDirectSelect,
   onTourSelect,
   onFlightSearch,
+  onStopoverSearch,
   onHolidaySearch,
   onActivitySearch,
   onActivityDirectSelect,
   onAiPlannerStart,
   aiExperienceMode,
   onAiExperienceModeChange: setAiExperienceMode,
+  initialActiveTab,
 }: DiscoveryPageProps) {
-  const [activeTab, setActiveTab] = useState<TabId>("holidays");
+  // Seed from App's `initialActiveTab` (the last-searched tab) when provided,
+  // otherwise fall back to the original default. This only sets the STARTING
+  // tab — the user can still switch tabs freely after mount.
+  const [activeTab, setActiveTab] = useState<TabId>(initialActiveTab ?? "holidays");
   // `aiExperienceMode` is controlled by App.tsx so the toggle persists across
   // the Discovery → AI Itinerary → Back round trip. See DiscoveryPageProps.
 
@@ -1253,6 +1273,14 @@ export default function DiscoveryPage({
                   />
                 )}
 
+                {/* STOPOVER PANEL — same flight form, but in stopover mode:
+                    no opt-in checkbox (a stopover is always on), round-trip only,
+                    airports restricted to Fiji's network. Submitting leads to the
+                    results page in stopover-only mode. */}
+                {activeTab === "stopover" && (
+                  <FlightSearchForm stopoverMode onSearch={onStopoverSearch} />
+                )}
+
                 {/* HOLIDAYS PANEL */}
                 {activeTab === "holidays" && (
                   <PackageSearchForm variant="hero" onSearch={onHolidaySearch} />
@@ -1330,7 +1358,7 @@ export default function DiscoveryPage({
           type), (2) Iconic events. */}
       {activeTab === "activities" && (
         <section className="py-10 md:py-16 px-4 md:px-6 lg:px-12">
-          <div className="max-w-[1200px] mx-auto flex flex-col gap-12 md:gap-16">
+          <PageContainer tier="standard" className="flex flex-col gap-12 md:gap-16">
 
             {/* ── 1. Experience what you like ── */}
             {/* Activities grouped by activity type, behind a tab bar that
@@ -1411,7 +1439,7 @@ export default function DiscoveryPage({
               </div>
             </div>
 
-          </div>
+          </PageContainer>
         </section>
       )}
 
@@ -1422,7 +1450,7 @@ export default function DiscoveryPage({
           dropdown above. */}
       {activeTab === "cruises" && (
         <section className="py-10 md:py-16 px-4 md:px-6 lg:px-12">
-          <div className="max-w-[1200px] mx-auto">
+          <PageContainer tier="standard">
 
             <div className="mb-6 md:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
@@ -1468,7 +1496,7 @@ export default function DiscoveryPage({
               </button>
             </div>
 
-          </div>
+          </PageContainer>
         </section>
       )}
 
@@ -1477,7 +1505,7 @@ export default function DiscoveryPage({
           again sourced from the existing ACTIVITY_CARDS_BY_TYPE mock data. */}
       {activeTab === "events" && (
         <section className="py-10 md:py-16 px-4 md:px-6 lg:px-12">
-          <div className="max-w-[1200px] mx-auto">
+          <PageContainer tier="standard">
 
             <div className="mb-6 md:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
@@ -1519,14 +1547,14 @@ export default function DiscoveryPage({
               </button>
             </div>
 
-          </div>
+          </PageContainer>
         </section>
       )}
 
       {/* ── HOTELS ── */}
       {activeTab === "hotels" && (
         <section className="py-10 md:py-16 px-4 md:px-6 lg:px-12">
-          <div className="max-w-[1200px] mx-auto">
+          <PageContainer tier="standard">
 
             <div className="mb-6 md:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
@@ -1635,14 +1663,14 @@ export default function DiscoveryPage({
               </button>
             </div>
 
-          </div>
+          </PageContainer>
         </section>
       )}
 
       {/* ── FLIGHTS ── */}
       {activeTab === "flights" && (
         <section className="py-16 px-4 md:px-6 lg:px-12">
-          <div className="max-w-[1200px] mx-auto">
+          <PageContainer tier="standard">
 
             <div className="mb-8">
               <div className="flex items-center gap-2.5 mb-2">
@@ -1741,7 +1769,7 @@ export default function DiscoveryPage({
               ))}
             </div>
 
-          </div>
+          </PageContainer>
         </section>
       )}
 
@@ -1751,14 +1779,14 @@ export default function DiscoveryPage({
         <>
 
           {/* ── Section 1: Tours by travel style ────────────────────────── */}
-          {/* Section has no horizontal padding. The max-w-[1200px] wrapper aligns
+          {/* Section has no horizontal padding. The max-w-[1280px] wrapper aligns
               headings + tab bars with the hero card. Scroll rows use dynamic
-              pl-[max(pad, (100vw-1200px)/2)] so the first card starts at exactly
+              pl-[max(pad, (100vw-1280px)/2)] so the first card starts at exactly
               the same left edge on all screen sizes, including wide viewports. */}
           <section className="py-10 md:py-16">
 
             {/* Constrained content — aligns with hero card left edge */}
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-5 md:mb-8">
+            <div className="px-[max(1rem,calc((100vw-80rem)/2))] md:px-[max(1.5rem,calc((100vw-80rem)/2))] lg:px-[max(3rem,calc((100vw-80rem)/2))] mb-5 md:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
                 <TreePalm size={24} className="text-primary md:size-7" />
                 <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
@@ -1770,7 +1798,7 @@ export default function DiscoveryPage({
               </p>
             </div>
 
-            <div ref={styleTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] md:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto">
+            <div ref={styleTabBarRef} className="mx-[max(1rem,calc((100vw-80rem)/2))] md:mx-[max(1.5rem,calc((100vw-80rem)/2))] lg:mx-[max(3rem,calc((100vw-80rem)/2))] relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto">
               {selectedStyles.map((style) => (
                 <button
                   key={style}
@@ -1799,9 +1827,9 @@ export default function DiscoveryPage({
             </div>
 
             {/* Scroll row: starts at the same left edge as the hero card.
-                pl-[max(pad,(100vw-75rem)/2)] dynamically tracks the mx-auto centering
+                pl-[max(pad,(100vw-80rem)/2)] dynamically tracks the mx-auto centering
                 so cards align correctly on both narrow and wide screens. */}
-            <div className="pl-[max(1rem,calc((100vw-75rem)/2))] md:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+            <div className="pl-[max(1rem,calc((100vw-80rem)/2))] md:pl-[max(1.5rem,calc((100vw-80rem)/2))] lg:pl-[max(3rem,calc((100vw-80rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-80rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-80rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-80rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
               {TOUR_CARDS.map((tour) => (
                 <div key={tour.id} className="shrink-0 w-[320px] snap-start">
                   <TourCard tour={tour} onSelect={() => onTourSelect(tour)} />
@@ -1809,7 +1837,7 @@ export default function DiscoveryPage({
               ))}
             </div>
 
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
+            <div className="px-[max(1rem,calc((100vw-80rem)/2))] md:px-[max(1.5rem,calc((100vw-80rem)/2))] lg:px-[max(3rem,calc((100vw-80rem)/2))] flex justify-end">
               <button
                 onClick={() => onHolidaySearch({
                   from: "London (LHR)",
@@ -1832,12 +1860,12 @@ export default function DiscoveryPage({
 
           </section>
 
-          <hr className="border-border mx-4 md:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
+          <hr className="border-border mx-4 md:mx-6 lg:mx-[max(3rem,calc((100vw-80rem)/2))]" />
 
           {/* ── Section 2: Tours by destination ──────────────────────────── */}
           <section className="py-10 md:py-16">
 
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-5 md:mb-8">
+            <div className="px-[max(1rem,calc((100vw-80rem)/2))] md:px-[max(1.5rem,calc((100vw-80rem)/2))] lg:px-[max(3rem,calc((100vw-80rem)/2))] mb-5 md:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
                 <Flag size={24} className="text-primary md:size-7" />
                 <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
@@ -1849,7 +1877,7 @@ export default function DiscoveryPage({
               </p>
             </div>
 
-            <div ref={countryTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] md:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto">
+            <div ref={countryTabBarRef} className="mx-[max(1rem,calc((100vw-80rem)/2))] md:mx-[max(1.5rem,calc((100vw-80rem)/2))] lg:mx-[max(3rem,calc((100vw-80rem)/2))] relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto">
               {/* Render only the user's selected destinations as tabs */}
               {selectedDestinations.map((country) => (
                 <button
@@ -1879,7 +1907,7 @@ export default function DiscoveryPage({
               />
             </div>
 
-            <div className="pl-[max(1rem,calc((100vw-75rem)/2))] md:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+            <div className="pl-[max(1rem,calc((100vw-80rem)/2))] md:pl-[max(1.5rem,calc((100vw-80rem)/2))] lg:pl-[max(3rem,calc((100vw-80rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-80rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-80rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-80rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
               {(TOURS_BY_COUNTRY[activeCountry] ?? []).map((tour) => (
                 <div key={tour.id} className="shrink-0 w-[320px] snap-start">
                   <TourCard tour={tour} onSelect={() => onTourSelect(tour)} />
@@ -1887,7 +1915,7 @@ export default function DiscoveryPage({
               ))}
             </div>
 
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
+            <div className="px-[max(1rem,calc((100vw-80rem)/2))] md:px-[max(1.5rem,calc((100vw-80rem)/2))] lg:px-[max(3rem,calc((100vw-80rem)/2))] flex justify-end">
               <button
                 onClick={() => onHolidaySearch({
                   from: "London (LHR)",
@@ -1910,12 +1938,12 @@ export default function DiscoveryPage({
 
           </section>
 
-          <hr className="border-border mx-4 md:mx-6 lg:mx-[max(3rem,calc((100vw-75rem)/2))]" />
+          <hr className="border-border mx-4 md:mx-6 lg:mx-[max(3rem,calc((100vw-80rem)/2))]" />
 
           {/* ── Section 3: Travel the way you like ───────────────────────── */}
           <section className="py-10 md:py-16">
 
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] mb-5 md:mb-8">
+            <div className="px-[max(1rem,calc((100vw-80rem)/2))] md:px-[max(1.5rem,calc((100vw-80rem)/2))] lg:px-[max(3rem,calc((100vw-80rem)/2))] mb-5 md:mb-8">
               <div className="flex items-center gap-2.5 mb-2">
                 <GitBranch size={24} className="text-primary md:size-7" />
                 <h2 className="text-foreground font-bold text-2xl md:text-3xl leading-tight">
@@ -1927,7 +1955,7 @@ export default function DiscoveryPage({
               </p>
             </div>
 
-            <div ref={tripTypeTabBarRef} className="mx-[max(1rem,calc((100vw-75rem)/2))] md:mx-[max(1.5rem,calc((100vw-75rem)/2))] lg:mx-[max(3rem,calc((100vw-75rem)/2))] relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto">
+            <div ref={tripTypeTabBarRef} className="mx-[max(1rem,calc((100vw-80rem)/2))] md:mx-[max(1.5rem,calc((100vw-80rem)/2))] lg:mx-[max(3rem,calc((100vw-80rem)/2))] relative border-b border-border mb-5 md:mb-8 flex gap-0 overflow-x-auto">
               {TRIP_TYPES.map((tt) => (
                 <button
                   key={tt.id}
@@ -1949,7 +1977,7 @@ export default function DiscoveryPage({
             </div>
 
             {activeTripType === "hotel-flight" && (
-              <div className="pl-[max(1rem,calc((100vw-75rem)/2))] md:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+              <div className="pl-[max(1rem,calc((100vw-80rem)/2))] md:pl-[max(1.5rem,calc((100vw-80rem)/2))] lg:pl-[max(3rem,calc((100vw-80rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-80rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-80rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-80rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
                 {HOLIDAY_DESTINATIONS.map((dest) => {
                   // Resolve the card's destCode to its full DESTINATIONS entry
                   // so we pass the correct search label (e.g. "Cancún, Mexico")
@@ -1982,7 +2010,7 @@ export default function DiscoveryPage({
             )}
 
             {activeTripType !== "hotel-flight" && (
-              <div className="pl-[max(1rem,calc((100vw-75rem)/2))] md:pl-[max(1.5rem,calc((100vw-75rem)/2))] lg:pl-[max(3rem,calc((100vw-75rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-75rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-75rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-75rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
+              <div className="pl-[max(1rem,calc((100vw-80rem)/2))] md:pl-[max(1.5rem,calc((100vw-80rem)/2))] lg:pl-[max(3rem,calc((100vw-80rem)/2))] flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scroll-padding-left:max(1rem,calc((100vw-80rem)/2))] md:[scroll-padding-left:max(1.5rem,calc((100vw-80rem)/2))] lg:[scroll-padding-left:max(3rem,calc((100vw-80rem)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-8">
                 {(TRIP_TYPE_CARDS[activeTripType] ?? []).map((card) => (
                   <div key={card.id} className="shrink-0 w-[300px] snap-start">
                     <div
@@ -2060,7 +2088,7 @@ export default function DiscoveryPage({
               </div>
             )}
 
-            <div className="px-[max(1rem,calc((100vw-75rem)/2))] md:px-[max(1.5rem,calc((100vw-75rem)/2))] lg:px-[max(3rem,calc((100vw-75rem)/2))] flex justify-end">
+            <div className="px-[max(1rem,calc((100vw-80rem)/2))] md:px-[max(1.5rem,calc((100vw-80rem)/2))] lg:px-[max(3rem,calc((100vw-80rem)/2))] flex justify-end">
               <button
                 onClick={() => onHolidaySearch({
                   from: "London (LHR)",

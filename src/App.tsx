@@ -1,13 +1,15 @@
 import { useState } from "react";
-import DiscoveryPage from "./modules/smartPlanner/pages/DiscoveryPage";
+import DiscoveryPage, { type TabId } from "./modules/smartPlanner/pages/DiscoveryPage";
 import HotelListPage from "./modules/smartPlanner/pages/HotelListPage";
 import HotelDetailPage from "./modules/smartPlanner/pages/HotelDetailPage";
+import StopoverRoomPage from "./modules/smartPlanner/pages/StopoverRoomPage";
 import HolidayListPage from "./modules/smartPlanner/pages/HolidayListPage";
 import PackageDetailPage from "./modules/smartPlanner/pages/PackageDetailPage";
 import TourDetailPage from "./modules/smartPlanner/pages/TourDetailPage";
 import { SWISS_WINTER_TOUR, DISCOVERY_TOUR_MAP } from "./mocks/tours";
 import type { Tour } from "./types";
 import FlightListPage from "./modules/smartPlanner/pages/FlightListPage";
+import { FlightStepper } from "./modules/smartPlanner/components/flightSearch/FlightStepper";
 import { type StartingContext } from "./modules/smartPlanner/pages/SmartPlannerPage";
 // Wrap Smart Planner with the DISCOVER video-fill loader so every entry to
 // the planner gets a 5s branded intro before the itinerary appears.
@@ -88,6 +90,30 @@ export type FlightSearchCriteria = {
   adults: number;
   children: number;
   cabinClass: "economy" | "premium-economy" | "business" | "first";
+  // Stopover opt-in (round trip only). When `enabled`, the results page mixes
+  // stopover offers into the chosen leg ("outbound" or "return"), and picking
+  // one routes the user through a stopover-hotel step before SmartPlanner.
+  stopover?: {
+    enabled: boolean;
+    leg: "outbound" | "return";
+    nights: number;
+  };
+  // When true, this search came from the dedicated Stopover tab. The results
+  // page then shows ONLY stopover offers on the chosen leg, flat flights only
+  // on the other leg, and restricts every result to Fiji Airways. The normal
+  // Flights tab never sets this, so its behaviour is unchanged.
+  stopoverOnly?: boolean;
+};
+
+// One physical flight in a journey (origin→hub or hub→destination). Used to
+// describe each half of a stopover offer so the card can show both legs with
+// their own times, duration and "lands next day" marker.
+export type FlightSegment = {
+  depTime: string;          // "21:40"
+  arrTime: string;          // "07:55"
+  duration: string;         // "7h 15m"
+  arrivesNextDay?: boolean; // true → show a "+1" next to the arrival time
+  note?: string;            // small label under the line, e.g. "direct" / "overnight"
 };
 
 // One flight result card shown on the FlightListPage.
@@ -102,6 +128,17 @@ export type FlightOption = {
   stopInfo?: string;     // "via Dubai" — optional extra detail
   price: number;         // per person in USD
   badge?: "Best" | "Cheapest" | "Fastest";
+  // Present only on stopover offers — the multi-night stay built into this
+  // flight. Drives the stopover treatment on the card and the hotel step after.
+  // `out`/`onward`/`hubCode` power the richer two-flight stopover card; they're
+  // optional so any simpler stopover usage still type-checks.
+  stopover?: {
+    city: string;
+    nights: number;
+    hubCode?: string;        // the stopover airport, e.g. "DXB"
+    out?: FlightSegment;     // origin → hub
+    onward?: FlightSegment;  // hub → destination
+  };
 };
 
 // A leg that the user has finished choosing — the search leg + the chosen flight option.
@@ -136,6 +173,8 @@ export default function App() {
     | "package-detail"
     | "tour-detail"
     | "flight-results"
+    | "stopover-hotel"
+    | "stopover-room"
     | "smart-planner"
     // ── Activities flow ──
     | "activity-list"
@@ -155,6 +194,11 @@ export default function App() {
   // flips this on so the back link from the conversation lands on the AI
   // version of the hero, not the default search card.
   const [aiExperienceMode, setAiExperienceMode] = useState(false);
+
+  // Which Discovery tab to land on when we return to it. Each search handler
+  // sets this to its own tab, so e.g. backing out of the flights list reopens
+  // Discovery on the Flights tab. Starts on the original default, "holidays".
+  const [discoveryTab, setDiscoveryTab] = useState<TabId>("holidays");
 
   // The "how did you get here" context passed into SmartPlanner.
   // It tells SmartPlanner which product(s) to pre-load in the itinerary.
@@ -226,11 +270,18 @@ export default function App() {
   const [currentFlightLegIndex, setCurrentFlightLegIndex] = useState(0);
   // Legs the user has already chosen — builds up as the user selects flights.
   const [selectedFlightLegs, setSelectedFlightLegs] = useState<SelectedFlightLeg[]>([]);
+  // The stopover the user picked (city + nights), held while they choose a
+  // stopover hotel on the next step. Null on a plain flight search.
+  const [stopoverSelection, setStopoverSelection] = useState<{ city: string; nights: number } | null>(null);
+  // The stopover hotel the user picked — held while they choose a room for it on
+  // the new stopover-room step, then folded into the SmartPlanner context.
+  const [stopoverHotel, setStopoverHotel] = useState<any | null>(null);
 
   // ── HOTELS tab: search → HotelListPage ──────────────────────────────────
   // Called when the user submits the Hotel search form on Discovery.
   const handleHotelSearch = (criteria: SearchCriteria) => {
     setSearchCriteria(criteria);
+    setDiscoveryTab("hotels"); // return here → Hotels tab
     setCurrentPage("hotel-list");
     window.scrollTo(0, 0);
   };
@@ -334,6 +385,19 @@ export default function App() {
     setFlightSearchCriteria(criteria);
     setSelectedFlightLegs([]);      // clear any previous selections
     setCurrentFlightLegIndex(0);    // always start with leg 0
+    setDiscoveryTab("flights");     // "Back to discovery" → Flights tab
+    setCurrentPage("flight-results");
+    window.scrollTo(0, 0);
+  };
+
+  // ── STOPOVER tab: submit search → FlightListPage (stopover-only mode) ─────
+  // Same as handleFlightSearch (the criteria already carries `stopoverOnly`),
+  // but remembers the Stopover tab so "Back to discovery" returns there.
+  const handleStopoverSearch = (criteria: FlightSearchCriteria) => {
+    setFlightSearchCriteria(criteria);
+    setSelectedFlightLegs([]);
+    setCurrentFlightLegIndex(0);
+    setDiscoveryTab("stopover");    // "Back to discovery" → Stopover tab
     setCurrentPage("flight-results");
     window.scrollTo(0, 0);
   };
@@ -341,6 +405,81 @@ export default function App() {
   // ── FlightListPage: user selects a flight for one leg ────────────────────
   // If there are more legs to pick, advance to the next one.
   // If this was the last leg, build the StartingContext and go to SmartPlanner.
+  // Shared helper — build the "flight" StartingContext from the chosen legs and
+  // head to SmartPlanner. `stopoverHotel` is passed only on the stopover path,
+  // and adds the chosen stay (city + nights + hotel) to the flight context so
+  // seedTimeline can drop it into the itinerary.
+  const goToPlannerWithFlights = (
+    selected: SelectedFlightLeg[],
+    stopoverHotel?: any,
+    // The room(s) chosen on the stopover-room step (keyed by room config id).
+    // We pull the first selection's room name + board through so the stopover
+    // accommodation card shows the actual room rather than a placeholder.
+    stopoverRoomSelections?: any,
+  ) => {
+    // Mirror handleHotelDetailBook: take the first chosen room's name + board.
+    const firstRoom: any = stopoverRoomSelections
+      ? Object.values(stopoverRoomSelections).find((v) => v)
+      : undefined;
+    const stopoverRoomType = firstRoom?.room?.name;
+    const stopoverBoardType = firstRoom?.cancelOption || firstRoom?.extraOption;
+    const first = selected[0];
+    const last = selected[selected.length - 1];
+    setStartingContext({
+      type: "flight",
+      flight: {
+        from: first.leg.from || "London",
+        // On the stopover path the destination is the outbound leg's arrival
+        // (the real holiday city); otherwise keep the prior behaviour.
+        to: (stopoverHotel ? first.leg.to : last.leg.to) || "Destination",
+        stops: first.option.stops,
+        duration: first.option.duration,
+        airline: first.option.airline,
+        price: `$${first.option.price}`,
+        // Pass all legs (both round-trip and multi-city) so SmartPlanner
+        // can show one FlightCard per leg with the correct date.
+        legs: selected.map((s) => ({
+          from: s.leg.from,
+          to: s.leg.to,
+          date: s.leg.date ? format(s.leg.date, "d MMM") : "",       // display: "9 Apr"
+          dateISO: s.leg.date ? format(s.leg.date, "yyyy-MM-dd") : "", // machine-readable: "2026-04-09"
+          airline: s.option.airline,
+          duration: s.option.duration,
+          stops: s.option.stops,
+        })),
+        // Stopover stay — only set when the user picked a hotel for it.
+        ...(stopoverHotel && stopoverSelection
+          ? {
+              stopover: {
+                city: stopoverSelection.city,
+                nights: stopoverSelection.nights,
+                hotel: {
+                  name: stopoverHotel.name,
+                  image: stopoverHotel.image,
+                  stars: stopoverHotel.stars,
+                  rating: stopoverHotel.rating,
+                  reviewCount: stopoverHotel.reviewCount,
+                  // The HotelListPage mock hotels carry fixed locations, so
+                  // pin the stopover stay to the actual stopover city instead.
+                  location: stopoverSelection.city,
+                  price: stopoverHotel.price,
+                  // The room the user chose on the stopover-room step.
+                  roomType: stopoverRoomType,
+                  boardType: stopoverBoardType,
+                },
+              },
+            }
+          : {}),
+      },
+    });
+    setSelectedFlightLegs([]);
+    setCurrentFlightLegIndex(0);
+    setStopoverSelection(null);
+    setStopoverHotel(null);
+    setCurrentPage("smart-planner");
+    window.scrollTo(0, 0);
+  };
+
   const handleFlightLegSelect = (option: FlightOption) => {
     const currentLeg = flightSearchCriteria!.legs[currentFlightLegIndex];
     const newSelected = [...selectedFlightLegs, { leg: currentLeg, option }];
@@ -351,43 +490,58 @@ export default function App() {
       setSelectedFlightLegs(newSelected);
       setCurrentFlightLegIndex((prev) => prev + 1);
       window.scrollTo(0, 0);
-    } else {
-      // All legs chosen — build the context and head to SmartPlanner.
-      const first = newSelected[0];
-      const last = newSelected[newSelected.length - 1];
-      setStartingContext({
-        type: "flight",
-        flight: {
-          from: first.leg.from || "London",
-          to: last.leg.to || "Destination",
-          stops: first.option.stops,
-          duration: first.option.duration,
-          airline: first.option.airline,
-          price: `$${first.option.price}`,
-          // Pass all legs (both round-trip and multi-city) so SmartPlanner
-          // can show one FlightCard per leg with the correct date.
-          legs: newSelected.map((s) => ({
-            from: s.leg.from,
-            to: s.leg.to,
-            date: s.leg.date ? format(s.leg.date, "d MMM") : "",       // display: "9 Apr"
-            dateISO: s.leg.date ? format(s.leg.date, "yyyy-MM-dd") : "", // machine-readable: "2026-04-09"
-            airline: s.option.airline,
-            duration: s.option.duration,
-            stops: s.option.stops,
-          })),
-        },
-      });
-      setSelectedFlightLegs([]);
-      setCurrentFlightLegIndex(0);
-      setCurrentPage("smart-planner");
-      window.scrollTo(0, 0);
+      return;
     }
+
+    // Last leg chosen. If a stopover offer was picked on any leg, route through
+    // the stopover-hotel step first; the SmartPlanner context is built once a
+    // hotel is chosen there. Otherwise go straight to SmartPlanner.
+    const stopoverPick = newSelected.find((s) => s.option.stopover)?.option.stopover ?? null;
+    if (stopoverPick) {
+      setSelectedFlightLegs(newSelected);
+      setStopoverSelection(stopoverPick);
+      setCurrentPage("stopover-hotel");
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    goToPlannerWithFlights(newSelected);
+  };
+
+  // ── Stepper: click a completed step to jump back to that flight leg ───────
+  // We drop that leg's selection and everything chosen after it, so the user
+  // re-picks forward from there. Clearing the stopover selection too means a
+  // re-pick can change (or remove) the stopover. Works from either the flight
+  // results page or the stopover-hotel page (we always land back on results).
+  const handleFlightStepSelect = (legIndex: number) => {
+    setSelectedFlightLegs((prev) => prev.slice(0, legIndex));
+    setCurrentFlightLegIndex(legIndex);
+    setStopoverSelection(null);
+    setStopoverHotel(null);
+    setCurrentPage("flight-results");
+    window.scrollTo(0, 0);
+  };
+
+  // ── Stopover-hotel step: user picked a hotel → stopover-room step ─────────
+  // Hold the chosen hotel, then move to the new room-selection step. The
+  // SmartPlanner context is only built once a room is picked there.
+  const handleStopoverHotelSelect = (hotel: any) => {
+    setStopoverHotel(hotel);
+    setCurrentPage("stopover-room");
+    window.scrollTo(0, 0);
+  };
+
+  // ── Stopover-room step: user picked a room → SmartPlanner ─────────────────
+  // Now we have the flights, the hotel, and the room — build the full context.
+  const handleStopoverRoomSelect = (roomSelections: any) => {
+    goToPlannerWithFlights(selectedFlightLegs, stopoverHotel, roomSelections);
   };
 
   // ── HOLIDAYS tab: submit search → HolidayListPage ────────────────────────
   // Saves the search criteria and navigates to the results list.
   const handleHolidaySearch = (criteria: HolidaySearchCriteria) => {
     setHolidaySearchCriteria(criteria);
+    setDiscoveryTab("holidays"); // return here → Holidays tab
     setCurrentPage("holiday-list");
     window.scrollTo(0, 0);
   };
@@ -417,6 +571,7 @@ export default function App() {
   // ── ACTIVITIES tab: submit search → ActivityListPage ──────────────────────
   const handleActivitySearch = (criteria: ActivitySearchCriteria) => {
     setActivitySearchCriteria(criteria);
+    setDiscoveryTab("activities"); // return here → Activities tab
     setCurrentPage("activity-list");
     window.scrollTo(0, 0);
   };
@@ -498,12 +653,14 @@ export default function App() {
           onHotelDirectSelect={handleHotelDirectSelect}
           onTourSelect={handleTourSelect}
           onFlightSearch={handleFlightSearch}
+          onStopoverSearch={handleStopoverSearch}
           onHolidaySearch={handleHolidaySearch}
           onActivitySearch={handleActivitySearch}
           onActivityDirectSelect={handleActivityDirectSelect}
           onAiPlannerStart={handleAiPlannerStart}
           aiExperienceMode={aiExperienceMode}
           onAiExperienceModeChange={setAiExperienceMode}
+          initialActiveTab={discoveryTab}
         />
       )}
 
@@ -558,7 +715,89 @@ export default function App() {
             setSelectedFlightLegs([]);
             setCurrentFlightLegIndex(0);
           }}
+          onStepSelect={handleFlightStepSelect}
           onBack={handleBack}
+        />
+      )}
+
+      {/* Stopover hotel step — reached after the user picks a stopover flight
+          and finishes choosing their legs. We REUSE the existing HotelListPage
+          (same hotel cards), scoped to the stopover city. Picking a hotel here
+          builds the flight+stopover context and lands on SmartPlanner. */}
+      {currentPage === "stopover-hotel" && stopoverSelection && (
+        <HotelListPage
+          onHotelSelect={handleStopoverHotelSelect}
+          // "Back to discovery" exits the whole stopover flow. Stepping back to
+          // the flight legs is handled by the FlightStepper in the header below.
+          onBackToSearch={handleBack}
+          initialLocation={stopoverSelection.city}
+          stopoverNights={stopoverSelection.nights}
+          // Stopover step: no search fields (city + dates are fixed by the
+          // flight), and the flight stepper sits in the header instead. Both
+          // flights are done by now, so the hotel card is the current step:
+          // currentLegIndex = legs.length marks every flight "done", and
+          // stopoverStatus="current" lights up the hotel card.
+          hideSearch
+          headerSlot={
+            flightSearchCriteria ? (
+              <FlightStepper
+                legs={flightSearchCriteria.legs}
+                currentLegIndex={flightSearchCriteria.legs.length}
+                tripType={flightSearchCriteria.tripType}
+                stopover={flightSearchCriteria.stopover}
+                // The hub city for the hotel step ("… stay in {city}").
+                stopoverCity={stopoverSelection.city}
+                stopoverStatus="current"
+                onStepSelect={handleFlightStepSelect}
+              />
+            ) : null
+          }
+        />
+      )}
+
+      {/* Stopover room step — reached after the user picks a stopover hotel.
+          The traveller selects a room in that hotel (primary), with a richer
+          hotel showcase below (secondary). Picking a room builds the full
+          flight+stopover context and lands on SmartPlanner. */}
+      {currentPage === "stopover-room" && stopoverSelection && stopoverHotel && (
+        <StopoverRoomPage
+          hotel={stopoverHotel}
+          city={stopoverSelection.city}
+          nights={stopoverSelection.nights}
+          // The room is for the flight's passengers — one room with those guests.
+          roomConfiguration={
+            flightSearchCriteria
+              ? [{ id: 1, adults: flightSearchCriteria.adults, children: flightSearchCriteria.children }]
+              : undefined
+          }
+          // "Back to discovery" exits the whole stopover flow. Stepping back to
+          // the hotel step is handled by the stepper's onStopoverStepSelect below.
+          onBack={handleBack}
+          onSelectRooms={handleStopoverRoomSelect}
+          // Stepper: flights + hotel are done, the room card is now current.
+          headerSlot={
+            flightSearchCriteria ? (
+              <FlightStepper
+                legs={flightSearchCriteria.legs}
+                currentLegIndex={flightSearchCriteria.legs.length}
+                tripType={flightSearchCriteria.tripType}
+                stopover={flightSearchCriteria.stopover}
+                // City for the (done) hotel step; hotel name for the room step
+                // ("… stay in {city}" → "Room selection in {hotel}").
+                stopoverCity={stopoverSelection.city}
+                stopoverHotelName={stopoverHotel.name}
+                stopoverStatus="done"
+                roomStatus="current"
+                onStepSelect={handleFlightStepSelect}
+                // Clicking the done "Stopover hotel" step returns to the hotel
+                // list — same back-to-a-step behaviour as the flight cards.
+                onStopoverStepSelect={() => {
+                  setCurrentPage("stopover-hotel");
+                  window.scrollTo(0, 0);
+                }}
+              />
+            ) : null
+          }
         />
       )}
 

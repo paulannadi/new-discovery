@@ -16,6 +16,7 @@ import { cn } from "../../../shared/components/ui/utils";
 import type { HolidaySearchCriteria } from "../../../App";
 import type { UnifiedPackage } from "../../../types";
 import PackageSearchForm from "../components/PackageSearchForm";
+import { PageContainer } from "../../../shared/components/PageContainer";
 import { PackageCard } from "../components/PackageCard";
 import { TourCard } from "../components/TourCard";
 // Loading kit — shared components that follow our loading patterns doc.
@@ -494,7 +495,7 @@ export default function HolidayListPage({
 
       {/* ── HEADER: editable search criteria ─────────────────────────────── */}
       <div className="bg-card border-b border-border relative z-40">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-6 py-4">
+        <PageContainer tier="wide" className="px-4 md:px-6 py-4">
 
           {/* Back to Discovery — always visible, including on mobile */}
           <BackButton label="Back to discovery" onClick={onBack} className="mb-3" />
@@ -538,12 +539,12 @@ export default function HolidayListPage({
               }}
             />
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* ── FILTER BAR: desktop ───────────────────────────────────────────── */}
       <div className="hidden md:block bg-grey-lightest sticky top-0 z-30 border-b border-border">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-6 py-3 flex gap-3 overflow-x-auto items-center">
+        <PageContainer tier="wide" className="px-4 md:px-6 py-3 flex gap-3 overflow-x-auto items-center">
 
           <FilterButton
             label={`Sort: ${getSortLabel()}`}
@@ -599,19 +600,19 @@ export default function HolidayListPage({
             </button>
           )}
 
-        </div>
+        </PageContainer>
       </div>
 
       {/* ── FILTER BAR: mobile ────────────────────────────────────────────── */}
       <div className="md:hidden bg-grey-lightest sticky top-0 z-30 px-4 py-3">
-        <div className="bg-card border border-border rounded-full flex items-center h-[48px] w-full">
-          <button className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-bold text-foreground first:rounded-l-full">
+        <div className="bg-card border border-border rounded-xl flex items-center h-[48px] w-full">
+          <button className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground first:rounded-l-xl">
             <ArrowUpDown size={14} />
             Sort
           </button>
           <div className="w-[1px] h-6 bg-border" />
           <button
-            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-bold text-foreground"
+            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground"
             onClick={() => setIsMobileFiltersOpen(true)}
           >
             <SlidersHorizontal size={14} />
@@ -624,7 +625,7 @@ export default function HolidayListPage({
           </button>
           <div className="w-[1px] h-6 bg-border" />
           <button
-            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-bold text-foreground last:rounded-r-full"
+            className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground last:rounded-r-xl"
             onClick={() => setMobileView(mobileView === "list" ? "map" : "list")}
           >
             {mobileView === "list" ? <MapIcon size={14} /> : <List size={14} />}
@@ -634,7 +635,7 @@ export default function HolidayListPage({
       </div>
 
       {/* ── MAIN SPLIT LAYOUT ─────────────────────────────────────────────── */}
-      <div className="flex flex-1 max-w-[1920px] mx-auto w-full overflow-hidden relative">
+      <PageContainer tier="wide" className="flex flex-1 overflow-hidden relative">
 
         {/* LEFT: package results list */}
         <div ref={listScrollRef} className={`w-full md:w-[65%] min-w-0 h-[calc(100vh-160px)] overflow-y-auto p-4 md:p-6 flex flex-col gap-4 ${mobileView === "map" ? "hidden md:flex" : "flex"}`}>
@@ -840,7 +841,7 @@ export default function HolidayListPage({
           })()}
         </div>
 
-      </div>
+      </PageContainer>
 
       {/* ── DESKTOP FILTER DROPDOWNS ──────────────────────────────────────── */}
       {renderFilterDropdown()}

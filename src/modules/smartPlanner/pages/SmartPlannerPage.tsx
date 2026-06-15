@@ -19,6 +19,7 @@ import { useEffect, useRef, useState } from "react";
 import { addDays, parseISO } from "date-fns";
 import { Button } from "../../../shared/components/ui/button";
 import { BackButton } from "../../../shared/components/BackButton";
+import { PageContainer } from "../../../shared/components/PageContainer";
 // Activity and tour types — passed straight through from the detail pages so
 // the timeline can render the actual stops/days/ports rather than mock data.
 import type { Activity, TourStop, TourTransfer } from "../../../types";
@@ -88,6 +89,13 @@ export type FlightData = {
     duration: string;
     stops: string;
   }>;
+  // Set when the user added a stopover and chose a hotel for it. seedTimeline
+  // drops this hotel into the itinerary as an extra accommodation stay.
+  stopover?: {
+    city: string;
+    nights: number;
+    hotel?: HotelData;
+  };
 };
 
 export type HolidayPackageData = {
@@ -258,9 +266,9 @@ export default function SmartPlannerPage({
       {/* Page-top back link — same shared BackButton style as every other page
           (TourDetailPage, HotelDetailPage, etc.). The label adapts to where the
           user came from, so they always know which screen "Back" leads to. */}
-      <div className="max-w-5xl mx-auto px-4 lg:px-0 pt-5">
+      <PageContainer tier="narrow" className="px-4 lg:px-0 pt-5">
         <BackButton label={getBackLabel(startingContext)} onClick={onBack} />
-      </div>
+      </PageContainer>
 
       {/* Immersive hero — image + overlay title + 3 icon buttons + ticket capsule.
           Map / Share / Expert-mode callbacks are stubs for now — we'll wire each
@@ -293,7 +301,7 @@ export default function SmartPlannerPage({
 
       {/* Content area — single unified timeline.
           pl-1 on mobile so the dashed timeline rail is visible at the screen edge. */}
-      <div className="max-w-5xl mx-auto pl-1 pr-4 md:px-4 pt-5 md:pt-8 pb-32 box-content">
+      <PageContainer tier="narrow" className="pl-1 pr-4 md:px-4 pt-5 md:pt-8 pb-32 box-content">
         <ItineraryTimeline items={timelineItems} aiPrompt={aiPrompt} passengerCount={adults} />
 
         {/* Footer — Book CTA only. The top-of-page BackButton handles
@@ -301,7 +309,7 @@ export default function SmartPlannerPage({
         <div className="flex justify-end items-center mt-8 pt-6 border-t border-border">
           <Button size="lg">Book · {totalPriceLabel}</Button>
         </div>
-      </div>
+      </PageContainer>
 
       {/* Sticky bottom bar with expandable trip-summary panel.
           Slides up only once the user has scrolled past the hero capsule —

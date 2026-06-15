@@ -18,6 +18,7 @@ import { useState, useMemo, useEffect } from "react";
 import { format } from "date-fns";
 import { Plane } from "lucide-react";
 import { BackButton } from "../../../shared/components/BackButton";
+import { PageContainer } from "../../../shared/components/PageContainer";
 import { Skeleton } from "../../../shared/components/ui/skeleton";
 import {
   StaggeredList,
@@ -39,7 +40,9 @@ import { FlightResultCard } from "../components/flightSearch/FlightResultCard";
 // the user clicks "Edit search" it replaces the trip summary row in-place,
 // pre-filled with the current criteria.
 import { FlightSearchForm } from "../components/flightSearch/FlightSearchForm";
-import { getMockFlightsForLeg } from "../components/flightSearch/mockFlights";
+// Banner that nudges the traveller to add a stopover when they didn't opt in.
+import { StopoverPromoBanner } from "../components/flightSearch/StopoverPromoBanner";
+import { getMockFlightsForLeg, getStopoverOffersForLeg, routeHasStopover } from "../components/flightSearch/mockFlights";
 import { applyFilters } from "../components/flightSearch/filterFlights";
 import { DEFAULT_FILTERS, type FlightFilters } from "../components/flightSearch/types";
 
@@ -55,6 +58,8 @@ type FlightListPageProps = {
   // New — Edit Search modal commits via this callback. The parent (App.tsx)
   // updates searchCriteria, clears selected legs, and resets the leg index.
   onSearchCriteriaChange: (next: FlightSearchCriteria) => void;
+  // Click a completed step in the stepper to jump back to that flight leg.
+  onStepSelect?: (legIndex: number) => void;
   onBack: () => void;
 };
 
@@ -97,6 +102,7 @@ export default function FlightListPage({
   selectedLegs,
   onFlightLegSelect,
   onSearchCriteriaChange,
+  onStepSelect,
   onBack,
 }: FlightListPageProps) {
   // ── Edit Search inline-editor open state ───────────────────────────────
@@ -106,6 +112,11 @@ export default function FlightListPage({
 
   // ── Filters state — single object so resets are one line ──────────────
   const [filters, setFilters] = useState<FlightFilters>(DEFAULT_FILTERS);
+
+  // ── Stopover suggestion banner ─────────────────────────────────────────
+  // Once the traveller dismisses the "add a stopover" nudge, we keep it hidden
+  // for the rest of the session so we don't keep pestering them.
+  const [stopoverPromoDismissed, setStopoverPromoDismissed] = useState(false);
 
   // ── Simulated streaming search ─────────────────────────────────────────
   // Real queries take several seconds across multiple carriers. We mimic
@@ -139,16 +150,83 @@ export default function FlightListPage({
   const totalLegs = searchCriteria.legs.length;
   const cabinLabel = CABIN_LABELS[searchCriteria.cabinClass];
 
-  // Raw mock results for this leg
-  const flights = useMemo(
-    () => getMockFlightsForLeg(currentLeg?.from || "", currentLeg?.to || ""),
-    [currentLeg?.from, currentLeg?.to],
+  // Is THIS the leg the user opted into a stopover on? (round trip only —
+  // leg 0 = outbound, leg 1 = return). If so, we surface stopover offers
+  // alongside the normal results for this connection.
+  const stop = searchCriteria.stopover;
+  const isStopoverLeg =
+    searchCriteria.tripType === "roundtrip" &&
+    !!stop?.enabled &&
+    ((stop.leg === "outbound" && currentLegIndex === 0) ||
+      (stop.leg === "return" && currentLegIndex === 1));
+
+  // Dedicated Stopover-tab search (from the new Discovery "Stopover" tab). When
+  // true we show ONLY stopover offers on the chosen leg, flat flights only on
+  // the other leg, and restrict every result to Fiji Airways.
+  const stopoverOnly = !!searchCriteria.stopoverOnly;
+
+  // Should we show the "add a stopover" nudge? Only when ALL of these hold:
+  //   • it's a round trip (stopovers only apply to round trips)
+  //   • the traveller hasn't already opted into a stopover
+  //   • they haven't dismissed the banner this session
+  //   • the outbound route actually HAS a sensible stopover hub — otherwise
+  //     enabling the option would surface zero offers, so the nudge would be a
+  //     dead end. `routeHasStopover` is the same gate the stepper uses.
+  const outboundLeg = searchCriteria.legs[0];
+  const showStopoverPromo =
+    searchCriteria.tripType === "roundtrip" &&
+    !stop?.enabled &&
+    !stopoverOnly &&
+    !stopoverPromoDismissed &&
+    !!outboundLeg &&
+    routeHasStopover(outboundLeg.from, outboundLeg.to);
+
+  // CTA handler — re-run the SAME search with the stopover option turned on.
+  // We hand the updated criteria to the parent (App.tsx), which clears the
+  // selected legs and resets to leg 0; the effect above then re-runs the
+  // simulated search, so the results refresh with stopover offers mixed in.
+  // We default to a 2-night stopover on the OUTBOUND leg — the most common
+  // choice, and the one the traveller lands back on after the reset.
+  const handleEnableStopover = () => {
+    onSearchCriteriaChange({
+      ...searchCriteria,
+      stopover: { enabled: true, leg: "outbound", nights: 2 },
+    });
+  };
+
+  // Raw mock results for this leg (the normal flights). In the dedicated
+  // Stopover flow we keep only Fiji Airways (FJ) flights, so the flat leg shows
+  // Fiji fares only — matching the stopover offers, which already fly Fiji.
+  const flights = useMemo(() => {
+    const all = getMockFlightsForLeg(currentLeg?.from || "", currentLeg?.to || "");
+    return stopoverOnly ? all.filter((f) => f.airlineCode === "FJ") : all;
+  }, [currentLeg?.from, currentLeg?.to, stopoverOnly]);
+
+  // Stopover offers for the chosen leg. Kept separate from `flights` so they
+  // aren't reordered by the price/duration sort or hidden by the airline
+  // filters — they're the whole reason the user opted in, so they stay pinned
+  // at the top of the list.
+  const stopoverOffers = useMemo(
+    () =>
+      isStopoverLeg && stop
+        ? getStopoverOffersForLeg(currentLeg?.from || "", currentLeg?.to || "", stop.nights)
+        : [],
+    [isStopoverLeg, currentLeg?.from, currentLeg?.to, stop?.nights],
   );
 
-  // Apply the active filters + sort
+  // Apply the active filters + sort to the normal flights, then pin the
+  // stopover offers on top.
+  //
+  // In the dedicated Stopover flow the chosen leg shows ONLY stopover offers —
+  // no flat flights — so the traveller picks from stopover journeys alone. On
+  // the other leg `stopoverOffers` is empty and `flights` is Fiji-filtered, so
+  // the same expression naturally yields Fiji flat flights only.
   const filteredFlights = useMemo(
-    () => applyFilters(flights, filters),
-    [flights, filters],
+    () =>
+      stopoverOnly && isStopoverLeg
+        ? stopoverOffers
+        : [...stopoverOffers, ...applyFilters(flights, filters)],
+    [stopoverOnly, isStopoverLeg, stopoverOffers, flights, filters],
   );
 
   // List of airlines available in the current result set — feeds the
@@ -171,7 +249,7 @@ export default function FlightListPage({
             criteria. Full-bleed background, inner content constrained to the
             same max-w-5xl as the results below so everything stays aligned. */}
       <header className="bg-card border-b border-border">
-        <div className="max-w-5xl mx-auto px-4 py-4">
+        <PageContainer tier="narrow" className="px-4 py-4">
 
           {/* 1. Back to discovery */}
           <BackButton label="Back to discovery" onClick={onBack} className="mb-3" />
@@ -184,6 +262,10 @@ export default function FlightListPage({
           {isEditingSearch ? (
             <FlightSearchForm
               initialCriteria={searchCriteria}
+              // Keep the stopover-only form (round-trip, no opt-in checkbox,
+              // Fiji-restricted airports) when editing a stopover search, so the
+              // edit can't accidentally drop back to the normal flights form.
+              stopoverMode={stopoverOnly}
               submitLabel="Search flights"
               onSearch={(next) => {
                 onSearchCriteriaChange(next);
@@ -196,19 +278,40 @@ export default function FlightListPage({
               onEditSearch={() => setIsEditingSearch(true)}
             />
           )}
-        </div>
+        </PageContainer>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-6 md:py-8">
+      <PageContainer as="main" tier="narrow" className="px-4 py-6 md:py-8">
 
-        {/* 4. Stepper — legs + Summary */}
-        <div className="mb-6 pb-5 border-b border-border">
-          <FlightStepper legs={searchCriteria.legs} currentLegIndex={currentLegIndex} />
+        {/* 4. Stepper — one card per flight leg (+ a stopover-hotel card when
+            the round trip opted into a stopover).
+            No divider here — we rely on generous whitespace (`mb-10`) to
+            separate the stepper from the title below instead of a border line. */}
+        <div className="mb-10">
+          <FlightStepper
+            legs={searchCriteria.legs}
+            currentLegIndex={currentLegIndex}
+            tripType={searchCriteria.tripType}
+            stopover={searchCriteria.stopover}
+            onStepSelect={onStepSelect}
+          />
         </div>
+
+        {/* 4b. Stopover nudge — sits directly below the stepper. Only for round
+            trips where the traveller hasn't opted into a stopover and the route
+            has a sensible hub. The CTA re-runs the search with stopovers on. */}
+        {showStopoverPromo && (
+          <div className="mb-8">
+            <StopoverPromoBanner
+              onEnableStopover={handleEnableStopover}
+              onDismiss={() => setStopoverPromoDismissed(true)}
+            />
+          </div>
+        )}
 
         {/* 5. Per-leg sub-heading row */}
         {currentLeg && (
-          <div className="flex flex-wrap items-start justify-between gap-2 mb-4">
+          <div className="flex flex-wrap items-start justify-between gap-2 mb-6">
             <div className="flex items-start gap-2.5">
               <Plane size={22} className="text-primary shrink-0 mt-1" aria-hidden="true" />
               <div>
@@ -234,6 +337,7 @@ export default function FlightListPage({
             filters={filters}
             onChange={setFilters}
             availableAirlines={availableAirlines}
+            resultCount={filteredFlights.length}
           />
         </div>
 
@@ -316,7 +420,7 @@ export default function FlightListPage({
             </div>
           </div>
         )}
-      </main>
+      </PageContainer>
     </div>
   );
 }

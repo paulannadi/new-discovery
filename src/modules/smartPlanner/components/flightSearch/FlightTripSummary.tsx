@@ -14,18 +14,8 @@
 // FlightStepper underneath already lists each leg with its route.
 
 import { format } from "date-fns";
-import { Pencil } from "lucide-react";
-import { Button } from "../../../../shared/components/ui/button";
+import { SearchSummary } from "../SearchSummary";
 import type { FlightSearchCriteria } from "../../../../App";
-
-// A small, explicit light-grey divider. We render a plain <span> rather than the
-// shared <Separator> here because that component forces `h-full` on vertical
-// dividers (via a higher-specificity data-variant class), and inside this
-// center-aligned flex row `h-full` collapses to 0 height — so the divider would
-// be invisible. A fixed `h-5` + `w-px` + the `grey-light` token avoids all that.
-function Divider() {
-  return <span aria-hidden="true" className="h-5 w-px shrink-0 bg-grey-light" />;
-}
 
 type FlightTripSummaryProps = {
   criteria: FlightSearchCriteria;
@@ -51,36 +41,13 @@ export function FlightTripSummary({ criteria, onEditSearch }: FlightTripSummaryP
         : `${format(firstDate, "d MMM")} – ${format(lastDate, "d MMM yyyy")}`;
   }
 
+  // Trip type is the headline (bold) fact; legs and the date range follow. The
+  // empty dateLabel is filtered out by SearchSummary, so an undated search just
+  // shows "Round trip · 2 flights" with no trailing divider.
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      {/* Trip type — bold */}
-      <span className="text-sm font-extrabold text-foreground">{tripTypeLabel}</span>
-
-      <Divider />
-
-      {/* Number of flights */}
-      <span className="text-sm text-foreground">{legsLabel}</span>
-
-      {dateLabel && (
-        <>
-          <Divider />
-          {/* Date range */}
-          <span className="text-sm text-foreground">{dateLabel}</span>
-        </>
-      )}
-
-      {/* Edit search — canonical design-system "secondary" button (primary
-          border + text on white, fills on hover). `size-3.5` keeps the Pencil
-          from defaulting to 20px inside the button. */}
-      <Button
-        variant="secondary"
-        size="sm"
-        onClick={onEditSearch}
-        className="ml-auto"
-      >
-        <Pencil className="size-3.5" aria-hidden="true" />
-        Edit search
-      </Button>
-    </div>
+    <SearchSummary
+      items={[tripTypeLabel, legsLabel, dateLabel]}
+      onEdit={onEditSearch}
+    />
   );
 }

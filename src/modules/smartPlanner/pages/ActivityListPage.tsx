@@ -27,6 +27,7 @@ import {
   Tag,
 } from "lucide-react";
 import { BackButton } from "../../../shared/components/BackButton";
+import { PageContainer } from "../../../shared/components/PageContainer";
 import { cn } from "../../../shared/components/ui/utils";
 import LeafletMap, {
   type MapMarkerData,
@@ -34,6 +35,8 @@ import LeafletMap, {
 import type { Activity, ActivitySearchCriteria } from "../../../types";
 import { ALL_ACTIVITIES } from "../../../mocks/activities";
 import ActivitySearchForm, { CRUISE_DESTINATION_GROUPS } from "../components/ActivitySearchForm";
+import { SearchSummary } from "../components/SearchSummary";
+import { format, parseISO } from "date-fns";
 import { ActivityCard } from "../components/ActivityCard";
 // Loading kit — vertical SkeletonCards while activities "load" briefly
 // (matches the doc's 1s–3s tier), then a 60ms staggered reveal.
@@ -158,6 +161,13 @@ export default function ActivityListPage({
     const id = setTimeout(() => setIsSearching(false), 1200);
     return () => clearTimeout(id);
   }, [searchCriteria]);
+
+  // ── Search form collapse (phone + tablet) ────────────────────────────────
+  // Below the desktop breakpoint the search form collapses to a compact
+  // <SearchSummary> (matching the flight + hotel headers); tapping "Edit
+  // search" expands the full form. On desktop (≥ 1024px) the form is always
+  // shown, so this flag is ignored there (the form's wrapper is `lg:block`).
+  const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
 
   // ── Filter state ────────────────────────────────────────────────────────
   // Sort defaults to "recommended" (the order from ALL_ACTIVITIES).
@@ -471,14 +481,43 @@ export default function ActivityListPage({
           (same shape as HolidayListPage's header card)
       ══════════════════════════════════════════════════════════════════ */}
       <div className="bg-card border-b border-border">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-6 pt-5 pb-5 flex flex-col gap-4">
+        <PageContainer tier="wide" className="px-4 md:px-6 pt-5 pb-5 flex flex-col gap-4">
           <BackButton label="Back to discovery" onClick={onBack} />
-          <ActivitySearchForm
-            variant="compact"
-            initialValues={searchCriteria}
-            onSearch={(c) => onRefineSearch?.(c)}
-          />
-        </div>
+
+          {/* Collapsed summary — flight-styled row, shown on phone + tablet.
+              Shows destination → date (if set) → travellers, with an "Edit
+              search" button that expands the full form. `lg:hidden` keeps this
+              scoped to below the desktop breakpoint (< 1024px), so tablets get
+              the compact summary too — matching the hotel header. */}
+          {!isMobileSearchExpanded && (
+            <SearchSummary
+              className="lg:hidden"
+              onEdit={() => setIsMobileSearchExpanded(true)}
+              items={[
+                searchCriteria.destination.trim() || "Anywhere",
+                // Optional date — skipped by SearchSummary when "Any time".
+                searchCriteria.dateFrom
+                  ? format(parseISO(searchCriteria.dateFrom), "d MMM yyyy")
+                  : null,
+                `${searchCriteria.travellers} traveller${searchCriteria.travellers !== 1 ? "s" : ""}`,
+              ]}
+            />
+          )}
+
+          {/* Full form — always on desktop (lg:block, ≥ 1024px); on phone +
+              tablet only once the summary's "Edit search" has expanded it.
+              Submitting collapses it back to the summary below desktop. */}
+          <div className={cn(isMobileSearchExpanded ? "block" : "hidden", "lg:block")}>
+            <ActivitySearchForm
+              variant="compact"
+              initialValues={searchCriteria}
+              onSearch={(c) => {
+                onRefineSearch?.(c);
+                setIsMobileSearchExpanded(false);
+              }}
+            />
+          </div>
+        </PageContainer>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
@@ -489,9 +528,11 @@ export default function ActivityListPage({
         {/* filtersRef stays `relative` so the dropdown panel can anchor under
             its button. It sits OUTSIDE the scrollable pill row, so the
             overflow-x on the pills never clips the open dropdown. */}
-        <div
+        <PageContainer
+          as="div"
+          tier="wide"
           ref={filtersRef}
-          className="relative max-w-[1920px] mx-auto px-4 md:px-6 py-3"
+          className="relative px-4 md:px-6 py-3"
         >
           {/* Filter pills — horizontal, scrollable on mobile */}
           <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -519,7 +560,7 @@ export default function ActivityListPage({
 
           {/* The actual dropdown panel — positioned absolute to the filters row */}
           {renderDropdown()}
-        </div>
+        </PageContainer>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
@@ -528,7 +569,7 @@ export default function ActivityListPage({
           the leftover viewport height, so the PAGE doesn't scroll — only the
           left column does (overflow-y-auto). The map fills its column.
       ══════════════════════════════════════════════════════════════════ */}
-      <div className="flex flex-1 max-w-[1920px] mx-auto w-full overflow-hidden relative">
+      <PageContainer tier="wide" className="flex flex-1 overflow-hidden relative">
 
         {/* LEFT — scrollable list column (65% on md+, full width below) */}
         <div className="w-full md:w-[65%] min-w-0 h-[calc(100vh-130px)] overflow-y-auto p-4 md:p-6 flex flex-col gap-6">
@@ -596,7 +637,7 @@ export default function ActivityListPage({
           />
         </div>
 
-      </div>
+      </PageContainer>
     </div>
   );
 }

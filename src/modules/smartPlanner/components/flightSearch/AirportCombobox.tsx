@@ -57,6 +57,10 @@ export type AirportComboboxProps = {
   iconRotated?: boolean;
   // Smaller styling for the multi-city rows.
   size?: "default" | "compact";
+  // Optional whitelist of IATA codes. When provided, the picker only offers
+  // these airports (used by the Stopover tab to restrict to Fiji's network).
+  // Omitted everywhere else, so the full catalogue shows as before.
+  allowedCodes?: string[];
 };
 
 export function AirportCombobox({
@@ -66,15 +70,22 @@ export function AirportCombobox({
   placeholder = "Select city",
   iconRotated = false,
   size = "default",
+  allowedCodes,
 }: AirportComboboxProps) {
   const [open, setOpen] = useState(false);
+
+  // When a whitelist is passed, narrow the catalogue to just those codes first.
+  // Otherwise use the full list.
+  const catalogue = allowedCodes
+    ? AIRPORTS.filter((a) => allowedCodes.includes(a.code))
+    : AIRPORTS;
 
   // We pre-group airports by region so the user sees big regional headings
   // (Europe, Middle East, …) instead of one long flat list. Computed once
   // up-top so the JSX below stays readable.
   const byRegion = REGION_ORDER.map((region) => ({
     region,
-    airports: AIRPORTS.filter((a) => a.region === region),
+    airports: catalogue.filter((a) => a.region === region),
   })).filter((g) => g.airports.length > 0);
 
   const display = airportDisplayLabel(value);
