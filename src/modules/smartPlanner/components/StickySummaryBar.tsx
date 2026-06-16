@@ -28,6 +28,16 @@ import { Button } from "../../../shared/components/ui/button";
 import { cn } from "../../../shared/components/ui/utils";
 import type { TimelineItem } from "../utils/seedTimeline";
 
+// One row in the right-hand "Price breakdown" column. Callers can pass a custom
+// list (e.g. the stopover flow itemises Flights + Stopover hotel + Trip total);
+// when omitted, the bar shows a single "Paid before departure" line.
+export type PriceBreakdownLine = {
+  label: string;
+  sub?: string;        // small grey sub-line under the label (e.g. "2 guests · 2 nights")
+  value: string;       // formatted money, e.g. "€1,340" or "+€500"
+  total?: boolean;     // the grand-total row — rendered bold with a top divider
+};
+
 interface StickySummaryBarProps {
   startDate: Date;
   endDate: Date;
@@ -47,6 +57,14 @@ interface StickySummaryBarProps {
   // their own positioning to constrain the bar to their column — e.g.
   // "fixed bottom-0 left-0 w-full md:left-[40%] md:w-[60%]".
   positionClassName?: string;
+  // The primary button. Defaults to the Smart Planner's "Book · {total}" with no
+  // handler. The stopover room step reuses this bar with "Continue" + a handler.
+  actionLabel?: string;
+  onAction?: () => void;
+  actionDisabled?: boolean;
+  // Custom right-column rows. When omitted, a single "Paid before departure"
+  // line is shown (the Smart Planner default).
+  priceBreakdown?: PriceBreakdownLine[];
 }
 
 // Map each item kind to a small line-style icon used in the expanded panel.
@@ -156,6 +174,10 @@ export function StickySummaryBar({
   items,
   show = true,
   positionClassName = "fixed bottom-0 left-0 w-full",
+  actionLabel,
+  onAction,
+  actionDisabled = false,
+  priceBreakdown,
 }: StickySummaryBarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -234,8 +256,13 @@ export function StickySummaryBar({
             </span>
           </div>
 
-          <Button size="lg" className="shrink-0">
-            Book · {totalPriceLabel}
+          <Button
+            size="lg"
+            className="shrink-0"
+            onClick={onAction}
+            disabled={actionDisabled}
+          >
+            {actionLabel ?? `Book · ${totalPriceLabel}`}
           </Button>
         </div>
 
@@ -321,18 +348,46 @@ export function StickySummaryBar({
             />
 
             {/* ── RIGHT COLUMN: price breakdown ─────────────────────────
-                For the prototype we show a single "Paid before departure"
-                line using the trip total. Real app would itemize this. */}
+                Callers can itemise this (the stopover flow passes Flights +
+                Stopover hotel + Trip total). With no custom list we fall back to
+                a single "Paid before departure" line using the trip total. */}
             <div className="flex flex-col gap-3">
               <h3 className="text-xs font-bold uppercase tracking-[0.08em] text-grey">
                 Price breakdown
               </h3>
-              <div className="flex items-baseline justify-between gap-4">
-                <span className="text-sm text-foreground">Paid before departure</span>
-                <span className="text-sm font-semibold text-foreground shrink-0">
-                  {totalPriceLabel}
-                </span>
-              </div>
+              {(priceBreakdown ?? [{ label: "Paid before departure", value: totalPriceLabel }]).map(
+                (line) => (
+                  <div
+                    key={line.label}
+                    className={cn(
+                      "flex items-baseline justify-between gap-4",
+                      line.total && "pt-3 mt-1 border-t border-grey-light",
+                    )}
+                  >
+                    <span className="flex flex-col">
+                      <span
+                        className={cn(
+                          "text-sm text-foreground",
+                          line.total && "font-bold",
+                        )}
+                      >
+                        {line.label}
+                      </span>
+                      {line.sub && (
+                        <span className="text-xs text-grey mt-0.5">{line.sub}</span>
+                      )}
+                    </span>
+                    <span
+                      className={cn(
+                        "text-sm font-semibold text-foreground shrink-0",
+                        line.total && "text-base font-bold",
+                      )}
+                    >
+                      {line.value}
+                    </span>
+                  </div>
+                ),
+              )}
             </div>
           </div>
         </section>

@@ -18,7 +18,7 @@ import { addDays, format } from 'date-fns';
 import { UnifiedPackage } from '../../types';
 
 // ── Rate calendar helper ───────────────────────────────────────────────────────
-// Generates a price for EVERY day in March–May 2026 so the calendar looks
+// Generates a price for EVERY day in March–August 2026 so the calendar looks
 // like a real price-per-day holiday grid (similar to TUI / jet2holidays).
 //
 // Price variation rules:
@@ -35,11 +35,20 @@ const makeRateCalendar = (basePricePerPerson: number) => {
     "2026-05-01",               // May Day bank holiday sold out
     "2026-05-12", "2026-05-13", // mid-May sold out
     "2026-05-26", "2026-05-27", // late May bank holiday sold out
+    // ── Extended summer months: June–August 2026 ──
+    "2026-06-06", "2026-06-07", // early-June weekend sold out
+    "2026-06-20", "2026-06-21", // mid-June weekend (school holidays) sold out
+    "2026-07-04", "2026-07-05", // early-July weekend sold out
+    "2026-07-18", "2026-07-19", // peak summer weekend sold out
+    "2026-07-25", "2026-07-26", // peak summer weekend sold out
+    "2026-08-01", "2026-08-02", // August peak weekend sold out
+    "2026-08-15", "2026-08-16", // mid-August peak weekend sold out
+    "2026-08-29", "2026-08-30", // late-August bank holiday sold out
   ]);
 
   const entries: { departureDate: string; pricePerPerson: number; available: boolean }[] = [];
   const startDate = new Date(2026, 2, 1);  // March 1
-  const totalDays = 92;                    // March + April + May
+  const totalDays = 184;                   // March → August (6 months)
 
   for (let i = 0; i < totalDays; i++) {
     const date = addDays(startDate, i);

@@ -13,7 +13,7 @@ import { ImageWithPlaceholder } from "../../../../shared/components/loading";
 import { ChevronLeft, ChevronRight, Bed, Users, Armchair, Check } from "lucide-react";
 import type { Room } from "./roomData";
 
-export const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelected, nights, guests = 1 }: {
+export const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelected, nights, guests = 1, bundleBase }: {
   room: Room,
   initialBoard?: string[],
   initialCancellation?: string[],
@@ -24,7 +24,13 @@ export const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, is
   // How many travellers the room is for. The displayed rate is "per person, per
   // night", so the stay total = rate × guests × nights. Defaults to 1 so existing
   // callers that don't pass it keep their previous (per-person) total.
-  guests?: number
+  guests?: number,
+  // Stopover flow only: the rest of the package's price (the flights) in euros.
+  // When provided, the card shows ONE bundled PACKAGE total
+  // (bundleBase + stay total) instead of a standalone per-person hotel rate —
+  // because in this flow we never show individual flight/hotel prices. The
+  // normal hotel-detail page leaves it undefined and keeps its own pricing.
+  bundleBase?: number
 }) => {
   const [selectedCancel, setSelectedCancel] = useState(() => {
     // If filters are passed, try to select the matching one
@@ -175,12 +181,26 @@ export const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, is
 
         {/* Footer */}
         <div className="mt-auto pt-4 border-t border-muted flex flex-col gap-2">
-          <div className="text-right text-xs text-grey">{totalPrice}€ per person, per night</div>
-          {/* Total for the full stay — the rate is per person, per night, so we
-              multiply by both the number of guests AND the number of nights. */}
-          <div className="text-right text-sm font-bold text-foreground">
-            Total for {guests} guest{guests !== 1 ? 's' : ''} · {nights} night{nights !== 1 ? 's' : ''}: {totalPrice * guests * nights}€
-          </div>
+          {bundleBase !== undefined ? (
+            // Stopover/package flow — show ONE bundled total for the whole trip
+            // (flights + this room), never a separate hotel price.
+            <>
+              <div className="text-right text-xs text-grey">Package total · {guests} guest{guests !== 1 ? 's' : ''} · {nights} night{nights !== 1 ? 's' : ''}</div>
+              <div className="text-right text-lg font-bold text-foreground">
+                {bundleBase + totalPrice * guests * nights}€
+              </div>
+            </>
+          ) : (
+            // Standalone hotel-detail flow — unchanged per-person rate + stay total.
+            <>
+              <div className="text-right text-xs text-grey">{totalPrice}€ per person, per night</div>
+              {/* Total for the full stay — the rate is per person, per night, so we
+                  multiply by both the number of guests AND the number of nights. */}
+              <div className="text-right text-sm font-bold text-foreground">
+                Total for {guests} guest{guests !== 1 ? 's' : ''} · {nights} night{nights !== 1 ? 's' : ''}: {totalPrice * guests * nights}€
+              </div>
+            </>
+          )}
           {/* default = main action, secondary = already-selected confirmation state */}
           <Button
             onClick={handleBookClick}

@@ -414,7 +414,7 @@ export default function FlightListPage({
                   <span className="text-success/60">·</span>
                   <span>{s.option.departure} → {s.option.arrival}</span>
                   <span className="text-success/60">·</span>
-                  <span className="font-bold">${s.option.price}</span>
+                  <span className="font-bold">€{s.option.price}</span>
                 </div>
               ))}
             </div>

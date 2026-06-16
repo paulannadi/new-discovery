@@ -532,10 +532,12 @@ export function seedTimeline(
           flight: ctx.flight,
         });
       }
-      // Stopover stay — when the user added a stopover and picked a hotel,
-      // it checks in first (on the way), and the destination hotel follows for
-      // the remaining nights. Without a stopover, the destination hotel covers
-      // the whole stay as before.
+      // Stopover stay — when the user added a stopover and picked a hotel, we
+      // add ONLY that hotel (the one they actually chose), for the stopover
+      // nights. We deliberately do NOT auto-add a hotel at the final
+      // destination: the itinerary should reflect just the flight + the stopover
+      // hotel the traveller selected, nothing invented on their behalf.
+      // Without a stopover, the destination hotel covers the whole stay as before.
       if (ctx.flight.stopover) {
         const s = ctx.flight.stopover;
         items.push({
@@ -544,13 +546,9 @@ export function seedTimeline(
           checkIn: startDate,
           nights: s.nights,
           hotel: s.hotel ?? mockHotel(s.city),
-        });
-        items.push({
-          kind: "accommodation",
-          id: `acc-flight-${cityName}`,
-          checkIn: addDays(startDate, s.nights),
-          nights: Math.max(1, nights - s.nights),
-          hotel: mockHotel(cityName),
+          // Bundled package — never show a standalone hotel price on the card.
+          // The package total lives in the hero + sticky bar instead.
+          showPrice: false,
         });
       } else {
         items.push({

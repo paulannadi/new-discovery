@@ -79,6 +79,10 @@ export type FlightData = {
   duration: string;
   airline: string;
   price: string;
+  // Numeric total of all the flights (€), all passengers — used to build the
+  // trip total in the Smart Planner. The `price` string above is just for
+  // display; this is the value we actually add up.
+  priceTotal?: number;
   // All legs — present for both round-trip (2 legs) and multi-city (2+ legs).
   legs?: Array<{
     from: string;
@@ -94,6 +98,10 @@ export type FlightData = {
   stopover?: {
     city: string;
     nights: number;
+    // The chosen room's rate (per person, per night, €) and how many guests it
+    // covers. The trip total adds (roomRate × guests × nights) to the flights.
+    roomRate?: number;
+    guests?: number;
     hotel?: HotelData;
   };
 };
@@ -232,7 +240,22 @@ export default function SmartPlannerPage({
 
   // Hard-coded for the prototype — real app reads from passenger context
   const adults: number = 2;
-  const totalPriceLabel = "from €2,499";
+
+  // Trip total — when we came through the flight/stopover flow we have the real
+  // numbers, so we add them up:  flights (all legs, all passengers)  +  the
+  // stopover stay (room rate × guests × nights).  Every other entry point still
+  // falls back to the placeholder until it carries real prices too.
+  const totalPriceLabel = (() => {
+    if (startingContext.type === "flight") {
+      const f = startingContext.flight;
+      const flights = f.priceTotal ?? 0;
+      const s = f.stopover;
+      const stay = s?.roomRate ? s.roomRate * (s.guests ?? 1) * s.nights : 0;
+      const total = flights + stay;
+      if (total > 0) return `€${total.toLocaleString()}`;
+    }
+    return "from €2,499";
+  })();
 
   // Track whether the user has scrolled past the hero's dates+price capsule.
   // Until they have, the sticky bottom bar stays hidden (avoids duplicating

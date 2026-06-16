@@ -329,7 +329,7 @@ const RadioRow = ({ label, checked, onChange }: { label: string, checked: boolea
 // `displayLocation` is the dynamic city (derived from the search destination)
 // shown on the card — it overrides the mock `hotel.location` so the list
 // reflects wherever the user actually searched.
-const HotelCard = ({ hotel, displayPrice, displayLocation, onSelect, onHover, isHovered }: { hotel: Hotel, displayPrice: number, displayLocation: string, onSelect: () => void, onHover?: (hovering: boolean) => void, isHovered?: boolean }) => {
+const HotelCard = ({ hotel, displayPrice, displayLocation, onSelect, onHover, isHovered, isStopover = false, packagePrice = 0 }: { hotel: Hotel, displayPrice: number, displayLocation: string, onSelect: () => void, onHover?: (hovering: boolean) => void, isHovered?: boolean, isStopover?: boolean, packagePrice?: number }) => {
   return (
     <div
       className={cn(
@@ -400,11 +400,21 @@ const HotelCard = ({ hotel, displayPrice, displayLocation, onSelect, onHover, is
                 Free cancellation
               </span>
             )}
-            {/* Price inline — label + amount on one baseline, right-aligned on mobile */}
-            <div className="flex items-baseline gap-1.5 self-end md:self-auto">
-              <span className="text-foreground text-xs">Per person, per night from</span>
-              <span className="text-foreground font-extrabold text-2xl leading-none">${displayPrice}</span>
-            </div>
+            {/* Price inline — label + amount on one baseline, right-aligned on mobile.
+                Stopover flow: we never show a standalone hotel price — instead we
+                show one bundled "Stopover package price" (flights + this hotel).
+                Normal hotel search keeps the per-night price. */}
+            {isStopover ? (
+              <div className="flex items-baseline gap-1.5 self-end md:self-auto">
+                <span className="text-foreground text-xs">Stopover package price from</span>
+                <span className="text-foreground font-extrabold text-2xl leading-none">€{packagePrice.toLocaleString()}</span>
+              </div>
+            ) : (
+              <div className="flex items-baseline gap-1.5 self-end md:self-auto">
+                <span className="text-foreground text-xs">Per person, per night from</span>
+                <span className="text-foreground font-extrabold text-2xl leading-none">${displayPrice}</span>
+              </div>
+            )}
           </div>
           {/* Blue CTA button — full-width on mobile for an easier tap target, auto-width on md+ */}
           <button
@@ -442,6 +452,10 @@ type HotelListPageProps = {
   // Number of stopover nights — used in the stopover-step title subtitle
   // ("2 nights in Dubai"). The city comes from `initialLocation`.
   stopoverNights?: number;
+  // The flight price already chosen (€). On the stopover step each hotel card
+  // shows a single "Stopover package price" = flights + that hotel's stay,
+  // instead of a standalone per-night hotel price.
+  stopoverFlightTotal?: number;
 };
 
 export default function HotelListPage({
@@ -453,6 +467,7 @@ export default function HotelListPage({
   hideSearch = false,
   headerSlot,
   stopoverNights,
+  stopoverFlightTotal = 0,
 }: HotelListPageProps) {
   // --- State ---
 
@@ -1411,6 +1426,12 @@ export default function HotelListPage({
               <StaggeredList className="flex flex-col gap-4">
                 {filteredAndSortedHotels.map(hotel => {
                   const displayPrice = calculateDisplayPrice(hotel.price, hotel);
+                  // Stopover package price = flights + this hotel's base stay
+                  // (rate × guests × nights). A "from" estimate using the base
+                  // rate, since the exact room/board is chosen on the next step.
+                  const stopoverGuests = rooms.reduce((sum, r) => sum + r.adults + r.children, 0);
+                  const packagePrice =
+                    stopoverFlightTotal + displayPrice * stopoverGuests * (stopoverNights ?? 1);
                   return (
                     <HotelCard
                       key={hotel.id}
@@ -1419,6 +1440,10 @@ export default function HotelListPage({
                       // Show the searched destination on every card (e.g. "Lisbon"),
                       // not the mock "Cagliari, Italy" hard-coded on each hotel.
                       displayLocation={displayCity}
+                      // Stopover step = bundled package: show one package price
+                      // (flights + this hotel) instead of a per-hotel price.
+                      isStopover={stopoverNights != null}
+                      packagePrice={packagePrice}
                       onSelect={() => onHotelSelect({ ...hotel, price: displayPrice }, { board: selectedBoardTypes, cancellation: selectedCancellation }, rooms)}
                       onHover={(isHovering) => setHoveredHotelId(isHovering ? hotel.id : null)}
                       isHovered={hoveredHotelId === hotel.id}

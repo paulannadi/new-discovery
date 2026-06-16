@@ -10,7 +10,6 @@
 // HotelDetailPage opens with a big hotel hero; here the rooms come first.
 
 import { useState, useMemo, useEffect } from "react";
-import { cn } from "../../../shared/components/ui/utils";
 import { BackButton } from "../../../shared/components/BackButton";
 import AccommodationStar from "../../../shared/components/AccommodationStar";
 import RatingBlock from "../../../shared/components/RatingBlock";
@@ -32,7 +31,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../../shared/components/ui/dialog";
-import { Tooltip, TooltipTrigger, TooltipContent } from "../../../shared/components/ui/tooltip";
+import { differenceInCalendarDays, parseISO } from "date-fns";
+// The SAME sticky trip-summary bar the Smart Planner uses, so the breakdown here
+// looks identical — flights + stay grouped on the left, price breakdown on the right.
+import { StickySummaryBar, type PriceBreakdownLine } from "../components/StickySummaryBar";
+import type { TimelineItem } from "../utils/seedTimeline";
 import LeafletMap from "../../../shared/components/LeafletMap";
 import { showToast } from "../../../shared/utils/toast";
 import { hotelDescription, nearbyPOIs, locationCoords } from "../../../shared/utils/hotelUtils";
@@ -80,6 +83,8 @@ export default function StopoverRoomPage({
   city,
   nights,
   roomConfiguration = [{ id: 1, adults: 2, children: 0 }],
+  flightTotal = 0,
+  flightLegs = [],
   headerSlot,
   onBack,
   onSelectRooms,
@@ -89,6 +94,18 @@ export default function StopoverRoomPage({
   // location field points at its original city, not the stopover hub).
   city: string;
   nights: number;
+  // The flight price already chosen (total for all flights, €). Shown in the
+  // trip-summary breakdown so flights + stopover hotel add up to the trip total.
+  flightTotal?: number;
+  // The flight legs the traveller already chose — listed under "Flights" in the
+  // trip summary (one row per leg, with its date), exactly like the Smart Planner.
+  flightLegs?: Array<{
+    from: string;
+    to: string;
+    dateISO?: string;
+    airline: string;
+    duration: string;
+  }>;
   // How many guests the room is for — derived from the flight passengers.
   roomConfiguration?: RoomConfig[];
   // The FlightStepper, rendered in the page header so the stopover progress is visible.
@@ -176,6 +193,61 @@ export default function StopoverRoomPage({
       showToast.error("Please select a room to continue");
     }
   };
+
+  // ── Trip-summary data ──────────────────────────────────────────────────────
+  // The stay total = per-person rate × guests × nights; the trip total adds the
+  // flights already chosen. These feed the shared StickySummaryBar so the
+  // breakdown here is structurally identical to the Smart Planner's.
+  const stayTotal = totalPrice * totalGuests * nights;
+  const tripTotal = flightTotal + stayTotal;
+
+  // The stopover hotel checks in on the first flight's date. We derive the trip
+  // span (for the bar's "X nights · Y adults" line) from the first/last legs.
+  const firstLegDate = flightLegs[0]?.dateISO ? parseISO(flightLegs[0].dateISO) : new Date();
+  const lastLegDate = flightLegs[flightLegs.length - 1]?.dateISO
+    ? parseISO(flightLegs[flightLegs.length - 1].dateISO!)
+    : firstLegDate;
+  const tripNights = Math.max(1, differenceInCalendarDays(lastLegDate, firstLegDate));
+
+  // Build the timeline items the bar renders on the left: one row per flight
+  // leg, then the stopover stay. Same TimelineItem shape the Smart Planner uses.
+  const summaryItems: TimelineItem[] = [
+    ...flightLegs.map((leg, i) => ({
+      kind: "flight" as const,
+      id: `summary-flight-${i}`,
+      direction: "leg" as const,
+      date: leg.dateISO ? parseISO(leg.dateISO) : firstLegDate,
+      flight: {
+        from: leg.from,
+        to: leg.to,
+        stops: "",
+        duration: leg.duration,
+        airline: leg.airline,
+        price: "",
+      },
+    })),
+    {
+      kind: "accommodation" as const,
+      id: "summary-stay",
+      checkIn: firstLegDate,
+      nights,
+      hotel: {
+        name: hotel.name,
+        image: hotel.image,
+        stars: hotel.stars,
+        rating: hotel.rating,
+        reviewCount: hotel.reviewCount,
+        location: city,
+        price: totalPrice,
+      },
+    },
+  ];
+
+  // The right-hand "Price breakdown" column. We never itemise flights vs hotel —
+  // it's a single bundled package — so this is just the one total package price.
+  const priceBreakdown: PriceBreakdownLine[] = [
+    { label: "Package price", value: `€${tripTotal.toLocaleString()}` },
+  ];
 
   // Scroll the showcase into view from the "View hotel details" link.
   const scrollToShowcase = () =>
@@ -278,6 +350,10 @@ export default function StopoverRoomPage({
                       // The room is for this config's travellers — pass the head
                       // count so the card's total reflects the per-person rate.
                       guests={getTotalGuests(config)}
+                      // Bundled package: each room card shows ONE total for the
+                      // whole trip (flights + this room), never a separate hotel
+                      // price. Passing the flight total as the package base.
+                      bundleBase={flightTotal}
                       onSelect={(cancelOption, extraOption) =>
                         handleRoomSelect(config.id, room.id, cancelOption, extraOption)
                       }
@@ -459,50 +535,25 @@ export default function StopoverRoomPage({
         </PageContainer>
       </div>
 
-      {/* ── STICKY CONTINUE BAR ──────────────────────────────────────────────── */}
-      {someRoomsSelected && (
-        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg z-50">
-          <PageContainer tier="narrow" className="px-4 md:px-6 py-3 md:py-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex flex-col">
-                <span className="text-grey text-xs">{totalPrice}€ per person, per night</span>
-                <span className="text-foreground font-bold text-base md:text-2xl">
-                  Total for {totalGuests} guest{totalGuests !== 1 ? "s" : ""} · {nights} night{nights !== 1 ? "s" : ""}: {totalPrice * totalGuests * nights}€
-                </span>
-              </div>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => allRoomsSelected && handleContinue()}
-                    onKeyDown={(e) => {
-                      if (allRoomsSelected && (e.key === "Enter" || e.key === " ")) {
-                        e.preventDefault();
-                        handleContinue();
-                      }
-                    }}
-                    aria-disabled={!allRoomsSelected}
-                    className={cn(
-                      "inline-flex shrink-0 px-6 py-3 rounded-lg font-bold text-sm md:text-base transition-all select-none items-center gap-2",
-                      allRoomsSelected
-                        ? "bg-primary hover:brightness-85 text-white cursor-pointer shadow-lg"
-                        : "bg-border text-grey cursor-not-allowed"
-                    )}
-                  >
-                    Continue
-                  </span>
-                </TooltipTrigger>
-                {!allRoomsSelected && (
-                  <TooltipContent side="top" sideOffset={8}>
-                    Please select a room to continue.
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            </div>
-          </PageContainer>
-        </div>
-      )}
+      {/* ── STICKY TRIP-SUMMARY BAR ──────────────────────────────────────────
+          The SAME bar the Smart Planner uses — flights + stay grouped on the
+          left, price breakdown on the right — so the structure matches exactly.
+          Here the primary action is "Continue" (with the running trip total),
+          and the price breakdown itemises flights + the stopover hotel. Slides
+          up once a room is selected (so we have a hotel price to add). */}
+      <StickySummaryBar
+        startDate={firstLegDate}
+        endDate={lastLegDate}
+        adults={totalGuests}
+        nights={tripNights}
+        totalPriceLabel={`€${tripTotal.toLocaleString()}`}
+        items={summaryItems}
+        priceBreakdown={priceBreakdown}
+        actionLabel={`Continue · €${tripTotal.toLocaleString()}`}
+        onAction={handleContinue}
+        actionDisabled={!allRoomsSelected}
+        show={someRoomsSelected}
+      />
 
       {/* ══════════════════════════════════════════════════════════════════════
           MODALS

@@ -423,7 +423,25 @@ export default function App() {
       : undefined;
     const stopoverRoomType = firstRoom?.room?.name;
     const stopoverBoardType = firstRoom?.cancelOption || firstRoom?.extraOption;
+    // The chosen room's RATE — per person, per night, in euros. This is the same
+    // maths the RoomCard/StopoverRoomPage show: base price + the cancellation
+    // surcharge + the board surcharge. We recompute it here so the trip total in
+    // the Smart Planner exactly matches what the traveller saw on the room step.
+    const stopoverRoomRate = firstRoom
+      ? firstRoom.room.basePrice +
+        (firstRoom.room.cancellationPolicies.find((o: any) => o.id === firstRoom.cancelOption)?.priceDelta || 0) +
+        (firstRoom.room.extras.find((o: any) => o.id === firstRoom.extraOption)?.priceDelta || 0)
+      : 0;
+    // How many travellers the stopover room is for — the rate is per person, so
+    // the stay total = rate × guests × nights. Comes from the flight search.
+    const stopoverGuests = flightSearchCriteria
+      ? flightSearchCriteria.adults + flightSearchCriteria.children
+      : 1;
     const first = selected[0];
+    // The flight price the traveller picked is the TOTAL for all the flights
+    // (all legs, all passengers). We keep it as a number so the Smart Planner
+    // can add the stopover stay to it and show one consistent trip total.
+    const flightTotal = first.option.price;
     const last = selected[selected.length - 1];
     setStartingContext({
       type: "flight",
@@ -435,7 +453,9 @@ export default function App() {
         stops: first.option.stops,
         duration: first.option.duration,
         airline: first.option.airline,
-        price: `$${first.option.price}`,
+        price: `€${first.option.price}`,
+        // Numeric total of all the flights (€) — used to build the trip total.
+        priceTotal: flightTotal,
         // Pass all legs (both round-trip and multi-city) so SmartPlanner
         // can show one FlightCard per leg with the correct date.
         legs: selected.map((s) => ({
@@ -453,6 +473,11 @@ export default function App() {
               stopover: {
                 city: stopoverSelection.city,
                 nights: stopoverSelection.nights,
+                // The chosen room's rate + how many guests it's for — the Smart
+                // Planner uses these to add the stay (rate × guests × nights) to
+                // the flight total.
+                roomRate: stopoverRoomRate,
+                guests: stopoverGuests,
                 hotel: {
                   name: stopoverHotel.name,
                   image: stopoverHotel.image,
@@ -462,7 +487,10 @@ export default function App() {
                   // The HotelListPage mock hotels carry fixed locations, so
                   // pin the stopover stay to the actual stopover city instead.
                   location: stopoverSelection.city,
-                  price: stopoverHotel.price,
+                  // Show the room rate the traveller actually picked (per person,
+                  // per night) on the accommodation card, so the card and the
+                  // trip total agree.
+                  price: stopoverRoomRate,
                   // The room the user chose on the stopover-room step.
                   roomType: stopoverRoomType,
                   boardType: stopoverBoardType,
@@ -732,6 +760,9 @@ export default function App() {
           onBackToSearch={handleBack}
           initialLocation={stopoverSelection.city}
           stopoverNights={stopoverSelection.nights}
+          // The flight package already chosen — each hotel card adds its stay to
+          // this and shows one "Stopover package price".
+          stopoverFlightTotal={selectedFlightLegs[0]?.option.price ?? 0}
           // Stopover step: no search fields (city + dates are fixed by the
           // flight), and the flight stepper sits in the header instead. Both
           // flights are done by now, so the hotel card is the current step:
@@ -764,6 +795,19 @@ export default function App() {
           hotel={stopoverHotel}
           city={stopoverSelection.city}
           nights={stopoverSelection.nights}
+          // The flight price the traveller already picked — the total for all
+          // the flights. The room page's trip summary adds the stopover hotel to
+          // this so the breakdown + total match the Smart Planner. (Use the
+          // first selected leg's price, same value goToPlannerWithFlights uses.)
+          flightTotal={selectedFlightLegs[0]?.option.price ?? 0}
+          // The legs already chosen — listed under "Flights" in the trip summary.
+          flightLegs={selectedFlightLegs.map((s) => ({
+            from: s.leg.from,
+            to: s.leg.to,
+            dateISO: s.leg.date ? format(s.leg.date, "yyyy-MM-dd") : undefined,
+            airline: s.option.airline,
+            duration: s.option.duration,
+          }))}
           // The room is for the flight's passengers — one room with those guests.
           roomConfiguration={
             flightSearchCriteria

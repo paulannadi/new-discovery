@@ -283,13 +283,17 @@ export function FlightResultCard({
             </div>
           </div>
 
-          {/* RIGHT: from-price + Select */}
+          {/* RIGHT: price + Select.
+              We never show separate flight / hotel prices — it's one bundled
+              package. So this is a "From" starting price for the whole package;
+              it grows as the traveller picks their stopover room, and the final
+              total is shown from here on through the flow. */}
           <div className="md:border-l border-t md:border-t-0 border-border bg-grey-lightest/40 md:min-w-[180px] flex flex-col items-center justify-center gap-1 p-4 md:p-5">
             <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">From</span>
             <div className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight">
-              ${option.price}
+              €{option.price}
             </div>
-            <div className="text-xs text-muted-foreground">per person</div>
+            <div className="text-xs text-muted-foreground text-center">package price</div>
             <Button onClick={onSelect} size="lg" className="w-full mt-3 font-bold">
               Select
             </Button>
@@ -396,11 +400,12 @@ export function FlightResultCard({
         {/* ── RIGHT SIDE: badge + price + Select ───────────────────────── */}
         <div className="md:border-l border-t md:border-t-0 border-border bg-grey-lightest/40 md:min-w-[180px] flex flex-col items-center justify-center gap-2 p-4 md:p-5">
           {option.badge && <ResultBadge label={option.badge} />}
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">From</span>
           <div className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight">
-            ${option.price}
+            €{option.price}
           </div>
           <div className="text-xs text-muted-foreground text-center">
-            total for all passengers
+            package price
           </div>
           <Button
             onClick={onSelect}
