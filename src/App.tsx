@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import DiscoveryPage, { type TabId } from "./modules/smartPlanner/pages/DiscoveryPage";
 import HotelListPage from "./modules/smartPlanner/pages/HotelListPage";
 import HotelDetailPage from "./modules/smartPlanner/pages/HotelDetailPage";
@@ -10,6 +10,8 @@ import { SWISS_WINTER_TOUR, DISCOVERY_TOUR_MAP } from "./mocks/tours";
 import type { Tour } from "./types";
 import FlightListPage from "./modules/smartPlanner/pages/FlightListPage";
 import { FlightStepper } from "./modules/smartPlanner/components/flightSearch/FlightStepper";
+import { getStopoverOffersForLeg, getMockFlightsForLeg } from "./modules/smartPlanner/components/flightSearch/mockFlights";
+import { generateRoomsForHotel } from "./modules/smartPlanner/components/rooms/roomData";
 import { type StartingContext } from "./modules/smartPlanner/pages/SmartPlannerPage";
 // Wrap Smart Planner with the DISCOVER video-fill loader so every entry to
 // the planner gets a 5s branded intro before the itinerary appears.
@@ -277,6 +279,44 @@ export default function App() {
   // the new stopover-room step, then folded into the SmartPlanner context.
   const [stopoverHotel, setStopoverHotel] = useState<any | null>(null);
 
+  // ── Cheapest-package price anchoring ─────────────────────────────────────
+  // The whole stopover flow shows ONE bundled price. We anchor it to the
+  // cheapest possible package: the cheapest stopover offer on the outbound leg.
+  // That number is what the cheapest option shows at EVERY step; every other
+  // option (pricier flight / hotel / room) adds its premium on top.
+  //
+  // `stopoverAnchorPrice` — the floor (cheapest stopover offer for the route).
+  const stopoverAnchorPrice = useMemo(() => {
+    const c = flightSearchCriteria;
+    if (!c?.stopover?.enabled && !c?.stopoverOnly) return null;
+    const ob = c.legs[0];
+    if (!ob) return null;
+    const offers = getStopoverOffersForLeg(ob.from, ob.to, c.stopover?.nights ?? 2);
+    return offers.length ? Math.min(...offers.map((o) => o.price)) : null;
+  }, [flightSearchCriteria]);
+
+  // The cheapest price for a given (already-chosen) leg, so we can measure how
+  // much MORE than the cheapest a chosen flight was. Outbound stopover leg → the
+  // anchor (min stopover offer); any other leg → cheapest Fiji flat fare.
+  const legMinPrice = (s: SelectedFlightLeg): number => {
+    if (s.option.stopover) return stopoverAnchorPrice ?? s.option.price;
+    const flat = getMockFlightsForLeg(s.leg.from, s.leg.to).filter((f) => f.airlineCode === "FJ");
+    return flat.length ? Math.min(...flat.map((f) => f.price)) : s.option.price;
+  };
+
+  // Running package floor after a set of chosen legs = anchor + the premium of
+  // each non-cheapest flight chosen so far. With the cheapest path it stays at
+  // the anchor; pricier flights push it up. Used both to PRICE the next leg's
+  // cards and as the base the hotel step builds on.
+  const packageFloorAfterLegs = (legs: SelectedFlightLeg[]): number | null => {
+    if (stopoverAnchorPrice == null) return null;
+    return legs.reduce((floor, s) => floor + (s.option.price - legMinPrice(s)), stopoverAnchorPrice);
+  };
+
+  // Floor to PRICE the current leg's cards = floor after the legs already chosen
+  // (the current one isn't selected yet).
+  const currentLegPackageFloor = packageFloorAfterLegs(selectedFlightLegs);
+
   // ── HOTELS tab: search → HotelListPage ──────────────────────────────────
   // Called when the user submits the Hotel search form on Discovery.
   const handleHotelSearch = (criteria: SearchCriteria) => {
@@ -442,6 +482,21 @@ export default function App() {
     // (all legs, all passengers). We keep it as a number so the Smart Planner
     // can add the stopover stay to it and show one consistent trip total.
     const flightTotal = first.option.price;
+    // ── Final package total ────────────────────────────────────────────────
+    // One bundled price = the chosen hotel's package floor + the room PREMIUM
+    // (how much more than the cheapest room in that hotel the traveller picked).
+    // The cheapest room adds nothing, so the all-cheapest path equals the anchor.
+    const stopoverRooms = stopoverHotel
+      ? generateRoomsForHotel(stopoverHotel, stopoverHotel.price)
+      : [];
+    const stopoverMinRoomRate = stopoverRooms.length
+      ? Math.min(...stopoverRooms.map((r: any) => r.basePrice))
+      : stopoverRoomRate;
+    const stopoverHotelFloor =
+      stopoverHotel?.stopoverPackageFloor ?? packageFloorAfterLegs(selected) ?? flightTotal;
+    const stopoverPackageTotal =
+      stopoverHotelFloor +
+      (stopoverRoomRate - stopoverMinRoomRate) * stopoverGuests * (stopoverSelection?.nights ?? 1);
     const last = selected[selected.length - 1];
     setStartingContext({
       type: "flight",
@@ -456,6 +511,9 @@ export default function App() {
         price: `€${first.option.price}`,
         // Numeric total of all the flights (€) — used to build the trip total.
         priceTotal: flightTotal,
+        // The final bundled package price (flights + chosen hotel + chosen room).
+        // The Smart Planner shows this as the one trip total.
+        packageTotal: stopoverPackageTotal,
         // Pass all legs (both round-trip and multi-city) so SmartPlanner
         // can show one FlightCard per leg with the correct date.
         legs: selected.map((s) => ({
@@ -735,6 +793,9 @@ export default function App() {
           searchCriteria={flightSearchCriteria}
           currentLegIndex={currentFlightLegIndex}
           selectedLegs={selectedFlightLegs}
+          // Cheapest-package anchoring: the running floor before this leg, so the
+          // cheapest flight on every leg shows the same anchor price.
+          packageFloor={currentLegPackageFloor ?? undefined}
           onFlightLegSelect={handleFlightLegSelect}
           // Edit Search modal commits via this — reset selection and leg
           // index so the user starts the new search from leg 1.
@@ -760,9 +821,9 @@ export default function App() {
           onBackToSearch={handleBack}
           initialLocation={stopoverSelection.city}
           stopoverNights={stopoverSelection.nights}
-          // The flight package already chosen — each hotel card adds its stay to
-          // this and shows one "Stopover package price".
-          stopoverFlightTotal={selectedFlightLegs[0]?.option.price ?? 0}
+          // The running package floor after the flights. Each hotel card shows
+          // this for the cheapest hotel and adds a premium for pricier ones.
+          stopoverPackageFloor={packageFloorAfterLegs(selectedFlightLegs) ?? 0}
           // Stopover step: no search fields (city + dates are fixed by the
           // flight), and the flight stepper sits in the header instead. Both
           // flights are done by now, so the hotel card is the current step:
@@ -795,11 +856,11 @@ export default function App() {
           hotel={stopoverHotel}
           city={stopoverSelection.city}
           nights={stopoverSelection.nights}
-          // The flight price the traveller already picked — the total for all
-          // the flights. The room page's trip summary adds the stopover hotel to
-          // this so the breakdown + total match the Smart Planner. (Use the
-          // first selected leg's price, same value goToPlannerWithFlights uses.)
-          flightTotal={selectedFlightLegs[0]?.option.price ?? 0}
+          // The running package floor for the chosen hotel (flights + this
+          // hotel's premium). The cheapest room sits exactly at this floor;
+          // pricier rooms add their premium. Falls back to the flight floor if
+          // the hotel didn't carry one.
+          packageFloor={stopoverHotel.stopoverPackageFloor ?? packageFloorAfterLegs(selectedFlightLegs) ?? 0}
           // The legs already chosen — listed under "Flights" in the trip summary.
           flightLegs={selectedFlightLegs.map((s) => ({
             from: s.leg.from,

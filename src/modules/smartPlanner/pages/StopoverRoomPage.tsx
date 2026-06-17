@@ -21,7 +21,7 @@ import {
   Check,
   Info,
   MapPinned,
-  Moon,
+  Bed,
   ChevronDown,
 } from "lucide-react";
 import { Button } from "../../../shared/components/ui/button";
@@ -35,6 +35,7 @@ import { differenceInCalendarDays, parseISO } from "date-fns";
 // The SAME sticky trip-summary bar the Smart Planner uses, so the breakdown here
 // looks identical — flights + stay grouped on the left, price breakdown on the right.
 import { StickySummaryBar, type PriceBreakdownLine } from "../components/StickySummaryBar";
+import { StopoverPackageLabel } from "../components/StopoverPackageLabel";
 import type { TimelineItem } from "../utils/seedTimeline";
 import LeafletMap from "../../../shared/components/LeafletMap";
 import { showToast } from "../../../shared/utils/toast";
@@ -83,7 +84,7 @@ export default function StopoverRoomPage({
   city,
   nights,
   roomConfiguration = [{ id: 1, adults: 2, children: 0 }],
-  flightTotal = 0,
+  packageFloor = 0,
   flightLegs = [],
   headerSlot,
   onBack,
@@ -94,9 +95,9 @@ export default function StopoverRoomPage({
   // location field points at its original city, not the stopover hub).
   city: string;
   nights: number;
-  // The flight price already chosen (total for all flights, €). Shown in the
-  // trip-summary breakdown so flights + stopover hotel add up to the trip total.
-  flightTotal?: number;
+  // The running package floor for this hotel (flights + hotel premium, €). The
+  // cheapest room sits exactly on this floor; pricier rooms add their premium.
+  packageFloor?: number;
   // The flight legs the traveller already chose — listed under "Flights" in the
   // trip summary (one row per leg, with its date), exactly like the Smart Planner.
   flightLegs?: Array<{
@@ -129,6 +130,10 @@ export default function StopoverRoomPage({
 
   // Build the room list once per hotel (stable across re-renders).
   const rooms = useMemo(() => generateRoomsForHotel(hotel, hotel.price), [hotel]);
+
+  // Fixed traveller totals, derived from the configuration we arrived with.
+  const totalAdults = roomConfiguration.reduce((sum, c) => sum + c.adults, 0);
+  const totalChildren = roomConfiguration.reduce((sum, c) => sum + c.children, 0);
 
   // One selection slot per guest configuration (a single stopover room here).
   const [roomSelections, setRoomSelections] = useState<{ [id: number]: RoomSelection | null }>(() => {
@@ -164,7 +169,7 @@ export default function StopoverRoomPage({
   const getTotalGuests = (c: RoomConfig) => c.adults + c.children;
   // Total travellers across the whole configuration — used to scale the sticky
   // bar's stay total, since the room rate is quoted "per person, per night".
-  const totalGuests = roomConfiguration.reduce((sum, c) => sum + getTotalGuests(c), 0);
+  const totalGuests = totalAdults + totalChildren;
   const getAvailableRooms = (c: RoomConfig) =>
     rooms.filter((room) => room.details.sleeps >= getTotalGuests(c));
 
@@ -195,11 +200,13 @@ export default function StopoverRoomPage({
   };
 
   // ── Trip-summary data ──────────────────────────────────────────────────────
-  // The stay total = per-person rate × guests × nights; the trip total adds the
-  // flights already chosen. These feed the shared StickySummaryBar so the
-  // breakdown here is structurally identical to the Smart Planner's.
-  const stayTotal = totalPrice * totalGuests * nights;
-  const tripTotal = flightTotal + stayTotal;
+  // Cheapest room rate in this hotel (per person, per night). The cheapest room
+  // sits exactly on the package floor; a pricier room adds its premium.
+  const minRoomRate = rooms.length ? Math.min(...rooms.map((r) => r.basePrice)) : 0;
+  // Trip total = package floor + the chosen room's premium over the cheapest
+  // room, scaled by guests × nights. All-cheapest path stays at the anchor.
+  const roomPremium = Math.max(0, (totalPrice - minRoomRate)) * totalGuests * nights;
+  const tripTotal = packageFloor + roomPremium;
 
   // The stopover hotel checks in on the first flight's date. We derive the trip
   // span (for the bar's "X nights · Y adults" line) from the first/last legs.
@@ -244,9 +251,10 @@ export default function StopoverRoomPage({
   ];
 
   // The right-hand "Price breakdown" column. We never itemise flights vs hotel —
-  // it's a single bundled package — so this is just the one total package price.
+  // it's a single bundled package — so this is the one total, labelled with the
+  // shared "Stopover package" caption + info bubble.
   const priceBreakdown: PriceBreakdownLine[] = [
-    { label: "Package price", value: `€${tripTotal.toLocaleString()}` },
+    { label: "Stopover package", labelNode: <StopoverPackageLabel />, value: `€${tripTotal.toLocaleString()}` },
   ];
 
   // Scroll the showcase into view from the "View hotel details" link.
@@ -286,6 +294,12 @@ export default function StopoverRoomPage({
               />
             </div>
             <div className="flex flex-col gap-1 min-w-0 flex-1">
+              {/* "Selected hotel" eyebrow — confirms this is the hotel the
+                  traveller just picked, before they move on to choosing a room. */}
+              <span className="flex items-center gap-1 text-sm font-bold text-primary">
+                <Check size={14} className="shrink-0" aria-hidden="true" />
+                Selected hotel
+              </span>
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-lg sm:text-xl font-extrabold text-foreground truncate">{hotel.name}</h1>
                 <AccommodationStar rating={hotel.stars} offerName={hotel.name} offerId={hotel.id} size={14} />
@@ -313,18 +327,18 @@ export default function StopoverRoomPage({
 
       {/* ── ROOM SELECTION (primary focus) ───────────────────────────────────── */}
       <PageContainer tier="narrow" className="px-4 md:px-6 pt-8 flex flex-col gap-2">
-        <h2 className="font-extrabold text-foreground text-2xl">Choose your room</h2>
+        {/* "Room for 2 travellers" — totalGuests sums adults + children across
+            the whole room configuration. The bed icon sits in the title now. */}
+        <h2 className="flex items-center gap-2 font-extrabold text-foreground text-2xl">
+          <Bed size={24} className="text-primary shrink-0" aria-hidden="true" />
+          Room for {totalGuests} traveller{totalGuests !== 1 ? "s" : ""}
+        </h2>
         {/* Context line — ties the room choice back to the stopover stay. */}
-        <p className="flex items-center gap-2 text-sm text-grey">
-          <Moon size={15} className="text-primary shrink-0" aria-hidden="true" />
+        <p className="text-sm text-foreground">
           {nights} night{nights !== 1 ? "s" : ""} in {city}
           {" · "}
-          {roomConfiguration.reduce((s, r) => s + r.adults, 0)} adult
-          {roomConfiguration.reduce((s, r) => s + r.adults, 0) !== 1 ? "s" : ""}
-          {roomConfiguration.reduce((s, r) => s + r.children, 0) > 0 &&
-            ` · ${roomConfiguration.reduce((s, r) => s + r.children, 0)} child${
-              roomConfiguration.reduce((s, r) => s + r.children, 0) !== 1 ? "ren" : ""
-            }`}
+          {totalAdults} adult{totalAdults !== 1 ? "s" : ""}
+          {totalChildren > 0 && ` · ${totalChildren} child${totalChildren !== 1 ? "ren" : ""}`}
         </p>
       </PageContainer>
 
@@ -351,9 +365,10 @@ export default function StopoverRoomPage({
                       // count so the card's total reflects the per-person rate.
                       guests={getTotalGuests(config)}
                       // Bundled package: each room card shows ONE total for the
-                      // whole trip (flights + this room), never a separate hotel
-                      // price. Passing the flight total as the package base.
-                      bundleBase={flightTotal}
+                      // whole trip. Cheapest room = the floor; pricier rooms add
+                      // their premium over the cheapest room.
+                      bundleBase={packageFloor}
+                      minRoomRate={minRoomRate}
                       onSelect={(cancelOption, extraOption) =>
                         handleRoomSelect(config.id, room.id, cancelOption, extraOption)
                       }

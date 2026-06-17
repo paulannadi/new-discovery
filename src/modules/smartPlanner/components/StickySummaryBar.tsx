@@ -12,7 +12,7 @@
 // Clicking outside the panel (or pressing Escape) closes it.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Binoculars,
   Building2,
@@ -33,6 +33,9 @@ import type { TimelineItem } from "../utils/seedTimeline";
 // when omitted, the bar shows a single "Paid before departure" line.
 export type PriceBreakdownLine = {
   label: string;
+  // Optional rich label (e.g. the "Stopover package" caption with an info
+  // bubble). When set it's rendered instead of the plain `label` text.
+  labelNode?: ReactNode;
   sub?: string;        // small grey sub-line under the label (e.g. "2 guests · 2 nights")
   value: string;       // formatted money, e.g. "€1,340" or "+€500"
   total?: boolean;     // the grand-total row — rendered bold with a top divider
@@ -356,9 +359,9 @@ export function StickySummaryBar({
                 Price breakdown
               </h3>
               {(priceBreakdown ?? [{ label: "Paid before departure", value: totalPriceLabel }]).map(
-                (line) => (
+                (line, i) => (
                   <div
-                    key={line.label}
+                    key={i}
                     className={cn(
                       "flex items-baseline justify-between gap-4",
                       line.total && "pt-3 mt-1 border-t border-grey-light",
@@ -371,7 +374,7 @@ export function StickySummaryBar({
                           line.total && "font-bold",
                         )}
                       >
-                        {line.label}
+                        {line.labelNode ?? line.label}
                       </span>
                       {line.sub && (
                         <span className="text-xs text-grey mt-0.5">{line.sub}</span>

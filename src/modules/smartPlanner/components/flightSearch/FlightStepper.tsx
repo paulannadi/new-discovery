@@ -1,16 +1,13 @@
-// FlightStepper — card-based progress stepper for the flight selection flow.
+// FlightStepper — compact, single-line progress stepper for the flight flow.
 //
-// Each step is a CARD with a numbered circle, an uppercase category label
-// ("OUTBOUND FLIGHT", "INBOUND FLIGHT", "STOPOVER HOTEL", …) and a bold route
-// title below it. Cards are separated by a chevron.
+// Each step is a small PILL with a numbered circle (or a plain green check once
+// done) and ONE short uppercase label next to it — no second line. Pills are
+// separated by a chevron.
 //
 // Example for a round trip with a stopover, sitting on leg 0:
 //
-//   ┌──────────────────────┐   ┌────────────────────┐   ┌──────────────────┐
-//   │ (1) OUTBOUND FLIGHT   │ › │ (2) INBOUND FLIGHT  │ › │ (3) STOPOVER HOTEL│
-//   │ New York → Los Angeles│   │ Los Angeles → NY    │   │ 2 nights stay     │
-//   └──────────────────────┘   └────────────────────┘   └──────────────────┘
-//        ^current (blue)             ^future (grey)            ^future (grey)
+//   (1) LAX – SYD  ›  (2) SYD – LAX  ›  (3) HOTEL IN NADI  ›  (4) ROOM SELECTION
+//        ^current             ^future            ^future              ^future
 //
 // The stopover step is only shown for round trips that opted into a stopover
 // AND where the chosen leg's route has a geographically sensible hub (so it
@@ -20,17 +17,8 @@
 import { Fragment } from "react";
 import { ChevronRight, Check } from "lucide-react";
 import { cn } from "../../../../shared/components/ui/utils";
-import { findAirportByCode } from "./airports";
 import { routeHasStopover } from "./mockFlights";
 import type { FlightLeg } from "../../../../App";
-
-// Format a leg endpoint as "City (CODE)" — e.g. "London (LHR)" — falling back
-// to just the code (or "?" when empty) if it's not in our airport catalogue.
-function formatEndpoint(code: string): string {
-  const airport = findAirportByCode(code);
-  if (airport) return `${airport.city} (${airport.code})`;
-  return code || "?";
-}
 
 type FlightStepperProps = {
   legs: FlightLeg[];
@@ -39,13 +27,11 @@ type FlightStepperProps = {
   tripType?: "roundtrip" | "multicity";
   /** When enabled (round trip only) a "Stopover hotel" step is inserted. */
   stopover?: { enabled: boolean; leg: "outbound" | "return"; nights: number };
-  /** Stopover hub city — appended to the hotel step's title ("… stay in {city}"). */
+  /** Stopover hub city — appended to the hotel step's label ("Hotel in {city}"). */
   stopoverCity?: string;
   /**
-   * Chosen stopover hotel name — appended to the room step's title
-   * ("Room selection in {name}"). Only known once a hotel has been picked, so
-   * it's absent on the stopover-hotel page (the room card just reads
-   * "Room selection" there).
+   * Chosen stopover hotel name. Accepted for compatibility but no longer shown
+   * in the compact stepper — the room step just reads "Room selection".
    */
   stopoverHotelName?: string;
   /**
@@ -82,19 +68,20 @@ type StepStatus = "done" | "current" | "future";
 
 type Step = {
   key: string;
-  category: string; // small uppercase label, e.g. "OUTBOUND FLIGHT"
-  title: string; // bold line, e.g. "New York (JFK) to Los Angeles (LAX)"
+  // Single short uppercase-rendered label, e.g. "LAX – SYD" or "HOTEL IN NADI".
+  label: string;
   status: StepStatus;
   // Which flight leg this card maps to (undefined for the stopover-hotel card).
   // Used to navigate back when a done step is clicked.
   legIndex?: number;
 };
 
-// ── A single step card ───────────────────────────────────────────────────────
-// `onClick` is only passed for clickable (done) steps; when present the card
+// ── A single step pill ───────────────────────────────────────────────────────
+// One compact line: a numbered circle (or a check once done) + one short label.
+// `onClick` is only passed for clickable (done) steps; when present the pill
 // becomes a button with a hover affordance.
 function StepCard({ step, index, onClick }: { step: Step; index: number; onClick?: () => void }) {
-  const { category, title, status } = step;
+  const { label, status } = step;
   const clickable = !!onClick;
 
   return (
@@ -116,50 +103,44 @@ function StepCard({ step, index, onClick }: { step: Step; index: number; onClick
           : undefined
       }
       className={cn(
-        "flex flex-1 min-w-[200px] flex-col gap-3 rounded-xl border px-5 py-4 transition-colors",
-        // current: white card with a blue outline + soft shadow (the focus of the flow)
-        status === "current" && "border-2 border-primary bg-card shadow-sm",
-        // done: white card, calm border — it's been completed
-        status === "done" && "border border-border bg-card",
-        // future: muted grey card with a grey border — not reached yet
-        status === "future" && "border border-grey-light bg-grey-lightest",
+        // Small inline pill: circle + label on a single line, light padding.
+        "inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 transition-colors",
+        // current: white pill with a blue outline (the focus of the flow)
+        status === "current" && "border-primary bg-card",
+        // done: white pill, calm border — it's been completed
+        status === "done" && "border-border bg-card",
+        // future: muted grey pill with a grey border — not reached yet
+        status === "future" && "border-grey-light bg-grey-lightest",
         // Affordance for clicking back to a completed step.
-        clickable && "cursor-pointer hover:border-primary hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
+        clickable && "cursor-pointer hover:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
       )}
     >
-      {/* Top row: numbered circle + category label */}
-      <div className="flex items-center gap-2.5">
+      {/* Done steps show a plain green check (no circle); current/future show a
+          numbered circle. */}
+      {status === "done" ? (
+        <Check size={16} className="text-success shrink-0" aria-hidden="true" />
+      ) : (
         <span
           className={cn(
-            "flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-            status === "current" && "bg-primary text-white",
-            status === "done" && "bg-success text-white",
-            status === "future" && "bg-grey text-white",
+            "flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white",
+            status === "current" && "bg-primary",
+            status === "future" && "bg-grey",
           )}
         >
-          {/* Done steps show a check instead of the number. */}
-          {status === "done" ? <Check size={14} aria-hidden="true" /> : index + 1}
+          {index + 1}
         </span>
-        <span
-          className={cn(
-            "text-xs font-bold uppercase tracking-wide",
-            status === "future" ? "text-grey" : "text-muted-foreground",
-          )}
-        >
-          {category}
-        </span>
-      </div>
+      )}
 
-      {/* Bold title line — the actual route / step detail */}
+      {/* The single label line — route codes / step detail */}
       <span
         className={cn(
-          "text-sm font-extrabold leading-snug",
+          "text-xs font-bold uppercase tracking-wide whitespace-nowrap",
           status === "current" && "text-foreground",
           status === "done" && "text-foreground",
-          status === "future" && "text-muted-foreground",
+          status === "future" && "text-grey",
         )}
       >
-        {title}
+        {label}
       </span>
     </div>
   );
@@ -171,7 +152,6 @@ export function FlightStepper({
   tripType = "roundtrip",
   stopover,
   stopoverCity,
-  stopoverHotelName,
   stopoverStatus = "future",
   roomStatus = "future",
   onStepSelect,
@@ -179,15 +159,12 @@ export function FlightStepper({
 }: FlightStepperProps) {
   const isRoundtrip = tripType === "roundtrip";
 
-  // 1. One card per real flight leg. `legIndex` lets a done step navigate back.
+  // 1. One pill per real flight leg. The label is just the airport codes, e.g.
+  //    "LAX – SYD" — short enough to live on one line. `legIndex` lets a done
+  //    step navigate back.
   const steps: Step[] = legs.map((leg, i) => ({
     key: `leg-${leg.id}`,
-    category: isRoundtrip
-      ? i === 0
-        ? "Outbound flight"
-        : "Inbound flight"
-      : `Flight ${i + 1}`,
-    title: `${formatEndpoint(leg.from)} to ${formatEndpoint(leg.to)}`,
+    label: `${leg.from || "?"} – ${leg.to || "?"}`,
     status:
       i < currentLegIndex ? "done" : i === currentLegIndex ? "current" : "future",
     legIndex: i,
@@ -211,12 +188,9 @@ export function FlightStepper({
   if (isRoundtrip && stopover?.enabled && hasStopoverOffers) {
     steps.push({
       key: "stopover",
-      category: "Stopover hotel",
-      // "2 nights stay in Singapore" — the city is appended when known (always,
-      // in practice, since the stopover hub is fixed by the flight).
-      title: `${stopover.nights} night${stopover.nights > 1 ? "s" : ""} stay${
-        stopoverCity ? ` in ${stopoverCity}` : ""
-      }`,
+      // "Hotel in Nadi" — the city is appended when known (always, in practice,
+      // since the stopover hub is fixed by the flight).
+      label: `Hotel${stopoverCity ? ` in ${stopoverCity}` : ""}`,
       // "future" while choosing flights; "current" on the stopover-hotel page;
       // "done" once a hotel is picked and we're on the room step.
       status: stopoverStatus,
@@ -226,10 +200,7 @@ export function FlightStepper({
     //    room-selection page itself.
     steps.push({
       key: "stopover-room",
-      category: "Your room",
-      // "Room selection in Marina Bay Sands" — the hotel name is appended once
-      // a hotel has been chosen; before that it just reads "Room selection".
-      title: `Room selection${stopoverHotelName ? ` in ${stopoverHotelName}` : ""}`,
+      label: "Room selection",
       status: roomStatus,
     });
   }

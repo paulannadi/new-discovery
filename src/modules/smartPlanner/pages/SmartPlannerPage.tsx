@@ -83,6 +83,9 @@ export type FlightData = {
   // trip total in the Smart Planner. The `price` string above is just for
   // display; this is the value we actually add up.
   priceTotal?: number;
+  // The final bundled package price (flights + stopover hotel + room). When set
+  // it IS the trip total — no further addition needed.
+  packageTotal?: number;
   // All legs — present for both round-trip (2 legs) and multi-city (2+ legs).
   legs?: Array<{
     from: string;
@@ -248,6 +251,8 @@ export default function SmartPlannerPage({
   const totalPriceLabel = (() => {
     if (startingContext.type === "flight") {
       const f = startingContext.flight;
+      // Prefer the bundled package total when present (the stopover flow).
+      if (f.packageTotal && f.packageTotal > 0) return `€${f.packageTotal.toLocaleString()}`;
       const flights = f.priceTotal ?? 0;
       const s = f.stopover;
       const stay = s?.roomRate ? s.roomRate * (s.guests ?? 1) * s.nights : 0;

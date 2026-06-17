@@ -11,9 +11,10 @@ import { cn } from "../../../../shared/components/ui/utils";
 import { Button } from "../../../../shared/components/ui/button";
 import { ImageWithPlaceholder } from "../../../../shared/components/loading";
 import { ChevronLeft, ChevronRight, Bed, Users, Armchair, Check } from "lucide-react";
+import { StopoverPackageLabel } from "../StopoverPackageLabel";
 import type { Room } from "./roomData";
 
-export const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelected, nights, guests = 1, bundleBase }: {
+export const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, isSelected, nights, guests = 1, bundleBase, minRoomRate }: {
   room: Room,
   initialBoard?: string[],
   initialCancellation?: string[],
@@ -25,12 +26,15 @@ export const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, is
   // night", so the stay total = rate × guests × nights. Defaults to 1 so existing
   // callers that don't pass it keep their previous (per-person) total.
   guests?: number,
-  // Stopover flow only: the rest of the package's price (the flights) in euros.
-  // When provided, the card shows ONE bundled PACKAGE total
-  // (bundleBase + stay total) instead of a standalone per-person hotel rate —
-  // because in this flow we never show individual flight/hotel prices. The
-  // normal hotel-detail page leaves it undefined and keeps its own pricing.
-  bundleBase?: number
+  // Stopover flow only: the package floor for this hotel (flights + hotel) in €.
+  // When provided, the card shows ONE bundled "Stopover package" total instead
+  // of a standalone hotel rate. The CHEAPEST room sits exactly on this floor;
+  // pricier rooms add (their rate − cheapest rate) × guests × nights on top.
+  // The normal hotel-detail page leaves it undefined and keeps its own pricing.
+  bundleBase?: number,
+  // The cheapest room rate in this hotel (per person, per night). Used to size a
+  // room's premium over the floor. Defaults to this room's rate (premium 0).
+  minRoomRate?: number
 }) => {
   const [selectedCancel, setSelectedCancel] = useState(() => {
     // If filters are passed, try to select the matching one
@@ -183,11 +187,16 @@ export const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, is
         <div className="mt-auto pt-4 border-t border-muted flex flex-col gap-2">
           {bundleBase !== undefined ? (
             // Stopover/package flow — show ONE bundled total for the whole trip
-            // (flights + this room), never a separate hotel price.
+            // (flights + hotel + this room), never a separate hotel price. The
+            // cheapest room equals the floor; this room adds its premium on top.
             <>
-              <div className="text-right text-xs text-grey">Package total · {guests} guest{guests !== 1 ? 's' : ''} · {nights} night{nights !== 1 ? 's' : ''}</div>
+              <div className="flex justify-end">
+                <StopoverPackageLabel
+                  label={`Stopover package · ${guests} guest${guests !== 1 ? 's' : ''} · ${nights} night${nights !== 1 ? 's' : ''}`}
+                />
+              </div>
               <div className="text-right text-lg font-bold text-foreground">
-                {bundleBase + totalPrice * guests * nights}€
+                {(bundleBase + (totalPrice - (minRoomRate ?? totalPrice)) * guests * nights).toLocaleString()}€
               </div>
             </>
           ) : (

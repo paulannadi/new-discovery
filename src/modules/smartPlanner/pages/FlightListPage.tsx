@@ -43,6 +43,7 @@ import { FlightSearchForm } from "../components/flightSearch/FlightSearchForm";
 // Banner that nudges the traveller to add a stopover when they didn't opt in.
 import { StopoverPromoBanner } from "../components/flightSearch/StopoverPromoBanner";
 import { getMockFlightsForLeg, getStopoverOffersForLeg, routeHasStopover } from "../components/flightSearch/mockFlights";
+import { findAirportByCode } from "../components/flightSearch/airports";
 import { applyFilters } from "../components/flightSearch/filterFlights";
 import { DEFAULT_FILTERS, type FlightFilters } from "../components/flightSearch/types";
 
@@ -54,6 +55,11 @@ type FlightListPageProps = {
   searchCriteria: FlightSearchCriteria;
   currentLegIndex: number;
   selectedLegs: SelectedFlightLeg[];
+  // Cheapest-package anchoring (stopover flow only). The running package floor
+  // BEFORE this leg: the cheapest flight on this leg shows exactly this price,
+  // pricier ones add their premium. Undefined on a plain flight search, where
+  // each flight just shows its own fare.
+  packageFloor?: number;
   onFlightLegSelect: (option: FlightOption) => void;
   // New — Edit Search modal commits via this callback. The parent (App.tsx)
   // updates searchCriteria, clears selected legs, and resets the leg index.
@@ -100,6 +106,7 @@ export default function FlightListPage({
   searchCriteria,
   currentLegIndex,
   selectedLegs,
+  packageFloor,
   onFlightLegSelect,
   onSearchCriteriaChange,
   onStepSelect,
@@ -316,16 +323,21 @@ export default function FlightListPage({
               <Plane size={22} className="text-primary shrink-0 mt-1" aria-hidden="true" />
               <div>
                 <h2 className="text-lg md:text-xl font-extrabold text-foreground leading-tight">
-                  Flight {currentLegIndex + 1}: {currentLeg.from || "Origin"} to {currentLeg.to || "Destination"}
+                  {/* Full city names ("Los Angeles to Sydney"), with "with
+                      stopover" appended when this leg is the stopover leg. */}
+                  Flight {currentLegIndex + 1}:{" "}
+                  {findAirportByCode(currentLeg.from)?.city || currentLeg.from || "Origin"} to{" "}
+                  {findAirportByCode(currentLeg.to)?.city || currentLeg.to || "Destination"}
+                  {isStopoverLeg && " with stopover"}
                 </h2>
                 {currentLeg.date && (
-                  <p className="text-sm text-muted-foreground mt-0.5">
+                  <p className="text-sm text-foreground mt-0.5">
                     {format(currentLeg.date, "EEE, dd MMM yyyy")}
                   </p>
                 )}
               </div>
             </div>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-foreground">
               Selecting flight {currentLegIndex + 1} of {totalLegs}
             </span>
           </div>
@@ -373,19 +385,30 @@ export default function FlightListPage({
         ) : (
           <>
             <StaggeredList className="flex flex-col gap-3">
-              {filteredFlights.map((option) => (
-                <FlightResultCard
-                  key={option.id}
-                  option={option}
-                  legDate={currentLeg?.date}
-                  fromCode={currentLeg?.from || ""}
-                  toCode={currentLeg?.to || ""}
-                  legIndex={currentLegIndex}
-                  totalLegs={totalLegs}
-                  cabinLabel={cabinLabel}
-                  onSelect={() => onFlightLegSelect(option)}
-                />
-              ))}
+              {(() => {
+                // Cheapest-package anchoring: when a package floor is supplied
+                // (stopover flow), every card shows floor + (its fare − cheapest
+                // fare here). The cheapest flight lands exactly on the floor.
+                const packageMode = packageFloor != null;
+                const minFare = filteredFlights.length
+                  ? Math.min(...filteredFlights.map((o) => o.price))
+                  : 0;
+                return filteredFlights.map((option) => (
+                  <FlightResultCard
+                    key={option.id}
+                    option={option}
+                    legDate={currentLeg?.date}
+                    fromCode={currentLeg?.from || ""}
+                    toCode={currentLeg?.to || ""}
+                    legIndex={currentLegIndex}
+                    totalLegs={totalLegs}
+                    cabinLabel={cabinLabel}
+                    packageMode={packageMode}
+                    displayPrice={packageMode ? packageFloor! + (option.price - minFare) : undefined}
+                    onSelect={() => onFlightLegSelect(option)}
+                  />
+                ));
+              })()}
             </StaggeredList>
             <StreamingStatusBanner
               isStreaming={streamingProgress.completed < streamingProgress.total}

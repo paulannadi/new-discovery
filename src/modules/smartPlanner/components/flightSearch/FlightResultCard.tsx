@@ -23,11 +23,12 @@
 
 import { useState, useEffect, type ReactNode } from "react";
 import { format, addDays } from "date-fns";
-import { Plane, Sparkles, MapPin } from "lucide-react";
+import { Plane, Route, MapPin } from "lucide-react";
 import { Button } from "../../../../shared/components/ui/button";
 import { Badge } from "../../../../shared/components/ui/badge";
 import { cn } from "../../../../shared/components/ui/utils";
 import { getAirlineLogo } from "./airlineLogos";
+import { StopoverPackageLabel } from "../StopoverPackageLabel";
 import type { FlightOption } from "../../../../App";
 
 type FlightResultCardProps = {
@@ -43,6 +44,10 @@ type FlightResultCardProps = {
   legIndex?: number;
   totalLegs?: number;
   cabinLabel: string;
+  // Stopover/package flow: show "Stopover package" wording + the bundled price.
+  packageMode?: boolean;
+  // The anchored package price to show instead of the raw fare (stopover flow).
+  displayPrice?: number;
   onSelect: () => void;
   onMoreDetails?: () => void;
 };
@@ -130,7 +135,7 @@ function JourneySegment({
           normal flight card so the logo sits in the same place: in the date row,
           right above the times. */}
       <div className="flex items-center justify-between gap-3">
-        <span className="text-xs text-muted-foreground">{dateLabel}</span>
+        <span className="text-sm font-medium text-foreground">{dateLabel}</span>
         {mark}
       </div>
 
@@ -138,13 +143,13 @@ function JourneySegment({
       <div className="flex items-center gap-3 md:gap-5">
         {/* Departure */}
         <div className="shrink-0 min-w-[60px]">
-          <div className="text-xl md:text-2xl font-extrabold text-foreground leading-none">{depTime}</div>
-          <div className="text-xs text-muted-foreground mt-1">{depCode}</div>
+          <div className="text-2xl font-extrabold text-foreground leading-none">{depTime}</div>
+          <div className="text-sm text-foreground mt-1">{depCode}</div>
         </div>
 
         {/* Connector: duration · line with a plane · note */}
         <div className="flex-1 flex flex-col items-center gap-1">
-          <span className="text-xs text-muted-foreground">{duration}</span>
+          <span className="text-sm text-foreground">{duration}</span>
           <div className="w-full flex items-center gap-1">
             <span className="size-1.5 rounded-full bg-foreground/40 shrink-0" />
             <div className="flex-1 h-px bg-border" />
@@ -152,18 +157,18 @@ function JourneySegment({
             <div className="flex-1 h-px bg-border" />
             <span className="size-1.5 rounded-full bg-foreground/40 shrink-0" />
           </div>
-          {note && <span className="text-xs text-muted-foreground">{note}</span>}
+          {note && <span className="text-sm text-foreground">{note}</span>}
         </div>
 
         {/* Arrival — "+1" superscript when it lands the next day */}
         <div className="shrink-0 min-w-[60px] text-right">
-          <div className="text-xl md:text-2xl font-extrabold text-foreground leading-none">
+          <div className="text-2xl font-extrabold text-foreground leading-none">
             {arrTime}
             {arrivesNextDay && (
-              <sup className="ml-0.5 align-super text-xs font-bold text-primary">+1</sup>
+              <sup className="ml-0.5 align-super text-sm font-bold text-primary">+1</sup>
             )}
           </div>
-          <div className="text-xs text-muted-foreground mt-1">{arrCode}</div>
+          <div className="text-sm text-foreground mt-1">{arrCode}</div>
         </div>
       </div>
     </div>
@@ -178,9 +183,13 @@ export function FlightResultCard({
   legIndex,
   totalLegs,
   cabinLabel,
+  packageMode = false,
+  displayPrice,
   onSelect,
   onMoreDetails,
 }: FlightResultCardProps) {
+  // The figure to show: the anchored package price when supplied, else the fare.
+  const shownPrice = displayPrice ?? option.price;
   const logoSrc = getAirlineLogo(option.airlineCode);
   const dateLabel = legDate ? format(legDate, "dd MMM yyyy") : "";
   const legLabel = getLegLabel(legIndex, totalLegs);
@@ -217,18 +226,15 @@ export function FlightResultCard({
         : undefined;
 
     return (
-      <div className="bg-card rounded-xl border-2 border-primary shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 ease-out overflow-hidden">
+      <div className="bg-card rounded-xl border border-border shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 ease-out overflow-hidden">
         {/* Header banner */}
         <div className="flex flex-wrap items-center gap-2 bg-primary px-4 md:px-5 py-2 text-primary-foreground">
-          <Sparkles size={15} aria-hidden="true" />
+          <Route size={15} aria-hidden="true" />
           <span className="text-sm font-bold">Stopover offer</span>
-          <span className="rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-extrabold text-primary">
-            {nights} night{nights > 1 ? "s" : ""} in {city}
-          </span>
           {/* Curated tag (Cheapest / Fastest / Best) — pushed to the far right so
               several offers through the same hub read as distinct picks. */}
           {option.badge && (
-            <span className="ml-auto rounded-full border border-white/50 px-2.5 py-0.5 text-xs font-bold">
+            <span className="ml-auto rounded-full border border-white/50 px-2.5 py-0.5 text-sm font-bold">
               {option.badge}
             </span>
           )}
@@ -250,16 +256,16 @@ export function FlightResultCard({
               arrivesNextDay={out.arrivesNextDay}
             />
 
-            {/* The stopover — a full-width dashed, tinted highlight box with the
+            {/* The stopover — a full-width, softly tinted highlight box with the
                 pin inline, so its left edge lines up with the times above/below. */}
-            <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 px-4 py-2.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <div className="rounded-lg border border-primary/30 bg-primary/5 px-4 py-2.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
               <MapPin size={16} className="text-primary shrink-0" aria-hidden="true" />
               <span className="text-sm font-bold text-primary">
-                {nights}-night stopover in {city}
+                Spend {nights} night{nights > 1 ? "s" : ""} in {city}
               </span>
-              <span className="text-sm text-muted-foreground">
-                {stayRange ? `${stayRange} · ` : ""}pick a hotel
-              </span>
+              {stayRange && (
+                <span className="text-sm text-foreground">{stayRange}</span>
+              )}
             </div>
 
             {/* Flight 2 — hub → destination */}
@@ -277,7 +283,7 @@ export function FlightResultCard({
 
             {/* Footer — cabin pill, same as the normal flight card */}
             <div className="flex items-center justify-between mt-1">
-              <Badge variant="outline" className="rounded-full px-3 py-0.5 text-muted-foreground">
+              <Badge variant="outline" className="rounded-full px-3 py-0.5 text-foreground">
                 {cabinLabel}
               </Badge>
             </div>
@@ -288,12 +294,12 @@ export function FlightResultCard({
               package. So this is a "From" starting price for the whole package;
               it grows as the traveller picks their stopover room, and the final
               total is shown from here on through the flow. */}
-          <div className="md:border-l border-t md:border-t-0 border-border bg-grey-lightest/40 md:min-w-[180px] flex flex-col items-center justify-center gap-1 p-4 md:p-5">
-            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">From</span>
-            <div className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight">
-              €{option.price}
+          <div className="border-t md:border-t-0 border-border md:min-w-[210px] flex flex-col items-center justify-center gap-1 p-4 md:p-5 md:relative md:before:content-[''] md:before:absolute md:before:left-0 md:before:top-6 md:before:bottom-6 md:before:w-px md:before:bg-border">
+            <div className="flex items-baseline gap-1.5 text-foreground leading-tight">
+              <span className="text-sm font-extrabold">from</span>
+              <span className="text-2xl font-extrabold">€{shownPrice.toLocaleString()}</span>
             </div>
-            <div className="text-xs text-muted-foreground text-center">package price</div>
+            <StopoverPackageLabel />
             <Button onClick={onSelect} size="lg" className="w-full mt-3 font-bold">
               Select
             </Button>
@@ -316,7 +322,7 @@ export function FlightResultCard({
 
           {/* Top row — "Outbound – date" on the left, airline logo on the right */}
           <div className="flex items-start justify-between gap-3">
-            <span className="text-xs md:text-sm text-muted-foreground">
+            <span className="text-sm text-foreground">
               {legLabel}{dateLabel ? ` – ${dateLabel}` : ""}
             </span>
 
@@ -346,17 +352,17 @@ export function FlightResultCard({
           <div className="flex items-center gap-3 md:gap-6 mt-2">
             {/* Departure */}
             <div className="text-left shrink-0 min-w-[60px]">
-              <div className="text-xl md:text-2xl font-extrabold text-foreground leading-none">
+              <div className="text-2xl font-extrabold text-foreground leading-none">
                 {option.departure}
               </div>
-              <div className="text-xs text-muted-foreground mt-1 truncate max-w-[80px]" title={fromCode}>
+              <div className="text-sm text-foreground mt-1 truncate max-w-[80px]" title={fromCode}>
                 {fromCode}
               </div>
             </div>
 
             {/* Connector — line + stops label + duration */}
             <div className="flex-1 flex flex-col items-center gap-1">
-              <span className="text-xs font-semibold text-foreground">
+              <span className="text-sm font-semibold text-foreground">
                 {`${option.stops === "Direct" ? "Non-Stop" : option.stops}${option.stopInfo ? ` · ${option.stopInfo}` : ""}`}
               </span>
               <div className="w-full flex items-center gap-1">
@@ -364,17 +370,17 @@ export function FlightResultCard({
                 <Plane size={12} className="text-grey shrink-0" aria-hidden="true" />
                 <div className="flex-1 h-px bg-border" />
               </div>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-sm text-foreground">
                 {option.duration.replace(/m\b/, "min")}
               </span>
             </div>
 
             {/* Arrival */}
             <div className="text-right shrink-0 min-w-[60px]">
-              <div className="text-xl md:text-2xl font-extrabold text-foreground leading-none">
+              <div className="text-2xl font-extrabold text-foreground leading-none">
                 {option.arrival}
               </div>
-              <div className="text-xs text-muted-foreground mt-1 truncate max-w-[80px] ml-auto" title={toCode}>
+              <div className="text-sm text-foreground mt-1 truncate max-w-[80px] ml-auto" title={toCode}>
                 {toCode}
               </div>
             </div>
@@ -382,14 +388,14 @@ export function FlightResultCard({
 
           {/* Bottom row — cabin pill on the left, "More details" link on the right */}
           <div className="flex items-center justify-between mt-2">
-            <Badge variant="outline" className="rounded-full px-3 py-0.5 text-muted-foreground">
+            <Badge variant="outline" className="rounded-full px-3 py-0.5 text-foreground">
               {cabinLabel}
             </Badge>
             {onMoreDetails && (
               <button
                 type="button"
                 onClick={onMoreDetails}
-                className="text-xs font-bold text-primary hover:underline"
+                className="text-sm font-bold text-primary hover:underline"
               >
                 More details
               </button>
@@ -398,15 +404,19 @@ export function FlightResultCard({
         </div>
 
         {/* ── RIGHT SIDE: badge + price + Select ───────────────────────── */}
-        <div className="md:border-l border-t md:border-t-0 border-border bg-grey-lightest/40 md:min-w-[180px] flex flex-col items-center justify-center gap-2 p-4 md:p-5">
+        <div className="border-t md:border-t-0 border-border md:min-w-[210px] flex flex-col items-center justify-center gap-2 p-4 md:p-5 md:relative md:before:content-[''] md:before:absolute md:before:left-0 md:before:top-6 md:before:bottom-6 md:before:w-px md:before:bg-border">
           {option.badge && <ResultBadge label={option.badge} />}
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">From</span>
-          <div className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight">
-            €{option.price}
+          <div className="flex items-baseline gap-1.5 text-foreground leading-tight">
+            <span className="text-sm font-extrabold">from</span>
+            <span className="text-2xl font-extrabold">€{shownPrice.toLocaleString()}</span>
           </div>
-          <div className="text-xs text-muted-foreground text-center">
-            package price
-          </div>
+          {packageMode ? (
+            <StopoverPackageLabel />
+          ) : (
+            <div className="text-sm text-foreground text-center">
+              total for all passengers
+            </div>
+          )}
           <Button
             onClick={onSelect}
             size="lg"
