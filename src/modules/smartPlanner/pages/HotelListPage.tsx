@@ -1477,9 +1477,9 @@ export default function HotelListPage({
 
         {/* Map — hidden entirely on the stopover step (single-column layout) */}
         {!hideSearch && (
-        {/* `isolate` traps Leaflet's high internal z-indexes (panes/controls
-            reach ~1000) inside this column so they can't paint over the sticky
-            header (z-30) as the list scrolls. */}
+        /* `isolate` traps Leaflet's high internal z-indexes (panes/controls
+           reach ~1000) inside this column so they can't paint over the sticky
+           header (z-30) as the list scrolls. */
         <div className={cn(
           "isolate w-full md:w-[35%] min-w-0 h-[calc(100vh-130px)] sticky top-0",
           mobileView === 'list' ? 'hidden md:block' : 'block'
