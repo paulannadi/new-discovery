@@ -46,11 +46,21 @@ type PillContentProps = {
 export function PillContent({ icon: Icon, value }: PillContentProps) {
   return (
     <>
-      <Icon size={14} className="shrink-0" aria-hidden="true" />
+      {/* `text-foreground` is required, not cosmetic: shadcn's SelectTrigger
+          forces any icon WITHOUT a `text-` class to grey (muted-foreground).
+          Naming the colour here opts these icons out of that rule so the Sort
+          and Stops pills match the black icons in the Popover pills. The
+          open-state override keeps the icon turning primary when the
+          dropdown is open, matching the trigger text. */}
+      <Icon
+        size={14}
+        className="shrink-0 text-foreground group-data-[state=open]:text-primary"
+        aria-hidden="true"
+      />
       <span className="truncate flex-1 md:flex-initial">{value}</span>
       <ChevronDown
         size={13}
-        className="shrink-0 transition-transform group-data-[state=open]:rotate-180"
+        className="shrink-0 text-foreground group-data-[state=open]:text-primary transition-transform group-data-[state=open]:rotate-180"
       />
     </>
   );

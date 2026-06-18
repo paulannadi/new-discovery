@@ -773,7 +773,10 @@ export default function HolidayListPage({
         </div>
 
         {/* RIGHT: real Leaflet world map with destination pins */}
-        <div className={`w-full md:w-[35%] min-w-0 h-[calc(100vh-160px)] sticky top-0 ${mobileView === "list" ? "hidden md:block" : "block"}`}>
+        {/* `isolate` traps Leaflet's high internal z-indexes (panes/controls
+            reach ~1000) inside this column so they can't paint over the sticky
+            header (z-30) as the list scrolls. */}
+        <div className={`isolate w-full md:w-[35%] min-w-0 h-[calc(100vh-160px)] sticky top-0 ${mobileView === "list" ? "hidden md:block" : "block"}`}>
           {(() => {
             // Look up the selected destination's coordinates so we can centre the map on it.
             // If no destination is selected yet (searchCriteria.to is empty), default to

@@ -1054,7 +1054,11 @@ export default function PackageDetailPage({
                 {/* Interactive Leaflet map — replaces the old static image placeholder.
                     The map is centred on the hotel's real coordinates (from locationCoords).
                     The "Show on map" button overlaid top-right opens the full modal. */}
-                <div className="rounded-lg overflow-hidden h-[220px] relative mb-4 border border-border">
+                {/* `isolate` traps Leaflet's high internal z-indexes (panes/
+                    controls reach ~1000) inside this box so they can't paint
+                    over the sticky section nav (z-30) or the mobile bottom
+                    sheet (z-50) when the page scrolls. */}
+                <div className="isolate rounded-lg overflow-hidden h-[220px] relative mb-4 border border-border">
                   <LeafletMap
                     center={coords}
                     zoom={13}

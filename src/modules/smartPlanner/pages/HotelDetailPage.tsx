@@ -959,8 +959,12 @@ export default function HotelDetailPage({
           {/* ── RIGHT: Map + Getting around ──────────────────────────────────── */}
           <div className="flex flex-col gap-4">
 
-            {/* Interactive map — h-[200px] matches the About tile height on the left */}
-            <div className="rounded-xl overflow-hidden h-[200px] relative border border-border">
+            {/* Interactive map — h-[200px] matches the About tile height on the left.
+                `isolate` creates a stacking context so Leaflet's high internal
+                z-indexes (map panes/controls go up to ~1000) stay trapped inside
+                this box and can't paint over the sticky summary bar (z-30) when
+                you scroll. */}
+            <div className="isolate rounded-xl overflow-hidden h-[200px] relative border border-border">
               <LeafletMap
                 center={coords}
                 zoom={13}

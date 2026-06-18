@@ -65,9 +65,22 @@ interface StickySummaryBarProps {
   actionLabel?: string;
   onAction?: () => void;
   actionDisabled?: boolean;
+  // Optional SECONDARY button, shown to the left of the primary one (rendered in
+  // the lower-emphasis "secondary" style — blue border + blue text). The stopover
+  // room step uses this for "Personalize this trip" alongside "Proceed to checkout".
+  secondaryActionLabel?: string;
+  onSecondaryAction?: () => void;
+  secondaryActionDisabled?: boolean;
+  // Optional icon rendered before the secondary button's label (e.g. a pencil).
+  secondaryActionIcon?: ReactNode;
   // Custom right-column rows. When omitted, a single "Paid before departure"
   // line is shown (the Smart Planner default).
   priceBreakdown?: PriceBreakdownLine[];
+  // When this flips to true, the expandable panel pops open automatically so the
+  // user can review their trip before confirming (e.g. once every room in the
+  // stopover flow has been selected). It only triggers on the rising edge, so the
+  // user is free to close the panel again afterwards.
+  autoExpand?: boolean;
 }
 
 // Map each item kind to a small line-style icon used in the expanded panel.
@@ -180,10 +193,22 @@ export function StickySummaryBar({
   actionLabel,
   onAction,
   actionDisabled = false,
+  secondaryActionLabel,
+  onSecondaryAction,
+  secondaryActionDisabled = false,
+  secondaryActionIcon,
   priceBreakdown,
+  autoExpand = false,
 }: StickySummaryBarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Pop the panel open when the caller signals the trip is ready to confirm.
+  // This fires only when `autoExpand` changes to true (the rising edge), so once
+  // it's open the user can freely close it again without it springing back.
+  useEffect(() => {
+    if (autoExpand) setIsOpen(true);
+  }, [autoExpand]);
 
   // When the bar gets hidden (e.g. user scrolls back up to the hero), also
   // collapse the expanded panel so it doesn't pop open again when the bar
@@ -234,39 +259,65 @@ export function StickySummaryBar({
       )}
     >
       <div className="max-w-5xl mx-auto">
-        {/* COLLAPSED ROW — toggle + summary text (mobile compact) + Book */}
-        <div className="flex items-center gap-3 lg:gap-5 py-3 px-4 lg:py-4 lg:px-5">
-          <TripSummaryToggle isOpen={isOpen} onToggle={() => setIsOpen((v) => !v)} />
+        {/* COLLAPSED ROW — toggle + summary text (mobile compact) + actions.
+            On mobile this stacks: the toggle+summary sit on top and the action
+            buttons drop to their own full-width row below. On desktop (lg) it's
+            a single inline row. */}
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-5 py-3 px-4 lg:py-4 lg:px-5">
 
-          {/* Desktop: detailed summary line */}
-          <div className="hidden lg:block flex-1 text-sm text-foreground whitespace-nowrap overflow-hidden text-ellipsis">
-            {summaryLine}
+          {/* Toggle + summary. `lg:contents` makes this wrapper dissolve on
+              desktop so the toggle and summary become direct flex children of
+              the row again (keeping the original inline layout). */}
+          <div className="flex items-center gap-3 lg:contents">
+            <TripSummaryToggle isOpen={isOpen} onToggle={() => setIsOpen((v) => !v)} />
+
+            {/* Desktop: detailed summary line */}
+            <div className="hidden lg:block flex-1 text-sm text-foreground whitespace-nowrap overflow-hidden text-ellipsis">
+              {summaryLine}
+            </div>
+
+            {/* Mobile: compact pax + dates icons */}
+            <div className="flex lg:hidden flex-1 flex-col gap-0.5 text-xs text-foreground min-w-0">
+              <span className="flex items-center gap-1.5">
+                <User size={13} className="text-grey shrink-0" aria-hidden="true" />
+                <span className="truncate">
+                  {adults} adult{adults !== 1 ? "s" : ""}
+                </span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CalendarDays size={13} className="text-grey shrink-0" aria-hidden="true" />
+                <span className="truncate">
+                  {format(startDate, "dd MMM")} – {format(endDate, "dd MMM yyyy")}
+                </span>
+              </span>
+            </div>
           </div>
 
-          {/* Mobile: compact pax + dates icons */}
-          <div className="flex lg:hidden flex-1 flex-col gap-0.5 text-xs text-foreground min-w-0">
-            <span className="flex items-center gap-1.5">
-              <User size={13} className="text-grey shrink-0" aria-hidden="true" />
-              <span className="truncate">
-                {adults} adult{adults !== 1 ? "s" : ""}
-              </span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CalendarDays size={13} className="text-grey shrink-0" aria-hidden="true" />
-              <span className="truncate">
-                {format(startDate, "dd MMM")} – {format(endDate, "dd MMM yyyy")}
-              </span>
-            </span>
+          {/* Action buttons. Mobile: full-width, stacked with the PRIMARY on top
+              (flex-col-reverse lifts the last DOM child up). Desktop: inline row
+              with the secondary on the left and the primary on the right. */}
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end items-stretch sm:items-center gap-2 lg:gap-3 w-full lg:w-auto shrink-0">
+            {secondaryActionLabel && (
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={onSecondaryAction}
+                disabled={secondaryActionDisabled}
+                className="w-full sm:w-auto"
+              >
+                {secondaryActionIcon}
+                {secondaryActionLabel}
+              </Button>
+            )}
+            <Button
+              size="lg"
+              onClick={onAction}
+              disabled={actionDisabled}
+              className="w-full sm:w-auto"
+            >
+              {actionLabel ?? `Book · ${totalPriceLabel}`}
+            </Button>
           </div>
-
-          <Button
-            size="lg"
-            className="shrink-0"
-            onClick={onAction}
-            disabled={actionDisabled}
-          >
-            {actionLabel ?? `Book · ${totalPriceLabel}`}
-          </Button>
         </div>
 
         {/* EXPANDABLE PANEL — slides up from the bar.

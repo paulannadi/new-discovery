@@ -9,7 +9,7 @@
 // rooms. This mirrors HotelDetailPage's look, but with the emphasis flipped:
 // HotelDetailPage opens with a big hotel hero; here the rooms come first.
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { BackButton } from "../../../shared/components/BackButton";
 import AccommodationStar from "../../../shared/components/AccommodationStar";
 import RatingBlock from "../../../shared/components/RatingBlock";
@@ -23,8 +23,13 @@ import {
   MapPinned,
   Bed,
   ChevronDown,
+  Users,
+  Pencil,
 } from "lucide-react";
 import { Button } from "../../../shared/components/ui/button";
+// cn = a tiny helper that joins Tailwind class strings together and lets us
+// switch classes on/off conditionally (used for the field's active/hover state).
+import { cn } from "../../../shared/components/ui/utils";
 import {
   Dialog,
   DialogContent,
@@ -135,12 +140,67 @@ export default function StopoverRoomPage({
   const totalAdults = roomConfiguration.reduce((sum, c) => sum + c.adults, 0);
   const totalChildren = roomConfiguration.reduce((sum, c) => sum + c.children, 0);
 
-  // One selection slot per guest configuration (a single stopover room here).
+  // Editable room allocation. The TOTAL number of travellers is fixed here (it
+  // comes from the flights the traveller already booked and can't change on this
+  // step). What the user CAN do is split those same travellers across one or more
+  // rooms — so this is a local, editable copy of the config we arrived with.
+  const [localRoomConfig, setLocalRoomConfig] = useState<RoomConfig[]>(roomConfiguration);
+
+  // When the user books more than one room, we show a tab per room (same as the
+  // hotel flow) so each room is picked separately. This tracks the open tab.
+  const [activeRoomTab, setActiveRoomTab] = useState(roomConfiguration[0]?.id ?? 1);
+
+  // Whether the "Guests & Rooms" dropdown is open, plus a ref on its wrapper so
+  // we can close it when the user clicks anywhere outside (same pattern the hotel
+  // detail page uses for its search-bar popups).
+  const [guestsOpen, setGuestsOpen] = useState(false);
+  const guestsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (guestsRef.current && !guestsRef.current.contains(e.target as Node)) {
+        setGuestsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // How many travellers are already placed into rooms, and how many still need a
+  // home. The "+" buttons in the dropdown are only enabled while there are still
+  // unplaced travellers, so the user can never exceed the locked totals.
+  const allocatedAdults = localRoomConfig.reduce((sum, r) => sum + r.adults, 0);
+  const allocatedChildren = localRoomConfig.reduce((sum, r) => sum + r.children, 0);
+  const remainingAdults = totalAdults - allocatedAdults;
+  const remainingChildren = totalChildren - allocatedChildren;
+  // True once every traveller sits in a room (and no room is left empty).
+  const allAllocated =
+    remainingAdults === 0 &&
+    remainingChildren === 0 &&
+    localRoomConfig.every((r) => r.adults + r.children > 0);
+
+  // One selection slot per guest configuration (one per room).
   const [roomSelections, setRoomSelections] = useState<{ [id: number]: RoomSelection | null }>(() => {
     const initial: { [id: number]: RoomSelection | null } = {};
     roomConfiguration.forEach((c) => (initial[c.id] = null));
     return initial;
   });
+
+  // Keep the selection slots in sync with the rooms: whenever rooms are added or
+  // removed in the dropdown, make sure every current room has a slot (new rooms
+  // start unselected) and drop slots for rooms that no longer exist.
+  useEffect(() => {
+    setRoomSelections((prev) => {
+      const next: { [id: number]: RoomSelection | null } = {};
+      localRoomConfig.forEach((c) => {
+        next[c.id] = prev[c.id] ?? null;
+      });
+      return next;
+    });
+    // If the room whose tab is open got removed, fall back to the first room.
+    setActiveRoomTab((current) =>
+      localRoomConfig.some((c) => c.id === current) ? current : localRoomConfig[0]?.id ?? 1
+    );
+  }, [localRoomConfig]);
 
   // Brief loading shimmer is unused here (no search bar), but kept simple: rooms
   // are ready immediately.
@@ -156,7 +216,7 @@ export default function StopoverRoomPage({
   const pois = useMemo(() => nearbyPOIs(city), [city]);
   const coords = useMemo(() => locationCoords(city), [city]);
 
-  const allRoomsSelected = roomConfiguration.every((c) => roomSelections[c.id] != null);
+  const allRoomsSelected = localRoomConfig.every((c) => roomSelections[c.id] != null);
   const someRoomsSelected = Object.values(roomSelections).some((s) => s !== null);
 
   // Toast once everything's chosen — same friendly confirmation as the detail page.
@@ -176,6 +236,13 @@ export default function StopoverRoomPage({
   const handleRoomSelect = (configId: number, roomId: string, cancelOption: string, extraOption: string) => {
     const room = rooms.find((r) => r.id === roomId)!;
     setRoomSelections((prev) => ({ ...prev, [configId]: { room, cancelOption, extraOption } }));
+
+    // Auto-advance to the next room's tab so the user flows naturally through
+    // each room (stays put if this was the last room).
+    const currentIndex = localRoomConfig.findIndex((c) => c.id === configId);
+    if (currentIndex < localRoomConfig.length - 1) {
+      setActiveRoomTab(localRoomConfig[currentIndex + 1].id);
+    }
   };
 
   // Per-night total across all selected rooms (matches RoomCard's maths).
@@ -191,12 +258,81 @@ export default function StopoverRoomPage({
     return total;
   }, [roomSelections]);
 
-  const handleContinue = () => {
-    if (allRoomsSelected) {
-      onSelectRooms(roomSelections);
-    } else {
-      showToast.error("Please select a room to continue");
+  // Renders the room grid (or skeleton / empty state) for a single room config.
+  // Shared by both the single-room view and each tab in the multi-room view.
+  const renderRoomGrid = (config: RoomConfig) => {
+    const availableRooms = getAvailableRooms(config);
+    const selectedRoom = roomSelections[config.id];
+    if (isSearching) {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((n) => (
+            <SkeletonCard key={n} variant="vertical" />
+          ))}
+        </div>
+      );
     }
+    if (availableRooms.length > 0) {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {availableRooms.map((room) => (
+            <RoomCard
+              key={room.id}
+              room={room}
+              nights={nights}
+              // The room is for this config's travellers — pass the head
+              // count so the card's total reflects the per-person rate.
+              guests={getTotalGuests(config)}
+              // Bundled package: each room card shows ONE total for the
+              // whole trip. Cheapest room = the floor; pricier rooms add
+              // their premium over the cheapest room.
+              bundleBase={packageFloor}
+              minRoomRate={minRoomRate}
+              onSelect={(cancelOption, extraOption) =>
+                handleRoomSelect(config.id, room.id, cancelOption, extraOption)
+              }
+              isSelected={selectedRoom?.room.id === room.id}
+            />
+          ))}
+        </div>
+      );
+    }
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+        <p className="text-yellow-900 font-bold text-sm">
+          No rooms available for {getTotalGuests(config)} guest{getTotalGuests(config) > 1 ? "s" : ""}
+        </p>
+      </div>
+    );
+  };
+
+  // Shared guard for BOTH summary CTAs: every traveller must be allocated to a
+  // room, and every room must have a room type chosen. Returns true when the
+  // trip is ready to move forward, otherwise shows the relevant error toast.
+  const tripReady = () => {
+    if (!allAllocated) {
+      showToast.error("Please allocate all travellers to a room");
+      return false;
+    }
+    if (!allRoomsSelected) {
+      showToast.error("Please select a room to continue");
+      return false;
+    }
+    return true;
+  };
+
+  // SECONDARY CTA — "Personalize this trip": hands the chosen rooms back to
+  // App.tsx, which builds the trip context and opens the Smart Planner so the
+  // traveller can add activities, transfers, etc.
+  const handlePersonalize = () => {
+    if (tripReady()) onSelectRooms(roomSelections);
+  };
+
+  // PRIMARY CTA — "Proceed to checkout": the checkout flow isn't built yet, so
+  // for now this just confirms readiness with a friendly placeholder toast.
+  // Swap the toast for real navigation once a checkout page exists.
+  const handleProceedToCheckout = () => {
+    if (tripReady()) showToast.info("Checkout is coming soon");
   };
 
   // ── Trip-summary data ──────────────────────────────────────────────────────
@@ -340,52 +476,212 @@ export default function StopoverRoomPage({
           {totalAdults} adult{totalAdults !== 1 ? "s" : ""}
           {totalChildren > 0 && ` · ${totalChildren} child${totalChildren !== 1 ? "ren" : ""}`}
         </p>
+
+        {/* ── Guests & Rooms field ───────────────────────────────────────────
+            The SAME field + dropdown the hotel detail page uses, but with one
+            rule changed: the total traveller count is locked (it comes from the
+            flights), so the user can only SPLIT those travellers across rooms —
+            they can't add or remove travellers, only place them. The "+" buttons
+            below switch off once everyone has been allocated. */}
+        <div ref={guestsRef} className="relative mt-2 w-full sm:max-w-[360px]">
+          {/* Clickable field box — active state adds a blue ring, matching the
+              hotel page's field style. */}
+          <div
+            className={cn(
+              "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors cursor-pointer",
+              guestsOpen
+                ? "border-primary ring-2 ring-primary/20 bg-card"
+                : "border-border bg-card hover:border-primary"
+            )}
+            onClick={() => setGuestsOpen((open) => !open)}
+          >
+            <Users size={16} className="text-primary shrink-0" aria-hidden="true" />
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+                Guests &amp; Rooms
+              </span>
+              <span className="text-sm font-semibold text-foreground truncate">
+                {totalAdults} Adult{totalAdults !== 1 ? "s" : ""}
+                {totalChildren > 0 &&
+                  ` · ${totalChildren} Child${totalChildren !== 1 ? "ren" : ""}`}
+                {" · "}
+                {localRoomConfig.length} Room{localRoomConfig.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+            <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+          </div>
+
+          {/* Dropdown panel */}
+          {guestsOpen && (
+            <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-2xl border border-border p-4 w-full sm:w-[320px] max-w-[calc(100vw-2rem)] flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150">
+
+              {/* Helper line — reminds the user the total is fixed and shows how
+                  many travellers still need placing into a room. */}
+              <p className="text-xs text-grey leading-snug">
+                {allAllocated ? (
+                  "All travellers are allocated to a room."
+                ) : (
+                  <>
+                    Allocate all travellers across your rooms.
+                    {remainingAdults > 0 &&
+                      ` ${remainingAdults} adult${remainingAdults !== 1 ? "s" : ""} left to place.`}
+                    {remainingChildren > 0 &&
+                      ` ${remainingChildren} child${remainingChildren !== 1 ? "ren" : ""} left to place.`}
+                  </>
+                )}
+              </p>
+
+              {localRoomConfig.map((config, index) => (
+                <div key={config.id} className="flex flex-col gap-3">
+                  {/* Room header row */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-foreground">Room {index + 1}</span>
+                    {/* Remove button — only when there's more than 1 room. Its
+                        travellers return to the "left to place" pool. */}
+                    {localRoomConfig.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        onClick={() => setLocalRoomConfig((prev) => prev.filter((r) => r.id !== config.id))}
+                        className="text-xs text-danger font-bold h-auto p-0 hover:bg-transparent hover:underline"
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Adults counter — "+" is disabled once no adults are left to
+                      place, so the locked total can't be exceeded. */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-sm text-foreground">Adults</div>
+                      <div className="text-xs text-grey">Age 18+</div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setLocalRoomConfig((prev) => prev.map((r) =>
+                          r.id === config.id ? { ...r, adults: Math.max(0, r.adults - 1) } : r
+                        ))}
+                        className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground font-bold text-base hover:border-primary hover:text-primary disabled:opacity-30"
+                        disabled={config.adults <= 0}
+                      >−</button>
+                      <span className="text-sm font-bold text-foreground w-4 text-center">{config.adults}</span>
+                      <button
+                        onClick={() => setLocalRoomConfig((prev) => prev.map((r) =>
+                          r.id === config.id ? { ...r, adults: r.adults + 1 } : r
+                        ))}
+                        className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground font-bold text-base hover:border-primary hover:text-primary disabled:opacity-30"
+                        disabled={remainingAdults <= 0}
+                      >+</button>
+                    </div>
+                  </div>
+
+                  {/* Children counter — same locked-total rule. */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-sm text-foreground">Children</div>
+                      <div className="text-xs text-grey">Age 2–17</div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setLocalRoomConfig((prev) => prev.map((r) =>
+                          r.id === config.id ? { ...r, children: Math.max(0, r.children - 1) } : r
+                        ))}
+                        className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground font-bold text-base hover:border-primary hover:text-primary disabled:opacity-30"
+                        disabled={config.children <= 0}
+                      >−</button>
+                      <span className="text-sm font-bold text-foreground w-4 text-center">{config.children}</span>
+                      <button
+                        onClick={() => setLocalRoomConfig((prev) => prev.map((r) =>
+                          r.id === config.id ? { ...r, children: r.children + 1 } : r
+                        ))}
+                        className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground font-bold text-base hover:border-primary hover:text-primary disabled:opacity-30"
+                        disabled={remainingChildren <= 0}
+                      >+</button>
+                    </div>
+                  </div>
+
+                  {/* Divider between rooms */}
+                  {index < localRoomConfig.length - 1 && (
+                    <div className="border-t border-muted" />
+                  )}
+                </div>
+              ))}
+
+              {/* Add room — starts empty; the user then moves travellers into it
+                  from the "left to place" pool. Capped at 6 rooms. */}
+              {localRoomConfig.length < 6 && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const newId = Math.max(...localRoomConfig.map((r) => r.id)) + 1;
+                    setLocalRoomConfig((prev) => [...prev, { id: newId, adults: 0, children: 0 }]);
+                  }}
+                  className="w-full h-[36px] border-dashed border-primary text-primary hover:bg-primary/10"
+                >
+                  + Add another room
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
       </PageContainer>
 
       <PageContainer tier="narrow" className="px-4 md:px-6 pt-6 flex flex-col gap-6">
-        {roomConfiguration.map((config) => {
-          const availableRooms = getAvailableRooms(config);
-          const selectedRoom = roomSelections[config.id];
-          return (
-            <div key={config.id} className="flex flex-col gap-6">
-              {isSearching ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[1, 2, 3].map((n) => (
-                    <SkeletonCard key={n} variant="vertical" />
-                  ))}
-                </div>
-              ) : availableRooms.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {availableRooms.map((room) => (
-                    <RoomCard
-                      key={room.id}
-                      room={room}
-                      nights={nights}
-                      // The room is for this config's travellers — pass the head
-                      // count so the card's total reflects the per-person rate.
-                      guests={getTotalGuests(config)}
-                      // Bundled package: each room card shows ONE total for the
-                      // whole trip. Cheapest room = the floor; pricier rooms add
-                      // their premium over the cheapest room.
-                      bundleBase={packageFloor}
-                      minRoomRate={minRoomRate}
-                      onSelect={(cancelOption, extraOption) =>
-                        handleRoomSelect(config.id, room.id, cancelOption, extraOption)
-                      }
-                      isSelected={selectedRoom?.room.id === room.id}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
-                  <p className="text-yellow-900 font-bold text-sm">
-                    No rooms available for {getTotalGuests(config)} guest{getTotalGuests(config) > 1 ? "s" : ""}
-                  </p>
-                </div>
-              )}
+        {localRoomConfig.length > 1 ? (
+          /* ── Multiple rooms → one tab per room ──────────────────────────────
+              The user picks each room separately. A tab is locked until every
+              earlier room has a selection, so they're chosen in order. */
+          <>
+            {/* Tab navigation */}
+            <div className="sticky top-0 z-40 bg-grey-lightest flex items-center -mx-1 px-1 pt-2 border-b border-border overflow-x-auto whitespace-nowrap">
+              {localRoomConfig.map((config, index) => {
+                const selectedRoom = roomSelections[config.id];
+                const isActive = activeRoomTab === config.id;
+                // Disabled until all previous rooms have a selection.
+                const isDisabled = localRoomConfig.slice(0, index).some((prev) => !roomSelections[prev.id]);
+                return (
+                  <button
+                    key={config.id}
+                    onClick={() => !isDisabled && setActiveRoomTab(config.id)}
+                    disabled={isDisabled}
+                    className={cn(
+                      "flex items-center gap-2 px-6 py-3 font-bold text-sm border-b-2 transition-colors relative",
+                      isDisabled
+                        ? "border-transparent text-grey cursor-not-allowed"
+                        : isActive
+                          ? "border-primary text-primary"
+                          : "border-transparent text-foreground hover:text-foreground hover:border-primary"
+                    )}
+                  >
+                    <span>Room {index + 1}</span>
+                    <div className="flex items-center gap-1 text-xs font-normal">
+                      <Users size={14} aria-hidden="true" />
+                      <span>{config.adults + config.children}</span>
+                    </div>
+                    {/* A checkmark badge once this room has a selection. */}
+                    {selectedRoom && (
+                      <div className="absolute top-0 right-0 bg-foreground rounded-full p-0.5">
+                        <Check size={12} className="text-white" aria-hidden="true" />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
             </div>
-          );
-        })}
+
+            {/* Active tab content — only the open room's grid is shown. */}
+            {localRoomConfig.map((config) =>
+              activeRoomTab === config.id ? (
+                <div key={config.id} className="flex flex-col gap-6">
+                  {renderRoomGrid(config)}
+                </div>
+              ) : null
+            )}
+          </>
+        ) : (
+          /* ── Single room → no tabs ── */
+          <div className="flex flex-col gap-6">{renderRoomGrid(localRoomConfig[0])}</div>
+        )}
       </PageContainer>
 
       {/* ══════════════════════════════════════════════════════════════════════
@@ -483,7 +779,11 @@ export default function StopoverRoomPage({
 
               {/* RIGHT: map + getting around */}
               <div className="flex flex-col gap-4">
-                <div className="rounded-xl overflow-hidden h-[200px] relative border border-border">
+                {/* `isolate` creates a stacking context so Leaflet's high
+                    internal z-indexes (map panes/controls go up to ~1000) stay
+                    trapped inside this box and can't paint over the sticky
+                    summary bar (z-30) when you scroll. */}
+                <div className="isolate rounded-xl overflow-hidden h-[200px] relative border border-border">
                   <LeafletMap
                     center={coords}
                     zoom={13}
@@ -564,9 +864,18 @@ export default function StopoverRoomPage({
         totalPriceLabel={`€${tripTotal.toLocaleString()}`}
         items={summaryItems}
         priceBreakdown={priceBreakdown}
-        actionLabel={`Continue · €${tripTotal.toLocaleString()}`}
-        onAction={handleContinue}
-        actionDisabled={!allRoomsSelected}
+        // PRIMARY CTA — direct conversion path to checkout.
+        actionLabel={`Proceed to checkout · €${tripTotal.toLocaleString()}`}
+        onAction={handleProceedToCheckout}
+        actionDisabled={!allRoomsSelected || !allAllocated}
+        // SECONDARY CTA — jump into the Smart Planner to add activities/transfers.
+        secondaryActionLabel="Personalize this trip"
+        secondaryActionIcon={<Pencil size={16} aria-hidden="true" />}
+        onSecondaryAction={handlePersonalize}
+        secondaryActionDisabled={!allRoomsSelected || !allAllocated}
+        // Once every room is picked and all travellers are allocated, pop the
+        // summary panel open so the user can review their trip before continuing.
+        autoExpand={allRoomsSelected && allAllocated}
         show={someRoomsSelected}
       />
 
