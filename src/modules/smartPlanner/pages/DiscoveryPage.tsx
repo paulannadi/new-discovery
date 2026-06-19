@@ -63,8 +63,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "../../../shared/compone
 import DiscoverySettingsPanel from "../components/DiscoverySettingsPanel";
 // Shared settings (which tabs are on, which stopover airline) live in this context.
 import { useSettings } from "../../../shared/contexts/SettingsContext";
-// Shared design-system date picker (token-based). DateRange is just the {from,to} type.
-import { Calendar } from "../../../shared/components/ui/calendar";
+// Shared responsive date picker: dropdown on desktop, bottom drawer on mobile.
+import { ResponsiveDatePicker } from "../../../shared/components/ui/responsive-date-picker";
 import { type DateRange } from "react-day-picker";
 // Shared range-picker logic: 1st click = from, 2nd = to, re-open restarts.
 import { stepRange, isRangeComplete } from "../../../shared/utils/dateRange";
@@ -1120,67 +1120,67 @@ export default function DiscoveryPage({
                       </div>
 
                       {/* Dates */}
-                      <div className="flex-1 relative">
-                        <button
-                          className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border text-left transition-all ${
-                            hotelOpenPanel === "dates"
-                              ? "border-primary ring-2 ring-primary/20 bg-white"
-                              : "border-border bg-white hover:border-primary"
-                          }`}
-                          onClick={() =>
-                            setHotelOpenPanel(
-                              hotelOpenPanel === "dates" ? null : "dates"
-                            )
-                          }
-                        >
-                          <CalendarIcon
-                            size={18}
-                            className="text-primary shrink-0"
-                          />
-                          <div className="flex flex-col items-start flex-1 min-w-0">
-                            <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
-                              Check-in – Check-out
-                            </span>
-                            <span className="text-sm font-semibold text-foreground truncate w-full">
-                              {hotelDateLabel}
-                            </span>
-                          </div>
-                          <ChevronDown
-                            size={16}
-                            className={`text-grey shrink-0 transition-transform ${
-                              hotelOpenPanel === "dates" ? "rotate-180" : ""
+                      {/* ResponsiveDatePicker = shared calendar wrapper. It shows
+                          a dropdown on desktop and a bottom drawer on mobile, so
+                          this picker matches every other one in the app. We keep
+                          our own trigger button (passed via `trigger`) and just
+                          forward the range-calendar props through to it. */}
+                      <ResponsiveDatePicker
+                        className="flex-1"
+                        open={hotelOpenPanel === "dates"}
+                        onOpenChange={(open) =>
+                          setHotelOpenPanel(open ? "dates" : null)
+                        }
+                        title="Check-in – Check-out"
+                        trigger={
+                          <button
+                            className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border text-left transition-all ${
+                              hotelOpenPanel === "dates"
+                                ? "border-primary ring-2 ring-primary/20 bg-white"
+                                : "border-border bg-white hover:border-primary"
                             }`}
-                          />
-                        </button>
-
-                        {hotelOpenPanel === "dates" && (
-                          <div className="absolute top-full left-0 mt-2 bg-card rounded-xl shadow-xl border border-border z-50 overflow-hidden">
-                            {/* Shared design-system Calendar — same component the
-                                Flights tab and edit-search panels use, so all date
-                                pickers are identical and theme-token driven. */}
-                            <Calendar
-                              mode="range"
-                              selected={hotelDateRange}
-                              // Drive the range from the clicked day so it's
-                              // predictable: 1st click = check-in, 2nd = check-out,
-                              // and re-opening restarts on the first click.
-                              onSelect={(_range, day) => {
-                                const next = stepRange(hotelDateRange, day);
-                                setHotelDateRange(next);
-                                // Both dates picked → close shortly after.
-                                if (isRangeComplete(next)) {
-                                  setTimeout(
-                                    () => setHotelOpenPanel(null),
-                                    200
-                                  );
-                                }
-                              }}
-                              numberOfMonths={1}
-                              disabled={{ before: new Date() }}
+                            onClick={() =>
+                              setHotelOpenPanel(
+                                hotelOpenPanel === "dates" ? null : "dates"
+                              )
+                            }
+                          >
+                            <CalendarIcon
+                              size={18}
+                              className="text-primary shrink-0"
                             />
-                          </div>
-                        )}
-                      </div>
+                            <div className="flex flex-col items-start flex-1 min-w-0">
+                              <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+                                Check-in – Check-out
+                              </span>
+                              <span className="text-sm font-semibold text-foreground truncate w-full">
+                                {hotelDateLabel}
+                              </span>
+                            </div>
+                            <ChevronDown
+                              size={16}
+                              className={`text-grey shrink-0 transition-transform ${
+                                hotelOpenPanel === "dates" ? "rotate-180" : ""
+                              }`}
+                            />
+                          </button>
+                        }
+                        mode="range"
+                        selected={hotelDateRange}
+                        // Drive the range from the clicked day so it's
+                        // predictable: 1st click = check-in, 2nd = check-out,
+                        // and re-opening restarts on the first click.
+                        onSelect={(_range, day) => {
+                          const next = stepRange(hotelDateRange, day);
+                          setHotelDateRange(next);
+                          // Both dates picked → close shortly after.
+                          if (isRangeComplete(next)) {
+                            setTimeout(() => setHotelOpenPanel(null), 200);
+                          }
+                        }}
+                        numberOfMonths={1}
+                        disabled={{ before: new Date() }}
+                      />
 
                       {/* Guests & rooms */}
                       <div className="flex-1 relative">

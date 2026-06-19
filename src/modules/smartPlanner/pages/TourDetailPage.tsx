@@ -30,7 +30,9 @@ import {
   X,
   LayoutGrid,
 } from "lucide-react";
-import { DayPicker } from "react-day-picker";
+// Shared design-system calendar (token-based colors). Aliased to DateCalendar
+// because lucide's <Calendar> icon is already imported above under that name.
+import { Calendar as DateCalendar } from "../../../shared/components/ui/calendar";
 import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { BackButton } from "../../../shared/components/BackButton";
@@ -604,8 +606,8 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   {/* DayPicker panel — same style as PackageSearchForm / HotelDetailPage */}
                   {openPanel === "date" && (
                     <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-150">
-                      <style>{`.rdp-root { --rdp-accent-color: hsl(var(--primary)); --rdp-accent-background-color: hsl(var(--primary) / 0.10); --rdp-day_button-border-radius: 6px; margin: 0; }`}</style>
-                      <DayPicker
+                      {/* Shared design-system Calendar (token-based, no hex). */}
+                      <DateCalendar
                         mode="single"
                         selected={selectedDate}
                         onSelect={(date) => {
@@ -615,6 +617,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                         }}
                         disabled={{ before: new Date() }}
                         numberOfMonths={1}
+                        className="p-0"
                       />
                     </div>
                   )}
@@ -845,8 +848,8 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               {/* DayPicker — positioned above the field on mobile so it doesn't get cut off */}
               {openPanel === "date" && (
                 <div className="absolute bottom-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-150">
-                  <style>{`.rdp-root { --rdp-accent-color: hsl(var(--primary)); --rdp-accent-background-color: hsl(var(--primary) / 0.10); --rdp-day_button-border-radius: 6px; margin: 0; }`}</style>
-                  <DayPicker
+                  {/* Shared design-system Calendar (token-based, no hex). */}
+                  <DateCalendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => {
@@ -856,6 +859,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                     }}
                     disabled={{ before: new Date() }}
                     numberOfMonths={1}
+                    className="p-0"
                   />
                 </div>
               )}

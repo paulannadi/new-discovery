@@ -27,7 +27,10 @@ import {
   DialogTitle,
 } from "../../../shared/components/ui/dialog";
 import LeafletMap from "../../../shared/components/LeafletMap";
-import { DayPicker } from "react-day-picker";
+// Shared responsive date picker: dropdown on desktop, bottom drawer on mobile.
+// (Replaces the raw <DayPicker> + inline hex <style> these fields used before —
+// the shared Calendar inside is token-based, so no hardcoded colors.)
+import { ResponsiveDatePicker } from "../../../shared/components/ui/responsive-date-picker";
 import { format, parseISO, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { showToast } from "../../../shared/utils/toast";
@@ -533,94 +536,89 @@ export default function HotelDetailPage({
           <div ref={searchBarRef} className="flex flex-col lg:flex-row gap-3 w-full">
 
             {/* ── Check-in field ── */}
-            <div className="relative flex-1">
-              {/* Clickable field box — active state adds a blue ring, matching PackageSearchForm's fieldBase() */}
-              <div
-                className={cn(
-                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors cursor-pointer",
-                  openSearchPanel === "checkIn"
-                    ? "border-primary ring-2 ring-primary/20 bg-white"
-                    : "border-border bg-white hover:border-primary"
-                )}
-                onClick={() => setOpenSearchPanel(openSearchPanel === "checkIn" ? null : "checkIn")}
-              >
-                <CalendarDays size={16} className="text-primary shrink-0" aria-hidden="true" />
-                <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Check-in</span>
-                  {/* format() converts the ISO string ("2026-04-10") to "Apr 10, 2026" */}
-                  <span className={cn(
-                    "text-sm font-semibold truncate",
-                    searchDates.checkIn ? "text-foreground" : "text-grey font-normal"
-                  )}>
-                    {searchDates.checkIn ? format(parseISO(searchDates.checkIn), "MMM d, yyyy") : "Add date"}
-                  </span>
+            {/* Responsive picker: dropdown on desktop, bottom drawer on mobile. */}
+            <ResponsiveDatePicker
+              className="flex-1"
+              open={openSearchPanel === "checkIn"}
+              onOpenChange={(open) => setOpenSearchPanel(open ? "checkIn" : null)}
+              title="Check-in"
+              trigger={
+                /* Clickable field box — active state adds a blue ring, matching PackageSearchForm's fieldBase() */
+                <div
+                  className={cn(
+                    "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors cursor-pointer",
+                    openSearchPanel === "checkIn"
+                      ? "border-primary ring-2 ring-primary/20 bg-white"
+                      : "border-border bg-white hover:border-primary"
+                  )}
+                  onClick={() => setOpenSearchPanel(openSearchPanel === "checkIn" ? null : "checkIn")}
+                >
+                  <CalendarDays size={16} className="text-primary shrink-0" aria-hidden="true" />
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Check-in</span>
+                    {/* format() converts the ISO string ("2026-04-10") to "Apr 10, 2026" */}
+                    <span className={cn(
+                      "text-sm font-semibold truncate",
+                      searchDates.checkIn ? "text-foreground" : "text-grey font-normal"
+                    )}>
+                      {searchDates.checkIn ? format(parseISO(searchDates.checkIn), "MMM d, yyyy") : "Add date"}
+                    </span>
+                  </div>
+                  <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
                 </div>
-                <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
-              </div>
-
-              {/* DayPicker popup — same pattern as PackageSearchForm's dates panel */}
-              {/* max-w-[calc(100vw-2rem)] prevents the calendar from overflowing the viewport on small phones */}
-              {openSearchPanel === "checkIn" && (
-                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-xl shadow-2xl border border-border p-4 animate-in fade-in zoom-in-95 duration-150 max-w-[calc(100vw-2rem)] overflow-x-auto">
-                  <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
-                  <DayPicker
-                    mode="single"
-                    selected={searchDates.checkIn ? parseISO(searchDates.checkIn) : undefined}
-                    onSelect={(date) => {
-                      if (!date) return;
-                      // Store back as ISO string to match existing state shape
-                      setSearchDates(prev => ({ ...prev, checkIn: format(date, "yyyy-MM-dd") }));
-                      // Auto-advance to check-out so the user flows naturally through both fields
-                      setOpenSearchPanel("checkOut");
-                    }}
-                    disabled={{ before: new Date() }}
-                  />
-                </div>
-              )}
-            </div>
+              }
+              mode="single"
+              selected={searchDates.checkIn ? parseISO(searchDates.checkIn) : undefined}
+              onSelect={(date) => {
+                if (!date) return;
+                // Store back as ISO string to match existing state shape
+                setSearchDates(prev => ({ ...prev, checkIn: format(date, "yyyy-MM-dd") }));
+                // Auto-advance to check-out so the user flows naturally through both fields
+                setOpenSearchPanel("checkOut");
+              }}
+              disabled={{ before: new Date() }}
+            />
 
             {/* ── Check-out field ── */}
-            <div className="relative flex-1">
-              <div
-                className={cn(
-                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors cursor-pointer",
-                  openSearchPanel === "checkOut"
-                    ? "border-primary ring-2 ring-primary/20 bg-white"
-                    : "border-border bg-white hover:border-primary"
-                )}
-                onClick={() => setOpenSearchPanel(openSearchPanel === "checkOut" ? null : "checkOut")}
-              >
-                <CalendarDays size={16} className="text-primary shrink-0" aria-hidden="true" />
-                <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Check-out</span>
-                  <span className={cn(
-                    "text-sm font-semibold truncate",
-                    searchDates.checkOut ? "text-foreground" : "text-grey font-normal"
-                  )}>
-                    {searchDates.checkOut ? format(parseISO(searchDates.checkOut), "MMM d, yyyy") : "Add date"}
-                  </span>
+            <ResponsiveDatePicker
+              className="flex-1"
+              open={openSearchPanel === "checkOut"}
+              onOpenChange={(open) => setOpenSearchPanel(open ? "checkOut" : null)}
+              title="Check-out"
+              trigger={
+                <div
+                  className={cn(
+                    "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors cursor-pointer",
+                    openSearchPanel === "checkOut"
+                      ? "border-primary ring-2 ring-primary/20 bg-white"
+                      : "border-border bg-white hover:border-primary"
+                  )}
+                  onClick={() => setOpenSearchPanel(openSearchPanel === "checkOut" ? null : "checkOut")}
+                >
+                  <CalendarDays size={16} className="text-primary shrink-0" aria-hidden="true" />
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Check-out</span>
+                    <span className={cn(
+                      "text-sm font-semibold truncate",
+                      searchDates.checkOut ? "text-foreground" : "text-grey font-normal"
+                    )}>
+                      {searchDates.checkOut ? format(parseISO(searchDates.checkOut), "MMM d, yyyy") : "Add date"}
+                    </span>
+                  </div>
+                  <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
                 </div>
-                <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
-              </div>
-
-              {openSearchPanel === "checkOut" && (
-                <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-white rounded-xl shadow-2xl border border-border p-4 animate-in fade-in zoom-in-95 duration-150 max-w-[calc(100vw-2rem)] overflow-x-auto">
-                  <style>{`.rdp-root { --rdp-accent-color: #2681FF; --rdp-accent-background-color: rgba(38,129,255,0.10); --rdp-day_button-border-radius: 8px; margin: 0; }`}</style>
-                  <DayPicker
-                    mode="single"
-                    selected={searchDates.checkOut ? parseISO(searchDates.checkOut) : undefined}
-                    onSelect={(date) => {
-                      if (!date) return;
-                      setSearchDates(prev => ({ ...prev, checkOut: format(date, "yyyy-MM-dd") }));
-                      // Close panel once check-out is picked — both dates are now set
-                      setOpenSearchPanel(null);
-                    }}
-                    // Must be at least 1 night after check-in
-                    disabled={{ before: searchDates.checkIn ? addDays(parseISO(searchDates.checkIn), 1) : new Date() }}
-                  />
-                </div>
-              )}
-            </div>
+              }
+              mode="single"
+              selected={searchDates.checkOut ? parseISO(searchDates.checkOut) : undefined}
+              onSelect={(date) => {
+                if (!date) return;
+                setSearchDates(prev => ({ ...prev, checkOut: format(date, "yyyy-MM-dd") }));
+                // Close panel once check-out is picked — both dates are now set
+                setOpenSearchPanel(null);
+              }}
+              // Must be at least 1 night after check-in
+              disabled={{ before: searchDates.checkIn ? addDays(parseISO(searchDates.checkIn), 1) : new Date() }}
+            />
 
             {/* ── Guests & Rooms — clickable, opens a dropdown to edit travellers and rooms ── */}
             <div className="relative flex-1">

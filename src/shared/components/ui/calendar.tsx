@@ -38,13 +38,20 @@ function Calendar({
       // Pass through any caller-supplied classNames (none by default).
       classNames={classNames}
       components={{
-        // react-day-picker v9 uses a single Chevron component instead of IconLeft/IconRight
-        // The `orientation` prop tells us which direction to point the arrow
+        // react-day-picker v9 uses a single Chevron component instead of IconLeft/IconRight.
+        // The `orientation` prop tells us which direction to point the arrow.
+        //
+        // `text-grey` makes the arrows a neutral grey (matching the ChevronDown
+        // on our field triggers). `style={{ fill: "none" }}` is the important bit:
+        // rdp's own stylesheet sets `.rdp-chevron { fill: var(--rdp-accent-color) }`,
+        // which would fill these stroked lucide arrows with our blue --primary and
+        // leave a blue tint inside them. An inline style beats that class rule, so
+        // the arrows stay clean (stroke only, no blue fill).
         Chevron: ({ orientation, className, ...props }: ChevronProps) =>
           orientation === "left" ? (
-            <ChevronLeft className={cn("size-4", className)} {...props} />
+            <ChevronLeft className={cn("size-4 text-grey", className)} {...props} style={{ fill: "none" }} />
           ) : (
-            <ChevronRight className={cn("size-4", className)} {...props} />
+            <ChevronRight className={cn("size-4 text-grey", className)} {...props} style={{ fill: "none" }} />
           ),
       }}
       {...props}

@@ -46,6 +46,8 @@ import * as Slider from "@radix-ui/react-slider";
 import { showToast } from "../../../shared/utils/toast";
 // Shared design-system date picker (token-based). DateRange is just the {from,to} type.
 import { Calendar } from "../../../shared/components/ui/calendar";
+// Shared responsive date picker: dropdown on desktop, bottom drawer on mobile.
+import { ResponsiveDatePicker } from "../../../shared/components/ui/responsive-date-picker";
 import { type DateRange } from "react-day-picker";
 // Shared range-picker logic: 1st click = from, 2nd = to, re-open restarts.
 import { stepRange, isRangeComplete } from "../../../shared/utils/dateRange";
@@ -953,38 +955,9 @@ export default function HotelListPage({
             </div>
           </div>
         );
-      case 'date':
-        return (
-           <div style={style} className="bg-card rounded-xl shadow-xl border border-border p-4 animate-in fade-in zoom-in-95 duration-200">
-             {/* Shared design-system Calendar — same token-driven component the
-                 flight edit-search panel uses, so both results editors match. */}
-             <Calendar
-               mode="range"
-               defaultMonth={new Date()}
-               selected={dateRange}
-               // 1st click = check-in, 2nd = check-out, then auto-close.
-               // Re-opening restarts on the first click (see stepRange).
-               onSelect={(_range, day) => {
-                 const next = stepRange(dateRange, day);
-                 setDateRange(next);
-                 if (isRangeComplete(next)) {
-                   setTimeout(() => setOpenDropdown(null), 200);
-                 }
-               }}
-               numberOfMonths={1}
-               disabled={{ before: new Date() }}
-               className="p-0"
-             />
-             <div className="flex justify-end mt-4 pt-4 border-t border-muted">
-               <button
-                 className="bg-primary text-white text-sm font-extrabold px-4 py-2 rounded-lg hover:brightness-85"
-                 onClick={() => setOpenDropdown(null)}
-               >
-                 Apply Dates
-               </button>
-             </div>
-           </div>
-        );
+      // NOTE: the 'date' dropdown now lives inline with its trigger via
+      // <ResponsiveDatePicker> (dropdown on desktop, drawer on mobile), so it's
+      // intentionally NOT handled here in the fixed-position dropdown renderer.
       case 'guests':
         return (
           <div style={style} className="w-[300px] bg-card rounded-xl shadow-xl border border-border p-4 animate-in fade-in zoom-in-95 duration-200 cursor-default">
@@ -1158,30 +1131,72 @@ export default function HotelListPage({
               <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
             </div>
 
-            {/* Date Picker */}
-            <div
-              className={cn(
-                "border rounded-lg h-[48px] flex items-center px-4 gap-3 w-full lg:flex-1 cursor-pointer transition-colors",
-                openDropdown === 'date'
-                  ? "border-primary ring-2 ring-primary/20 bg-card"
-                  : "border-border bg-white hover:border-primary"
-              )}
-              onClick={(e) => handleDropdownToggle('date', e)}
+            {/* Date Picker — responsive: dropdown on desktop, bottom drawer on
+                mobile. Unlike the other controls here (which use the shared
+                fixed-position dropdown), this one couples its trigger + panel in
+                the shared <ResponsiveDatePicker> so it gets the mobile drawer. */}
+            <ResponsiveDatePicker
+              className="w-full lg:flex-1"
+              open={openDropdown === 'date'}
+              onOpenChange={(open) => setOpenDropdown(open ? 'date' : null)}
+              title="Check-in – Check-out"
+              trigger={
+                <div
+                  className={cn(
+                    "border rounded-lg h-[48px] flex items-center px-4 gap-3 w-full cursor-pointer transition-colors",
+                    openDropdown === 'date'
+                      ? "border-primary ring-2 ring-primary/20 bg-card"
+                      : "border-border bg-white hover:border-primary"
+                  )}
+                  onClick={() => setOpenDropdown(openDropdown === 'date' ? null : 'date')}
+                >
+                  <CalendarIcon size={16} className="text-primary shrink-0" aria-hidden="true" />
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <span className="text-[10px] font-extrabold text-grey uppercase tracking-wide leading-none mb-0.5">Check-in – Check-out</span>
+                    <span className={cn(
+                      "text-sm font-semibold truncate",
+                      dateRange?.from ? "text-foreground" : "text-grey font-normal"
+                    )}>
+                      {dateRange?.from
+                        ? `${format(dateRange.from, "MMM d")} – ${dateRange.to ? format(dateRange.to, "MMM d, yyyy") : "?"}`
+                        : "Add dates"}
+                    </span>
+                  </div>
+                  <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+                </div>
+              }
             >
-              <CalendarIcon size={16} className="text-primary shrink-0" aria-hidden="true" />
-              <div className="flex flex-col flex-1 min-w-0">
-                <span className="text-[10px] font-extrabold text-grey uppercase tracking-wide leading-none mb-0.5">Check-in – Check-out</span>
-                <span className={cn(
-                  "text-sm font-semibold truncate",
-                  dateRange?.from ? "text-foreground" : "text-grey font-normal"
-                )}>
-                  {dateRange?.from
-                    ? `${format(dateRange.from, "MMM d")} – ${dateRange.to ? format(dateRange.to, "MMM d, yyyy") : "?"}`
-                    : "Add dates"}
-                </span>
+              {/* p-4 pads both desktop dropdown and mobile drawer evenly. */}
+              <div className="p-4">
+                {/* Shared design-system Calendar — same token-driven component the
+                    flight edit-search panel uses, so both results editors match. */}
+                <Calendar
+                  mode="range"
+                  defaultMonth={new Date()}
+                  selected={dateRange}
+                  // 1st click = check-in, 2nd = check-out, then auto-close.
+                  // Re-opening restarts on the first click (see stepRange).
+                  onSelect={(_range, day) => {
+                    const next = stepRange(dateRange, day);
+                    setDateRange(next);
+                    if (isRangeComplete(next)) {
+                      setTimeout(() => setOpenDropdown(null), 200);
+                    }
+                  }}
+                  numberOfMonths={1}
+                  disabled={{ before: new Date() }}
+                  className="p-0"
+                />
+                <div className="flex justify-end mt-4 pt-4 border-t border-muted">
+                  <button
+                    className="bg-primary text-white text-sm font-extrabold px-4 py-2 rounded-lg hover:brightness-85"
+                    onClick={() => setOpenDropdown(null)}
+                  >
+                    Apply Dates
+                  </button>
+                </div>
               </div>
-              <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
-            </div>
+            </ResponsiveDatePicker>
 
             {/* Guests */}
             <div

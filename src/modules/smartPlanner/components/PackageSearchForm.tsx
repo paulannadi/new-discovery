@@ -29,14 +29,14 @@ import {
 import { DayPicker, DateRange } from "react-day-picker";
 import { format, addMonths, startOfMonth, addDays } from "date-fns";
 import "react-day-picker/dist/style.css";
-// useIsMobile: returns true when viewport is < 768px (phone sizes)
+// useIsMobile: returns true when viewport is < 768px (phone sizes). Still used
+// by datesPanelContent below to size the price-per-day cells for phones.
 import { useIsMobile } from "../../../shared/components/ui/use-mobile";
 // cn: utility for combining Tailwind classes conditionally
 import { cn } from "../../../shared/components/ui/utils";
-// Drawer: vaul-based bottom sheet — used to display the dates panel on mobile
-import {
-  Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose,
-} from "../../../shared/components/ui/drawer";
+// Shared responsive date picker: dropdown on desktop, bottom drawer on mobile.
+// The dates field below now uses this instead of its own hand-rolled drawer.
+import { ResponsiveDatePicker } from "../../../shared/components/ui/responsive-date-picker";
 import type { HolidaySearchCriteria } from "../../../App";
 
 // ── Destination + pricing data (imported from central mock files) ─────────────
@@ -777,64 +777,46 @@ export default function PackageSearchForm({
 
       {/* ── DATES ─────────────────────────────────────────────────────────── */}
       {/* md:col-span-2 → middle of row 2 on the tablet grid. */}
-      <div className="relative flex-[1.2] md:col-span-2">
-        <div
-          className={cn(fieldBase(openPanel === "dates"), "cursor-pointer")}
-          onClick={() => setOpenPanel(openPanel === "dates" ? null : "dates")}
-        >
-          <CalendarIcon size={iconSize} className="text-primary shrink-0" aria-hidden="true" />
-          <div className="flex flex-col flex-1 min-w-0">
-            <span className={labelCls}>
-              {dateMode === "flexible" ? "Flexible dates" : "Departure date"}
-            </span>
-            <span
-              className={cn(
-                valueCls,
-                "truncate",
-                (dateMode === "specific" && dateRange?.from) ||
-                (dateMode === "flexible" && selectedMonths.length > 0)
-                  ? "text-foreground"
-                  : "text-grey font-normal"
-              )}
-            >
-              {dateSummary}
-            </span>
-          </div>
-          <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
-        </div>
-
-        {/* Desktop: absolute dropdown, positioned below the field trigger */}
-        {!isMobile && openPanel === "dates" && (
-          // max-h + overflow-y-auto: if the calendar is near the bottom of the
-          // viewport it won't clip — the panel becomes scrollable instead.
-          <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-xl border border-border animate-in fade-in zoom-in-95 duration-150 max-h-[calc(100vh-180px)] overflow-y-auto">
-            {datesPanelContent}
-          </div>
-        )}
-
-        {/* Mobile: vaul bottom Drawer — slides up from the bottom of the screen.
-            open/onOpenChange map directly to our existing openPanel state so we
-            don't need any extra state. User can also swipe down to dismiss. */}
-        {isMobile && (
-          <Drawer
-            open={openPanel === "dates"}
-            onOpenChange={(open) => { if (!open) setOpenPanel(null); }}
+      {/* This is the calendar the whole app now shares: the same
+          <ResponsiveDatePicker> (dropdown on desktop, bottom drawer on mobile).
+          Here we pass our custom price-per-day panel as children, and opt out of
+          the default mobile cell-fill sizing because datesPanelContent tunes its
+          own cell height (taller cells fit the "from £849" price text). */}
+      <ResponsiveDatePicker
+        className="flex-[1.2] md:col-span-2"
+        open={openPanel === "dates"}
+        onOpenChange={(open) => setOpenPanel(open ? "dates" : null)}
+        title="Select dates"
+        fillMobileWidth={false}
+        trigger={
+          <div
+            className={cn(fieldBase(openPanel === "dates"), "cursor-pointer")}
+            onClick={() => setOpenPanel(openPanel === "dates" ? null : "dates")}
           >
-            <DrawerContent>
-              <DrawerHeader className="flex flex-row items-center justify-between pb-0">
-                <DrawerTitle className="text-sm font-bold text-foreground">Select dates</DrawerTitle>
-                <DrawerClose asChild>
-                  <button className="text-grey p-1" aria-label="Close"><X size={18} aria-hidden="true" /></button>
-                </DrawerClose>
-              </DrawerHeader>
-              {/* overflow-y-auto allows the calendar to scroll if it's taller than the drawer */}
-              <div className="overflow-y-auto">
-                {datesPanelContent}
-              </div>
-            </DrawerContent>
-          </Drawer>
-        )}
-      </div>
+            <CalendarIcon size={iconSize} className="text-primary shrink-0" aria-hidden="true" />
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className={labelCls}>
+                {dateMode === "flexible" ? "Flexible dates" : "Departure date"}
+              </span>
+              <span
+                className={cn(
+                  valueCls,
+                  "truncate",
+                  (dateMode === "specific" && dateRange?.from) ||
+                  (dateMode === "flexible" && selectedMonths.length > 0)
+                    ? "text-foreground"
+                    : "text-grey font-normal"
+                )}
+              >
+                {dateSummary}
+              </span>
+            </div>
+            <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+          </div>
+        }
+      >
+        {datesPanelContent}
+      </ResponsiveDatePicker>
 
       {/* ── TRAVELLERS ────────────────────────────────────────────────────── */}
       {/* md:col-span-2 → end of row 2 on the tablet grid. */}

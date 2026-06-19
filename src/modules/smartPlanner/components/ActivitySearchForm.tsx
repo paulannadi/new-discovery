@@ -39,6 +39,8 @@ import "react-day-picker/dist/style.css";
 import { cn } from "../../../shared/components/ui/utils";
 // Shared design-system date picker (token-based, no hardcoded colors).
 import { Calendar } from "../../../shared/components/ui/calendar";
+// Shared responsive date picker: dropdown on desktop, bottom drawer on mobile.
+import { ResponsiveDatePicker } from "../../../shared/components/ui/responsive-date-picker";
 import type { ActivitySearchCriteria, ActivityType } from "../../../types";
 // Pull real mock data so the Destination dropdown only shows places we
 // actually have activities for. Keeps the prototype honest: clicking a
@@ -401,64 +403,72 @@ export default function ActivitySearchForm({
       </div>
 
       {/* ── DATES (optional) ──────────────────────────────────────────────── */}
-      <div className="relative flex-[1.2]">
-        <button
-          className={cn(fieldBase(openPanel === "dates"), "cursor-pointer")}
-          onClick={() => setOpenPanel(openPanel === "dates" ? null : "dates")}
-        >
-          <CalendarIcon size={iconSize} className="text-primary shrink-0" aria-hidden="true" />
-          <div className="flex flex-col flex-1 min-w-0">
-            <span className={labelCls}>When</span>
-            <span
-              className={cn(
-                valueCls,
-                "truncate",
-                date ? "text-foreground" : "text-grey font-normal"
-              )}
-            >
-              {dateSummary}
-            </span>
-          </div>
-          <ChevronDown
-            size={14}
-            className={cn(
-              "text-grey shrink-0 transition-transform",
-              openPanel === "dates" && "rotate-180"
-            )}
-            aria-hidden="true"
-          />
-        </button>
-
-        {openPanel === "dates" && (
-          <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-xl border border-border p-4 animate-in fade-in zoom-in-95 duration-150">
-            {/* Shared design-system Calendar in single-date mode (token-based, no
-                hardcoded hex). Picking a day sets it and closes the panel — the
-                same flow as the other pickers, just completed in one click. */}
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={(picked) => {
-                setDate(picked);
-                if (picked) setOpenPanel(null);
-              }}
-              numberOfMonths={1}
-              disabled={{ before: new Date() }}
-              className="p-0"
-            />
-            {date && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDate(undefined);
-                }}
-                className="mt-2 text-xs text-grey hover:text-foreground"
+      {/* Responsive picker: dropdown on desktop, bottom drawer on mobile. We pass
+          the calendar + "Clear date" button as custom children so this picker
+          keeps its clear action while still using the shared responsive shell. */}
+      <ResponsiveDatePicker
+        className="flex-[1.2]"
+        open={openPanel === "dates"}
+        onOpenChange={(open) => setOpenPanel(open ? "dates" : null)}
+        title="When"
+        trigger={
+          <button
+            className={cn(fieldBase(openPanel === "dates"), "cursor-pointer")}
+            onClick={() => setOpenPanel(openPanel === "dates" ? null : "dates")}
+          >
+            <CalendarIcon size={iconSize} className="text-primary shrink-0" aria-hidden="true" />
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className={labelCls}>When</span>
+              <span
+                className={cn(
+                  valueCls,
+                  "truncate",
+                  date ? "text-foreground" : "text-grey font-normal"
+                )}
               >
-                Clear date
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+                {dateSummary}
+              </span>
+            </div>
+            <ChevronDown
+              size={14}
+              className={cn(
+                "text-grey shrink-0 transition-transform",
+                openPanel === "dates" && "rotate-180"
+              )}
+              aria-hidden="true"
+            />
+          </button>
+        }
+      >
+        {/* p-4 wraps both desktop dropdown and mobile drawer content evenly. */}
+        <div className="p-4">
+          {/* Shared design-system Calendar in single-date mode (token-based, no
+              hardcoded hex). Picking a day sets it and closes the panel — the
+              same flow as the other pickers, just completed in one click. */}
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(picked) => {
+              setDate(picked);
+              if (picked) setOpenPanel(null);
+            }}
+            numberOfMonths={1}
+            disabled={{ before: new Date() }}
+            className="p-0"
+          />
+          {date && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setDate(undefined);
+              }}
+              className="mt-2 text-xs text-grey hover:text-foreground"
+            >
+              Clear date
+            </button>
+          )}
+        </div>
+      </ResponsiveDatePicker>
 
       {/* ── TRAVELLERS ────────────────────────────────────────────────────── */}
       <div className="relative">

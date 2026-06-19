@@ -42,7 +42,8 @@ import { Button } from "../../../../shared/components/ui/button";
 // chip — both come straight from the shared design system.
 import { Checkbox } from "../../../../shared/components/ui/checkbox";
 import { Badge } from "../../../../shared/components/ui/badge";
-import { Calendar } from "../../../../shared/components/ui/calendar";
+// Shared responsive date picker: dropdown on desktop, bottom drawer on mobile.
+import { ResponsiveDatePicker } from "../../../../shared/components/ui/responsive-date-picker";
 // Shared range-picker logic: 1st click = from, 2nd = to, re-open restarts.
 import { stepRange, isRangeComplete } from "../../../../shared/utils/dateRange";
 import { AirportCombobox } from "./AirportCombobox";
@@ -654,47 +655,47 @@ export function FlightSearchForm({
               beside it; at xl the parent is flex so the col-span is ignored and
               flex-1 shares the row evenly with From / To. */}
           <div className="flex-1 md:col-span-2 xl:col-span-1">
-            <div className="relative w-full">
-              <button
-                className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border text-left transition-all ${flightDatesOpen ? "border-primary ring-2 ring-primary/20 bg-white" : "border-border bg-white hover:border-primary"}`}
-                onClick={() => setFlightDatesOpen(!flightDatesOpen)}
-              >
-                <CalendarIcon size={18} className="text-primary shrink-0" />
-                <div className="flex flex-col items-start flex-1 min-w-0">
-                  <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Depart – Return</span>
-                  <span className={cn("text-sm font-semibold truncate w-full", flightDateRange?.from ? "text-foreground" : "text-grey")}>
-                    {flightDateLabel}
-                  </span>
-                </div>
-                <ChevronDown size={16} className={`text-grey shrink-0 transition-transform ${flightDatesOpen ? "rotate-180" : ""}`} />
-              </button>
-              {flightDatesOpen && (
-                <div className="absolute top-full left-0 mt-2 bg-card rounded-xl shadow-xl border border-border z-50 overflow-hidden">
-                  {/* Shared design-system Calendar — colors come from theme tokens
-                      (--primary etc.), so there's no inline hex to maintain. */}
-                  <Calendar
-                    mode="range"
-                    selected={flightDateRange}
-                    // We drive the range ourselves from the clicked day (onSelect's
-                    // 2nd arg) so every click is predictable: 1st sets departure,
-                    // 2nd sets return, and a re-opened calendar restarts on click 1.
-                    onSelect={(_range, day) => {
-                      const next = stepRange(flightDateRange, day);
-                      setFlightDateRange(next);
-                      // Keep the underlying legs in sync — return clears on restart.
-                      updateLeg(flightLegs[0].id, "date", next.from);
-                      updateLeg(flightLegs[1].id, "date", next.to);
-                      // Both dates chosen → close shortly so the full range is seen.
-                      if (isRangeComplete(next)) {
-                        setTimeout(() => setFlightDatesOpen(false), 200);
-                      }
-                    }}
-                    numberOfMonths={1}
-                    disabled={{ before: new Date() }}
-                  />
-                </div>
-              )}
-            </div>
+            {/* Responsive date picker: dropdown on desktop, bottom drawer on
+                mobile. Same shared component every calendar in the app uses. */}
+            <ResponsiveDatePicker
+              className="w-full"
+              open={flightDatesOpen}
+              onOpenChange={setFlightDatesOpen}
+              title="Depart – Return"
+              trigger={
+                <button
+                  className={`w-full flex items-center gap-3 h-[52px] px-4 rounded-xl border text-left transition-all ${flightDatesOpen ? "border-primary ring-2 ring-primary/20 bg-white" : "border-border bg-white hover:border-primary"}`}
+                  onClick={() => setFlightDatesOpen(!flightDatesOpen)}
+                >
+                  <CalendarIcon size={18} className="text-primary shrink-0" />
+                  <div className="flex flex-col items-start flex-1 min-w-0">
+                    <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Depart – Return</span>
+                    <span className={cn("text-sm font-semibold truncate w-full", flightDateRange?.from ? "text-foreground" : "text-grey")}>
+                      {flightDateLabel}
+                    </span>
+                  </div>
+                  <ChevronDown size={16} className={`text-grey shrink-0 transition-transform ${flightDatesOpen ? "rotate-180" : ""}`} />
+                </button>
+              }
+              mode="range"
+              selected={flightDateRange}
+              // We drive the range ourselves from the clicked day (onSelect's
+              // 2nd arg) so every click is predictable: 1st sets departure,
+              // 2nd sets return, and a re-opened calendar restarts on click 1.
+              onSelect={(_range, day) => {
+                const next = stepRange(flightDateRange, day);
+                setFlightDateRange(next);
+                // Keep the underlying legs in sync — return clears on restart.
+                updateLeg(flightLegs[0].id, "date", next.from);
+                updateLeg(flightLegs[1].id, "date", next.to);
+                // Both dates chosen → close shortly so the full range is seen.
+                if (isRangeComplete(next)) {
+                  setTimeout(() => setFlightDatesOpen(false), 200);
+                }
+              }}
+              numberOfMonths={1}
+              disabled={{ before: new Date() }}
+            />
           </div>
 
           {/* Submit + (optional) Cancel — design-system <Button>. We keep the
@@ -883,32 +884,32 @@ export function FlightSearchForm({
                 />
               </div>
 
-              {/* Date picker for this leg (single date) */}
-              <div className="relative md:w-[160px]">
-                <button
-                  className={`w-full flex items-center gap-2 h-[52px] px-3 rounded-xl border bg-white transition-all ${openLegDateId === leg.id ? "border-primary" : "border-border hover:border-primary"}`}
-                  onClick={() => setOpenLegDateId(openLegDateId === leg.id ? null : leg.id)}
-                >
-                  <CalendarIcon size={15} className="text-primary shrink-0" />
-                  <span className={cn("text-xs font-semibold truncate", leg.date ? "text-foreground" : "text-grey")}>
-                    {leg.date ? format(leg.date, "d MMM yyyy") : "Select date"}
-                  </span>
-                </button>
-                {openLegDateId === leg.id && (
-                  <div className="absolute top-[60px] left-0 z-50 bg-card rounded-xl shadow-xl border border-border overflow-hidden">
-                    {/* Shared design-system Calendar (single date for this leg). */}
-                    <Calendar
-                      mode="single"
-                      selected={leg.date}
-                      onSelect={(date) => {
-                        updateLeg(leg.id, "date", date ?? undefined);
-                        setOpenLegDateId(null);
-                      }}
-                      disabled={{ before: new Date() }}
-                    />
-                  </div>
-                )}
-              </div>
+              {/* Date picker for this leg (single date) — same responsive
+                  component: dropdown on desktop, bottom drawer on mobile. */}
+              <ResponsiveDatePicker
+                className="md:w-[160px]"
+                open={openLegDateId === leg.id}
+                onOpenChange={(open) => setOpenLegDateId(open ? leg.id : null)}
+                title="Select date"
+                trigger={
+                  <button
+                    className={`w-full flex items-center gap-2 h-[52px] px-3 rounded-xl border bg-white transition-all ${openLegDateId === leg.id ? "border-primary" : "border-border hover:border-primary"}`}
+                    onClick={() => setOpenLegDateId(openLegDateId === leg.id ? null : leg.id)}
+                  >
+                    <CalendarIcon size={15} className="text-primary shrink-0" />
+                    <span className={cn("text-xs font-semibold truncate", leg.date ? "text-foreground" : "text-grey")}>
+                      {leg.date ? format(leg.date, "d MMM yyyy") : "Select date"}
+                    </span>
+                  </button>
+                }
+                mode="single"
+                selected={leg.date}
+                onSelect={(date) => {
+                  updateLeg(leg.id, "date", date ?? undefined);
+                  setOpenLegDateId(null);
+                }}
+                disabled={{ before: new Date() }}
+              />
 
               {/* Remove button — only for legs beyond the first 2 */}
               {index >= 2 ? (

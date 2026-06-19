@@ -57,7 +57,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../../shared/components/ui/dialog";
-import { DayPicker } from "react-day-picker";
+// Shared design-system calendar (token-based colors). Aliased to DateCalendar
+// for consistency with the other detail pages. Replaces the raw <DayPicker> +
+// inline hex <style> the live (non-cached) date fields used.
+import { Calendar as DateCalendar } from "../../../shared/components/ui/calendar";
 import { cn } from "../../../shared/components/ui/utils";
 import LeafletMap from "../../../shared/components/LeafletMap";
 import { hotelDescription, nearbyPOIs, locationCoords } from "../../../shared/utils/hotelUtils";
@@ -1231,8 +1234,8 @@ export default function PackageDetailPage({
                       </button>
                       {datePanelOpen && (
                         <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-150">
-                          <style>{`.rdp-root { --rdp-accent-color: hsl(var(--primary)); --rdp-accent-background-color: hsl(var(--primary) / 0.10); --rdp-day_button-border-radius: 6px; margin: 0; }`}</style>
-                          <DayPicker
+                          {/* Shared design-system Calendar (token-based, no hex). */}
+                          <DateCalendar
                             mode="single"
                             selected={selectedDate ? new Date(selectedDate) : undefined}
                             onSelect={(date) => {
@@ -1242,6 +1245,7 @@ export default function PackageDetailPage({
                             }}
                             disabled={{ before: new Date() }}
                             numberOfMonths={1}
+                            className="p-0"
                           />
                         </div>
                       )}
@@ -1411,8 +1415,8 @@ export default function PackageDetailPage({
                     // bottom-[calc(100%+8px)] = opens upward so the calendar
                     // isn't clipped against the bottom of the viewport.
                     <div className="absolute bottom-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-150">
-                      <style>{`.rdp-root { --rdp-accent-color: hsl(var(--primary)); --rdp-accent-background-color: hsl(var(--primary) / 0.10); --rdp-day_button-border-radius: 6px; margin: 0; }`}</style>
-                      <DayPicker
+                      {/* Shared design-system Calendar (token-based, no hex). */}
+                      <DateCalendar
                         mode="single"
                         selected={selectedDate ? new Date(selectedDate) : undefined}
                         onSelect={(date) => {
@@ -1422,6 +1426,7 @@ export default function PackageDetailPage({
                         }}
                         disabled={{ before: new Date() }}
                         numberOfMonths={1}
+                        className="p-0"
                       />
                     </div>
                   )}
