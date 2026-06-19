@@ -76,9 +76,17 @@ export const ROUTE_PRESETS: RoutePreset[] = [
   // distance-based catalogue. Categorised as "featured" so the picker can
   // group them separately.
   //
-  // Caribbean Airlines (BW) — via Port of Spain (POS)
-  { category: "featured", label: "New York → Grenada (BW via POS)",   from: "JFK", to: "GND" },
-  { category: "featured", label: "Toronto → Bridgetown (BW via POS)", from: "YYZ", to: "BGI" },
+  // Caribbean Airlines (BW) — via Port of Spain (POS). 2 origins × 5 islands.
+  { category: "featured", label: "New York → Grenada (BW via POS)",     from: "JFK", to: "GND" },
+  { category: "featured", label: "New York → Bridgetown (BW via POS)",  from: "JFK", to: "BGI" },
+  { category: "featured", label: "New York → Kingston (BW via POS)",    from: "JFK", to: "KIN" },
+  { category: "featured", label: "New York → Georgetown (BW via POS)",  from: "JFK", to: "GEO" },
+  { category: "featured", label: "New York → Antigua (BW via POS)",     from: "JFK", to: "ANU" },
+  { category: "featured", label: "Toronto → Grenada (BW via POS)",      from: "YYZ", to: "GND" },
+  { category: "featured", label: "Toronto → Bridgetown (BW via POS)",   from: "YYZ", to: "BGI" },
+  { category: "featured", label: "Toronto → Kingston (BW via POS)",     from: "YYZ", to: "KIN" },
+  { category: "featured", label: "Toronto → Georgetown (BW via POS)",   from: "YYZ", to: "GEO" },
+  { category: "featured", label: "Toronto → Antigua (BW via POS)",      from: "YYZ", to: "ANU" },
   // Fiji Airways (FJ) — via Nadi (NAN). 2 origins × 5 destinations.
   { category: "featured", label: "Los Angeles → Sydney (FJ via NAN)",       from: "LAX", to: "SYD" },
   { category: "featured", label: "Los Angeles → Melbourne (FJ via NAN)",    from: "LAX", to: "MEL" },
@@ -513,124 +521,113 @@ function buildFijiRoute(
   ];
 }
 
-// Build the override map. Caribbean routes are hand-rolled; Fiji generated.
-const ROUTE_OVERRIDES: Record<string, Omit<FlightOption, "id">[]> = {
-  // ── Caribbean Airlines via Port of Spain ─────────────────────────────────
-  "JFK-GND": [
-    {
-      airline: "Caribbean Airlines",
-      airlineCode: "BW",
-      departure: "08:30",
-      arrival: "17:15",
-      duration: "8h 45m",
-      stops: "1 stop",
-      stopInfo: "via Port of Spain",
-      price: 580,
-      badge: "Fastest",
-    },
+// ── Caribbean Airlines generator ─────────────────────────────────────────────
+// Mirror of the Fiji generator above, but for Caribbean Airlines (BW) breaking
+// the journey at Port of Spain (POS). Every JFK/YYZ origin × island destination.
+// Same idea: small per-route deltas so the city pairs feel a little different
+// without trying to be timetable-accurate.
+type CaribOrigin = { code: string; deltaMin: number; priceBias: number };
+type CaribDest = { code: string; deltaMin: number; priceBias: number };
+
+const CARIBBEAN_ORIGINS: CaribOrigin[] = [
+  // JFK is the baseline; Toronto's slightly longer first leg adds a touch.
+  { code: "JFK", deltaMin: 0,  priceBias: 0 },
+  { code: "YYZ", deltaMin: 30, priceBias: 25 },
+];
+
+const CARIBBEAN_DESTINATIONS: CaribDest[] = [
+  // Grenada (GND) is the baseline. Deltas are "vs JFK→GND".
+  { code: "GND", deltaMin: 0,   priceBias: 0 },
+  { code: "BGI", deltaMin: -20, priceBias: 15 },  // Barbados — busy, slightly pricier
+  { code: "KIN", deltaMin: 35,  priceBias: -10 }, // Kingston — further west
+  { code: "GEO", deltaMin: 55,  priceBias: 20 },  // Georgetown — longest onward hop
+  { code: "ANU", deltaMin: -30, priceBias: 25 },  // Antigua — short onward, premium
+];
+
+function buildCaribbeanRoute(
+  origin: CaribOrigin,
+  dest: CaribDest,
+): Omit<FlightOption, "id">[] {
+  const bwDelta = origin.deltaMin + dest.deltaMin;
+  const priceBias = origin.priceBias + dest.priceBias;
+
+  return [
+    // Featured: Caribbean Airlines via Port of Spain — Cheapest of the bunch
     {
       airline: "Caribbean Airlines",
       airlineCode: "BW",
       departure: "14:40",
       arrival: "01:55",
-      duration: "11h 15m",
+      duration: formatDuration(11 * 60 + 15 + bwDelta),
       stops: "1 stop",
       stopInfo: "via Port of Spain",
-      price: 495,
+      price: 495 + priceBias,
       badge: "Cheapest",
     },
+    // American via Miami — Fastest curated direct-ish competitor
     {
       airline: "American Airlines",
       airlineCode: "AA",
       departure: "07:00",
       arrival: "16:25",
-      duration: "9h 25m",
+      duration: formatDuration(9 * 60 + 25 + bwDelta),
       stops: "1 stop",
       stopInfo: "via Miami",
-      price: 645,
-      badge: "Best",
-    },
-    {
-      airline: "JetBlue",
-      airlineCode: "B6",
-      departure: "11:40",
-      arrival: "22:50",
-      duration: "11h 10m",
-      stops: "1 stop",
-      stopInfo: "via Fort Lauderdale",
-      price: 565,
-    },
-    {
-      airline: "Delta",
-      airlineCode: "DL",
-      departure: "16:25",
-      arrival: "06:50",
-      duration: "14h 25m",
-      stops: "1 stop",
-      stopInfo: "via Atlanta",
-      price: 715,
-    },
-  ],
-
-  "YYZ-BGI": [
-    {
-      airline: "Air Canada",
-      airlineCode: "AC",
-      departure: "09:30",
-      arrival: "14:40",
-      duration: "5h 10m",
-      stops: "Direct",
-      price: 685,
+      price: 645 + priceBias,
       badge: "Fastest",
     },
+    // Caribbean Airlines daytime departure — curated "Best" pick
     {
       airline: "Caribbean Airlines",
       airlineCode: "BW",
-      departure: "07:45",
-      arrival: "14:20",
-      duration: "6h 35m",
+      departure: "08:30",
+      arrival: "17:15",
+      duration: formatDuration(8 * 60 + 45 + bwDelta),
       stops: "1 stop",
       stopInfo: "via Port of Spain",
-      price: 540,
+      price: 580 + priceBias,
       badge: "Best",
     },
-    {
-      airline: "WestJet",
-      airlineCode: "WS",
-      departure: "12:15",
-      arrival: "17:50",
-      duration: "5h 35m",
-      stops: "Direct",
-      price: 525,
-      badge: "Cheapest",
-    },
+    // Caribbean Airlines — late departure, arrives next morning
     {
       airline: "Caribbean Airlines",
       airlineCode: "BW",
       departure: "16:30",
       arrival: "03:55",
-      duration: "11h 25m",
+      duration: formatDuration(11 * 60 + 25 + bwDelta),
       stops: "1 stop",
       stopInfo: "via Port of Spain",
-      price: 465,
+      price: 465 + priceBias,
     },
+    // JetBlue via Fort Lauderdale — a different stopover for visual variety
     {
-      airline: "American Airlines",
-      airlineCode: "AA",
-      departure: "10:00",
-      arrival: "19:35",
-      duration: "9h 35m",
+      airline: "JetBlue",
+      airlineCode: "B6",
+      departure: "11:40",
+      arrival: "22:50",
+      duration: formatDuration(11 * 60 + 10 + bwDelta),
       stops: "1 stop",
-      stopInfo: "via Miami",
-      price: 615,
+      stopInfo: "via Fort Lauderdale",
+      price: 565 + priceBias,
     },
-  ],
-};
+  ];
+}
+
+// Build the override map. Both airlines' featured routes are generated below.
+const ROUTE_OVERRIDES: Record<string, Omit<FlightOption, "id">[]> = {};
+
 
 // Populate the 10 Fiji Airways routes (LAX/SFO × 5 destinations).
 FIJI_ORIGINS.forEach((origin) => {
   FIJI_DESTINATIONS.forEach((dest) => {
     ROUTE_OVERRIDES[`${origin.code}-${dest.code}`] = buildFijiRoute(origin, dest);
+  });
+});
+
+// Populate the 10 Caribbean Airlines routes (JFK/YYZ × 5 islands).
+CARIBBEAN_ORIGINS.forEach((origin) => {
+  CARIBBEAN_DESTINATIONS.forEach((dest) => {
+    ROUTE_OVERRIDES[`${origin.code}-${dest.code}`] = buildCaribbeanRoute(origin, dest);
   });
 });
 

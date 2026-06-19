@@ -17,7 +17,7 @@
 // Pass `onCancel` to show a Cancel button (used by the edit-search panel); the
 // Discovery tab omits it.
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import { format } from "date-fns";
 // DateRange is just the { from, to } TYPE — the calendar UI itself now comes
 // from our shared design-system <Calendar> component (token-based, no hardcoded
@@ -46,6 +46,10 @@ import { Calendar } from "../../../../shared/components/ui/calendar";
 // Shared range-picker logic: 1st click = from, 2nd = to, re-open restarts.
 import { stepRange, isRangeComplete } from "../../../../shared/utils/dateRange";
 import { AirportCombobox } from "./AirportCombobox";
+// The currently-selected stopover airline (from Settings) decides which airports
+// the pickers allow and which hub city we name in the labels.
+import { useSettings } from "../../../../shared/contexts/SettingsContext";
+import { STOPOVER_AIRLINES } from "./stopoverAirlines";
 // Shared pill styling — the same PILL_CLASS / PillContent the post-search filter
 // bar uses, so the search form's pills and the filter bar's pills are now one
 // consistent control instead of two hand-tuned copies.
@@ -77,11 +81,6 @@ type FlightSearchFormProps = {
    */
   stopoverMode?: boolean;
 };
-
-// Fiji Airways' network — the only routes with Fiji mock data. Used to restrict
-// the airport pickers in stopover mode so every search returns Fiji flights.
-const FIJI_ORIGIN_CODES = ["LAX", "SFO"];
-const FIJI_DESTINATION_CODES = ["SYD", "MEL", "BNE", "AKL", "CHC"];
 
 const CABIN_CLASS_LABELS: Record<CabinClass, string> = {
   economy: "Economy",
@@ -167,6 +166,11 @@ export function FlightSearchForm({
   submitLabel = "Search Flights",
   stopoverMode = false,
 }: FlightSearchFormProps) {
+  // The selected stopover airline drives the picker whitelist and hub label when
+  // this form is in stopover mode. On the normal Flights tab it's simply unused.
+  const { settings } = useSettings();
+  const stopoverAirline = STOPOVER_AIRLINES[settings.stopoverAirline];
+
   // ── State (initialised from `initialCriteria` when editing) ──────────────
   // Stopover mode is round-trip only, so we never start it on multi-city.
   const [flightTripType, setFlightTripType] = useState<"roundtrip" | "multicity">(
@@ -180,11 +184,12 @@ export function FlightSearchForm({
     initialCriteria?.legs && initialCriteria.legs.length > 0
       ? initialCriteria.legs
       : stopoverMode
-        ? // Stopover mode opens demo-ready on a working Fiji route (LAX → Sydney),
-          // with the return leg mirrored, so offers show on first search.
+        ? // Stopover mode opens demo-ready on the selected airline's first route
+          // (e.g. Fiji LAX → Sydney, Caribbean JFK → Grenada), return leg mirrored,
+          // so offers show on the first search.
           [
-            { id: 1, from: "LAX", to: "SYD", date: undefined },
-            { id: 2, from: "SYD", to: "LAX", date: undefined },
+            { id: 1, from: stopoverAirline.originCodes[0], to: stopoverAirline.destinationCodes[0], date: undefined },
+            { id: 2, from: stopoverAirline.destinationCodes[0], to: stopoverAirline.originCodes[0], date: undefined },
           ]
         : [
             { id: 1, from: "", to: "", date: undefined },
@@ -277,6 +282,25 @@ export function FlightSearchForm({
     onChange?.(buildCriteria());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [flightTripType, flightLegs, flightPassengers, flightCabinClass, stopoverEnabled, stopoverLeg, stopoverNights]);
+
+  // ── Reset the route when the stopover airline changes ────────────────────
+  // In stopover mode, switching airline in Settings (e.g. Fiji → Caribbean) makes
+  // the old airports invalid (they're not in the new airline's network), so we
+  // snap the From/To back to the new airline's first route. We track the previous
+  // airline in a ref and only reset on an actual CHANGE — never on first mount, so
+  // an edit-search form opened with a real chosen route is left untouched.
+  const prevAirlineId = useRef(stopoverAirline.id);
+  useEffect(() => {
+    if (!stopoverMode) return;
+    if (prevAirlineId.current === stopoverAirline.id) return;
+    prevAirlineId.current = stopoverAirline.id;
+    const origin = stopoverAirline.originCodes[0];
+    const dest = stopoverAirline.destinationCodes[0];
+    setFlightLegs([
+      { id: 1, from: origin, to: dest, date: undefined },
+      { id: 2, from: dest, to: origin, date: undefined },
+    ]);
+  }, [stopoverAirline, stopoverMode]);
 
   // The submit (+ optional cancel) buttons, defined ONCE here so we can drop
   // them into EITHER the main input row (when stopover is off) or down in the
@@ -599,8 +623,8 @@ export function FlightSearchForm({
             <AirportCombobox
               label="From"
               placeholder="Departure city"
-              // Stopover mode only offers Fiji Airways' origin cities.
-              allowedCodes={stopoverMode ? FIJI_ORIGIN_CODES : undefined}
+              // Stopover mode only offers the selected airline's origin cities.
+              allowedCodes={stopoverMode ? stopoverAirline.originCodes : undefined}
               value={flightLegs[0]?.from ?? ""}
               onChange={(code) => {
                 updateLeg(flightLegs[0].id, "from", code);
@@ -615,8 +639,8 @@ export function FlightSearchForm({
               label="To"
               placeholder="Destination city"
               iconRotated
-              // Stopover mode only offers Fiji Airways' destination cities.
-              allowedCodes={stopoverMode ? FIJI_DESTINATION_CODES : undefined}
+              // Stopover mode only offers the selected airline's destination cities.
+              allowedCodes={stopoverMode ? stopoverAirline.destinationCodes : undefined}
               value={flightLegs[0]?.to ?? ""}
               onChange={(code) => {
                 updateLeg(flightLegs[0].id, "to", code);
@@ -704,7 +728,7 @@ export function FlightSearchForm({
             {stopoverMode ? (
               // Stopover mode: no checkbox — a stopover is always on here, so we
               // show a plain section heading instead of the opt-in toggle.
-              <span className="text-sm font-bold text-foreground">Explore Nadi</span>
+              <span className="text-sm font-bold text-foreground">Explore {stopoverAirline.hubCity}</span>
             ) : (
               // Normal Flights tab: the opt-in checkbox. <label> wraps the box +
               // words so clicking the text toggles it too — better a11y.

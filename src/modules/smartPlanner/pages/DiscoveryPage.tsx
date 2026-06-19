@@ -54,8 +54,15 @@ import {
   Ticket,
   // Stopover tab icon — a route with waypoints evokes "break the journey".
   Route,
+  // Settings gear — opens the Discovery display-settings popover (top-right).
+  Settings,
 } from "lucide-react";
 import { Switch } from "../../../shared/components/ui/switch";
+// Glassy gear → popover that holds the Discovery display settings.
+import { Popover, PopoverContent, PopoverTrigger } from "../../../shared/components/ui/popover";
+import DiscoverySettingsPanel from "../components/DiscoverySettingsPanel";
+// Shared settings (which tabs are on, which stopover airline) live in this context.
+import { useSettings } from "../../../shared/contexts/SettingsContext";
 // Shared design-system date picker (token-based). DateRange is just the {from,to} type.
 import { Calendar } from "../../../shared/components/ui/calendar";
 import { type DateRange } from "react-day-picker";
@@ -567,6 +574,30 @@ export default function DiscoveryPage({
   // `aiExperienceMode` is controlled by App.tsx so the toggle persists across
   // the Discovery → AI Itinerary → Back round trip. See DiscoveryPageProps.
 
+  // Discovery display settings (which tabs are on, which stopover airline). Read
+  // from the shared context so the gear popover can flip them live.
+  const { settings } = useSettings();
+  // Only the enabled tabs are rendered in the tab bar — a disabled tab is hidden
+  // entirely. We keep the original TABS order; filtering just drops the off ones.
+  const visibleTabs = TABS.filter((tab) => settings.enabledTabs[tab.id]);
+
+  // If the tab the user is currently on gets switched off in settings, fall back
+  // to the first still-visible tab so the page never shows an empty panel.
+  useEffect(() => {
+    if (!settings.enabledTabs[activeTab] && visibleTabs.length > 0) {
+      setActiveTab(visibleTabs[0].id);
+    }
+  }, [settings.enabledTabs, activeTab, visibleTabs]);
+
+  // If the AI Experience feature is switched off while its hero is showing, snap
+  // back to the normal search hero (the pill is gone, so there's no way to toggle
+  // it off otherwise).
+  useEffect(() => {
+    if (!settings.aiExperienceEnabled && aiExperienceMode) {
+      setAiExperienceMode(false);
+    }
+  }, [settings.aiExperienceEnabled, aiExperienceMode, setAiExperienceMode]);
+
   // Pill pulse — fires only when the toggle actually changes, not on first mount
   const toggleControls = useAnimation();
   const isMounted = useRef(false);
@@ -663,7 +694,9 @@ export default function DiscoveryPage({
     if (el && bar) {
       setIndicatorStyle({ left: el.offsetLeft, width: el.offsetWidth });
     }
-  }, [activeTab, hoveredTab]);
+    // `settings.enabledTabs` is in the deps because hiding/showing a tab shifts
+    // the active tab's position, so the underline must be re-measured.
+  }, [activeTab, hoveredTab, settings.enabledTabs]);
 
   // Same sliding indicator pattern for the style and country filter tabs
   const styleTabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
@@ -871,18 +904,44 @@ export default function DiscoveryPage({
 
         <div className={`relative z-10 flex flex-col ${aiExperienceMode ? "h-full" : ""}`}>
 
+          {/* ── Settings gear (top-right) ──
+              Subtle glassy button — same frosted look as the AI Experience pill.
+              Opens a popover to enable/disable tabs and pick the stopover airline.
+              Kept low-key (semi-transparent until hover) so it doesn't compete
+              with the hero. Radix Popover portals to <body>, so no ancestor
+              overflow-hidden can clip the panel. */}
+          <div className="absolute top-4 right-4 md:top-6 md:right-6 z-20">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Display settings"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/20 text-white backdrop-blur-sm transition-all hover:bg-white/30"
+                >
+                  <Settings size={18} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-72 p-0">
+                <DiscoverySettingsPanel tabs={TABS} />
+              </PopoverContent>
+            </Popover>
+          </div>
+
           {/* ── Toggle + tagline — always rendered, text swaps on mode change ── */}
           <div className={`flex flex-col items-center px-6 lg:px-12 pt-16 md:pt-32 pb-6 gap-5`}>
-            {/* Toggle pill — pulses when mode changes */}
-            <motion.div animate={toggleControls}>
-              <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm px-5 py-2.5 rounded-full border border-white/30">
-                <span className="text-white font-bold text-sm whitespace-nowrap">AI Experience</span>
-                <Switch
-                  checked={aiExperienceMode}
-                  onCheckedChange={setAiExperienceMode}
-                />
-              </div>
-            </motion.div>
+            {/* Toggle pill — pulses when mode changes. Hidden entirely when the
+                AI Experience feature is switched off in Settings. */}
+            {settings.aiExperienceEnabled && (
+              <motion.div animate={toggleControls}>
+                <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm px-5 py-2.5 rounded-full border border-white/30">
+                  <span className="text-white font-bold text-sm whitespace-nowrap">AI Experience</span>
+                  <Switch
+                    checked={aiExperienceMode}
+                    onCheckedChange={setAiExperienceMode}
+                  />
+                </div>
+              </motion.div>
+            )}
             {/* Tagline — crossfades between the two strings */}
             <div className="relative flex items-center justify-center min-h-[56px] lg:min-h-[68px] w-full">
               {/* Default tagline — fades out when AI mode turns on */}
@@ -927,7 +986,7 @@ export default function DiscoveryPage({
               <div ref={tabBarRef} className="relative border-b border-border">
                 {/* Tab row — horizontal scroll on mobile, centered on desktop */}
                 <div className="flex justify-center overflow-x-auto">
-                  {TABS.map((tab) => (
+                  {visibleTabs.map((tab) => (
                     <button
                       key={tab.id}
                       ref={(el) => {

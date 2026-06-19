@@ -44,6 +44,10 @@ import { FlightSearchForm } from "../components/flightSearch/FlightSearchForm";
 import { StopoverPromoBanner } from "../components/flightSearch/StopoverPromoBanner";
 import { getMockFlightsForLeg, getStopoverOffersForLeg, routeHasStopover } from "../components/flightSearch/mockFlights";
 import { findAirportByCode } from "../components/flightSearch/airports";
+// The stopover airline (from Settings) decides which carrier the flat flights are
+// filtered to in stopover-only mode.
+import { useSettings } from "../../../shared/contexts/SettingsContext";
+import { STOPOVER_AIRLINES } from "../components/flightSearch/stopoverAirlines";
 import { applyFilters } from "../components/flightSearch/filterFlights";
 import { DEFAULT_FILTERS, type FlightFilters } from "../components/flightSearch/types";
 
@@ -112,6 +116,10 @@ export default function FlightListPage({
   onStepSelect,
   onBack,
 }: FlightListPageProps) {
+  // The selected stopover airline decides which carrier the flat flights are
+  // filtered to when this page is in stopover-only mode (see `flights` below).
+  const { settings } = useSettings();
+
   // ── Edit Search inline-editor open state ───────────────────────────────
   // When true, <FlightSearchForm> replaces <FlightTripSummary> in the
   // same vertical spot on the page (no modal).
@@ -202,12 +210,14 @@ export default function FlightListPage({
   };
 
   // Raw mock results for this leg (the normal flights). In the dedicated
-  // Stopover flow we keep only Fiji Airways (FJ) flights, so the flat leg shows
-  // Fiji fares only — matching the stopover offers, which already fly Fiji.
+  // Stopover flow we keep only the selected airline's flights, so the flat leg
+  // shows that carrier's fares only — matching the stopover offers on the other
+  // leg, which already fly the same airline (Fiji via Nadi / Caribbean via POS).
+  const stopoverAirlineCode = STOPOVER_AIRLINES[settings.stopoverAirline].airlineCode;
   const flights = useMemo(() => {
     const all = getMockFlightsForLeg(currentLeg?.from || "", currentLeg?.to || "");
-    return stopoverOnly ? all.filter((f) => f.airlineCode === "FJ") : all;
-  }, [currentLeg?.from, currentLeg?.to, stopoverOnly]);
+    return stopoverOnly ? all.filter((f) => f.airlineCode === stopoverAirlineCode) : all;
+  }, [currentLeg?.from, currentLeg?.to, stopoverOnly, stopoverAirlineCode]);
 
   // Stopover offers for the chosen leg. Kept separate from `flights` so they
   // aren't reordered by the price/duration sort or hidden by the airline

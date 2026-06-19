@@ -60,6 +60,9 @@ export const AIRPORTS: Airport[] = [
   { code: "POS", city: "Port of Spain", airport: "Piarco",           country: "Trinidad & Tobago", region: "Caribbean" },
   { code: "BGI", city: "Bridgetown", airport: "Grantley Adams",      country: "Barbados",       region: "Caribbean" },
   { code: "GND", city: "Grenada",    airport: "Maurice Bishop",      country: "Grenada",        region: "Caribbean" },
+  { code: "KIN", city: "Kingston",   airport: "Norman Manley",       country: "Jamaica",        region: "Caribbean" },
+  { code: "GEO", city: "Georgetown", airport: "Cheddi Jagan",        country: "Guyana",         region: "Caribbean" },
+  { code: "ANU", city: "Antigua",    airport: "V. C. Bird",          country: "Antigua & Barbuda", region: "Caribbean" },
 
   // ── Oceania ────────────────────────────────────────────────────────────
   { code: "SYD", city: "Sydney",     airport: "Kingsford Smith",     country: "Australia",      region: "Oceania" },
