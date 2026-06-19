@@ -1,7 +1,7 @@
 // StopoverRoomPage — the room-selection step of the stopover flow.
 //
-// Sits between "pick your stopover hotel" and the Smart Planner:
-//   flights → stopover hotel → THIS PAGE (pick a room) → Smart Planner
+// Sits between "pick your stopover hotel" and the booking summary:
+//   flights → stopover hotel → THIS PAGE (pick a room) → booking summary
 //
 // The PRIMARY job is choosing a room, so the room grid leads the page. The
 // SECONDARY job is showing off the hotel the traveller just picked, so a richer
@@ -24,7 +24,7 @@ import {
   Bed,
   ChevronDown,
   Users,
-  Pencil,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "../../../shared/components/ui/button";
 // cn = a tiny helper that joins Tailwind class strings together and lets us
@@ -36,12 +36,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../../shared/components/ui/dialog";
-import { differenceInCalendarDays, parseISO } from "date-fns";
-// The SAME sticky trip-summary bar the Smart Planner uses, so the breakdown here
-// looks identical — flights + stay grouped on the left, price breakdown on the right.
-import { StickySummaryBar, type PriceBreakdownLine } from "../components/StickySummaryBar";
+// Tooltip explains why the bottom-bar CTA is disabled (rooms not all chosen yet).
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "../../../shared/components/ui/tooltip";
+// The "Stopover package" caption + info bubble, shown beside the bottom-bar total.
 import { StopoverPackageLabel } from "../components/StopoverPackageLabel";
-import type { TimelineItem } from "../utils/seedTimeline";
 import LeafletMap from "../../../shared/components/LeafletMap";
 import { showToast } from "../../../shared/utils/toast";
 import { hotelDescription, nearbyPOIs, locationCoords } from "../../../shared/utils/hotelUtils";
@@ -92,8 +94,10 @@ export default function StopoverRoomPage({
   packageFloor = 0,
   flightLegs = [],
   headerSlot,
+  initialRoomSelections,
+  initialRoomConfig,
   onBack,
-  onSelectRooms,
+  onGoToBookingSummary,
 }: {
   hotel: StopoverHotel | null;
   // The stopover city — used for the location line + map (the hotel's own
@@ -116,13 +120,23 @@ export default function StopoverRoomPage({
   roomConfiguration?: RoomConfig[];
   // The FlightStepper, rendered in the page header so the stopover progress is visible.
   headerSlot?: React.ReactNode;
+  // When the traveller returns here from the booking summary, App passes their
+  // previous choices back so we can re-seed the page (otherwise this page
+  // unmounts on navigation and the selections would reset). Optional — absent
+  // on the first visit.
+  initialRoomSelections?: { [id: number]: RoomSelection | null };
+  initialRoomConfig?: RoomConfig[];
   // Exits the whole stopover flow back to Discovery. Stepping back to an
   // earlier step (flights / hotel) is handled by the FlightStepper in the
   // header, so this back button consistently says "Back to discovery".
   onBack: () => void;
-  // Called once a room is chosen for every guest config — App.tsx then builds
-  // the flight+stopover context and moves on to the Smart Planner.
-  onSelectRooms: (roomSelections: { [key: number]: RoomSelection | null }) => void;
+  // Called once a room is chosen for every guest config and all travellers are
+  // allocated — App.tsx stores the choices and moves on to the booking summary.
+  onGoToBookingSummary: (
+    roomSelections: { [key: number]: RoomSelection | null },
+    roomConfig: RoomConfig[],
+    tripTotal: number,
+  ) => void;
 }) {
   if (!hotel) {
     return (
@@ -144,11 +158,14 @@ export default function StopoverRoomPage({
   // comes from the flights the traveller already booked and can't change on this
   // step). What the user CAN do is split those same travellers across one or more
   // rooms — so this is a local, editable copy of the config we arrived with.
-  const [localRoomConfig, setLocalRoomConfig] = useState<RoomConfig[]>(roomConfiguration);
+  // Seed from the user's previous choices when returning from the booking
+  // summary; otherwise start from the config we arrived with.
+  const seedConfig = initialRoomConfig ?? roomConfiguration;
+  const [localRoomConfig, setLocalRoomConfig] = useState<RoomConfig[]>(seedConfig);
 
   // When the user books more than one room, we show a tab per room (same as the
   // hotel flow) so each room is picked separately. This tracks the open tab.
-  const [activeRoomTab, setActiveRoomTab] = useState(roomConfiguration[0]?.id ?? 1);
+  const [activeRoomTab, setActiveRoomTab] = useState(seedConfig[0]?.id ?? 1);
 
   // Whether the "Guests & Rooms" dropdown is open, plus a ref on its wrapper so
   // we can close it when the user clicks anywhere outside (same pattern the hotel
@@ -178,10 +195,12 @@ export default function StopoverRoomPage({
     remainingChildren === 0 &&
     localRoomConfig.every((r) => r.adults + r.children > 0);
 
-  // One selection slot per guest configuration (one per room).
+  // One selection slot per guest configuration (one per room). Re-seeded from
+  // the traveller's previous choices when they come back from the summary.
   const [roomSelections, setRoomSelections] = useState<{ [id: number]: RoomSelection | null }>(() => {
+    if (initialRoomSelections) return initialRoomSelections;
     const initial: { [id: number]: RoomSelection | null } = {};
-    roomConfiguration.forEach((c) => (initial[c.id] = null));
+    seedConfig.forEach((c) => (initial[c.id] = null));
     return initial;
   });
 
@@ -321,18 +340,11 @@ export default function StopoverRoomPage({
     return true;
   };
 
-  // SECONDARY CTA — "Personalize this trip": hands the chosen rooms back to
-  // App.tsx, which builds the trip context and opens the Smart Planner so the
-  // traveller can add activities, transfers, etc.
-  const handlePersonalize = () => {
-    if (tripReady()) onSelectRooms(roomSelections);
-  };
-
-  // PRIMARY CTA — "Proceed to checkout": the checkout flow isn't built yet, so
-  // for now this just confirms readiness with a friendly placeholder toast.
-  // Swap the toast for real navigation once a checkout page exists.
-  const handleProceedToCheckout = () => {
-    if (tripReady()) showToast.info("Checkout is coming soon");
+  // CTA — "Go to booking summary": once everything's chosen, hand the selections
+  // (plus the room config and the computed package total) up to App, which stores
+  // them and advances to the booking-summary review step.
+  const handleGoToBookingSummary = () => {
+    if (tripReady()) onGoToBookingSummary(roomSelections, localRoomConfig, tripTotal);
   };
 
   // ── Trip-summary data ──────────────────────────────────────────────────────
@@ -344,58 +356,12 @@ export default function StopoverRoomPage({
   const roomPremium = Math.max(0, (totalPrice - minRoomRate)) * totalGuests * nights;
   const tripTotal = packageFloor + roomPremium;
 
-  // The stopover hotel checks in on the first flight's date. We derive the trip
-  // span (for the bar's "X nights · Y adults" line) from the first/last legs.
-  const firstLegDate = flightLegs[0]?.dateISO ? parseISO(flightLegs[0].dateISO) : new Date();
-  const lastLegDate = flightLegs[flightLegs.length - 1]?.dateISO
-    ? parseISO(flightLegs[flightLegs.length - 1].dateISO!)
-    : firstLegDate;
-  const tripNights = Math.max(1, differenceInCalendarDays(lastLegDate, firstLegDate));
-
-  // Build the timeline items the bar renders on the left: one row per flight
-  // leg, then the stopover stay. Same TimelineItem shape the Smart Planner uses.
-  const summaryItems: TimelineItem[] = [
-    ...flightLegs.map((leg, i) => ({
-      kind: "flight" as const,
-      id: `summary-flight-${i}`,
-      direction: "leg" as const,
-      date: leg.dateISO ? parseISO(leg.dateISO) : firstLegDate,
-      flight: {
-        from: leg.from,
-        to: leg.to,
-        stops: "",
-        duration: leg.duration,
-        airline: leg.airline,
-        price: "",
-      },
-    })),
-    {
-      kind: "accommodation" as const,
-      id: "summary-stay",
-      checkIn: firstLegDate,
-      nights,
-      hotel: {
-        name: hotel.name,
-        image: hotel.image,
-        stars: hotel.stars,
-        rating: hotel.rating,
-        reviewCount: hotel.reviewCount,
-        location: city,
-        price: totalPrice,
-      },
-    },
-  ];
-
-  // The right-hand "Price breakdown" column. We never itemise flights vs hotel —
-  // it's a single bundled package — so this is the one total, labelled with the
-  // shared "Stopover package" caption + info bubble.
-  const priceBreakdown: PriceBreakdownLine[] = [
-    { label: "Stopover package", labelNode: <StopoverPackageLabel />, value: `€${tripTotal.toLocaleString()}` },
-  ];
-
-  // Scroll the showcase into view from the "View hotel details" link.
-  const scrollToShowcase = () =>
-    document.getElementById("hotel-showcase")?.scrollIntoView({ behavior: "smooth" });
+  // The bottom-bar CTA is enabled only once every room is chosen AND every
+  // traveller is allocated to a room. When disabled, the tooltip explains why.
+  const ctaDisabled = !allRoomsSelected || !allAllocated;
+  const ctaDisabledReason = !allAllocated
+    ? "Allocate all travellers to a room to continue."
+    : "Select a room for each traveller to continue.";
 
   return (
     <div className="bg-grey-lightest min-h-screen pb-28">
@@ -409,65 +375,25 @@ export default function StopoverRoomPage({
         </PageContainer>
       </div>
 
-      {/* ── GREY SECTION — flight stepper + the chosen-hotel card ─────────────
-          Both sit on the page's grey background (not inside a white card), just
-          like the stepper + title block on the stopover-hotel step. */}
+      {/* ── GREY SECTION — flight stepper ────────────────────────────────────
+          Sits on the page's grey background (not inside a white card), just
+          like the stepper on the stopover-hotel step. */}
       <div className="bg-grey-lightest">
         <PageContainer tier="narrow" className="px-4 md:px-6 pt-4 pb-3">
 
           {/* The FlightStepper passed in from App.tsx (✓Flights › ✓Hotel › ● Room). */}
           {headerSlot}
-
-          {/* Slim hotel card — a compact reminder of the hotel they chose, with a
-              link down to the full showcase. Room selection is the focus, so the
-              hotel stays small here. mt-10 mirrors the hotel step's title spacing. */}
-          <div className="mt-10 flex items-center gap-4 rounded-xl border border-border bg-card p-3 sm:p-4">
-            <div className="size-16 sm:size-20 shrink-0 overflow-hidden rounded-lg">
-              <ImageWithPlaceholder
-                src={hotel.image}
-                alt={hotel.name}
-                containerClassName="w-full h-full"
-              />
-            </div>
-            <div className="flex flex-col gap-1 min-w-0 flex-1">
-              {/* "Selected hotel" eyebrow — confirms this is the hotel the
-                  traveller just picked, before they move on to choosing a room. */}
-              <span className="flex items-center gap-1 text-sm font-bold text-primary">
-                <Check size={14} className="shrink-0" aria-hidden="true" />
-                Selected hotel
-              </span>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-lg sm:text-xl font-extrabold text-foreground truncate">{hotel.name}</h1>
-                <AccommodationStar rating={hotel.stars} offerName={hotel.name} offerId={hotel.id} size={14} />
-              </div>
-              <div className="flex items-center gap-2 flex-wrap text-sm text-foreground">
-                <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
-                <span className="flex items-center gap-1 text-grey">
-                  <MapPin size={13} className="shrink-0" aria-hidden="true" />
-                  {city}
-                </span>
-              </div>
-            </div>
-            {/* link variant = navigation action (jump to the showcase below) */}
-            <Button
-              variant="link"
-              onClick={scrollToShowcase}
-              className="hidden sm:flex items-center gap-1 text-sm font-semibold text-primary h-auto p-0 shrink-0"
-            >
-              View hotel details
-              <ChevronDown size={14} aria-hidden="true" />
-            </Button>
-          </div>
         </PageContainer>
       </div>
 
       {/* ── ROOM SELECTION (primary focus) ───────────────────────────────────── */}
       <PageContainer tier="narrow" className="px-4 md:px-6 pt-8 flex flex-col gap-2">
-        {/* "Room for 2 travellers" — totalGuests sums adults + children across
-            the whole room configuration. The bed icon sits in the title now. */}
+        {/* "Room for 2 travellers in Hotel Palazzo Doglio" — totalGuests sums
+            adults + children across the whole room configuration, and we name the
+            chosen hotel right in the title now that the top card is gone. */}
         <h2 className="flex items-center gap-2 font-extrabold text-foreground text-2xl">
           <Bed size={24} className="text-primary shrink-0" aria-hidden="true" />
-          Room for {totalGuests} traveller{totalGuests !== 1 ? "s" : ""}
+          Room for {totalGuests} traveller{totalGuests !== 1 ? "s" : ""} in {hotel.name}
         </h2>
         {/* Context line — ties the room choice back to the stopover stay. */}
         <p className="text-sm text-foreground">
@@ -690,42 +616,62 @@ export default function StopoverRoomPage({
       <div id="hotel-showcase" className="scroll-mt-4">
 
         {/* ── PHOTO GALLERY ──────────────────────────────────────────────────── */}
-        <PageContainer tier="narrow" className="px-4 md:px-6 pt-12 flex flex-col gap-4">
-          <h2 className="text-2xl font-bold text-foreground">About this hotel</h2>
-          <div className="relative">
-            <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[260px] md:h-[360px] gap-2">
-              <div
-                className="relative overflow-hidden rounded-xl group cursor-pointer"
-                onClick={() => setPhotosOpen(true)}
-              >
-                <ImageWithPlaceholder
-                  src={hotel.image}
-                  alt={hotel.name}
-                  containerClassName="w-full h-full"
-                  className="group-hover:scale-[1.03] transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-transparent pointer-events-none" />
+        <PageContainer tier="narrow" className="px-4 md:px-6 pt-12">
+          {/* One white card wrapping the hotel header + photos, matching the
+              "About + Highlights + Map" card below so the showcase reads as a
+              consistent stack of white sections. */}
+          <div className="bg-card rounded-xl shadow-sm p-6 flex flex-col gap-4">
+            {/* Hotel header — the name + star class + rating + location, moved
+                down here from the (now removed) top card so the room choice leads
+                the page and the hotel's own details live with the rest of its info. */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-2xl font-bold text-foreground">{hotel.name}</h2>
+                <AccommodationStar rating={hotel.stars} offerName={hotel.name} offerId={hotel.id} size={16} />
               </div>
-              <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-2">
-                {[SHOWCASE_PHOTOS[0], SHOWCASE_PHOTOS[1], ROOM_IMAGES[0], ROOM_IMAGES[1]].map((src, i) => (
-                  <div
-                    key={i}
-                    className="overflow-hidden rounded-xl cursor-pointer group"
-                    onClick={() => setPhotosOpen(true)}
-                  >
-                    <ImageWithPlaceholder
-                      src={src}
-                      alt="Hotel photo"
-                      containerClassName="w-full h-full"
-                      className="group-hover:scale-[1.03] transition-transform duration-500"
-                    />
-                  </div>
-                ))}
+              <div className="flex items-center gap-3 flex-wrap text-sm text-foreground">
+                <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
+                <span className="flex items-center gap-1 text-grey">
+                  <MapPin size={14} className="shrink-0" aria-hidden="true" />
+                  {city}
+                </span>
               </div>
             </div>
-            <Button variant="secondary" onClick={() => setPhotosOpen(true)} className="absolute bottom-4 right-4">
-              ⊞ See all photos
-            </Button>
+            <div className="relative">
+              <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] h-[260px] md:h-[360px] gap-2">
+                <div
+                  className="relative overflow-hidden rounded-xl group cursor-pointer"
+                  onClick={() => setPhotosOpen(true)}
+                >
+                  <ImageWithPlaceholder
+                    src={hotel.image}
+                    alt={hotel.name}
+                    containerClassName="w-full h-full"
+                    className="group-hover:scale-[1.03] transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-transparent pointer-events-none" />
+                </div>
+                <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-2">
+                  {[SHOWCASE_PHOTOS[0], SHOWCASE_PHOTOS[1], ROOM_IMAGES[0], ROOM_IMAGES[1]].map((src, i) => (
+                    <div
+                      key={i}
+                      className="overflow-hidden rounded-xl cursor-pointer group"
+                      onClick={() => setPhotosOpen(true)}
+                    >
+                      <ImageWithPlaceholder
+                        src={src}
+                        alt="Hotel photo"
+                        containerClassName="w-full h-full"
+                        className="group-hover:scale-[1.03] transition-transform duration-500"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <Button variant="secondary" onClick={() => setPhotosOpen(true)} className="absolute bottom-4 right-4">
+                ⊞ See all photos
+              </Button>
+            </div>
           </div>
         </PageContainer>
 
@@ -850,34 +796,139 @@ export default function StopoverRoomPage({
         </PageContainer>
       </div>
 
-      {/* ── STICKY TRIP-SUMMARY BAR ──────────────────────────────────────────
-          The SAME bar the Smart Planner uses — flights + stay grouped on the
-          left, price breakdown on the right — so the structure matches exactly.
-          Here the primary action is "Continue" (with the running trip total),
-          and the price breakdown itemises flights + the stopover hotel. Slides
-          up once a room is selected (so we have a hotel price to add). */}
-      <StickySummaryBar
-        startDate={firstLegDate}
-        endDate={lastLegDate}
-        adults={totalGuests}
-        nights={tripNights}
-        totalPriceLabel={`€${tripTotal.toLocaleString()}`}
-        items={summaryItems}
-        priceBreakdown={priceBreakdown}
-        // PRIMARY CTA — direct conversion path to checkout.
-        actionLabel={`Proceed to checkout · €${tripTotal.toLocaleString()}`}
-        onAction={handleProceedToCheckout}
-        actionDisabled={!allRoomsSelected || !allAllocated}
-        // SECONDARY CTA — jump into the Smart Planner to add activities/transfers.
-        secondaryActionLabel="Personalize this trip"
-        secondaryActionIcon={<Pencil size={16} aria-hidden="true" />}
-        onSecondaryAction={handlePersonalize}
-        secondaryActionDisabled={!allRoomsSelected || !allAllocated}
-        // Once every room is picked and all travellers are allocated, pop the
-        // summary panel open so the user can review their trip before continuing.
-        autoExpand={allRoomsSelected && allAllocated}
-        show={someRoomsSelected}
-      />
+      {/* ── STICKY BOTTOM SUMMARY ────────────────────────────────────────────
+          Same footer style the hotel room-selection page uses: a per-room
+          breakdown on the left, the running total on the right, and a single
+          CTA. Here the total is the bundled STOPOVER PACKAGE total (tripTotal),
+          and the CTA advances to the booking-summary review step. Appears once
+          any room is selected; the CTA stays disabled (with an explanatory
+          tooltip) until every room is chosen and every traveller allocated. */}
+      {someRoomsSelected && (
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg z-50">
+          <PageContainer tier="standard" className="px-4 md:px-8 lg:px-[60px] py-3 md:py-4">
+
+            {/* Mobile layout: compact room pills, then total + button */}
+            <div className="flex flex-col gap-2 sm:hidden">
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                {localRoomConfig.map((config, index) => {
+                  const sel = roomSelections[config.id];
+                  return (
+                    <div key={config.id} className="flex items-center gap-1.5 min-w-0">
+                      {sel ? (
+                        <div className="shrink-0 bg-foreground rounded-full p-0.5">
+                          <Check size={10} className="text-white" aria-hidden="true" />
+                        </div>
+                      ) : (
+                        <ArrowRight size={14} className="shrink-0 text-foreground" aria-hidden="true" />
+                      )}
+                      <span className="text-xs font-semibold text-foreground shrink-0 flex items-center gap-1">
+                        Room {index + 1} <Users size={12} aria-hidden="true" /> {getTotalGuests(config)}:
+                      </span>
+                      <span className="text-xs text-foreground truncate min-w-0">
+                        {sel ? sel.room.name : <span className="text-grey italic">Selecting now</span>}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-col">
+                  <StopoverPackageLabel />
+                  <span className="text-foreground font-bold text-base">€{tripTotal.toLocaleString()}</span>
+                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => !ctaDisabled && handleGoToBookingSummary()}
+                      aria-disabled={ctaDisabled}
+                      className={cn(
+                        "inline-flex shrink-0 px-4 py-2.5 rounded-lg font-bold text-sm transition-all select-none items-center gap-2",
+                        !ctaDisabled
+                          ? "bg-primary hover:brightness-85 text-white cursor-pointer shadow-lg"
+                          : "bg-border text-grey cursor-not-allowed"
+                      )}
+                    >
+                      Go to booking summary
+                    </span>
+                  </TooltipTrigger>
+                  {ctaDisabled && (
+                    <TooltipContent side="top" sideOffset={8}>
+                      {ctaDisabledReason}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </div>
+            </div>
+
+            {/* Desktop layout: per-room breakdown left, total + CTA right */}
+            <div className="hidden sm:flex items-center justify-between gap-6">
+              <div className="flex flex-col gap-2">
+                <span className="text-grey text-xs font-semibold uppercase tracking-wide">Room selection</span>
+                {localRoomConfig.map((config, index) => {
+                  const sel = roomSelections[config.id];
+                  const cancelLabel = sel?.room.cancellationPolicies.find((p) => p.id === sel.cancelOption)?.label;
+                  const boardLabel = sel?.room.extras.find((p) => p.id === sel.extraOption)?.label;
+                  return (
+                    <div key={config.id} className="flex items-center gap-2 min-w-0">
+                      {sel ? (
+                        <div className="shrink-0 bg-foreground rounded-full p-0.5">
+                          <Check size={12} className="text-white" aria-hidden="true" />
+                        </div>
+                      ) : (
+                        <ArrowRight size={16} className="shrink-0 text-foreground" aria-hidden="true" />
+                      )}
+                      <span className="text-sm font-semibold text-foreground shrink-0 flex items-center gap-1">
+                        Room {index + 1}
+                        <Users size={14} aria-hidden="true" />
+                        {getTotalGuests(config)}:
+                      </span>
+                      {sel ? (
+                        <span className="text-sm font-semibold text-foreground truncate min-w-0">
+                          {sel.room.name} · {cancelLabel} · {boardLabel}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-grey italic shrink-0">· Selecting now</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center gap-6">
+                <div className="flex flex-col items-end">
+                  <StopoverPackageLabel />
+                  <span className="text-foreground font-bold text-2xl">€{tripTotal.toLocaleString()}</span>
+                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => !ctaDisabled && handleGoToBookingSummary()}
+                      aria-disabled={ctaDisabled}
+                      className={cn(
+                        "inline-flex px-6 py-3 rounded-lg font-bold text-base transition-all select-none items-center gap-2",
+                        !ctaDisabled
+                          ? "bg-primary hover:brightness-85 text-white cursor-pointer shadow-lg"
+                          : "bg-border text-grey cursor-not-allowed"
+                      )}
+                    >
+                      Go to booking summary
+                    </span>
+                  </TooltipTrigger>
+                  {ctaDisabled && (
+                    <TooltipContent side="top" sideOffset={8}>
+                      {ctaDisabledReason}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </div>
+            </div>
+          </PageContainer>
+        </div>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════════════
           MODALS

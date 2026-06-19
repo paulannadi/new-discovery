@@ -62,6 +62,13 @@ type FlightStepperProps = {
    * — i.e. on the room step, after a hotel has been picked.
    */
   onStopoverStepSelect?: () => void;
+  /**
+   * Called when the user clicks the *completed* (done) "Room selection" step to
+   * jump back to it — e.g. from the booking-summary page, where every step reads
+   * as done. Like the hotel step, it has no leg index so it gets its own
+   * callback, and is only clickable once roomStatus === "done".
+   */
+  onRoomStepSelect?: () => void;
 };
 
 type StepStatus = "done" | "current" | "future";
@@ -156,6 +163,7 @@ export function FlightStepper({
   roomStatus = "future",
   onStepSelect,
   onStopoverStepSelect,
+  onRoomStepSelect,
 }: FlightStepperProps) {
   const isRoundtrip = tripType === "roundtrip";
 
@@ -220,6 +228,8 @@ export function FlightStepper({
             onClick = () => onStepSelect(step.legIndex!);
           } else if (step.key === "stopover" && onStopoverStepSelect) {
             onClick = onStopoverStepSelect;
+          } else if (step.key === "stopover-room" && onRoomStepSelect) {
+            onClick = onRoomStepSelect;
           }
         }
         return (

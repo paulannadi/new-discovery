@@ -3,6 +3,7 @@ import DiscoveryPage, { type TabId } from "./modules/smartPlanner/pages/Discover
 import HotelListPage from "./modules/smartPlanner/pages/HotelListPage";
 import HotelDetailPage from "./modules/smartPlanner/pages/HotelDetailPage";
 import StopoverRoomPage from "./modules/smartPlanner/pages/StopoverRoomPage";
+import StopoverBookingSummaryPage from "./modules/smartPlanner/pages/StopoverBookingSummaryPage";
 import HolidayListPage from "./modules/smartPlanner/pages/HolidayListPage";
 import PackageDetailPage from "./modules/smartPlanner/pages/PackageDetailPage";
 import TourDetailPage from "./modules/smartPlanner/pages/TourDetailPage";
@@ -26,6 +27,7 @@ import type { Activity, ActivitySearchCriteria } from "./types";
 // path is documented in AGENT_PATH.md at repo root and no longer reachable.
 import AiItineraryPage from "./modules/smartPlanner/pages/AiItineraryPage";
 import { Toast } from "./shared/components/ui/toast";
+import { showToast } from "./shared/utils/toast";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toastify.css";
 import { DateRange } from "react-day-picker";
@@ -177,6 +179,7 @@ export default function App() {
     | "flight-results"
     | "stopover-hotel"
     | "stopover-room"
+    | "stopover-booking-summary"
     | "smart-planner"
     // ── Activities flow ──
     | "activity-list"
@@ -278,6 +281,13 @@ export default function App() {
   // The stopover hotel the user picked — held while they choose a room for it on
   // the new stopover-room step, then folded into the SmartPlanner context.
   const [stopoverHotel, setStopoverHotel] = useState<any | null>(null);
+  // The room choices made on the stopover-room step, carried forward to the
+  // booking-summary review page (and back, so returning preserves them). We also
+  // stash the room config + the computed package total so the summary can render
+  // without re-deriving the room-page maths.
+  const [stopoverRoomSelections, setStopoverRoomSelections] = useState<{ [id: number]: any } | null>(null);
+  const [stopoverRoomConfig, setStopoverRoomConfig] = useState<any[] | null>(null);
+  const [stopoverTripTotal, setStopoverTripTotal] = useState(0);
 
   // ── Cheapest-package price anchoring ─────────────────────────────────────
   // The whole stopover flow shows ONE bundled price. We anchor it to the
@@ -562,6 +572,10 @@ export default function App() {
     setCurrentFlightLegIndex(0);
     setStopoverSelection(null);
     setStopoverHotel(null);
+    // Clear the booking-summary carry-over so a fresh flow starts clean.
+    setStopoverRoomSelections(null);
+    setStopoverRoomConfig(null);
+    setStopoverTripTotal(0);
     setCurrentPage("smart-planner");
     window.scrollTo(0, 0);
   };
@@ -617,10 +631,26 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
-  // ── Stopover-room step: user picked a room → SmartPlanner ─────────────────
-  // Now we have the flights, the hotel, and the room — build the full context.
-  const handleStopoverRoomSelect = (roomSelections: any) => {
-    goToPlannerWithFlights(selectedFlightLegs, stopoverHotel, roomSelections);
+  // ── Stopover-room step: rooms chosen → booking summary ────────────────────
+  // We have the flights, the hotel, and the room(s). Stash the choices (plus the
+  // room config and the package total the room page computed) and advance to the
+  // booking-summary review page.
+  const handleGoToBookingSummary = (roomSelections: any, roomConfig: any[], tripTotal: number) => {
+    setStopoverRoomSelections(roomSelections);
+    setStopoverRoomConfig(roomConfig);
+    setStopoverTripTotal(tripTotal);
+    setCurrentPage("stopover-booking-summary");
+    window.scrollTo(0, 0);
+  };
+
+  // ── Booking-summary CTAs ──────────────────────────────────────────────────
+  // "Personalize this package" → build the full context and open Smart Planner.
+  const handlePersonalizeStopover = () => {
+    goToPlannerWithFlights(selectedFlightLegs, stopoverHotel, stopoverRoomSelections);
+  };
+  // "Proceed to checkout" → placeholder until a checkout page exists.
+  const handleStopoverCheckout = () => {
+    showToast.info("Checkout is coming soon");
   };
 
   // ── HOLIDAYS tab: submit search → HolidayListPage ────────────────────────
@@ -721,6 +751,10 @@ export default function App() {
   const handleBack = () => {
     setCurrentPage("discovery");
     setStartingContext(null);
+    // Drop any stopover room choices so re-entering the funnel starts fresh.
+    setStopoverRoomSelections(null);
+    setStopoverRoomConfig(null);
+    setStopoverTripTotal(0);
     window.scrollTo(0, 0);
   };
 
@@ -875,10 +909,14 @@ export default function App() {
               ? [{ id: 1, adults: flightSearchCriteria.adults, children: flightSearchCriteria.children }]
               : undefined
           }
+          // When returning here from the booking summary, re-seed the page with
+          // the choices the traveller already made (this page unmounts on nav).
+          initialRoomSelections={stopoverRoomSelections ?? undefined}
+          initialRoomConfig={stopoverRoomConfig ?? undefined}
           // "Back to discovery" exits the whole stopover flow. Stepping back to
           // the hotel step is handled by the stepper's onStopoverStepSelect below.
           onBack={handleBack}
-          onSelectRooms={handleStopoverRoomSelect}
+          onGoToBookingSummary={handleGoToBookingSummary}
           // Stepper: flights + hotel are done, the room card is now current.
           headerSlot={
             flightSearchCriteria ? (
@@ -905,6 +943,55 @@ export default function App() {
           }
         />
       )}
+
+      {/* Stopover booking summary — the review/confirm step after room selection.
+          Read-only recap of flights + hotel + room, ending in "Proceed to
+          checkout" (placeholder) and "Personalize this package" (→ SmartPlanner). */}
+      {currentPage === "stopover-booking-summary" &&
+        stopoverSelection &&
+        stopoverHotel &&
+        stopoverRoomSelections &&
+        stopoverRoomConfig && (
+          <StopoverBookingSummaryPage
+            hotel={stopoverHotel}
+            city={stopoverSelection.city}
+            nights={stopoverSelection.nights}
+            // Full chosen-flight objects, so the summary can show the stopover segments.
+            selectedFlightLegs={selectedFlightLegs}
+            roomSelections={stopoverRoomSelections}
+            roomConfig={stopoverRoomConfig}
+            tripTotal={stopoverTripTotal}
+            onBack={handleBack}
+            onProceedToCheckout={handleStopoverCheckout}
+            onPersonalize={handlePersonalizeStopover}
+            // Stepper: every step done. The room step is clickable to go back.
+            headerSlot={
+              flightSearchCriteria ? (
+                <FlightStepper
+                  legs={flightSearchCriteria.legs}
+                  currentLegIndex={flightSearchCriteria.legs.length}
+                  tripType={flightSearchCriteria.tripType}
+                  stopover={flightSearchCriteria.stopover}
+                  stopoverCity={stopoverSelection.city}
+                  stopoverHotelName={stopoverHotel.name}
+                  stopoverStatus="done"
+                  roomStatus="done"
+                  onStepSelect={handleFlightStepSelect}
+                  onStopoverStepSelect={() => {
+                    setCurrentPage("stopover-hotel");
+                    window.scrollTo(0, 0);
+                  }}
+                  // Clicking the done "Room selection" step returns to the room
+                  // page — selections are preserved via the initial* props.
+                  onRoomStepSelect={() => {
+                    setCurrentPage("stopover-room");
+                    window.scrollTo(0, 0);
+                  }}
+                />
+              ) : null
+            }
+          />
+        )}
 
       {/* Screen 6: Holiday results list — reached from the Holidays tab */}
       {currentPage === "holiday-list" && (

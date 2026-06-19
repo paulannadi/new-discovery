@@ -28,6 +28,40 @@ export function locationCoords(location: string): [number, number] {
   return [48.8566, 2.3522];
 }
 
+// Wide hero photos keyed by destination. Ideally we'd hit a live keyword-image
+// search with the destination as the query — but those services (Unsplash
+// Source, LoremFlickr) are unavailable in this environment, so we map the
+// destination to a vetted, confirmed-loading Unsplash photo instead. The
+// destination still drives the image; it's just a lookup rather than a live
+// query. Substring match so "Santiago de Chile" still hits "santiago".
+const CITY_IMAGES: { match: string; url: string }[] = [
+  // ── Caribbean destinations (reached via the Port of Spain hub) ────────────
+  { match: "grenada",    url: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1600&q=80" },
+  { match: "bridgetown", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80" },
+  { match: "kingston",   url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80" },
+  { match: "georgetown", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80" },
+  { match: "antigua",    url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80" },
+  { match: "port of spain", url: "https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=1600&q=80" },
+  // ── Oceania destinations (reached via the Nadi hub) ───────────────────────
+  { match: "sydney",     url: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1600&q=80" },
+  { match: "melbourne",  url: "https://images.unsplash.com/photo-1514395462725-fb4566210144?auto=format&fit=crop&w=1600&q=80" },
+];
+
+// Used for any destination we don't have a specific photo for — a wide beach
+// shot that suits the warm-weather routes this flow surfaces.
+const CITY_IMAGE_FALLBACK =
+  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80";
+
+/**
+ * Returns a wide hero image URL for a destination. Keyed off the destination
+ * name (so the destination drives the picture), falling back to a generic beach
+ * photo for anywhere we don't have a specific image.
+ */
+export function cityImage(query: string): string {
+  const q = query.trim().toLowerCase();
+  return CITY_IMAGES.find((e) => q.includes(e.match))?.url ?? CITY_IMAGE_FALLBACK;
+}
+
 /**
  * Returns destination-aware "Getting around" points of interest.
  */

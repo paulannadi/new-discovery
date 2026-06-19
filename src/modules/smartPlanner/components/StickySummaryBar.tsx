@@ -65,6 +65,8 @@ interface StickySummaryBarProps {
   actionLabel?: string;
   onAction?: () => void;
   actionDisabled?: boolean;
+  // Optional icon rendered AFTER the primary button's label (e.g. a right arrow).
+  actionIcon?: ReactNode;
   // Optional SECONDARY button, shown to the left of the primary one (rendered in
   // the lower-emphasis "secondary" style — blue border + blue text). The stopover
   // room step uses this for "Personalize this trip" alongside "Proceed to checkout".
@@ -193,6 +195,7 @@ export function StickySummaryBar({
   actionLabel,
   onAction,
   actionDisabled = false,
+  actionIcon,
   secondaryActionLabel,
   onSecondaryAction,
   secondaryActionDisabled = false,
@@ -316,6 +319,7 @@ export function StickySummaryBar({
               className="w-full sm:w-auto"
             >
               {actionLabel ?? `Book · ${totalPriceLabel}`}
+              {actionIcon}
             </Button>
           </div>
         </div>
