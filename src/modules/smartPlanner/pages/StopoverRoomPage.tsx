@@ -94,6 +94,7 @@ export default function StopoverRoomPage({
   packageFloor = 0,
   flightLegs = [],
   headerSlot,
+  searchSummarySlot,
   initialRoomSelections,
   initialRoomConfig,
   onBack,
@@ -120,6 +121,10 @@ export default function StopoverRoomPage({
   roomConfiguration?: RoomConfig[];
   // The FlightStepper, rendered in the page header so the stopover progress is visible.
   headerSlot?: React.ReactNode;
+  // The collapsed search-criteria row, rendered inside the white header strip
+  // (under the back button) so it reads as an integral part of the header —
+  // matching the flight results step where the criteria live in the header too.
+  searchSummarySlot?: React.ReactNode;
   // When the traveller returns here from the booking summary, App passes their
   // previous choices back so we can re-seed the page (otherwise this page
   // unmounts on navigation and the selections would reset). Optional — absent
@@ -371,7 +376,15 @@ export default function StopoverRoomPage({
           using the same "narrow" content width as the rest of the flight flow. */}
       <div className="bg-card border-b border-border z-30 relative">
         <PageContainer tier="narrow" className="px-4 md:px-6 py-4">
-          <BackButton label="Back to discovery" onClick={onBack} />
+          {/* Back button, then the collapsed search criteria directly beneath it
+              — the same stacked layout the flight results header uses. The
+              back button only needs its bottom margin when the summary follows. */}
+          <BackButton
+            label="Back to discovery"
+            onClick={onBack}
+            className={searchSummarySlot ? "mb-3" : undefined}
+          />
+          {searchSummarySlot}
         </PageContainer>
       </div>
 
@@ -390,18 +403,28 @@ export default function StopoverRoomPage({
       <PageContainer tier="narrow" className="px-4 md:px-6 pt-8 flex flex-col gap-2">
         {/* "Room for 2 travellers in Hotel Palazzo Doglio" — totalGuests sums
             adults + children across the whole room configuration, and we name the
-            chosen hotel right in the title now that the top card is gone. */}
-        <h2 className="flex items-center gap-2 font-extrabold text-foreground text-2xl">
-          <Bed size={24} className="text-primary shrink-0" aria-hidden="true" />
-          Room for {totalGuests} traveller{totalGuests !== 1 ? "s" : ""} in {hotel.name}
-        </h2>
-        {/* Context line — ties the room choice back to the stopover stay. */}
-        <p className="text-sm text-foreground">
-          {nights} night{nights !== 1 ? "s" : ""} in {city}
-          {" · "}
-          {totalAdults} adult{totalAdults !== 1 ? "s" : ""}
-          {totalChildren > 0 && ` · ${totalChildren} child${totalChildren !== 1 ? "ren" : ""}`}
-        </p>
+            chosen hotel right in the title now that the top card is gone.
+
+            Layout + sizing mirror the previous steps (Flights, Stopover hotel)
+            so the step titles stay consistent: icon + text in a top-aligned row
+            (`items-start gap-2.5`, icon nudged down with `mt-1`), and the title
+            uses the same `text-lg md:text-xl ... leading-tight` instead of the
+            larger `text-2xl` it had before. */}
+        <div className="flex items-start gap-2.5">
+          <Bed size={22} className="text-primary shrink-0 mt-1" aria-hidden="true" />
+          <div>
+            <h2 className="text-lg md:text-xl font-extrabold text-foreground leading-tight">
+              Room for {totalGuests} traveller{totalGuests !== 1 ? "s" : ""} in {hotel.name}
+            </h2>
+            {/* Context line — ties the room choice back to the stopover stay. */}
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {nights} night{nights !== 1 ? "s" : ""} in {city}
+              {" · "}
+              {totalAdults} adult{totalAdults !== 1 ? "s" : ""}
+              {totalChildren > 0 && ` · ${totalChildren} child${totalChildren !== 1 ? "ren" : ""}`}
+            </p>
+          </div>
+        </div>
 
         {/* ── Guests & Rooms field ───────────────────────────────────────────
             The SAME field + dropdown the hotel detail page uses, but with one

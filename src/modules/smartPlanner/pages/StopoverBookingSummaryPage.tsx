@@ -12,7 +12,7 @@ import { useState, useRef, useEffect } from "react";
 import { BackButton } from "../../../shared/components/BackButton";
 import AccommodationStar from "../../../shared/components/AccommodationStar";
 import RatingBlock from "../../../shared/components/RatingBlock";
-import { MapPin, MapPinned, Plane, Bed, Users, Pencil, ArrowRight, ChevronRight } from "lucide-react";
+import { MapPin, MapPinned, Plane, Bed, Users, Pencil, Calendar, ChevronRight } from "lucide-react";
 import { format, differenceInCalendarDays } from "date-fns";
 import { Button } from "../../../shared/components/ui/button";
 import { PageContainer } from "../../../shared/components/PageContainer";
@@ -52,22 +52,29 @@ function FlightLegSummary({ leg }: { leg: SelectedFlightLeg }) {
   // back to the city name if a code wasn't provided.
   const hub = stop?.hubCode ?? stop?.city ?? "";
 
+  // Full "City (CODE)" labels for the header route line. The segment rows below
+  // keep just the bare airport codes. Fall back to the code if it's not in the
+  // airport lookup table.
+  const fromCity = findAirportByCode(leg.leg.from)?.city ?? leg.leg.from;
+  const toCity = findAirportByCode(leg.leg.to)?.city ?? leg.leg.to;
+
   return (
     <div className="bg-card rounded-xl border border-border p-4 flex flex-col gap-3">
-      {/* Header: route + date */}
+      {/* Header: route (city + code) + date. The codes alone live in the
+          segment rows below. */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <span className="flex items-center gap-2 font-bold text-foreground">
           <Plane size={16} className="text-primary shrink-0" aria-hidden="true" />
-          {leg.leg.from} → {leg.leg.to}
+          {fromCity} ({leg.leg.from}) → {toCity} ({leg.leg.to})
         </span>
-        {dateLabel && <span className="text-sm text-grey">{dateLabel}</span>}
+        {dateLabel && <span className="text-sm text-foreground">{dateLabel}</span>}
       </div>
 
       {stop?.out && stop?.onward ? (
         // Two-segment stopover leg
         <div className="flex flex-col gap-2">
           <SegmentRow from={leg.leg.from} to={hub} seg={stop.out} />
-          <div className="flex items-center gap-2 rounded-lg bg-primary/5 text-primary px-3 py-2 text-sm">
+          <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 text-primary px-3 py-2 text-sm">
             <MapPinned size={14} className="shrink-0" aria-hidden="true" />
             <span className="font-semibold">
               Stopover · {stop.nights} night{stop.nights !== 1 ? "s" : ""} in {stop.city}
@@ -80,20 +87,20 @@ function FlightLegSummary({ leg }: { leg: SelectedFlightLeg }) {
         <div className="flex items-center justify-between gap-3 text-sm">
           <div className="flex items-baseline gap-2">
             <span className="font-bold text-foreground">{option.departure}</span>
-            <span className="text-grey">{leg.leg.from}</span>
+            <span className="text-foreground">{leg.leg.from}</span>
           </div>
-          <div className="flex flex-col items-center text-xs text-grey">
+          <div className="flex flex-col items-center text-xs text-foreground">
             <span>{option.duration}</span>
             <span>{option.stops}{option.stopInfo ? ` · ${option.stopInfo}` : ""}</span>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="font-bold text-foreground">{option.arrival}</span>
-            <span className="text-grey">{leg.leg.to}</span>
+            <span className="text-foreground">{leg.leg.to}</span>
           </div>
         </div>
       )}
 
-      <div className="text-xs text-grey">{option.airline}</div>
+      <div className="text-xs text-foreground">{option.airline}</div>
     </div>
   );
 }
@@ -112,9 +119,9 @@ function SegmentRow({
     <div className="flex items-center justify-between gap-3 text-sm">
       <div className="flex items-baseline gap-2">
         <span className="font-bold text-foreground">{seg.depTime}</span>
-        <span className="text-grey">{from}</span>
+        <span className="text-foreground">{from}</span>
       </div>
-      <div className="flex flex-col items-center text-xs text-grey flex-1">
+      <div className="flex flex-col items-center text-xs text-foreground flex-1">
         <span>{seg.duration}</span>
         {seg.note && <span>{seg.note}</span>}
       </div>
@@ -123,7 +130,7 @@ function SegmentRow({
           {seg.arrTime}
           {seg.arrivesNextDay && <sup className="text-[10px] ml-0.5">+1</sup>}
         </span>
-        <span className="text-grey">{to}</span>
+        <span className="text-foreground">{to}</span>
       </div>
     </div>
   );
@@ -150,12 +157,12 @@ function RoomSummaryRow({
           <Bed size={15} className="text-primary shrink-0" aria-hidden="true" />
           {showLabel ? `Room ${index + 1}: ` : ""}{sel.room.name}
         </span>
-        <span className="flex items-center gap-1 text-sm text-grey shrink-0">
+        <span className="flex items-center gap-1 text-sm text-foreground shrink-0">
           <Users size={13} aria-hidden="true" /> {guests}
         </span>
       </div>
       {/* Bed / occupancy / board / cancellation — the details that reassure. */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-grey pl-[23px]">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-foreground pl-[23px]">
         <span>{sel.room.details.bedType}</span>
         <span aria-hidden="true">·</span>
         <span>Sleeps {sel.room.details.sleeps}</span>
@@ -175,6 +182,7 @@ export default function StopoverBookingSummaryPage({
   roomConfig,
   tripTotal,
   headerSlot,
+  searchSummarySlot,
   onBack,
   onProceedToCheckout,
   onPersonalize,
@@ -190,6 +198,10 @@ export default function StopoverBookingSummaryPage({
   tripTotal: number;
   // The FlightStepper (all steps done), built by App and passed in.
   headerSlot?: React.ReactNode;
+  // The collapsed search-criteria row, rendered inside the white header strip
+  // (under the back button) so it's an integral part of the header — matching
+  // the flight results step.
+  searchSummarySlot?: React.ReactNode;
   // "Back to discovery" — exits the whole flow.
   onBack: () => void;
   // PRIMARY CTA — placeholder for now (no checkout page yet).
@@ -276,9 +288,12 @@ export default function StopoverBookingSummaryPage({
     },
   ];
 
-  // One bundled line — same "Stopover package" caption used across the flow.
+  // The bundled "Stopover package" line, then a bold "Total" row beneath it —
+  // the "Total" label + "1,886 €" format match the hero card's footer. Amounts
+  // are written as "<number> €" (not "€<number>") to stay consistent throughout.
   const priceBreakdown: PriceBreakdownLine[] = [
-    { label: "Stopover package", labelNode: <StopoverPackageLabel />, value: `€${tripTotal.toLocaleString()}` },
+    { label: "Stopover package", labelNode: <StopoverPackageLabel />, value: `${tripTotal.toLocaleString()} €` },
+    { label: "Total", value: `${tripTotal.toLocaleString()} €`, total: true },
   ];
 
   // The rooms the traveller actually selected (skip any empty slots defensively).
@@ -294,7 +309,14 @@ export default function StopoverBookingSummaryPage({
       {/* ── WHITE HEADER STRIP — back button only (matches the room step) ──── */}
       <div className="bg-card border-b border-border z-30 relative">
         <PageContainer tier="narrow" className="px-4 md:px-6 py-4">
-          <BackButton label="Back to discovery" onClick={onBack} />
+          {/* Back button + collapsed search criteria beneath it — same stacked
+              header layout as the flight results step. */}
+          <BackButton
+            label="Back to discovery"
+            onClick={onBack}
+            className={searchSummarySlot ? "mb-3" : undefined}
+          />
+          {searchSummarySlot}
         </PageContainer>
       </div>
 
@@ -305,69 +327,84 @@ export default function StopoverBookingSummaryPage({
         </PageContainer>
       </div>
 
-      {/* ── HERO — headlines the FINAL DESTINATION (with the stopover named in
-          the title), and a ticket capsule carrying the dates, total, and the
-          primary CTA (Smart Planner style). ────────────────────────────────── */}
+      {/* ── HERO — a compact horizontal "package card" (hotel-card style):
+          the destination photo on the LEFT, the trip facts + booking CTAs on
+          the RIGHT. Deliberately low-key (a calm confirmation card, not a tall
+          full-bleed banner) so attention stays on confirming and booking. ───── */}
       <PageContainer tier="narrow" className="px-4 md:px-6 pt-4">
-        <div className="relative h-80 md:h-[420px] rounded-2xl overflow-hidden">
-          <ImageWithPlaceholder
-            src={cityImage(finalDestination)}
-            alt={finalDestination}
-            priority
-            containerClassName="absolute inset-0 w-full h-full"
-            className="w-full h-full object-cover"
-          />
-          {/* Dark gradient — heavier top + bottom so overlay text stays legible. */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 bg-gradient-to-b from-black/65 from-0% via-black/10 via-45% to-black/60 to-100%"
-          />
+        <div className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm flex flex-col md:flex-row">
 
-          {/* Title overlay — top-left. */}
-          <div className="absolute inset-x-0 top-0 px-5 md:px-6 pt-5 md:pt-6 text-white">
-            <p className="text-xs md:text-sm font-bold uppercase tracking-[0.1em] opacity-90 mb-1.5 drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]">
-              {totalGuests} traveller{totalGuests !== 1 ? "s" : ""} · {tripNights} night{tripNights !== 1 ? "s" : ""}
-            </p>
-            <h1 className="text-3xl md:text-4xl font-extrabold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-              Trip to {finalDestination} with {city} stopover
-            </h1>
+          {/* LEFT — destination photo. Fixed height when stacked below md; at
+              md+ the photo is absolutely positioned (inset-0) so it contributes
+              NO intrinsic height — that lets the text column drive the card
+              height and the photo simply covers it. Without this the photo's
+              natural height was taller than the text, so the flex row stretched
+              and `mt-auto` left a big gap above the footer divider. */}
+          <div className="relative w-full md:w-[300px] lg:w-[340px] h-[180px] md:h-auto shrink-0 overflow-hidden">
+            <div className="md:absolute md:inset-0 w-full h-full">
+              <ImageWithPlaceholder
+                src={cityImage(finalDestination)}
+                alt={finalDestination}
+                priority
+                containerClassName="w-full h-full"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
 
-          {/* TICKET CAPSULE — frosted pill pinned to the bottom: dates, total, CTAs. */}
-          <div className="absolute inset-x-3 md:inset-x-4 bottom-3 md:bottom-4 flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-5 rounded-2xl border border-white/70 bg-white/95 backdrop-blur-md px-4 md:px-5 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.18)]">
-            {/* Dates cluster — grows to fill the row so the dashed line stretches
-                between depart and return (matching the Smart Planner capsule). */}
-            <div className="flex items-center gap-4 md:gap-6 min-w-0 lg:flex-1">
-              <div className="flex flex-col leading-tight">
-                <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-grey">Depart</span>
-                <span className="mt-0.5 text-sm md:text-[15px] font-bold text-foreground">{format(firstLegDate, "dd MMM")}</span>
-              </div>
-              <div aria-hidden className="relative flex-1 min-w-[32px] border-t border-dashed border-grey-light">
-                <ArrowRight className="absolute -top-[11px] left-1/2 -translate-x-1/2 size-5 text-foreground" />
-              </div>
-              <div className="flex flex-col leading-tight">
-                <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-grey">Return</span>
-                <span className="mt-0.5 text-sm md:text-[15px] font-bold text-foreground">{format(lastLegDate, "dd MMM")}</span>
-              </div>
+          {/* RIGHT — the information card. Everything left-aligned: title at
+              the top, a single travellers · dates info row, then the total +
+              booking CTAs pinned to the bottom. */}
+          <div className="flex-1 flex flex-col gap-3 p-5 md:p-6 text-left">
+
+            {/* Title — left-aligned, smaller than the old banner heading. */}
+            <h1 className="text-xl md:text-2xl font-extrabold text-foreground leading-tight">
+              Trip to {finalDestination} with {city} stopover
+            </h1>
+
+            {/* Info row — travellers · date range, each with an icon and
+                separated by a thin divider (the same idiom the Discovery cards
+                use). Icons use our foreground (black) token. Wraps on narrow
+                widths. (The nights count was dropped — it lives on the stay
+                card lower down, so it was redundant here.) */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-foreground">
+              <span className="flex items-center gap-1.5">
+                <Users size={15} className="text-foreground shrink-0" aria-hidden="true" />
+                {totalGuests} traveller{totalGuests !== 1 ? "s" : ""}
+              </span>
+              <span aria-hidden className="w-px h-4 bg-border" />
+              <span className="flex items-center gap-1.5">
+                <Calendar size={15} className="text-foreground shrink-0" aria-hidden="true" />
+                {format(firstLegDate, "EEE, d MMM")} – {format(lastLegDate, "EEE, d MMM yyyy")}
+              </span>
             </div>
 
-            {/* Mobile divider */}
-            <div aria-hidden className="lg:hidden h-px w-full bg-grey-light" />
-
-            {/* Total (right-aligned) + CTA */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 lg:gap-4">
-              {/* Divider sits between the dates and the total, just after Return. */}
-              <div aria-hidden className="hidden lg:block w-px h-9 bg-grey-light" />
-              <div className="flex flex-col leading-tight items-start sm:items-end">
-                <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-grey">Total</span>
-                <span className="mt-0.5 text-lg font-extrabold text-foreground">€{tripTotal.toLocaleString()}</span>
+            {/* Footer (pinned to the card bottom with `mt-auto`): a thin divider,
+                then the total stacked on the LEFT and the two booking actions
+                grouped together on the RIGHT — Personalize as a quiet text
+                button beside the primary checkout CTA. Stacks on mobile. */}
+            {/* Even 16px on both sides of the divider: above = the column's
+                gap-3 (12px) topped up by mt-1 (4px); below = pt-4 (16px). Done
+                this way (rather than bumping the column gap) so the title↔info
+                spacing above stays unchanged. */}
+            <div className="mt-1 pt-4 border-t border-border flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              {/* LEFT — total label with the amount beneath it. */}
+              <div className="flex flex-col leading-tight">
+                <span className="text-sm font-bold text-foreground">Total</span>
+                <span className="mt-1 text-2xl font-extrabold text-foreground">{tripTotal.toLocaleString()} €</span>
               </div>
-              {/* Primary CTA only — the secondary "personalize" action lives as a
-                  quieter link below, so checkout stays the clear focus here. */}
-              <Button size="lg" onClick={onProceedToCheckout}>
-                Proceed to checkout
-                <ChevronRight size={18} aria-hidden="true" />
-              </Button>
+              {/* RIGHT — actions grouped: Personalize (text button) + primary CTA. */}
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" className="text-primary hover:text-primary" onClick={onPersonalize}>
+                  <Pencil size={16} aria-hidden="true" />
+                  <span className="hidden sm:inline">Personalize this package</span>
+                  <span className="sm:hidden">Personalize</span>
+                </Button>
+                <Button onClick={onProceedToCheckout}>
+                  Proceed to checkout
+                  <ChevronRight size={18} aria-hidden="true" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -377,34 +414,21 @@ export default function StopoverBookingSummaryPage({
           the viewport, the IntersectionObserver reveals the sticky bottom bar. */}
       <div ref={heroSentinelRef} aria-hidden className="h-0 w-0" />
 
-      {/* ── INTRO — confirm-step heading, with the secondary "personalize"
-          action on the right of the same row (checkout stays the hero focus). */}
+      {/* ── INTRO — confirm-step heading. The "personalize" action now lives in
+          the hero card beside the checkout CTA, so this row is just the
+          heading + a short instruction. */}
       <PageContainer tier="narrow" className="px-4 md:px-6 pt-8">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <h2 className="text-2xl font-extrabold text-foreground">Review your trip</h2>
-            <p className="text-sm text-foreground">
-              Check the details below — when everything looks right, proceed to checkout.
-            </p>
-          </div>
-          {/* Secondary action — a quiet link (not a bordered button), for
-              travellers who'd rather keep building (activities, transfers…) in
-              the Smart Planner before paying. */}
-          <Button
-            variant="link"
-            onClick={onPersonalize}
-            className="shrink-0 h-auto p-0 mt-1 font-semibold"
-          >
-            <Pencil size={14} aria-hidden="true" />
-            <span className="hidden sm:inline">Personalize this package</span>
-            <span className="sm:hidden">Personalize</span>
-          </Button>
+        <div className="flex flex-col gap-1">
+          <h2 className="text-2xl font-extrabold text-foreground">Review your trip</h2>
+          <p className="text-sm text-foreground">
+            Check the details below — when everything looks right, proceed to checkout.
+          </p>
         </div>
       </PageContainer>
 
       {/* ── FLIGHTS ────────────────────────────────────────────────────────── */}
       <PageContainer tier="narrow" className="px-4 md:px-6 pt-6 flex flex-col gap-3">
-        <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-grey">
+        <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-foreground">
           <Plane size={15} className="text-primary shrink-0" aria-hidden="true" />
           Your flights
         </h3>
@@ -415,31 +439,44 @@ export default function StopoverBookingSummaryPage({
 
       {/* ── HOTEL + CHOSEN ROOM(S) ─────────────────────────────────────────── */}
       <PageContainer tier="narrow" className="px-4 md:px-6 pt-8 flex flex-col gap-3">
-        <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-grey">
+        <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-foreground">
           <Bed size={15} className="text-primary shrink-0" aria-hidden="true" />
           Your stopover stay
         </h3>
         <div className="bg-card rounded-xl border border-border p-4 flex flex-col gap-4">
-          {/* Hotel header */}
+          {/* Hotel header — small picture first (unchanged). Beside it: the
+              name + stars and dates · location on the LEFT, and the TrustYou
+              score + reviews pushed to the RIGHT (`justify-between`) so the row
+              reads balanced rather than everything bunched left. */}
           <div className="flex items-center gap-4">
             <div className="size-20 shrink-0 overflow-hidden rounded-lg">
               <ImageWithPlaceholder src={hotel.image} alt={hotel.name} containerClassName="w-full h-full" />
             </div>
-            <div className="flex flex-col gap-1 min-w-0 flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h4 className="text-lg font-extrabold text-foreground truncate">{hotel.name}</h4>
-                <AccommodationStar rating={hotel.stars} offerName={hotel.name} offerId={hotel.id} size={14} />
+            <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
+              {/* LEFT — name + stars, then dates · location. */}
+              <div className="flex flex-col gap-1.5 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="text-lg font-extrabold text-foreground truncate">{hotel.name}</h4>
+                  <AccommodationStar rating={hotel.stars} offerName={hotel.name} offerId={hotel.id} size={14} />
+                </div>
+                {/* Dates · location — icons + text in our foreground (black),
+                    split by a thin divider (same idiom as the hero info row). */}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-foreground">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar size={14} className="text-foreground shrink-0" aria-hidden="true" />
+                    Check-in {format(firstLegDate, "d MMM yyyy")} · {nights} night{nights !== 1 ? "s" : ""}
+                  </span>
+                  <span aria-hidden className="w-px h-4 bg-border" />
+                  <span className="flex items-center gap-1.5">
+                    <MapPin size={14} className="text-foreground shrink-0" aria-hidden="true" />
+                    {city}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-2 flex-wrap text-sm text-foreground">
+              {/* RIGHT — TrustYou score + reviews, pushed right for balance. */}
+              <div className="shrink-0">
                 <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
-                <span className="flex items-center gap-1 text-grey">
-                  <MapPin size={13} className="shrink-0" aria-hidden="true" />
-                  {city}
-                </span>
               </div>
-              <span className="text-sm text-grey">
-                Check-in {format(firstLegDate, "d MMM yyyy")} · {nights} night{nights !== 1 ? "s" : ""}
-              </span>
             </div>
           </div>
 
@@ -464,11 +501,11 @@ export default function StopoverBookingSummaryPage({
         endDate={lastLegDate}
         adults={totalGuests}
         nights={tripNights}
-        totalPriceLabel={`€${tripTotal.toLocaleString()}`}
+        totalPriceLabel={`${tripTotal.toLocaleString()} €`}
         items={summaryItems}
         priceBreakdown={priceBreakdown}
         // PRIMARY — proceed to checkout (placeholder for now).
-        actionLabel={`Proceed to checkout · €${tripTotal.toLocaleString()}`}
+        actionLabel={`Proceed to checkout · ${tripTotal.toLocaleString()} €`}
         actionIcon={<ChevronRight size={16} aria-hidden="true" />}
         onAction={onProceedToCheckout}
         // SECONDARY — back into the Smart Planner to personalize the package.

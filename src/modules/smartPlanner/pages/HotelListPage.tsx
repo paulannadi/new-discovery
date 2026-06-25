@@ -452,6 +452,10 @@ type HotelListPageProps = {
   // render something else in the header instead — here, the flight stepper.
   hideSearch?: boolean;
   headerSlot?: React.ReactNode;
+  // The collapsed search-criteria row, rendered inside the white header strip
+  // (under the back button) on the stopover step, so it's an integral part of
+  // the header — matching the flight results step.
+  searchSummarySlot?: React.ReactNode;
   // Number of stopover nights — used in the stopover-step title subtitle
   // ("2 nights in Dubai"). The city comes from `initialLocation`.
   stopoverNights?: number;
@@ -469,6 +473,7 @@ export default function HotelListPage({
   initialRooms,
   hideSearch = false,
   headerSlot,
+  searchSummarySlot,
   stopoverNights,
   stopoverPackageFloor = 0,
 }: HotelListPageProps) {
@@ -1073,15 +1078,21 @@ export default function HotelListPage({
         <PageContainer tier={containerTier} className="px-4 md:px-6 py-4">
 
           {/* Back to Discovery — always visible, including on mobile.
-              No bottom margin on the stopover step since nothing follows it
-              inside this white strip. */}
+              Keeps its bottom margin whenever something follows it inside this
+              white strip: the search summary below it (full-search mode) OR the
+              collapsed criteria on the stopover step. Only when the stopover
+              step has no summary does the margin drop (nothing follows). */}
           {onBackToSearch && (
             <BackButton
               label="Back to discovery"
               onClick={onBackToSearch}
-              className={hideSearch ? undefined : "mb-3"}
+              className={hideSearch && !searchSummarySlot ? undefined : "mb-3"}
             />
           )}
+
+          {/* Stopover step: the collapsed search criteria sit here in the white
+              header (under the back button), matching the flight results step. */}
+          {hideSearch && searchSummarySlot}
 
           {/* Mobile Read-Only View — hidden on the stopover step (no search).
               Now uses the shared <SearchSummary> so it matches the flight

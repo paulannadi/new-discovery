@@ -19,12 +19,29 @@ import type { FlightSearchCriteria } from "../../../../App";
 
 type FlightTripSummaryProps = {
   criteria: FlightSearchCriteria;
-  onEditSearch: () => void;
+  // Optional: when omitted, the row is purely read-only (no "Edit search"
+  // button). The flight results page passes this to toggle the search form;
+  // the later stopover-flow steps leave it out so the criteria just shows as
+  // an at-a-glance recap.
+  onEditSearch?: () => void;
 };
 
 export function FlightTripSummary({ criteria, onEditSearch }: FlightTripSummaryProps) {
   const isRoundTrip = criteria.tripType === "roundtrip";
-  const tripTypeLabel = isRoundTrip ? "Round trip" : "Multi-city";
+
+  // A stopover is "active" either when the round-trip opted into one
+  // (`stopover.enabled`) or when the search came from the dedicated Stopover
+  // tab (`stopoverOnly`). Both imply a round trip, so when either is set we
+  // show the fuller "Round trip with stopover" headline. This is what makes
+  // the flight results page say it once a stopover is chosen — and, because
+  // every step of the stopover flow carries one of these flags, those steps
+  // always show it too.
+  const hasStopover = Boolean(criteria.stopover?.enabled || criteria.stopoverOnly);
+  const tripTypeLabel = hasStopover
+    ? "Round trip with stopover"
+    : isRoundTrip
+      ? "Round trip"
+      : "Multi-city";
 
   // ── Legs count ───────────────────────────────────────────────────────
   const legCount = criteria.legs.length;

@@ -5046,6 +5046,233 @@ export const LAKE_GARDA_BUS_TOUR: Tour = {
   ],
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// BALTIC_SPA_BUS_TOUR — a second coach (bus) tour, modelled on LAKE_GARDA_BUS_TOUR
+// above. Content is translated from the German spa-holiday listing for the
+// Hotel Medical SPA Unitral in Mielno on the Polish Baltic coast (kuren.de).
+//
+// Unlike Lake Garda (a sightseeing trip with a real day-by-day plan), this is a
+// medical "Kur" cure week: you stay put at one spa hotel and follow a treatment
+// plan. So instead of a granular daily schedule, the `days` array is a short
+// 3-phase PACKAGE OUTLINE (Arrival → cure week → Departure), and the real
+// substance lives in `highlights`, `attributes`, and `included`/`excluded`.
+//
+// `departurePoints` is set, so TourDetailPage automatically swaps the booking
+// widget's "Hotel preference" dropdown for a "Departure point" selector.
+// ─────────────────────────────────────────────────────────────────────────────
+export const BALTIC_SPA_BUS_TOUR: Tour = {
+  tourId: "baltic-coast-medical-spa-mielno",
+  title: "Polish Baltic Coast – Medical Spa Cure in Mielno",
+  subtitle: "8-day medical-cure coach holiday at the Hotel Medical SPA Unitral on Poland's Baltic coast.",
+  tripType: "group-tour",
+  duration: 8, // 8 days / 7 nights — the weekly "Volkskuren" coach package
+  locationsLabel: "Mielno · Polish Baltic Coast",
+  highlights: [
+    "Doctor-supervised cure with a personal treatment plan",
+    "Therapeutic Dead Sea salt pool & salt grotto",
+    "Sauna world, indoor pool & steam bath",
+    "180 m from the Baltic Sea beach",
+    "4★ Hotel Medical SPA Unitral",
+  ],
+  // A calm, soft-light sandy beach at sunset — reads as the serene northern
+  // seaside the cure is built around. Used as the SmartPlanner hero.
+  mainImage: "https://images.unsplash.com/photo-1473116763249-2faaef81ccda?w=1600&q=80",
+  price: {
+    perPerson: 499,
+    total: 998,
+    currency: "EUR",
+    paidBefore: 499,
+    // Local Kurtaxe (tourism tax) ≈ €2/night × 7 nights, paid at the hotel
+    paidAtDestination: 14,
+    // "Individual" option: flexible date + private door-to-door pickup
+    individualPerPerson: 599,
+  },
+  startDate: "Oct 3, 2026",
+  endDate: "Oct 10, 2026",
+  adults: 2,
+  destinationCodes: ["POLAND"],
+  // Northern German pickup points — fits a Germany → Baltic-Poland coach route
+  // (vs Lake Garda's southern Freiburg / Kirchzarten / Lörrach).
+  departurePoints: ["Hannover", "Berlin", "Hamburg"],
+  // Offer the coach (Saturdays) vs individual (any date + own address) choice.
+  flexibleTravelOptions: true,
+  // Coach operator for this tour — shown on the itinerary transfer cards.
+  operator: { name: "MediKur Reisen", tagline: "Gute Kuren und Erholung günstig!" },
+
+  // ── Quick-fact attribute chips ────────────────────────────────────────────
+  attributes: [
+    { iconKey: "users",          title: "Group size",    value: "Group tour · max 40 guests" },
+    { iconKey: "activity",       title: "Travel by",     value: "Coach from Germany" },
+    { iconKey: "car",            title: "Transfer",      value: "Door-to-door" },
+    { iconKey: "languages",      title: "Tour language", value: "German-speaking guide" },
+    { iconKey: "calendar-check", title: "Travel dates",  value: "Oct 3–10, 2026" },
+  ],
+
+  // ── Photo gallery ─────────────────────────────────────────────────────────
+  // Baltic coast + the hotel's spa & treatment world.
+  gallery: [
+    "https://images.unsplash.com/photo-1473116763249-2faaef81ccda?w=800&q=80", // Baltic beach at sunset
+    "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&q=80", // Spa pool
+    "https://images.unsplash.com/photo-1583416750470-965b2707b355?w=800&q=80", // Sauna
+    "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80", // Wellness / spa treatment
+    "https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=800&q=80", // Hot-stone massage
+    "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?w=800&q=80", // Baltic Sea waves
+  ],
+
+  // ── Package outline (not a granular day-by-day) ───────────────────────────
+  // Three phases that describe what the cure week looks like.
+  days: [
+    {
+      dayNumber: 1,
+      title: "Arrival & medical consultation",
+      location: "Germany → Mielno",
+      items: [
+        {
+          type: "transport",
+          label: "Coach departure from Germany",
+          description: "Morning pickup from Hannover, Berlin, or Hamburg. Comfortable coach journey to the Polish Baltic coast.",
+        },
+        {
+          type: "highlight",
+          label: "Doctor's consultation & personal treatment plan",
+          description: "After check-in, meet the spa doctor for an initial consultation. Together you set a personal treatment plan for the week, tailored to your needs.",
+        },
+        {
+          type: "hotel",
+          label: "Hotel Medical SPA Unitral **** or similar",
+        },
+      ],
+      image: "https://images.unsplash.com/photo-1519449556851-5720b33024e7?w=800&q=80",
+    },
+    {
+      dayNumber: 2,
+      title: "Days 2–7 · Your cure & wellness week",
+      location: "Mielno",
+      items: [
+        {
+          type: "highlight",
+          label: "Daily cure treatments",
+          description: "Each day follows your personal plan: inhalation, massages, magnetic, light & oxygen therapy, underwater massage, and therapeutic baths under medical supervision.",
+        },
+        {
+          type: "highlight",
+          label: "Free use of the spa & salt world",
+          description: "Between treatments, enjoy the indoor pool, the warm Dead Sea salt pool, the salt grotto, saunas, and the steam bath at your own pace.",
+        },
+        {
+          type: "highlight",
+          label: "Beach & seaside walks",
+          description: "The beach is just 180 m away — time for restful walks along the Baltic shore and the seaside resort of Mielno.",
+        },
+        {
+          type: "hotel",
+          label: "Hotel Medical SPA Unitral **** or similar",
+        },
+      ],
+      image: "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&q=80",
+    },
+    {
+      dayNumber: 8,
+      title: "Departure",
+      location: "Mielno → Germany",
+      items: [
+        {
+          type: "highlight",
+          label: "Breakfast & checkout",
+          description: "Enjoy a final breakfast buffet before checking out.",
+        },
+        {
+          type: "transport",
+          label: "Coach return to Germany",
+          description: "Comfortable return journey to your original pickup point.",
+        },
+      ],
+      image: "https://images.unsplash.com/photo-1473116763249-2faaef81ccda?w=800&q=80",
+    },
+  ],
+
+  // ── Included / Excluded ───────────────────────────────────────────────────
+  included: [
+    "Return coach travel from Hannover, Berlin, or Hamburg",
+    "Door-to-door transfer",
+    "7 nights at the 4★ Hotel Medical SPA Unitral with half board (breakfast & dinner buffet)",
+    "Therapeutic doctor's consultation on arrival",
+    "Daily cure treatments according to your personal plan",
+    "Unlimited spa access: indoor pool, Dead Sea salt pool, salt grotto, saunas & steam bath",
+    "WiFi throughout the hotel",
+    "German-speaking tour leader",
+  ],
+  excluded: [
+    "Local Kurtaxe / tourism tax (paid at the hotel)",
+    "Premium & à-la-carte massage packages",
+    "Individual fitness training",
+    "Parking and pet fees",
+    "Lunches",
+    "Travel insurance",
+  ],
+
+  // ── TourCard fields (route breadcrumb) ───────────────────────────────────
+  // Single base hotel in Mielno; the "activities" carry the package detail.
+  stops: [
+    {
+      destinationName: "Mielno",
+      dateRange: "Oct 03 – 10",
+      nights: 7,
+      description: "A seaside cure resort on Poland's Baltic coast, with the Hotel Medical SPA Unitral set just 180 m from the beach.",
+      accommodation: {
+        hotelName: "Hotel Medical SPA Unitral",
+        stars: 4,
+        image: "https://images.unsplash.com/photo-1519449556851-5720b33024e7?w=400&q=80",
+        checkIn: "Oct 03", checkOut: "Oct 10",
+        checkInISO: "2026-10-03", checkOutISO: "2026-10-10",
+        roomType: "SPA Double Room", boardType: "Half board",
+        roomAmenities: [
+          { iconKey: "bed",     label: "Double bed" },
+          { iconKey: "view",    label: "Sea or garden view" },
+          { iconKey: "ac",      label: "Air conditioning" },
+          { iconKey: "wifi",    label: "Free WiFi" },
+          { iconKey: "spa",     label: "Direct access to the spa & salt world" },
+          { iconKey: "bath",    label: "Bathrobe & slippers" },
+          { iconKey: "minibar", label: "Mini-fridge & safe" },
+          { iconKey: "tv",      label: "Flat-screen TV" },
+        ],
+      },
+      activities: [
+        {
+          date: "Daily",
+          name: "Medical cure programme",
+          description: "Doctor-supervised treatments tailored to you — inhalation, massages, magnetic, light & oxygen therapy, underwater massage, and therapeutic baths.",
+          image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&q=80",
+        },
+        {
+          date: "Daily",
+          name: "Salt & sauna world",
+          description: "Free use of the indoor pool, the warm Dead Sea salt pool, the salt grotto, saunas, and the steam bath throughout your stay.",
+          image: "https://images.unsplash.com/photo-1583416750470-965b2707b355?w=400&q=80",
+        },
+      ],
+      lat: 54.2611,
+      lng: 16.0625,
+    },
+  ],
+  transfers: [
+    {
+      from: "Germany",
+      to: "Mielno",
+      date: "Oct 03, Coach Transfer",
+      mode: "Coach",
+      description: "Modern coach from Hannover / Berlin / Hamburg to the Polish Baltic coast",
+    },
+    {
+      from: "Mielno",
+      to: "Germany",
+      date: "Oct 10, Coach Transfer",
+      mode: "Coach",
+      description: "Return coach to your original pickup point",
+    },
+  ],
+};
+
 // Maps a Discovery TourCardData.id to a Tour object.
 // Every card now points to its own unique tour (except 13/14/15 which are v2 copies).
 export const DISCOVERY_TOUR_MAP: Record<number, Tour> = {
@@ -5071,4 +5298,5 @@ export const DISCOVERY_TOUR_MAP: Record<number, Tour> = {
   20: MOROCCO_SAHARA_TOUR,     // Sahara & Kasbahs
   21: MOROCCO_COASTAL_TOUR,    // Coastal Morocco
   22: LAKE_GARDA_BUS_TOUR,     // Lake Garda Wine Festival Bus Tour
+  23: BALTIC_SPA_BUS_TOUR,     // Mielno Medical Spa Cure Bus Tour
 };

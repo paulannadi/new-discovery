@@ -29,6 +29,18 @@ import {
   Minus,
   X,
   LayoutGrid,
+  // Room-details section: board pill + room-amenity icons
+  UtensilsCrossed,
+  BedDouble,
+  Eye,
+  Wifi,
+  AirVent,
+  Bath,
+  Waves,
+  Tv,
+  Refrigerator,
+  Pencil,
+  Car,
 } from "lucide-react";
 // Shared design-system calendar (token-based colors). Aliased to DateCalendar
 // because lucide's <Calendar> icon is already imported above under that name.
@@ -44,7 +56,10 @@ import {
   DialogTitle,
 } from "../../../shared/components/ui/dialog";
 import { cn } from "../../../shared/components/ui/utils";
-import type { Tour, TourAttribute } from "../../../types";
+import type { Tour, TourAttribute, TourStop, RoomAmenity } from "../../../types";
+// Shared star renderer used across the package/stopover flow — reused here so
+// the Room section's hotel rating looks identical to the rest of the product.
+import AccommodationStar from "../../../shared/components/AccommodationStar";
 // Shared section components — extracted from TourDetailPage so ActivityDetailPage
 // can render the same day-by-day accordion, info lists, and route map.
 import { DayByDaySection } from "../components/DayByDaySection";
@@ -68,7 +83,195 @@ function AttributeIcon({ iconKey, size = 15 }: { iconKey: TourAttribute["iconKey
   if (iconKey === "languages")      return <Languages size={size} className={cls} aria-hidden="true" />;
   if (iconKey === "activity")       return <Activity size={size} className={cls} aria-hidden="true" />;
   if (iconKey === "calendar-check") return <CalendarCheck size={size} className={cls} aria-hidden="true" />;
+  if (iconKey === "car")            return <Car size={size} className={cls} aria-hidden="true" />;
   return null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TravelModeToggle — segmented control to switch the booking widget between the
+// group "By coach" option and the flexible "Individual" option. Shown only on
+// coach tours (those with departurePoints).
+// ─────────────────────────────────────────────────────────────────────────────
+function TravelModeToggle({
+  mode,
+  onChange,
+}: {
+  mode: "coach" | "individual";
+  onChange: (m: "coach" | "individual") => void;
+}) {
+  const options: { key: "coach" | "individual"; label: string }[] = [
+    { key: "coach",      label: "By coach" },
+    { key: "individual", label: "Individual" },
+  ];
+  return (
+    <div className="grid grid-cols-2 gap-1 p-1 rounded-lg bg-muted">
+      {options.map((o) => (
+        <button
+          key={o.key}
+          type="button"
+          onClick={() => onChange(o.key)}
+          aria-pressed={mode === o.key}
+          className={cn(
+            "flex items-center justify-center gap-1.5 h-9 rounded-md text-xs font-bold transition-colors cursor-pointer",
+            mode === o.key ? "bg-card text-primary shadow-sm" : "text-grey hover:text-foreground"
+          )}
+        >
+          {o.key === "coach"
+            ? <Bus size={14} aria-hidden="true" />
+            : <Car size={14} aria-hidden="true" />}
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AddressField — free-text pickup-address input used by the "Individual" travel
+// option in place of the departure-point dropdown. Styled to match the other
+// 48px booking fields (it's an <input>, so there's no panel to open).
+// ─────────────────────────────────────────────────────────────────────────────
+function AddressField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="h-[48px] rounded-lg border border-border bg-card px-4 flex items-center gap-3 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+      <MapPin size={16} className="text-primary shrink-0" aria-hidden="true" />
+      <div className="flex flex-col flex-1 min-w-0">
+        <label className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+          Pickup address
+        </label>
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Enter your full address"
+          className="text-xs font-semibold text-foreground bg-transparent outline-none placeholder:text-grey placeholder:font-normal"
+        />
+      </div>
+    </div>
+  );
+}
+
+// Maps a RoomAmenity.iconKey to its lucide icon. Unknown keys fall back to a
+// neutral check so the card never breaks on unexpected data.
+function RoomAmenityIcon({ iconKey }: { iconKey: RoomAmenity["iconKey"] }) {
+  const cls = "text-muted-foreground shrink-0";
+  const size = 17;
+  switch (iconKey) {
+    case "bed":     return <BedDouble size={size} className={cls} aria-hidden="true" />;
+    case "view":    return <Eye size={size} className={cls} aria-hidden="true" />;
+    case "ac":      return <AirVent size={size} className={cls} aria-hidden="true" />;
+    case "wifi":    return <Wifi size={size} className={cls} aria-hidden="true" />;
+    case "bath":    return <Bath size={size} className={cls} aria-hidden="true" />;
+    case "spa":     return <Waves size={size} className={cls} aria-hidden="true" />;
+    case "tv":      return <Tv size={size} className={cls} aria-hidden="true" />;
+    case "minibar": return <Refrigerator size={size} className={cls} aria-hidden="true" />;
+    default:        return <Check size={size} className={cls} aria-hidden="true" />;
+  }
+}
+
+// Sensible default amenities for tours whose accommodation doesn't list its own.
+const DEFAULT_ROOM_AMENITIES: RoomAmenity[] = [
+  { iconKey: "bed",  label: "Double bed" },
+  { iconKey: "ac",   label: "Air conditioning" },
+  { iconKey: "wifi", label: "Free WiFi" },
+  { iconKey: "bath", label: "Private bathroom" },
+];
+
+// How many amenities to show before the "Show all room facilities" toggle.
+const AMENITY_PREVIEW_COUNT = 4;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RoomDetailsCard — a READ-ONLY room card for the Accommodation section.
+//
+// Recreates the product's "Selected room" card: a photo on the left, then the
+// room name, a small hotel + star line, board & occupancy pills, and an icon'd
+// amenity list with a "Show all room facilities" toggle. No booking controls,
+// since the room is part of the fixed tour package.
+//
+// `sleeps` comes from the tour's party size; `slug` builds a stable placeholder
+// image when a stop has no accommodation photo.
+// ─────────────────────────────────────────────────────────────────────────────
+function RoomDetailsCard({ stop, sleeps, slug }: { stop: TourStop; sleeps: number; slug: string }) {
+  const acc = stop.accommodation;
+  const [showAll, setShowAll] = useState(false);
+
+  // Fall back to a deterministic placeholder so the layout stays stable even
+  // if a stop hasn't been given its own room photo.
+  const roomImage =
+    acc.image ?? `https://picsum.photos/seed/${slug}-${stop.destinationName}-room/600/400`;
+
+  const amenities = acc.roomAmenities ?? DEFAULT_ROOM_AMENITIES;
+  const hasMore = amenities.length > AMENITY_PREVIEW_COUNT;
+  const visible = showAll ? amenities : amenities.slice(0, AMENITY_PREVIEW_COUNT);
+
+  return (
+    <div className="bg-card rounded-xl overflow-hidden flex flex-col sm:flex-row shadow-sm border border-border">
+      {/* Room photo — left column on desktop, full-width banner on mobile */}
+      <div className="relative bg-muted shrink-0 aspect-[4/3] sm:aspect-auto sm:w-[280px]">
+        <ImageWithPlaceholder
+          src={roomImage}
+          alt={acc.roomType}
+          containerClassName="absolute inset-0 w-full h-full"
+        />
+      </div>
+
+      {/* Content */}
+      <div className="p-5 flex flex-col gap-4 flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-1 min-w-0">
+            <h4 className="text-foreground font-bold text-xl leading-tight">{acc.roomType}</h4>
+            {/* Small hotel + stars line keeps the tour context (which hotel, where) */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">{acc.hotelName}</span>
+              <AccommodationStar rating={acc.stars} offerName={acc.hotelName} size={13} />
+              <span>· {stop.destinationName}</span>
+            </div>
+          </div>
+          {/* Change room — matches the reference card's edit affordance. */}
+          <button
+            type="button"
+            className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-primary hover:underline cursor-pointer"
+          >
+            <Pencil size={15} aria-hidden="true" />
+            Change room
+          </button>
+        </div>
+
+        {/* Pills — board type + occupancy */}
+        <div className="flex flex-wrap gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm text-foreground">
+            <UtensilsCrossed size={15} aria-hidden="true" />
+            {acc.boardType}
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm text-foreground">
+            <Users size={15} aria-hidden="true" />
+            {sleeps} {sleeps === 1 ? "guest" : "guests"}
+          </span>
+        </div>
+
+        {/* Amenity list */}
+        <ul className="flex flex-col gap-2.5">
+          {visible.map((a, i) => (
+            <li key={`${a.iconKey}-${i}`} className="flex items-center gap-2.5 text-foreground">
+              <RoomAmenityIcon iconKey={a.iconKey} />
+              <span className="text-sm">{a.label}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* Show all / show fewer toggle — only when there are extra amenities */}
+        {hasMore && (
+          <button
+            type="button"
+            onClick={() => setShowAll((v) => !v)}
+            className="self-start text-sm font-semibold text-primary hover:underline cursor-pointer"
+          >
+            {showAll ? "Show fewer facilities" : "Show all room facilities"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }
 
 // ── Props ────────────────────────────────────────────────────────────────────
@@ -84,8 +287,8 @@ interface TourDetailPageProps {
 // Each section on the page has a stable id. The id is what the sticky
 // nav links to (#overview, #itinerary, etc) and what the IntersectionObserver
 // reports back when a section scrolls into the active band.
-type SectionId = "overview" | "itinerary" | "highlights" | "included" | "excluded";
-const SECTION_IDS: SectionId[] = ["overview", "itinerary", "highlights", "included", "excluded"];
+type SectionId = "overview" | "itinerary" | "room" | "highlights" | "included" | "excluded";
+const SECTION_IDS: SectionId[] = ["overview", "itinerary", "room", "highlights", "included", "excluded"];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Component
@@ -116,6 +319,26 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
     ? (tour.departurePoints as string[])
     : ["Standard", "Superior", "Deluxe", "Luxury"];
   const [hotelPreference, setHotelPreference] = useState(preferenceOptions[0]);
+
+  // ── Travel mode (coach tours only) ──────────────────────────────────────
+  // "coach"      → join the group coach; departures run every Saturday and the
+  //                traveller picks a departure point from the dropdown.
+  // "individual" → travel on any date; instead of a departure point the
+  //                traveller enters their own address for door-to-door pickup,
+  //                and the per-person price uses the individual rate.
+  type TravelMode = "coach" | "individual";
+  const [travelMode, setTravelMode] = useState<TravelMode>("coach");
+  const [pickupAddress, setPickupAddress] = useState("");
+
+  // Switch travel mode, closing any open panel. When switching to coach we drop
+  // a previously-chosen non-Saturday date so the date field stays valid.
+  const handleTravelModeChange = (mode: TravelMode) => {
+    setTravelMode(mode);
+    setOpenPanel(null);
+    if (mode === "coach" && selectedDate && selectedDate.getDay() !== 6) {
+      setSelectedDate(undefined);
+    }
+  };
 
   // Mobile bottom sheet — controls whether the booking fields are visible
   // on small screens. When closed, only the price + CTA show.
@@ -195,7 +418,32 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
   }, []);
 
   const currency = sym(tour.price.currency);
-  const totalPrice = tour.price.perPerson * adults;
+
+  // Only coach tours that opt in (flexibleTravelOptions) get the coach-vs-individual
+  // choice. Other coach tours (e.g. Lake Garda) keep their original single behaviour.
+  const showTravelModes = isDepartureMode && !!tour.flexibleTravelOptions;
+
+  // Per-person price depends on travel mode: the individual option carries its
+  // own rate (when the tour provides one); otherwise it's the standard rate.
+  const perPerson =
+    showTravelModes && travelMode === "individual"
+      ? (tour.price.individualPerPerson ?? tour.price.perPerson)
+      : tour.price.perPerson;
+  const totalPrice = perPerson * adults;
+
+  // Coach departures run every Saturday (getDay() === 6). The individual option
+  // (and all other tours) can start on any future date.
+  const dateDisabled =
+    showTravelModes && travelMode === "coach"
+      ? [{ before: new Date() }, (date: Date) => date.getDay() !== 6]
+      : { before: new Date() };
+
+  // What we hand to onBook as the "preference": a pickup address for the
+  // individual option, otherwise the chosen departure point / hotel preference.
+  const bookingPreference =
+    showTravelModes && travelMode === "individual"
+      ? (pickupAddress || "Address to be confirmed")
+      : hotelPreference;
 
   // Use the tour's real images (mainImage + gallery) instead of random picsum seeds.
   // This way each tour shows photos actually relevant to its destination.
@@ -382,6 +630,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   const labels: Record<SectionId, string> = {
                     overview:   "Overview",
                     itinerary:  "Itinerary",
+                    room:       "Accommodation",
                     highlights: "Highlights",
                     included:   "Included",
                     excluded:   "Excluded",
@@ -501,6 +750,31 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                 <DayByDaySection days={tour.days} slug={slug} />
               </section>
 
+              {/* Accommodation — read-only room details, one card per stop.
+                  Mirrors the package room card's visual language (photo + spec
+                  lines + hotel/stars) but without the booking controls, since
+                  the room is already part of the fixed tour package. */}
+              <section
+                id="room"
+                ref={(el) => { sectionRefs.current.room = el; }}
+                className="scroll-mt-[120px] flex flex-col gap-6"
+              >
+                <h3 className="text-xl font-bold text-foreground">
+                  Where you'll stay
+                </h3>
+                {/* Wide horizontal cards stacked vertically — one per stop hotel. */}
+                <div className="flex flex-col gap-4">
+                  {tour.stops.map((stop, i) => (
+                    <RoomDetailsCard
+                      key={`${stop.destinationName}-${i}`}
+                      stop={stop}
+                      sleeps={tour.adults}
+                      slug={slug}
+                    />
+                  ))}
+                </div>
+              </section>
+
               {/* Highlights */}
               <section
                 id="highlights"
@@ -564,7 +838,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               <div className="px-5 pt-5 pb-5 border-b border-border">
                 <div className="flex flex-col items-end text-right">
                   {/* Small grey label: per-person rate + tour length */}
-                  <span className="text-grey text-xs">{currency}{tour.price.perPerson.toLocaleString()} per person · {tour.duration}-day guided tour</span>
+                  <span className="text-grey text-xs">{currency}{perPerson.toLocaleString()} per person · {tour.duration}-day guided tour</span>
                   {/* Big bold total — same as hotel page */}
                   <span className="text-foreground font-bold text-2xl">Total for {adults} {adults === 1 ? "adult" : "adults"}: {currency}{totalPrice.toLocaleString()}</span>
                 </div>
@@ -579,6 +853,11 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                 <p className="text-xs font-bold text-grey uppercase tracking-wide mb-1">
                   Customise your trip
                 </p>
+
+                {/* ── Travel option — coach (Saturdays) vs individual (any date) ── */}
+                {showTravelModes && (
+                  <TravelModeToggle mode={travelMode} onChange={handleTravelModeChange} />
+                )}
 
                 {/* ── Travel date — DayPicker panel (same as PackageSearchForm) ── */}
                 <div className="relative">
@@ -615,7 +894,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                           setSelectedDate(date);
                           setOpenPanel(null); // close after selecting
                         }}
-                        disabled={{ before: new Date() }}
+                        disabled={dateDisabled}
                         numberOfMonths={1}
                         className="p-0"
                       />
@@ -689,7 +968,10 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   )}
                 </div>
 
-                {/* ── Hotel preference (or Departure point for coach tours) ── */}
+                {/* ── Pickup address (individual) OR Departure point / Hotel preference ── */}
+                {showTravelModes && travelMode === "individual" ? (
+                  <AddressField value={pickupAddress} onChange={setPickupAddress} />
+                ) : (
                 <div className="relative">
                   <button
                     onClick={() => setOpenPanel(openPanel === "hotel" ? null : "hotel")}
@@ -729,13 +1011,14 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                     </div>
                   )}
                 </div>
+                )}
 
               </div>
 
               {/* ── CTA button — same as PackageDetailPage sidebar CTA ── */}
               <div className="px-5 pb-5">
                 <button
-                  onClick={() => onBook(tour, travelDate, adults, hotelPreference)}
+                  onClick={() => onBook(tour, travelDate, adults, bookingPreference)}
                   className="w-full bg-primary hover:brightness-85 text-white font-bold text-base py-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
                   Start planning
@@ -785,7 +1068,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
           <div className="flex flex-col flex-1 min-w-0">
             {/* Small grey label */}
             <span className="text-grey text-xs">
-              {currency}{tour.price.perPerson.toLocaleString()} per person
+              {currency}{perPerson.toLocaleString()} per person
             </span>
             {/* Bold total */}
             <span className="text-foreground font-bold text-base">
@@ -826,6 +1109,11 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               Customise your trip
             </p>
 
+            {/* ── Travel option — coach (Saturdays) vs individual (any date) ── */}
+            {showTravelModes && (
+              <TravelModeToggle mode={travelMode} onChange={handleTravelModeChange} />
+            )}
+
             {/* ── Travel date ── */}
             <div className="relative">
               <button
@@ -857,7 +1145,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                       setSelectedDate(date);
                       setOpenPanel(null);
                     }}
-                    disabled={{ before: new Date() }}
+                    disabled={dateDisabled}
                     numberOfMonths={1}
                     className="p-0"
                   />
@@ -930,6 +1218,9 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
             </div>
 
             {/* ── Hotel preference (or Departure point for coach tours) ── */}
+            {showTravelModes && travelMode === "individual" ? (
+              <AddressField value={pickupAddress} onChange={setPickupAddress} />
+            ) : (
             <div className="relative">
               <button
                 onClick={() => setOpenPanel(openPanel === "hotel" ? null : "hotel")}
@@ -969,13 +1260,14 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                 </div>
               )}
             </div>
+            )}
 
           </div>
 
           {/* ── Primary CTA at the bottom of the expanded sheet ── */}
           <div className="px-5 pb-4 pt-2">
             <button
-              onClick={() => onBook(tour, travelDate, adults, hotelPreference)}
+              onClick={() => onBook(tour, travelDate, adults, bookingPreference)}
               className="w-full bg-primary hover:brightness-85 text-white font-bold text-sm py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               Start planning

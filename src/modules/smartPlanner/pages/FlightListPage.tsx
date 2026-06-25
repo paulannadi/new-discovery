@@ -22,7 +22,6 @@ import { PageContainer } from "../../../shared/components/PageContainer";
 import { Skeleton } from "../../../shared/components/ui/skeleton";
 import {
   StaggeredList,
-  StreamingStatusBanner,
 } from "../../../shared/components/loading";
 import { Button } from "../../../shared/components/ui/button";
 import type {
@@ -32,14 +31,13 @@ import type {
 } from "../../../App";
 
 // New flightSearch building blocks
-import { FlightTripSummary } from "../components/flightSearch/FlightTripSummary";
 import { FlightStepper } from "../components/flightSearch/FlightStepper";
 import { FlightFilterBar } from "../components/flightSearch/FlightFilterBar";
 import { FlightResultCard } from "../components/flightSearch/FlightResultCard";
-// FlightSearchForm — the SAME form used on the Discovery "Flights" tab. When
-// the user clicks "Edit search" it replaces the trip summary row in-place,
-// pre-filled with the current criteria.
-import { FlightSearchForm } from "../components/flightSearch/FlightSearchForm";
+// EditableFlightSearch — the collapsed trip summary that expands into the search
+// form in-place ("Edit search" reveals it, "Update search" re-runs it, a chevron
+// folds it back). Shared with every stopover-flow step.
+import { EditableFlightSearch } from "../components/flightSearch/EditableFlightSearch";
 // Banner that nudges the traveller to add a stopover when they didn't opt in.
 import { StopoverPromoBanner } from "../components/flightSearch/StopoverPromoBanner";
 import { getMockFlightsForLeg, getStopoverOffersForLeg, routeHasStopover } from "../components/flightSearch/mockFlights";
@@ -109,7 +107,6 @@ function FlightCardSkeleton() {
 export default function FlightListPage({
   searchCriteria,
   currentLegIndex,
-  selectedLegs,
   packageFloor,
   onFlightLegSelect,
   onSearchCriteriaChange,
@@ -119,11 +116,6 @@ export default function FlightListPage({
   // The selected stopover airline decides which carrier the flat flights are
   // filtered to when this page is in stopover-only mode (see `flights` below).
   const { settings } = useSettings();
-
-  // ── Edit Search inline-editor open state ───────────────────────────────
-  // When true, <FlightSearchForm> replaces <FlightTripSummary> in the
-  // same vertical spot on the page (no modal).
-  const [isEditingSearch, setIsEditingSearch] = useState(false);
 
   // ── Filters state — single object so resets are one line ──────────────
   const [filters, setFilters] = useState<FlightFilters>(DEFAULT_FILTERS);
@@ -138,26 +130,43 @@ export default function FlightListPage({
   // that with two phases (isSearching → cards arrive, then streaming
   // progress 1/3 → 2/3 → 3/3) and re-run on every criteria/leg change.
   const [isSearching, setIsSearching] = useState(true);
-  const [streamingProgress, setStreamingProgress] = useState({ completed: 0, total: 3 });
+  // Hotel-style horizontal loader: a thin bar fills over ~1.5s, then the
+  // results reveal and the bar fades out. This replaces the old streaming
+  // status banners ("Searching flights…" / "Checking remaining carriers…").
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [showLoadingBar, setShowLoadingBar] = useState(true);
 
   useEffect(() => {
     setIsSearching(true);
-    setStreamingProgress({ completed: 0, total: 3 });
+    setLoadingProgress(0);
+    setShowLoadingBar(true);
     // Reset filters when we switch legs / commit new criteria so each leg
     // starts from a clean filter slate. Avoids stale "Direct only" surprises.
     setFilters(DEFAULT_FILTERS);
 
-    const t1 = setTimeout(() => {
-      setIsSearching(false);
-      setStreamingProgress({ completed: 1, total: 3 });
-    }, 2500);
-    const t2 = setTimeout(() => setStreamingProgress({ completed: 2, total: 3 }), 3500);
-    const t3 = setTimeout(() => setStreamingProgress({ completed: 3, total: 3 }), 4500);
+    const duration = 1500;      // total fill time, matching HotelListPage
+    const intervalTime = 20;    // tick cadence
+    const increment = 100 / (duration / intervalTime);
+
+    const timer = setInterval(() => {
+      setLoadingProgress((prev) => {
+        const next = prev + increment;
+        if (next >= 100) {
+          clearInterval(timer);
+          return 100;
+        }
+        return next;
+      });
+    }, intervalTime);
+
+    // Reveal the cards when the fill completes, then fade the bar out 500ms later.
+    const reveal = setTimeout(() => setIsSearching(false), duration);
+    const fade = setTimeout(() => setShowLoadingBar(false), duration + 500);
 
     return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
+      clearInterval(timer);
+      clearTimeout(reveal);
+      clearTimeout(fade);
     };
   }, [currentLegIndex, searchCriteria]);
 
@@ -271,30 +280,14 @@ export default function FlightListPage({
           {/* 1. Back to discovery */}
           <BackButton label="Back to discovery" onClick={onBack} className="mb-3" />
 
-          {/* 2. Trip summary ↔ inline editor. Clicking any criteria box or the
-                Edit search button swaps this row for <FlightSearchForm>;
-                submitting brings the summary back. We don't pass `onCancel`
-                here, so the form's Cancel button is hidden — submitting the
-                search is the only way out, which keeps the row uncluttered. */}
-          {isEditingSearch ? (
-            <FlightSearchForm
-              initialCriteria={searchCriteria}
-              // Keep the stopover-only form (round-trip, no opt-in checkbox,
-              // Fiji-restricted airports) when editing a stopover search, so the
-              // edit can't accidentally drop back to the normal flights form.
-              stopoverMode={stopoverOnly}
-              submitLabel="Search flights"
-              onSearch={(next) => {
-                onSearchCriteriaChange(next);
-                setIsEditingSearch(false);
-              }}
-            />
-          ) : (
-            <FlightTripSummary
-              criteria={searchCriteria}
-              onEditSearch={() => setIsEditingSearch(true)}
-            />
-          )}
+          {/* 2. Trip summary ↔ inline editor, encapsulated in one component so
+                this page and every stopover-flow step share the exact same
+                behaviour: "Edit search" only reveals the form, "Update search"
+                re-runs it, and a folding chevron collapses it back unchanged. */}
+          <EditableFlightSearch
+            criteria={searchCriteria}
+            onUpdateSearch={onSearchCriteriaChange}
+          />
         </PageContainer>
       </header>
 
@@ -363,16 +356,25 @@ export default function FlightListPage({
           />
         </div>
 
-        {/* 7. Results list — skeletons while loading, then the cards */}
+        {/* 7. Loading bar — hotel-style thin horizontal loader that fills then
+            fades out once results arrive. Sits just above the results list. */}
+        {showLoadingBar && (
+          <div
+            className={`h-1 w-full bg-gray-200/50 rounded-full overflow-hidden transition-opacity duration-500 mb-4 ${loadingProgress >= 100 ? "opacity-0" : "opacity-100"}`}
+          >
+            <div
+              className="h-full bg-primary transition-all duration-75 ease-linear"
+              style={{ width: `${loadingProgress}%` }}
+            />
+          </div>
+        )}
+
+        {/* 8. Results list — skeletons while loading, then the cards */}
         {isSearching ? (
           <div className="flex flex-col gap-3">
             {[1, 2, 3, 4].map((i) => (
               <FlightCardSkeleton key={i} />
             ))}
-            <StreamingStatusBanner
-              isStreaming
-              message="Searching flights across carriers…"
-            />
           </div>
         ) : filteredFlights.length === 0 ? (
           // Empty state — happens when the user cranks Max duration down
@@ -393,8 +395,7 @@ export default function FlightListPage({
             </Button>
           </div>
         ) : (
-          <>
-            <StaggeredList className="flex flex-col gap-3">
+          <StaggeredList className="flex flex-col gap-3">
               {(() => {
                 // Cheapest-package anchoring: when a package floor is supplied
                 // (stopover flow), every card shows floor + (its fare − cheapest
@@ -419,39 +420,7 @@ export default function FlightListPage({
                   />
                 ));
               })()}
-            </StaggeredList>
-            <StreamingStatusBanner
-              isStreaming={streamingProgress.completed < streamingProgress.total}
-              progress={streamingProgress}
-              message="Checking remaining carriers…"
-            />
-          </>
-        )}
-
-        {/* 8. Already selected legs summary (shown after leg 1 is chosen) */}
-        {selectedLegs.length > 0 && (
-          <div className="mt-8 p-4 bg-success/10 border border-success/30 rounded-xl">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xs font-bold text-success">
-                Flights chosen so far
-              </span>
-            </div>
-            <div className="flex flex-col gap-2">
-              {selectedLegs.map((s, i) => (
-                <div key={i} className="flex flex-wrap items-center gap-3 text-xs text-success">
-                  <span className="font-bold">
-                    {s.leg.from} → {s.leg.to}
-                  </span>
-                  <span className="text-success/60">·</span>
-                  <span>{s.option.airline}</span>
-                  <span className="text-success/60">·</span>
-                  <span>{s.option.departure} → {s.option.arrival}</span>
-                  <span className="text-success/60">·</span>
-                  <span className="font-bold">€{s.option.price}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          </StaggeredList>
         )}
       </PageContainer>
     </div>

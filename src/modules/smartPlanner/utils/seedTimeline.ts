@@ -57,6 +57,8 @@ export type TransferItem = {
   from: string;
   to: string;
   vehicle: string;                     // e.g. "Private car"
+  // Coach operator brand for this leg. Defaults to M-TOURS in the card.
+  operator?: { name: string; tagline?: string };
 };
 
 export type TimelineItem =
@@ -435,6 +437,7 @@ export function seedTimeline(
           from: pickup,
           to: firstHotel,
           vehicle: vehicleLabel,
+          operator: ctx.tour.operator,
         });
 
         items.push(...stopsToTimelineItems(ctx.tour.stops!, ctx.tour.transfers ?? []));
@@ -446,6 +449,7 @@ export function seedTimeline(
           from: lastHotel,
           to: pickup,
           vehicle: vehicleLabel,
+          operator: ctx.tour.operator,
         });
         break;
       }

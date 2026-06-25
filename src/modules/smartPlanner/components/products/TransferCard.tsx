@@ -79,9 +79,19 @@ export function TransferCard({ item, passengerCount = 1 }: TransferCardProps) {
               {/* Operator "logo" — stylised text in lieu of a real asset.
                   Hidden on small screens to give the schedule room to breathe. */}
               <div className="hidden sm:flex flex-col w-28 lg:w-36 shrink-0 leading-tight">
-                <span className="text-base font-bold text-primary">M-TOURS</span>
-                <span className="text-[10px] tracking-[0.2em] text-muted-foreground">
-                  ERLEBNISREISEN
+                <span className="text-base font-bold text-primary">
+                  {item.operator?.name ?? "M-TOURS"}
+                </span>
+                <span
+                  className={
+                    "text-[10px] text-muted-foreground " +
+                    // The default brand uses wide letter-spacing on its all-caps
+                    // descriptor; a custom operator tagline keeps normal spacing
+                    // so longer text stays readable.
+                    (item.operator ? "" : "tracking-[0.2em]")
+                  }
+                >
+                  {item.operator?.tagline ?? "ERLEBNISREISEN"}
                 </span>
               </div>
 

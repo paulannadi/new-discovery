@@ -105,6 +105,13 @@ export interface TourActivity {
   image?: string;        // Optional photo
 }
 
+// A single room feature shown in the Accommodation card (bed, view, WiFi…).
+// `iconKey` picks the lucide icon; `label` is the human-readable text.
+export interface RoomAmenity {
+  iconKey: "bed" | "view" | "ac" | "wifi" | "bath" | "spa" | "tv" | "minibar";
+  label: string;
+}
+
 // The hotel staying at a given stop
 export interface TourAccommodation {
   hotelName: string;
@@ -116,6 +123,9 @@ export interface TourAccommodation {
   checkOutISO: string;
   roomType: string;      // e.g. "Double Room"
   boardType: string;     // e.g. "Buffet breakfast"
+  // Optional room features shown in the Accommodation card on TourDetailPage.
+  // If omitted, the card falls back to a sensible default amenity list.
+  roomAmenities?: RoomAmenity[];
 }
 
 // One destination stop in the tour itinerary
@@ -162,7 +172,7 @@ export interface TourDay {
 export interface TourAttribute {
   title: string;
   value: string;
-  iconKey: "users" | "languages" | "activity" | "calendar-check";
+  iconKey: "users" | "languages" | "activity" | "calendar-check" | "car";
 }
 
 // The top-level Tour object — used for both TourCard (list) and TourDetailPage
@@ -180,6 +190,10 @@ export interface Tour {
     currency: string;
     paidBefore: number;
     paidAtDestination: number;
+    // Optional per-person rate for the "individual" travel option on coach
+    // tours (flexible date + private door-to-door pickup). Falls back to
+    // `perPerson` when not set.
+    individualPerPerson?: number;
   };
   startDate: string;       // Display string, e.g. "Mar 31, 2026"
   endDate: string;
@@ -210,6 +224,17 @@ export interface Tour {
   // on TourDetailPage swaps the "Hotel preference" selector for a "Departure point"
   // selector populated with these options.
   departurePoints?: string[];
+
+  // When true, the booking widget offers two travel options: "By coach" (group
+  // coach, departures every Saturday, pick a departure point) and "Individual"
+  // (any travel date, enter your own pickup address, uses `price.individualPerPerson`).
+  // Only meaningful alongside `departurePoints`. Left off, the widget behaves as
+  // before (single coach option, any future date).
+  flexibleTravelOptions?: boolean;
+
+  // Coach operator brand shown on the transfer cards in the SmartPlanner
+  // itinerary. Defaults to "M-TOURS / ERLEBNISREISEN" when not set.
+  operator?: { name: string; tagline?: string };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

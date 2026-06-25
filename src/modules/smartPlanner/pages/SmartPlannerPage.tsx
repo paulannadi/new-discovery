@@ -52,6 +52,8 @@ export type TourData = {
   // (e.g. "Freiburg"). When set, seedTimeline replaces the mock outbound/inbound
   // flights with bus TransferCards routed from/to the chosen pickup point.
   departurePoint?: string;
+  // Coach operator brand, forwarded to the transfer cards. Defaults to M-TOURS.
+  operator?: { name: string; tagline?: string };
 };
 
 export type HotelData = {

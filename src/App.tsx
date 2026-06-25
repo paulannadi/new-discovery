@@ -11,6 +11,11 @@ import { SWISS_WINTER_TOUR, DISCOVERY_TOUR_MAP } from "./mocks/tours";
 import type { Tour } from "./types";
 import FlightListPage from "./modules/smartPlanner/pages/FlightListPage";
 import { FlightStepper } from "./modules/smartPlanner/components/flightSearch/FlightStepper";
+// Collapsed "search at a glance" row that expands into the search form in place
+// (Edit reveals it, "Update search" re-runs it, a chevron folds it back). Shown
+// across every stopover-flow step so the criteria stay visible — and editable —
+// after the flight results page.
+import { EditableFlightSearch } from "./modules/smartPlanner/components/flightSearch/EditableFlightSearch";
 import { getStopoverOffersForLeg, getMockFlightsForLeg } from "./modules/smartPlanner/components/flightSearch/mockFlights";
 import { generateRoomsForHotel } from "./modules/smartPlanner/components/rooms/roomData";
 import { type StartingContext } from "./modules/smartPlanner/pages/SmartPlannerPage";
@@ -622,6 +627,21 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
+  // ── "Update search" from a stopover-flow step's inline editor ────────────
+  // Only fires when the user actually submits the expanded search form (not
+  // when they merely open it). Re-running the flight search with new criteria
+  // restarts flight selection — and therefore the stopover flow — so we reset
+  // to leg 1, clear the stopover choices, and land back on the flight results.
+  const handleUpdateFlightSearch = (next: FlightSearchCriteria) => {
+    setFlightSearchCriteria(next);
+    setSelectedFlightLegs([]);
+    setCurrentFlightLegIndex(0);
+    setStopoverSelection(null);
+    setStopoverHotel(null);
+    setCurrentPage("flight-results");
+    window.scrollTo(0, 0);
+  };
+
   // ── Stopover-hotel step: user picked a hotel → stopover-room step ─────────
   // Hold the chosen hotel, then move to the new room-selection step. The
   // SmartPlanner context is only built once a room is picked there.
@@ -864,6 +884,15 @@ export default function App() {
           // currentLegIndex = legs.length marks every flight "done", and
           // stopoverStatus="current" lights up the hotel card.
           hideSearch
+          // Collapsed search criteria ("Round trip with stopover · N flights ·
+          // dates"), rendered inside the white page header (under the back
+          // button) so it's an integral part of the header — exactly like the
+          // flight results step, instead of a separate card on the grey area.
+          searchSummarySlot={
+            flightSearchCriteria ? (
+              <EditableFlightSearch criteria={flightSearchCriteria} onUpdateSearch={handleUpdateFlightSearch} />
+            ) : null
+          }
           headerSlot={
             flightSearchCriteria ? (
               <FlightStepper
@@ -918,6 +947,12 @@ export default function App() {
           onBack={handleBack}
           onGoToBookingSummary={handleGoToBookingSummary}
           // Stepper: flights + hotel are done, the room card is now current.
+          // Collapsed search criteria in the white header (see stopover-hotel above).
+          searchSummarySlot={
+            flightSearchCriteria ? (
+              <EditableFlightSearch criteria={flightSearchCriteria} onUpdateSearch={handleUpdateFlightSearch} />
+            ) : null
+          }
           headerSlot={
             flightSearchCriteria ? (
               <FlightStepper
@@ -965,6 +1000,12 @@ export default function App() {
             onProceedToCheckout={handleStopoverCheckout}
             onPersonalize={handlePersonalizeStopover}
             // Stepper: every step done. The room step is clickable to go back.
+            // Collapsed search criteria in the white header (see stopover-hotel above).
+            searchSummarySlot={
+              flightSearchCriteria ? (
+                <EditableFlightSearch criteria={flightSearchCriteria} onUpdateSearch={handleUpdateFlightSearch} />
+              ) : null
+            }
             headerSlot={
               flightSearchCriteria ? (
                 <FlightStepper
@@ -1043,6 +1084,7 @@ export default function App() {
                 transfers: tour.transfers,
                 startDateISO: startISO,
                 departurePoint: isCoachTour ? hotelPreference : undefined,
+                operator: tour.operator,
               },
             });
             setCurrentPage("smart-planner");

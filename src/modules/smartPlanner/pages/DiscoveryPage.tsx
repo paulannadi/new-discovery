@@ -548,6 +548,8 @@ const TRIP_TYPE_CARDS: Record<TripTypeId, { id: number; title: string; destinati
   "bus-tour": [
     // `tourId: 22` jumps the click handler straight to the matching tour in DISCOVERY_TOUR_MAP.
     { id: 16, tourId: 22, title: "Lake Garda Wine Festival Bus Tour", destination: "Lazise, Italy", flag: "it", desc: "4-day coach tour from Germany to Italy's Lake Garda with the Bardolino wine festival.", image: "https://images.unsplash.com/photo-1530538095376-a4936b35b5f0?w=800&q=80", duration: "4 days", price: "from €649" },
+    // `tourId: 23` → BALTIC_SPA_BUS_TOUR in DISCOVERY_TOUR_MAP.
+    { id: 17, tourId: 23, title: "Baltic Coast Medical Spa Cure", destination: "Mielno, Poland", flag: "pl", desc: "8-day coach cure holiday from Germany to the Polish Baltic coast — Dead Sea salt pools, saunas, and a doctor-supervised treatment plan.", image: "https://images.unsplash.com/photo-1473116763249-2faaef81ccda?w=800&q=80", duration: "8 days", price: "from €499" },
   ],
 };
 

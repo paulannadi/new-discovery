@@ -56,7 +56,29 @@ export interface PlanMessage {
   refCard?: string;
 }
 
+// The right-hand canvas walks through "generative" stages before it resolves
+// to the real Smart Planner itinerary. Each stage shows a different set of
+// AI-suggested cards:
+//   • "countries" — user gave a vibe / vacation type → suggest countries
+//   • "cities"    — a country is chosen → suggest cities (+ a template card)
+//   • "templates" — ready-made trips from inventory
+//   • "itinerary" — enough detail gathered → the Smart Planner timeline (final)
+export type CanvasStage = "countries" | "cities" | "templates" | "itinerary";
+
+// A single suggestion card rendered in the generative canvas grid. Deliberately
+// lightweight — it's a chooser tile, not a full product card.
+export interface SuggestionCard {
+  id: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  badge?: string; // e.g. "Best match", "Template"
+  meta?: string; // small footer line, e.g. "8 days · from €1,890 pp"
+}
+
 export interface PlanState {
+  // Which canvas stage the right side is currently showing.
+  canvasStage: CanvasStage;
   trip: TripMeta;
   items: TimelineItem[];
   messages: PlanMessage[];
@@ -86,6 +108,19 @@ const TILE_IMG =
   "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=900&q=70";
 const RAMIRO_IMG =
   "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=900&q=70";
+// Images for the generative-canvas cards (countries / cities / templates).
+// All subject-verified Unsplash CDN photos — keyword image services don't load
+// in this environment, so we point at specific photo IDs.
+const PORTO_IMG =
+  "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=900&q=70";
+const SPAIN_IMG =
+  "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=900&q=70";
+const ITALY_IMG =
+  "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=900&q=70";
+const GREECE_IMG =
+  "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=900&q=70";
+const TRAM_IMG =
+  "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?auto=format&fit=crop&w=900&q=70";
 
 // Flight alternative pools — each entry is the `FlightData` we splice into
 // the FlightItem when the user cycles via the chat ("any-alt swap"). The
@@ -199,6 +234,127 @@ export const HOTEL_ALTS: Array<{ hotel: HotelData; pricePerNight: number }> = [
   },
 ];
 
+// ─── Generative-canvas card data ─────────────────────────────────────────
+// Static suggestion cards for the pre-itinerary stages. The Portugal path is
+// the "golden path" with the richest content; the other countries/cities are
+// believable options that fall back to the Portugal plan in this prototype
+// (the AI says so in chat, so the demo stays honest).
+
+export const COUNTRY_CARDS: SuggestionCard[] = [
+  {
+    id: "portugal",
+    title: "Portugal",
+    subtitle: "Atlantic light, world-class food, hugely walkable cities.",
+    image: LISBON_IMG,
+    badge: "Best match",
+    meta: "Culture · Food · Coast",
+  },
+  {
+    id: "spain",
+    title: "Spain",
+    subtitle: "Tapas crawls, Gaudí, and late-night plazas.",
+    image: SPAIN_IMG,
+    meta: "Culture · Food · City life",
+  },
+  {
+    id: "italy",
+    title: "Italy",
+    subtitle: "Ancient cities, regional cooking, espresso culture.",
+    image: ITALY_IMG,
+    meta: "Culture · Food · History",
+  },
+  {
+    id: "greece",
+    title: "Greece",
+    subtitle: "Island towns, mezze tables, and sea views.",
+    image: GREECE_IMG,
+    meta: "Coast · Food · History",
+  },
+];
+
+export const CITY_CARDS: SuggestionCard[] = [
+  {
+    id: "lisbon",
+    title: "Lisbon",
+    subtitle: "Hilltop miradouros, fado nights, and the best seafood.",
+    image: LISBON_IMG,
+    badge: "Recommended",
+    meta: "Great food + walkable",
+  },
+  {
+    id: "porto",
+    title: "Porto",
+    subtitle: "Riverside cellars, port tasting, and azulejo facades.",
+    image: PORTO_IMG,
+    meta: "Wine · Riverside",
+  },
+  {
+    id: "sintra",
+    title: "Sintra",
+    subtitle: "Fairytale palaces and forested hills, a day-trip away.",
+    image: SINTRA_IMG,
+    meta: "Palaces · Nature",
+  },
+  {
+    id: "cascais",
+    title: "Cascais",
+    subtitle: "Easygoing coastal town on the Estoril line.",
+    image: CASCAIS_IMG,
+    meta: "Coast · Relaxed",
+  },
+];
+
+export const TEMPLATE_CARDS: SuggestionCard[] = [
+  {
+    id: "tmpl-portugal-highlights",
+    title: "Portugal Highlights",
+    subtitle: "Lisbon, Sintra and Porto in one easy loop.",
+    image: TRAM_IMG,
+    badge: "Template",
+    meta: "8 days · from €1,890 pp",
+  },
+  {
+    id: "tmpl-lisbon-food-fado",
+    title: "Lisbon Food & Fado",
+    subtitle: "A long-weekend base built around eating and music.",
+    image: LISBON_IMG,
+    badge: "Template",
+    meta: "5 days · from €1,290 pp",
+  },
+];
+
+// The cards shown for a given stage. The "cities" stage appends one featured
+// template card so the user can also start from a ready-made trip.
+export function cardsForStage(stage: CanvasStage): SuggestionCard[] {
+  if (stage === "countries") return COUNTRY_CARDS;
+  if (stage === "cities") return [...CITY_CARDS, TEMPLATE_CARDS[0]];
+  if (stage === "templates") return TEMPLATE_CARDS;
+  return [];
+}
+
+// Heading + subtext shown above the grid for each generative stage.
+export function stageMeta(stage: CanvasStage): { heading: string; subtext: string } {
+  switch (stage) {
+    case "countries":
+      return {
+        heading: "Countries that fit your vibe",
+        subtext: "Matched on culture, food and walkable cities. Pick one to get specific.",
+      };
+    case "cities":
+      return {
+        heading: "Where to base yourself in Portugal",
+        subtext: "Tap a place to build the trip around it — or start from a ready-made template.",
+      };
+    case "templates":
+      return {
+        heading: "Ready-made Portugal trips",
+        subtext: "Proven itineraries from our inventory. Tap one to load it into Smart Planner.",
+      };
+    default:
+      return { heading: "", subtext: "" };
+  }
+}
+
 // ─── Item-id constants ──────────────────────────────────────────────────
 // Stable ids let us mutate the same Flight / Hotel item across actions
 // without losing its place in the timeline.
@@ -269,7 +425,7 @@ const TRIP_NIGHTS = 6;
 function buildInitialState(seedPrompt: string): PlanState {
   const userBrief =
     seedPrompt.trim() ||
-    "Plan a 5–8 day city break in Lisbon for two adults around mid-June. Budget €2,400, including flights from Zurich. We love food and walking, not so much beach.";
+    "I'd love a culture-and-food trip somewhere in Europe — great cities to walk around and amazing places to eat. Not really a beach holiday.";
 
   const items: TimelineItem[] = [
     {
@@ -369,6 +525,10 @@ function buildInitialState(seedPrompt: string): PlanState {
   ];
 
   return {
+    // Start in the generative flow: the user gave a vibe, so we suggest
+    // countries first and only resolve to the itinerary once they've narrowed
+    // it down. `items` is pre-built so the itinerary stage has data ready.
+    canvasStage: "countries",
     trip: {
       title: "Lisbon city break",
       startDate: TRIP_START,
@@ -384,17 +544,56 @@ function buildInitialState(seedPrompt: string): PlanState {
       {
         id: newMsgId(),
         role: "ai",
-        text: "Got it. I've sketched a **6-night Lisbon city break** for Fri Jun 12 — Sat Jun 20.\n\nFlights and the hotel are locked. Days 1–3 are filled with food-led picks. **Days 4–6 are open** — pick a chip below or just ask me anything.",
-        refCard: "Trip summary & Days 1–3",
+        text: "Love it — a **culture-and-food trip** with cities you can walk and eat your way through. Based on that, here are four countries that fit your vibe.\n\nPick one on the right and I'll get specific about *where* to go.",
+        refCard: "4 countries match your vibe",
       },
     ],
-    pendingActions: ["sintra", "lock56", "michelin", "cheaper"],
+    // No suggestion chips during the generative stages — the cards on the
+    // right ARE the choices. Chips appear once we reach the itinerary.
+    pendingActions: [],
     hotelDrawer: false,
     justAddedIds: new Set<string>(),
     flightAltIdx: { outbound: 0, inbound: 0 },
     hotelAltIdx: 0,
   };
 }
+
+// Suggestion chips offered the moment the itinerary stage is reached, so the
+// user has somewhere to go after the trip is drafted.
+const ITINERARY_START_ACTIONS: ActionId[] = ["sintra", "lock56", "michelin", "cheaper"];
+
+// Short labels for each canvas stage — used by the demo stage-switcher.
+export const STAGE_LABEL: Record<CanvasStage, string> = {
+  countries: "Countries",
+  cities: "Cities",
+  templates: "Templates",
+  itinerary: "Itinerary",
+};
+
+// Per-card chat copy for the golden Portugal → Lisbon path. Any card not listed
+// here falls back to copy generated from the card title (see `pickSuggestion`).
+const PICK_COPY: Record<string, { user: string; ai: string; ref: string }> = {
+  portugal: {
+    user: "Portugal, definitely.",
+    ai: "Great call — **Portugal**. Atlantic light, incredible food, and very walkable cities.\n\nHere's where I'd base you, plus a ready-made template. Tap one and I'll build it out in Smart Planner.",
+    ref: "Exploring Portugal",
+  },
+  lisbon: {
+    user: "Let's build it around Lisbon.",
+    ai: "Perfect — **Lisbon** as your base. I've drafted a 6-night plan: flights from Zurich, a hotel in Alfama, and food-led days. It's on the right in Smart Planner — tweak anything from here.",
+    ref: "Lisbon itinerary drafted",
+  },
+  "tmpl-portugal-highlights": {
+    user: "Load the Portugal Highlights template.",
+    ai: "Loaded the **Portugal Highlights** template into Smart Planner — flights, hotel and the opening days are filled in. Adjust anything from the chat.",
+    ref: "Template loaded",
+  },
+  "tmpl-lisbon-food-fado": {
+    user: "Load the Lisbon Food & Fado template.",
+    ai: "Loaded **Lisbon Food & Fado** into Smart Planner. Flights, hotel and the first days are in — let's tweak from here.",
+    ref: "Template loaded",
+  },
+};
 
 // ─── Action library ──────────────────────────────────────────────────────
 
@@ -629,6 +828,70 @@ export function useAiPlanState(seedPrompt: string) {
     });
   }, []);
 
+  // Pick a generative-canvas card (a country, city or template). Pushes the
+  // choice into the conversation as a user+AI exchange, then advances the
+  // canvas stage: countries → cities, and cities/templates → the itinerary.
+  const pickSuggestion = useCallback((cardId: string) => {
+    setState((s) => {
+      const stage = s.canvasStage;
+      const card = cardsForStage(stage).find((c) => c.id === cardId);
+      if (!card) return s;
+
+      // Countries narrow to cities; everything else resolves to the itinerary.
+      const nextStage: CanvasStage = stage === "countries" ? "cities" : "itinerary";
+
+      const tailored = PICK_COPY[cardId];
+      let user: string;
+      let ai: string;
+      let ref: string;
+      if (tailored) {
+        ({ user, ai, ref } = tailored);
+      } else if (stage === "countries") {
+        // Non-Portugal country: be transparent that the demo's deep inventory
+        // is Portugal, then continue the same flow.
+        user = `Let's look at ${card.title}.`;
+        ai = `Nice — **${card.title}** is a great fit too. For this preview my richest inventory is **Portugal**, so I'll walk you through that flow; it works the same for ${card.title} once it's connected.`;
+        ref = "Showing Portugal";
+      } else {
+        // Non-Lisbon city: load the ready Lisbon base plan as a starting point.
+        user = `Can we center it on ${card.title}?`;
+        ai = `**${card.title}**'s a lovely choice. I've loaded my ready **Lisbon** base plan as a starting point — we can re-base it to ${card.title} from here. Take a look in Smart Planner.`;
+        ref = "Itinerary drafted";
+      }
+
+      return {
+        ...s,
+        canvasStage: nextStage,
+        pendingActions:
+          nextStage === "itinerary" ? ITINERARY_START_ACTIONS : s.pendingActions,
+        messages: [
+          ...s.messages,
+          { id: newMsgId(), role: "user", text: user },
+          { id: newMsgId(), role: "ai", text: ai, refCard: ref },
+        ],
+      };
+    });
+  }, []);
+
+  // Jump straight to a canvas stage — used by the demo stage-switcher so the
+  // designer can preview each state. Drops a short note in the chat so the
+  // transcript stays coherent.
+  const setCanvasStage = useCallback((stage: CanvasStage) => {
+    setState((s) => {
+      if (s.canvasStage === stage) return s;
+      const note =
+        stage === "itinerary"
+          ? "Here's the full **Smart Planner** itinerary — the final step of the flow."
+          : `Showing the **${STAGE_LABEL[stage].toLowerCase()}** suggestions.`;
+      return {
+        ...s,
+        canvasStage: stage,
+        pendingActions: stage === "itinerary" ? ITINERARY_START_ACTIONS : [],
+        messages: [...s.messages, { id: newMsgId(), role: "ai", text: note }],
+      };
+    });
+  }, []);
+
   // Cycle the outbound or inbound flight to the next alternative in its pool.
   const swapFlight = useCallback(
     (direction: "outbound" | "inbound"): string | null => {
@@ -718,6 +981,8 @@ export function useAiPlanState(seedPrompt: string) {
   return {
     state,
     runAction,
+    pickSuggestion,
+    setCanvasStage,
     swapFlight,
     pickHotelAlt,
     closeHotelDrawer,

@@ -54,6 +54,8 @@ import AiChatBubble from "./AiChatBubble";
 import AiSuggestionChips from "./AiSuggestionChips";
 import AiCanvasHeader from "./AiCanvasHeader";
 import AiCanvasHotelAlternatives from "./AiCanvasHotelAlternatives";
+import AiGenerativeCanvas from "./AiGenerativeCanvas";
+import AiCanvasStageSwitcher from "./AiCanvasStageSwitcher";
 import AiCanvasCheckoutModal, {
   type CheckoutStage,
 } from "./AiCanvasCheckoutModal";
@@ -76,11 +78,17 @@ export default function ConversationScreen({
   const {
     state,
     runAction,
+    pickSuggestion,
+    setCanvasStage,
     pickHotelAlt,
     closeHotelDrawer,
     sendReply,
     resetPlan,
   } = useAiPlanState(seedPrompt);
+
+  // True once the canvas has resolved to the real Smart Planner itinerary —
+  // the final stage. Before that, the canvas shows generative suggestion cards.
+  const inItinerary = state.canvasStage === "itinerary";
 
   // Mobile tab — defaults to "chat" so the user sees what they're talking
   // about, then can swipe over once the canvas starts filling.
@@ -139,9 +147,10 @@ export default function ConversationScreen({
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-    // Re-runs when the layout swaps (chatMinimized) because the scroll
-    // container and sentinel are inside the conditional branch and remount.
-  }, [chatMinimized]);
+    // Re-runs when the layout swaps (chatMinimized) or when the canvas reaches
+    // the itinerary stage — both remount the scroll container and sentinel,
+    // which only exist in the itinerary branch.
+  }, [chatMinimized, state.canvasStage]);
 
   const spent = computeSpent(state);
 
@@ -233,12 +242,16 @@ export default function ConversationScreen({
                   </div>
                 </div>
                 <div className="text-base font-extrabold tracking-tight">
-                  Planning your {state.trip.title}
+                  {inItinerary
+                    ? `Planning your ${state.trip.title}`
+                    : "Let's find your trip"}
                 </div>
                 <div className="text-xs text-grey mt-1">
-                  {state.trip.travelersLabel} · {state.trip.nights} night
-                  {state.trip.nights !== 1 ? "s" : ""} · €
-                  {state.trip.budget.toLocaleString("en")} budget
+                  {inItinerary
+                    ? `${state.trip.travelersLabel} · ${state.trip.nights} night${
+                        state.trip.nights !== 1 ? "s" : ""
+                      } · €${state.trip.budget.toLocaleString("en")} budget`
+                    : "Pick an option on the right, or tell me more below."}
                 </div>
               </div>
               {/* Minimize button — desktop only. Mobile uses the tab
@@ -265,11 +278,16 @@ export default function ConversationScreen({
             ))}
           </div>
 
-          <AiSuggestionChips
-            actions={state.pendingActions}
-            onPickAction={runAction}
-            onCheckout={() => setCheckout("open")}
-          />
+          {/* Suggestion chips (and the checkout button inside them) only make
+              sense once there's an itinerary. During the generative stages the
+              cards on the canvas ARE the choices. */}
+          {inItinerary && (
+            <AiSuggestionChips
+              actions={state.pendingActions}
+              onPickAction={runAction}
+              onCheckout={() => setCheckout("open")}
+            />
+          )}
 
           <div className="px-4 pt-2 pb-4 border-t border-border">
             <div className="flex items-center gap-2.5 bg-grey-lightest border border-border rounded-lg px-3 py-2 focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px] transition-[color,box-shadow]">
@@ -325,7 +343,27 @@ export default function ConversationScreen({
             mobileTab === "canvas" ? "flex" : "hidden md:flex",
           ].join(" ")}
         >
-          {chatMinimized ? (
+          {/* Demo stage-switcher — always visible so the design can be
+              previewed at any state (Countries · Cities · Templates ·
+              Itinerary) without clicking through the whole conversation. */}
+          <AiCanvasStageSwitcher
+            stage={state.canvasStage}
+            onChange={setCanvasStage}
+          />
+
+          <div className="flex-1 min-h-0 flex flex-col">
+            {!inItinerary ? (
+              // ─── GENERATIVE STAGE ───────────────────────────────────
+              // Country / city / template suggestion cards. Tapping one
+              // pushes the choice into the chat and advances the canvas
+              // until enough detail exists to draft the itinerary.
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                <AiGenerativeCanvas
+                  stage={state.canvasStage}
+                  onSelect={pickSuggestion}
+                />
+              </div>
+            ) : chatMinimized ? (
             // ─── CANONICAL SMART PLANNER LAYOUT ─────────────────────
             // Same building blocks as SmartPlannerPage so the page reads
             // as "the regular Smart Planner" once the AI chat is out of
@@ -334,7 +372,7 @@ export default function ConversationScreen({
             // viewport bottom. The data still comes from the AI plan
             // state so any items the AI added/changed remain visible
             // and highlighted via `state.justAddedIds`.
-            <div ref={canvasScrollRef} className="overflow-y-auto h-full relative">
+            <div ref={canvasScrollRef} className="overflow-y-auto flex-1 min-h-0 relative">
               <ItineraryHero
                 title={state.trip.title}
                 travelersLabel={state.trip.travelersLabel}
@@ -385,7 +423,7 @@ export default function ConversationScreen({
             <>
               <div
                 ref={canvasScrollRef}
-                className="overflow-y-auto h-full px-4 md:px-6 py-5 pb-32"
+                className="overflow-y-auto flex-1 min-h-0 px-4 md:px-6 py-5 pb-32"
               >
                 <AiCanvasHeader
                   title={state.trip.title}
@@ -433,6 +471,7 @@ export default function ConversationScreen({
               />
             </>
           )}
+          </div>
         </section>
       </div>
 

@@ -35,8 +35,10 @@ function Divider() {
 type SearchSummaryProps = {
   /** Facts to show, left → right. The first is bold; falsy entries are skipped. */
   items: ReactNode[];
-  /** Fired when the Edit button is clicked — the page swaps in its full form. */
-  onEdit: () => void;
+  /** Fired when the Edit button is clicked — the page swaps in its full form.
+   *  Optional: when omitted, the Edit button is hidden and the row is purely
+   *  read-only (used by the stopover-flow steps, which have no form to edit). */
+  onEdit?: () => void;
   /** Edit button label. Defaults to "Edit search" (matches the flight header). */
   editLabel?: string;
   /** Extra classes for the outer row (e.g. responsive gating from the caller). */
@@ -67,11 +69,15 @@ export function SearchSummary({
 
       {/* Edit search — canonical design-system "secondary" button (primary
           border + text on white, fills on hover). `size-3.5` keeps the Pencil
-          from defaulting to 20px inside the button. `ml-auto` pins it right. */}
-      <Button variant="secondary" size="sm" onClick={onEdit} className="ml-auto">
-        <Pencil className="size-3.5" aria-hidden="true" />
-        {editLabel}
-      </Button>
+          from defaulting to 20px inside the button. `ml-auto` pins it right.
+          Only rendered when an `onEdit` handler is supplied; the read-only
+          stopover-flow steps omit it. */}
+      {onEdit && (
+        <Button variant="secondary" size="sm" onClick={onEdit} className="ml-auto">
+          <Pencil className="size-3.5" aria-hidden="true" />
+          {editLabel}
+        </Button>
+      )}
     </div>
   );
 }
