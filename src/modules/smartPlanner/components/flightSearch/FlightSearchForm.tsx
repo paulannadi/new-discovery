@@ -115,14 +115,16 @@ function MobileSheet({
       <div className="relative bg-card rounded-t-3xl p-6 pb-12 flex flex-col gap-4 animate-in slide-in-from-bottom duration-300 z-10">
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-lg font-extrabold text-foreground">{title}</h3>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="rounded-full p-2 hover:bg-grey-light"
+            className="rounded-full"
             aria-label="Close"
           >
             <X size={20} className="text-foreground" aria-hidden="true" />
-          </button>
+          </Button>
         </div>
         {children}
       </div>
@@ -310,24 +312,29 @@ export function FlightSearchForm({
   // `heightClass` lets each caller pass the right height: the top row uses the
   // tall h-[52px] to line up with the From/To/Dates fields, while the stopover
   // row uses h-11 (44px) to match the shorter stopover inputs.
-  const renderActionButtons = (heightClass: string) => (
+  // Both action buttons use the lg size (biggest CTA: 52px, bold, rounded-xl).
+  // `heightClass` is only passed for the shorter stopover row (h-11) to override
+  // lg's 52px so it lines up with the shorter stopover inputs.
+  const renderActionButtons = (heightClass = "") => (
     <>
       {onCancel && (
         <Button
-          variant="secondary"
+          variant="tertiary"
+          size="lg"
           onClick={onCancel}
-          className={cn("w-full lg:w-auto rounded-xl px-5 text-base font-bold", heightClass)}
+          className={cn("w-full lg:w-auto", heightClass)}
         >
           Cancel
         </Button>
       )}
       <Button
+        size="lg"
         onClick={() => {
           setFlightDatesOpen(false);
           setFlightPassengersOpen(false);
           onSearch(buildCriteria());
         }}
-        className={cn("w-full lg:w-auto rounded-xl px-6 text-base font-extrabold shadow-md", heightClass)}
+        className={cn("w-full lg:w-auto", heightClass)}
       >
         <Search />
         {submitLabel}
@@ -362,7 +369,7 @@ export function FlightSearchForm({
             <div key={key} className="flex items-center justify-between">
               <div>
                 <div className="text-sm font-semibold text-foreground">{label}</div>
-                <div className="text-xs text-grey">{sub}</div>
+                <div className="text-xs text-muted-foreground">{sub}</div>
               </div>
               <div className="flex items-center gap-3">
                 <button
@@ -384,12 +391,12 @@ export function FlightSearchForm({
               </div>
             </div>
           ))}
-          <button
+          <Button
             onClick={() => setFlightPassengersOpen(false)}
-            className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-all"
+            className="w-full"
           >
             Done
-          </button>
+          </Button>
         </div>
       )}
     </div>
@@ -572,7 +579,7 @@ export function FlightSearchForm({
               <div key={key} className="flex items-center justify-between">
                 <div>
                   <div className="text-sm font-semibold text-foreground">{label}</div>
-                  <div className="text-xs text-grey">{sub}</div>
+                  <div className="text-xs text-muted-foreground">{sub}</div>
                 </div>
                 <div className="flex items-center gap-4">
                   <button
@@ -596,13 +603,14 @@ export function FlightSearchForm({
                 </div>
               </div>
             ))}
-            <button
+            <Button
               type="button"
               onClick={() => setFlightPassengersOpen(false)}
-              className="mt-1 w-full rounded-xl bg-primary py-3 text-sm font-bold text-white transition-all hover:brightness-85"
+              size="lg"
+              className="mt-1 w-full"
             >
               Done
-            </button>
+            </Button>
           </div>
         </MobileSheet>
       )}
@@ -669,12 +677,12 @@ export function FlightSearchForm({
                 >
                   <CalendarIcon size={18} className="text-primary shrink-0" />
                   <div className="flex flex-col items-start flex-1 min-w-0">
-                    <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Depart – Return</span>
-                    <span className={cn("text-sm font-semibold truncate w-full", flightDateRange?.from ? "text-foreground" : "text-grey")}>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Depart – Return</span>
+                    <span className={cn("text-sm font-semibold truncate w-full", flightDateRange?.from ? "text-foreground" : "text-muted-foreground")}>
                       {flightDateLabel}
                     </span>
                   </div>
-                  <ChevronDown size={16} className={`text-grey shrink-0 transition-transform ${flightDatesOpen ? "rotate-180" : ""}`} />
+                  <ChevronDown size={16} className={`text-muted-foreground shrink-0 transition-transform ${flightDatesOpen ? "rotate-180" : ""}`} />
                 </button>
               }
               mode="range"
@@ -754,7 +762,7 @@ export function FlightSearchForm({
             </Badge>
 
             {/* Short supporting line — kept inline; wraps below on small screens. */}
-            <span className="text-xs text-grey">
+            <span className="text-xs text-muted-foreground">
               Break the long haul — spend a few nights in a city along the way.
             </span>
           </div>
@@ -764,10 +772,10 @@ export function FlightSearchForm({
             <div className="mt-4 flex flex-col gap-4 border-t border-border pt-4 md:flex-row md:items-end md:gap-8">
               {/* Which leg gets the stopover */}
               <div>
-                <div className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-grey">
+                <div className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
                   When on your trip
                 </div>
-                <div className="inline-flex h-11 items-stretch gap-0.5 rounded-lg border border-border p-0.5">
+                <div className="inline-flex h-[52px] items-stretch gap-0.5 rounded-lg border border-border p-0.5">
                   {(
                     [
                       ["outbound", "Departure"],
@@ -793,10 +801,10 @@ export function FlightSearchForm({
 
               {/* Up to how many nights — a small −/+ stepper, clamped 1–4 */}
               <div>
-                <div className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-grey">
+                <div className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
                   Up to how many nights
                 </div>
-                <div className="inline-flex h-11 items-center gap-3 rounded-lg border border-border px-2">
+                <div className="inline-flex h-[52px] items-center gap-3 rounded-lg border border-border px-2">
                   <button
                     type="button"
                     aria-label="Fewer nights"
@@ -825,9 +833,10 @@ export function FlightSearchForm({
                   pushes it to the far right, next to the stopover inputs. The
                   `animate-in` classes (from tw-animate-css) fade + slide it up on
                   appear so the move from the top row feels intentional, not a jump.
-                  h-11 matches the stopover inputs' height. */}
+                  Uses the standard lg size (52px) — same as every other tab's
+                  Search button and the now-52px stopover inputs beside it. */}
               <div className="flex gap-2 md:ml-auto lg:items-stretch animate-in fade-in slide-in-from-bottom-2 duration-300">
-                {renderActionButtons("h-11")}
+                {renderActionButtons()}
               </div>
             </div>
           )}
@@ -856,7 +865,7 @@ export function FlightSearchForm({
             <div key={leg.id} className="flex flex-col md:flex-row items-stretch md:items-center gap-2">
 
               {/* Leg label */}
-              <span className="text-[10px] font-extrabold text-grey uppercase tracking-wide shrink-0 md:w-12 pt-3.5 md:pt-0 text-left md:text-right">
+              <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wide shrink-0 md:w-12 pt-3.5 md:pt-0 text-left md:text-right">
                 {`Leg ${index + 1}`}
               </span>
 
@@ -871,7 +880,7 @@ export function FlightSearchForm({
               </div>
 
               {/* Arrow between From and To */}
-              <ArrowRight size={14} className="text-grey shrink-0 hidden md:block" />
+              <ArrowRight size={14} className="text-muted-foreground shrink-0 hidden md:block" />
 
               {/* To */}
               <div className="flex-1">
@@ -897,7 +906,7 @@ export function FlightSearchForm({
                     onClick={() => setOpenLegDateId(openLegDateId === leg.id ? null : leg.id)}
                   >
                     <CalendarIcon size={15} className="text-primary shrink-0" />
-                    <span className={cn("text-xs font-semibold truncate", leg.date ? "text-foreground" : "text-grey")}>
+                    <span className={cn("text-xs font-semibold truncate", leg.date ? "text-foreground" : "text-muted-foreground")}>
                       {leg.date ? format(leg.date, "d MMM yyyy") : "Select date"}
                     </span>
                   </button>
@@ -913,51 +922,60 @@ export function FlightSearchForm({
 
               {/* Remove button — only for legs beyond the first 2 */}
               {index >= 2 ? (
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => removeLeg(leg.id)}
-                  className="shrink-0 w-9 h-9 rounded-full border border-border flex items-center justify-center text-grey hover:border-red-300 hover:text-red-400 transition-colors self-center"
+                  className="rounded-full shrink-0 self-center text-muted-foreground hover:text-destructive"
                   title="Remove this leg"
+                  aria-label="Remove this leg"
                 >
                   <X size={14} />
-                </button>
+                </Button>
               ) : (
                 <div className="shrink-0 w-9 hidden md:block" />
               )}
             </div>
           ))}
 
-          {/* Add another flight button — up to 6 legs */}
-          {flightLegs.length < 6 && (
-            <button
-              onClick={addLeg}
-              className="mt-1 h-[44px] w-full border border-dashed border-primary rounded-lg text-primary text-xs font-bold hover:bg-primary/10 transition-colors flex items-center justify-center gap-2"
-            >
-              <Plus size={14} />
-              Add another flight
-            </button>
-          )}
-
-          {/* Bottom row: submit + (optional) Cancel, pushed to the far right.
-              Travellers now lives in the secondary pill row at the top, so this
-              row only carries the action buttons. */}
-          <div className="flex flex-col md:flex-row gap-2 pt-1 md:items-center md:justify-end">
+          {/* Bottom row: "Add another flight" on the left · Cancel + Search on the right.
+              On mobile (flex-col) the add button stacks above the action group. */}
+          <div className="flex flex-col md:flex-row gap-2 pt-1 md:items-center md:justify-between">
+            {/* Add another flight — up to 6 legs. Matches the field height so it
+                sits level with the Search button in the same row. */}
+            {flightLegs.length < 6 ? (
+              <Button
+                variant="tertiary"
+                size="lg"
+                onClick={addLeg}
+                className="w-full md:w-auto"
+              >
+                <Plus />
+                Add another flight
+              </Button>
+            ) : (
+              // Keeps Search pushed to the right on desktop when the add button is hidden.
+              <div className="hidden md:block" />
+            )}
             <div className="flex gap-2">
               {onCancel && (
                 <Button
-                  variant="secondary"
+                  variant="tertiary"
+                  size="lg"
                   onClick={onCancel}
-                  className="flex-1 md:flex-none h-[52px] rounded-xl px-5 text-base font-bold"
+                  className="flex-1 md:flex-none"
                 >
                   Cancel
                 </Button>
               )}
               <Button
+                size="lg"
                 onClick={() => {
                   setFlightPassengersOpen(false);
                   setOpenLegDateId(null);
                   onSearch(buildCriteria());
                 }}
-                className="flex-1 md:flex-none h-[52px] rounded-xl px-6 text-base font-extrabold shadow-md"
+                className="flex-1 md:flex-none"
               >
                 <Search />
                 {submitLabel}

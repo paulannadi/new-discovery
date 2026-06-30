@@ -75,11 +75,11 @@ export default function AiSuggestionCard({
 
       <div className="p-3.5">
         <div className="text-sm font-semibold leading-none">{card.title}</div>
-        <p className="mt-1.5 text-xs text-grey leading-relaxed text-pretty line-clamp-2">
+        <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed text-pretty line-clamp-2">
           {card.subtitle}
         </p>
         {card.meta && (
-          <div className="mt-2.5 flex items-center gap-1.5 text-[11px] font-medium text-grey">
+          <div className="mt-2.5 flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
             <Sparkles className="size-3 text-primary" aria-hidden="true" />
             {card.meta}
           </div>

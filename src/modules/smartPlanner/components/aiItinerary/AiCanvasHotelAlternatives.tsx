@@ -62,7 +62,7 @@ export default function AiCanvasHotelAlternatives({
               ))}
             </div>
             <div className="text-xs font-extrabold">{alt.hotel.name}</div>
-            <div className="text-[11px] text-grey">{alt.hotel.location}</div>
+            <div className="text-[11px] text-muted-foreground">{alt.hotel.location}</div>
             <div className="text-xs font-extrabold text-primary">
               €{alt.pricePerNight}/nt
             </div>

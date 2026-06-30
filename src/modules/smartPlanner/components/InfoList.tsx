@@ -31,7 +31,7 @@ export function InfoList({ title, items, variant }: InfoListProps) {
             {/* Bullet icon — no background circle, 16px (w-4 h-4).
                 highlight → primary star · check → success check · cross → red X */}
             {variant === "cross" ? (
-              <X className="w-4 h-4 text-red-600 shrink-0 mt-0.75" aria-hidden="true" />
+              <X className="w-4 h-4 text-destructive shrink-0 mt-0.75" aria-hidden="true" />
             ) : variant === "highlight" ? (
               <CircleCheckBig className="w-4 h-4 text-foreground shrink-0 mt-0.75" aria-hidden="true" />
             ) : (

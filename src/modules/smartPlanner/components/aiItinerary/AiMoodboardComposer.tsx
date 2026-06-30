@@ -368,7 +368,7 @@ export default function AiMoodboardComposer({
                 if (e.key === "Enter") submit();
               }}
               placeholder="Tell us anything — destination, dates, the vibe…"
-              className="flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-grey py-2"
+              className="flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground py-2"
             />
             <Button
               variant="ghost"
@@ -610,7 +610,7 @@ function ChipPill({
         type="button"
         onClick={onRemove}
         aria-label="Remove"
-        className="size-5 rounded-full inline-flex items-center justify-center bg-grey-lightest text-grey ml-0.5 hover:bg-grey-light"
+        className="size-5 rounded-full inline-flex items-center justify-center bg-grey-lightest text-muted-foreground ml-0.5 hover:bg-grey-light"
       >
         <X className="size-2.5" aria-hidden="true" />
       </button>
@@ -682,7 +682,7 @@ function PlusItem({
       </div>
       <div>
         <div className="text-xs font-bold leading-tight">{label}</div>
-        <div className="text-[11px] text-grey mt-0.5">{hint}</div>
+        <div className="text-[11px] text-muted-foreground mt-0.5">{hint}</div>
       </div>
     </button>
   );

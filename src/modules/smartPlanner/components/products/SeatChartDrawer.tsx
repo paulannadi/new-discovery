@@ -121,7 +121,7 @@ type SeatVariant = "free" | "booked" | "selected" | "guide";
 // `grey-light`, `card`, etc. are defined in the project's theme.
 const SEAT_STYLES: Record<SeatVariant, string> = {
   free:     "bg-grey-light",
-  booked:   "bg-grey-light text-grey",
+  booked:   "bg-grey-light text-muted-foreground",
   selected: "bg-success text-white",
   guide:    "bg-card border border-border text-foreground",
 };

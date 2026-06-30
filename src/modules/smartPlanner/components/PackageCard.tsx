@@ -12,10 +12,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from "react";
-import { MapPin, BedDouble, Utensils, Calendar as CalendarIcon, ArrowRight, Wifi, Waves, Dumbbell, Wine, Wind, Dog, Accessibility, Droplets, Umbrella, Sparkles, Flag, Fish, Anchor, Eye, Music2, Plane, Loader2 } from "lucide-react";
+import { MapPin, BedDouble, Utensils, Calendar as CalendarIcon, Wifi, Waves, Dumbbell, Wine, Wind, Dog, Accessibility, Droplets, Umbrella, Sparkles, Flag, Fish, Anchor, Eye, Music2, Plane, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { UnifiedPackage } from "../../../types";
 import { cn } from "../../../shared/components/ui/utils";
+import { Button } from "../../../shared/components/ui/button";
 import AccommodationStar from "../../../shared/components/AccommodationStar";
 import RatingBlock from "../../../shared/components/RatingBlock";
 // ImageWithPlaceholder — handles lazy loading, reserves space (no CLS),
@@ -215,13 +216,12 @@ export function PackageCard({ pkg, onSelect, onHover, isHovered, isPricePending 
               </span>
             </div>
           )}
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); onSelect?.(pkg); }}
-            className="w-full justify-center bg-primary hover:brightness-85 text-primary-foreground font-bold text-sm px-5 py-2.5 rounded-lg transition-all flex items-center gap-2"
+            className="w-full"
           >
             View details
-            <ArrowRight size={15} aria-hidden="true" />
-          </button>
+          </Button>
         </div>
 
       </div>

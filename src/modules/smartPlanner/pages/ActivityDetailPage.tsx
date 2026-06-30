@@ -385,12 +385,13 @@ export default function ActivityDetailPage({
               </div>
             </div>
 
-            <button
+            <Button
+              variant="secondary"
               onClick={() => setPhotosOpen(true)}
-              className="absolute bottom-4 right-4 bg-card border border-primary text-primary text-sm font-semibold px-4 py-2 rounded-md flex items-center gap-2 hover:bg-primary hover:text-white transition-colors shadow-sm"
+              className="absolute bottom-4 right-4 shadow-sm"
             >
               <LayoutGrid size={16} aria-hidden="true" /> See all photos
-            </button>
+            </Button>
           </div>
 
           {/* Title + quick facts */}
@@ -647,7 +648,7 @@ export default function ActivityDetailPage({
                           <Ruler size={18} className="text-primary" aria-hidden="true" />
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-grey uppercase tracking-wide">
+                          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">
                             Distance
                           </p>
                           <p className="text-lg font-bold text-foreground">
@@ -718,7 +719,7 @@ export default function ActivityDetailPage({
 
               <div className="px-5 pt-5 pb-5 border-b border-border">
                 <div className="flex flex-col items-end text-right">
-                  <span className="text-grey text-xs">
+                  <span className="text-muted-foreground text-xs">
                     {currency}{activity.price.perPerson.toLocaleString()} per person · {activity.durationDays}-day experience
                   </span>
                   <span className="text-foreground font-bold text-2xl">
@@ -729,7 +730,7 @@ export default function ActivityDetailPage({
 
               <div ref={bookingRef} className="p-5 flex flex-col gap-3">
 
-                <p className="text-xs font-bold text-grey uppercase tracking-wide mb-1">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-1">
                   Customise your trip
                 </p>
 
@@ -738,7 +739,7 @@ export default function ActivityDetailPage({
                   <button
                     onClick={() => setOpenPanel(openPanel === "date" ? null : "date")}
                     className={cn(
-                      "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                      "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                       openPanel === "date"
                         ? "border-primary ring-2 ring-primary/20 bg-card"
                         : "border-border bg-card hover:border-primary"
@@ -746,7 +747,7 @@ export default function ActivityDetailPage({
                   >
                     <Calendar size={16} className="text-primary shrink-0" aria-hidden="true" />
                     <div className="flex flex-col flex-1 min-w-0">
-                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
                         Travel date
                       </span>
                       <span className="text-xs font-semibold text-foreground truncate">
@@ -756,7 +757,7 @@ export default function ActivityDetailPage({
                     <ChevronDown
                       size={14}
                       className={cn(
-                        "text-grey shrink-0 transition-transform",
+                        "text-muted-foreground shrink-0 transition-transform",
                         openPanel === "date" && "rotate-180"
                       )}
                       aria-hidden="true"
@@ -787,7 +788,7 @@ export default function ActivityDetailPage({
                   <button
                     onClick={() => setOpenPanel(openPanel === "guests" ? null : "guests")}
                     className={cn(
-                      "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                      "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                       openPanel === "guests"
                         ? "border-primary ring-2 ring-primary/20 bg-card"
                         : "border-border bg-card hover:border-primary"
@@ -795,7 +796,7 @@ export default function ActivityDetailPage({
                   >
                     <Users size={16} className="text-primary shrink-0" aria-hidden="true" />
                     <div className="flex flex-col flex-1 min-w-0">
-                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
                         Travellers
                       </span>
                       <span className="text-xs font-semibold text-foreground">
@@ -805,7 +806,7 @@ export default function ActivityDetailPage({
                     <ChevronDown
                       size={14}
                       className={cn(
-                        "text-grey shrink-0 transition-transform",
+                        "text-muted-foreground shrink-0 transition-transform",
                         openPanel === "guests" && "rotate-180"
                       )}
                       aria-hidden="true"
@@ -817,7 +818,7 @@ export default function ActivityDetailPage({
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="text-sm font-semibold text-foreground">Travellers</div>
-                          <div className="text-xs text-grey">All ages</div>
+                          <div className="text-xs text-muted-foreground">All ages</div>
                         </div>
                         <div className="flex items-center gap-3">
                           <button
@@ -840,12 +841,12 @@ export default function ActivityDetailPage({
                           </button>
                         </div>
                       </div>
-                      <button
+                      <Button
                         onClick={() => setOpenPanel(null)}
-                        className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-colors"
+                        className="w-full"
                       >
                         Done
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -855,7 +856,7 @@ export default function ActivityDetailPage({
                   <button
                     onClick={() => setOpenPanel(openPanel === "preference" ? null : "preference")}
                     className={cn(
-                      "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                      "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                       openPanel === "preference"
                         ? "border-primary ring-2 ring-primary/20 bg-card"
                         : "border-border bg-card hover:border-primary"
@@ -863,7 +864,7 @@ export default function ActivityDetailPage({
                   >
                     {preferenceField.icon}
                     <div className="flex flex-col flex-1 min-w-0">
-                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
                         {preferenceField.label}
                       </span>
                       <span className="text-xs font-semibold text-foreground truncate">
@@ -873,7 +874,7 @@ export default function ActivityDetailPage({
                     <ChevronDown
                       size={14}
                       className={cn(
-                        "text-grey shrink-0 transition-transform",
+                        "text-muted-foreground shrink-0 transition-transform",
                         openPanel === "preference" && "rotate-180"
                       )}
                       aria-hidden="true"
@@ -903,12 +904,13 @@ export default function ActivityDetailPage({
               </div>
 
               <div className="px-5 pb-5">
-                <button
+                <Button
+                  size="lg"
                   onClick={() => onBook(activity, travelDate, travellers, preference)}
-                  className="w-full bg-primary hover:brightness-85 text-white font-bold text-base py-4 rounded-md transition-colors flex items-center justify-center gap-2"
+                  className="w-full"
                 >
                   Start planning
-                </button>
+                </Button>
               </div>
 
             </div>
@@ -942,7 +944,7 @@ export default function ActivityDetailPage({
 
         <div className="px-5 py-3 flex items-center justify-between gap-3">
           <div className="flex flex-col flex-1 min-w-0">
-            <span className="text-grey text-xs">
+            <span className="text-muted-foreground text-xs">
               {currency}{activity.price.perPerson.toLocaleString()} per person
             </span>
             <span className="text-foreground font-bold text-base">
@@ -951,32 +953,33 @@ export default function ActivityDetailPage({
           </div>
 
           {!mobileSheetOpen && (
-            <button
+            <Button
               onClick={() => setMobileSheetOpen(true)}
-              className="flex items-center gap-2 bg-primary hover:brightness-85 text-white font-bold text-sm px-5 py-3 rounded-md transition-colors shrink-0"
+              className="shrink-0"
               aria-expanded={false}
               aria-label="Customise booking options"
             >
               Customise
-            </button>
+            </Button>
           )}
 
           {mobileSheetOpen && (
-            <button
+            <Button
+              variant="link"
               onClick={() => { setMobileSheetOpen(false); setOpenPanel(null); }}
-              className="flex items-center gap-1 text-primary text-sm font-semibold shrink-0"
+              className="shrink-0"
               aria-expanded={true}
               aria-label="Close booking options"
             >
               Close <X size={16} aria-hidden="true" />
-            </button>
+            </Button>
           )}
         </div>
 
         {mobileSheetOpen && (<>
           <div className="px-5 pb-2 flex flex-col gap-3 animate-in slide-in-from-bottom-4 fade-in duration-200">
 
-            <p className="text-xs font-bold text-grey uppercase tracking-wide">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">
               Customise your trip
             </p>
 
@@ -985,7 +988,7 @@ export default function ActivityDetailPage({
               <button
                 onClick={() => setOpenPanel(openPanel === "date" ? null : "date")}
                 className={cn(
-                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                  "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                   openPanel === "date"
                     ? "border-primary ring-2 ring-primary/20 bg-card"
                     : "border-border bg-card hover:border-primary"
@@ -993,10 +996,10 @@ export default function ActivityDetailPage({
               >
                 <Calendar size={16} className="text-primary shrink-0" aria-hidden="true" />
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Travel date</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Travel date</span>
                   <span className="text-xs font-semibold text-foreground truncate">{dateSummary}</span>
                 </div>
-                <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "date" && "rotate-180")} aria-hidden="true" />
+                <ChevronDown size={14} className={cn("text-muted-foreground shrink-0 transition-transform", openPanel === "date" && "rotate-180")} aria-hidden="true" />
               </button>
 
               {openPanel === "date" && (
@@ -1023,7 +1026,7 @@ export default function ActivityDetailPage({
               <button
                 onClick={() => setOpenPanel(openPanel === "guests" ? null : "guests")}
                 className={cn(
-                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                  "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                   openPanel === "guests"
                     ? "border-primary ring-2 ring-primary/20 bg-card"
                     : "border-border bg-card hover:border-primary"
@@ -1031,12 +1034,12 @@ export default function ActivityDetailPage({
               >
                 <Users size={16} className="text-primary shrink-0" aria-hidden="true" />
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Travellers</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Travellers</span>
                   <span className="text-xs font-semibold text-foreground">
                     {travellers} {travellers === 1 ? "Traveller" : "Travellers"}
                   </span>
                 </div>
-                <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "guests" && "rotate-180")} aria-hidden="true" />
+                <ChevronDown size={14} className={cn("text-muted-foreground shrink-0 transition-transform", openPanel === "guests" && "rotate-180")} aria-hidden="true" />
               </button>
 
               {openPanel === "guests" && (
@@ -1044,7 +1047,7 @@ export default function ActivityDetailPage({
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-sm font-semibold text-foreground">Travellers</div>
-                      <div className="text-xs text-grey">All ages</div>
+                      <div className="text-xs text-muted-foreground">All ages</div>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
@@ -1065,12 +1068,12 @@ export default function ActivityDetailPage({
                       </button>
                     </div>
                   </div>
-                  <button
+                  <Button
                     onClick={() => setOpenPanel(null)}
-                    className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-colors"
+                    className="w-full"
                   >
                     Done
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -1080,7 +1083,7 @@ export default function ActivityDetailPage({
               <button
                 onClick={() => setOpenPanel(openPanel === "preference" ? null : "preference")}
                 className={cn(
-                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                  "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                   openPanel === "preference"
                     ? "border-primary ring-2 ring-primary/20 bg-card"
                     : "border-border bg-card hover:border-primary"
@@ -1088,12 +1091,12 @@ export default function ActivityDetailPage({
               >
                 {preferenceField.icon}
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
                     {preferenceField.label}
                   </span>
                   <span className="text-xs font-semibold text-foreground">{preference}</span>
                 </div>
-                <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "preference" && "rotate-180")} aria-hidden="true" />
+                <ChevronDown size={14} className={cn("text-muted-foreground shrink-0 transition-transform", openPanel === "preference" && "rotate-180")} aria-hidden="true" />
               </button>
 
               {openPanel === "preference" && (
@@ -1118,12 +1121,13 @@ export default function ActivityDetailPage({
           </div>
 
           <div className="px-5 pb-4 pt-2">
-            <button
+            <Button
+              size="lg"
               onClick={() => onBook(activity, travelDate, travellers, preference)}
-              className="w-full bg-primary hover:brightness-85 text-white font-bold text-sm py-3.5 rounded-md transition-colors flex items-center justify-center gap-2"
+              className="w-full"
             >
               Start planning
-            </button>
+            </Button>
           </div>
         </>)}
 
@@ -1298,7 +1302,7 @@ function CabinGrid({
             {/* "Best value" badge — only shown on the cheapest cabin */}
             {isCheapest && (
               <span
-                className="absolute top-2 left-2 z-10 text-green-700 bg-green-50 text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-md"
+                className="absolute top-2 left-2 z-10 text-success bg-success/10 text-xs font-bold uppercase tracking-wide px-2 py-1 rounded-md"
               >
                 Best value
               </span>

@@ -322,8 +322,8 @@ export default function StopoverRoomPage({
       );
     }
     return (
-      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
-        <p className="text-yellow-900 font-bold text-sm">
+      <div className="bg-warning/10 border border-warning/30 rounded-xl p-6 text-center">
+        <p className="text-foreground font-bold text-sm">
           No rooms available for {getTotalGuests(config)} guest{getTotalGuests(config) > 1 ? "s" : ""}
         </p>
       </div>
@@ -437,7 +437,7 @@ export default function StopoverRoomPage({
               hotel page's field style. */}
           <div
             className={cn(
-              "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors cursor-pointer",
+              "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors cursor-pointer",
               guestsOpen
                 ? "border-primary ring-2 ring-primary/20 bg-card"
                 : "border-border bg-card hover:border-primary"
@@ -446,7 +446,7 @@ export default function StopoverRoomPage({
           >
             <Users size={16} className="text-primary shrink-0" aria-hidden="true" />
             <div className="flex flex-col flex-1 min-w-0">
-              <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
                 Guests &amp; Rooms
               </span>
               <span className="text-sm font-semibold text-foreground truncate">
@@ -457,7 +457,7 @@ export default function StopoverRoomPage({
                 {localRoomConfig.length} Room{localRoomConfig.length !== 1 ? "s" : ""}
               </span>
             </div>
-            <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+            <ChevronDown size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
           </div>
 
           {/* Dropdown panel */}
@@ -466,7 +466,7 @@ export default function StopoverRoomPage({
 
               {/* Helper line — reminds the user the total is fixed and shows how
                   many travellers still need placing into a room. */}
-              <p className="text-xs text-grey leading-snug">
+              <p className="text-xs text-muted-foreground leading-snug">
                 {allAllocated ? (
                   "All travellers are allocated to a room."
                 ) : (
@@ -503,7 +503,7 @@ export default function StopoverRoomPage({
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-sm text-foreground">Adults</div>
-                      <div className="text-xs text-grey">Age 18+</div>
+                      <div className="text-xs text-muted-foreground">Age 18+</div>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
@@ -528,7 +528,7 @@ export default function StopoverRoomPage({
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-sm text-foreground">Children</div>
-                      <div className="text-xs text-grey">Age 2–17</div>
+                      <div className="text-xs text-muted-foreground">Age 2–17</div>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
@@ -560,12 +560,12 @@ export default function StopoverRoomPage({
                   from the "left to place" pool. Capped at 6 rooms. */}
               {localRoomConfig.length < 6 && (
                 <Button
-                  variant="outline"
+                  variant="tertiary"
                   onClick={() => {
                     const newId = Math.max(...localRoomConfig.map((r) => r.id)) + 1;
                     setLocalRoomConfig((prev) => [...prev, { id: newId, adults: 0, children: 0 }]);
                   }}
-                  className="w-full h-[36px] border-dashed border-primary text-primary hover:bg-primary/10"
+                  className="w-full h-[36px]"
                 >
                   + Add another room
                 </Button>
@@ -596,7 +596,7 @@ export default function StopoverRoomPage({
                     className={cn(
                       "flex items-center gap-2 px-6 py-3 font-bold text-sm border-b-2 transition-colors relative",
                       isDisabled
-                        ? "border-transparent text-grey cursor-not-allowed"
+                        ? "border-transparent text-muted-foreground cursor-not-allowed"
                         : isActive
                           ? "border-primary text-primary"
                           : "border-transparent text-foreground hover:text-foreground hover:border-primary"
@@ -654,7 +654,7 @@ export default function StopoverRoomPage({
               </div>
               <div className="flex items-center gap-3 flex-wrap text-sm text-foreground">
                 <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
-                <span className="flex items-center gap-1 text-grey">
+                <span className="flex items-center gap-1 text-muted-foreground">
                   <MapPin size={14} className="shrink-0" aria-hidden="true" />
                   {city}
                 </span>
@@ -780,7 +780,7 @@ export default function StopoverRoomPage({
                       >
                         <MapPin size={12} className="text-primary shrink-0" aria-hidden="true" />
                         <span className="font-medium text-foreground">{poi.label}</span>
-                        <span className="text-grey">· {poi.distance}</span>
+                        <span className="text-muted-foreground">· {poi.distance}</span>
                       </span>
                     ))}
                   </div>
@@ -810,7 +810,7 @@ export default function StopoverRoomPage({
                     </div>
                     <p className="text-base text-foreground leading-normal flex-1 overflow-hidden">{review.text}</p>
                     <div className="text-sm text-foreground">{review.date}</div>
-                    <div className="text-xs text-grey">Verified review</div>
+                    <div className="text-xs text-muted-foreground">Verified review</div>
                   </div>
                 ))}
               </div>
@@ -848,7 +848,7 @@ export default function StopoverRoomPage({
                         Room {index + 1} <Users size={12} aria-hidden="true" /> {getTotalGuests(config)}:
                       </span>
                       <span className="text-xs text-foreground truncate min-w-0">
-                        {sel ? sel.room.name : <span className="text-grey italic">Selecting now</span>}
+                        {sel ? sel.room.name : <span className="text-muted-foreground italic">Selecting now</span>}
                       </span>
                     </div>
                   );
@@ -870,7 +870,7 @@ export default function StopoverRoomPage({
                         "inline-flex shrink-0 px-4 py-2.5 rounded-lg font-bold text-sm transition-all select-none items-center gap-2",
                         !ctaDisabled
                           ? "bg-primary hover:brightness-85 text-white cursor-pointer shadow-lg"
-                          : "bg-border text-grey cursor-not-allowed"
+                          : "bg-border text-muted-foreground cursor-not-allowed"
                       )}
                     >
                       Go to booking summary
@@ -888,7 +888,7 @@ export default function StopoverRoomPage({
             {/* Desktop layout: per-room breakdown left, total + CTA right */}
             <div className="hidden sm:flex items-center justify-between gap-6">
               <div className="flex flex-col gap-2">
-                <span className="text-grey text-xs font-semibold uppercase tracking-wide">Room selection</span>
+                <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">Room selection</span>
                 {localRoomConfig.map((config, index) => {
                   const sel = roomSelections[config.id];
                   const cancelLabel = sel?.room.cancellationPolicies.find((p) => p.id === sel.cancelOption)?.label;
@@ -912,7 +912,7 @@ export default function StopoverRoomPage({
                           {sel.room.name} · {cancelLabel} · {boardLabel}
                         </span>
                       ) : (
-                        <span className="text-sm text-grey italic shrink-0">· Selecting now</span>
+                        <span className="text-sm text-muted-foreground italic shrink-0">· Selecting now</span>
                       )}
                     </div>
                   );
@@ -935,7 +935,7 @@ export default function StopoverRoomPage({
                         "inline-flex px-6 py-3 rounded-lg font-bold text-base transition-all select-none items-center gap-2",
                         !ctaDisabled
                           ? "bg-primary hover:brightness-85 text-white cursor-pointer shadow-lg"
-                          : "bg-border text-grey cursor-not-allowed"
+                          : "bg-border text-muted-foreground cursor-not-allowed"
                       )}
                     >
                       Go to booking summary

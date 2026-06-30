@@ -1,9 +1,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// ActivityCard
+// ActivityProductCard
 //
 // One experience/excursion in the itinerary. Same overall shape as the
 // AccommodationCard (image left, content right) but a bit lighter — activities
 // don't have stars or check-in/out logic.
+// (Renamed from ActivityCard to disambiguate from the search-result
+//  ActivityResultCard in components/.)
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Clock, MapPin } from "lucide-react";
@@ -12,7 +14,7 @@ import { Button } from "../../../../shared/components/ui/button";
 import { ImageWithPlaceholder } from "../../../../shared/components/loading";
 import type { ActivityItem } from "../../utils/seedTimeline";
 
-export function ActivityCard({ item }: { item: ActivityItem }) {
+export function ActivityProductCard({ item }: { item: ActivityItem }) {
   return (
     <div>
       {/* Date header — same style as flight / hotel cards */}
@@ -20,12 +22,12 @@ export function ActivityCard({ item }: { item: ActivityItem }) {
         {format(item.date, "EEE, dd MMM yyyy")}
       </p>
 
-      <div className="border border-border rounded-lg md:rounded-3xl shadow-sm">
-        <div className="bg-card rounded-lg md:rounded-3xl grid md:grid-cols-[160px_1fr] lg:grid-cols-[270px_1fr] md:grid-rows-[200px]">
+      <div className="border border-border rounded-xl shadow-sm">
+        <div className="bg-card rounded-xl grid md:grid-cols-[160px_1fr] lg:grid-cols-[270px_1fr] md:grid-rows-[200px]">
           <ImageWithPlaceholder
             src={item.image}
             alt={item.title}
-            containerClassName="block w-full h-32 md:h-full max-md:rounded-t-lg md:rounded-l-3xl"
+            containerClassName="block w-full h-32 md:h-full max-md:rounded-t-xl md:rounded-l-xl"
           />
 
           <div className="p-4 md:p-6 grid md:grid-cols-[1fr_160px] lg:grid-cols-[1fr_220px]">
@@ -50,7 +52,7 @@ export function ActivityCard({ item }: { item: ActivityItem }) {
                 </div>
                 {item.price && (
                   <div className="text-right">
-                    <div className="text-xs text-grey">From</div>
+                    <div className="text-xs text-muted-foreground">From</div>
                     <div className="text-base font-bold text-foreground">{item.price}</div>
                   </div>
                 )}

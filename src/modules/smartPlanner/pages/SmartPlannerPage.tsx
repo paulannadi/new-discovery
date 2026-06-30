@@ -54,6 +54,12 @@ export type TourData = {
   departurePoint?: string;
   // Coach operator brand, forwarded to the transfer cards. Defaults to M-TOURS.
   operator?: { name: string; tagline?: string };
+  // Which travel option the user picked on a flexible coach tour:
+  //   "coach"      → join the group coach (pick a seat).
+  //   "individual" → door-to-door pickup from your own address (no seat).
+  // When "individual", `departurePoint` holds the typed pickup address and
+  // seedTimeline flags the bus transfers as door-to-door.
+  travelMode?: "coach" | "individual";
 };
 
 export type HotelData = {

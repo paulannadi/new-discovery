@@ -9,7 +9,6 @@
 import { useState, useEffect } from "react";
 import {
   MapPin,
-  ArrowRight,
   Train,
   Users,
   User,
@@ -21,6 +20,7 @@ import {
 } from "lucide-react";
 import type { Tour } from "../../../types";
 import { cn } from "../../../shared/components/ui/utils";
+import { Button } from "../../../shared/components/ui/button";
 // ImageWithPlaceholder — reserves space, lazy-loads, fades the image in.
 import { ImageWithPlaceholder } from "../../../shared/components/loading";
 
@@ -145,13 +145,12 @@ export function TourCard({ tour, onSelect, onHover, isHovered }: TourCardProps) 
               {sym}{tour.price.perPerson.toLocaleString()}
             </span>
           </div>
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); onSelect?.(tour); }}
-            className="w-full justify-center bg-primary hover:brightness-85 text-primary-foreground font-bold text-sm px-5 py-2.5 rounded-lg transition-all flex items-center gap-2"
+            className="w-full"
           >
             View tour
-            <ArrowRight size={15} aria-hidden="true" />
-          </button>
+          </Button>
         </div>
 
       </div>

@@ -37,6 +37,10 @@ import {
 import { format, parseISO } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { cn } from "../../../shared/components/ui/utils";
+// Shared design-system Button — used for the real action CTAs in this form
+// (the travellers "Done" confirm and the Search submit) so they pick up the
+// canonical variant/size styling instead of hand-rolled bg-primary classes.
+import { Button } from "../../../shared/components/ui/button";
 // Shared design-system date picker (token-based, no hardcoded colors).
 import { Calendar } from "../../../shared/components/ui/calendar";
 // Shared responsive date picker: dropdown on desktop, bottom drawer on mobile.
@@ -216,17 +220,16 @@ export default function ActivitySearchForm({
 
   // ── Sizing tokens by variant — match PackageSearchForm exactly so the two
   //    forms feel like siblings on the discovery page hero. ─────────────────
-  const h = variant === "hero" ? "h-[52px]" : "h-[48px]";
-  const r = variant === "hero" ? "rounded-xl" : "rounded-lg";
+  // One search size everywhere (hero landing + compact list-page bar): 52px,
+  // rounded-xl, same value text / icon / gap. `variant` only drives layout now.
+  const h = "h-[52px]";
+  const r = "rounded-xl";
   const labelCls =
-    "text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5";
+    "text-[10px] font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5";
   // 16px text on mobile keeps iOS Safari from auto-zooming on focus
-  const valueCls =
-    variant === "hero"
-      ? "text-base md:text-sm font-semibold"
-      : "text-base md:text-xs font-semibold";
-  const iconSize = variant === "hero" ? 18 : 16;
-  const fieldGap = variant === "hero" ? "gap-3" : "gap-2";
+  const valueCls = "text-base md:text-sm font-semibold";
+  const iconSize = 18;
+  const fieldGap = "gap-3";
 
   const fieldBase = (active: boolean) =>
     cn(
@@ -262,7 +265,7 @@ export default function ActivitySearchForm({
           <ChevronDown
             size={14}
             className={cn(
-              "text-grey shrink-0 transition-transform",
+              "text-muted-foreground shrink-0 transition-transform",
               openPanel === "type" && "rotate-180"
             )}
             aria-hidden="true"
@@ -313,7 +316,7 @@ export default function ActivitySearchForm({
                   e.stopPropagation();
                   setActivityTypes([]);
                 }}
-                className="mt-1 text-xs text-grey hover:text-foreground self-start px-3 py-1"
+                className="mt-1 text-xs text-muted-foreground hover:text-foreground self-start px-3 py-1"
               >
                 Clear all
               </button>
@@ -345,7 +348,7 @@ export default function ActivitySearchForm({
               className={cn(
                 "bg-transparent",
                 valueCls,
-                "text-foreground outline-none placeholder:text-grey placeholder:font-normal w-full"
+                "text-foreground outline-none placeholder:text-muted-foreground placeholder:font-normal w-full"
               )}
               onChange={(e) => setDestination(e.target.value)}
               onFocus={() => setOpenPanel("destination")}
@@ -373,7 +376,7 @@ export default function ActivitySearchForm({
                   }}
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm font-medium text-foreground hover:bg-grey-light transition-colors"
                 >
-                  <MapPin size={14} className="text-grey shrink-0" aria-hidden="true" />
+                  <MapPin size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
                   <span className="truncate">{region}</span>
                 </button>
               ))
@@ -393,7 +396,7 @@ export default function ActivitySearchForm({
                   }}
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm text-foreground hover:bg-grey-light transition-colors"
                 >
-                  <MapPin size={14} className="text-grey shrink-0" aria-hidden="true" />
+                  <MapPin size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
                   <span className="truncate">{dest}</span>
                 </button>
               ))
@@ -423,7 +426,7 @@ export default function ActivitySearchForm({
                 className={cn(
                   valueCls,
                   "truncate",
-                  date ? "text-foreground" : "text-grey font-normal"
+                  date ? "text-foreground" : "text-muted-foreground font-normal"
                 )}
               >
                 {dateSummary}
@@ -432,7 +435,7 @@ export default function ActivitySearchForm({
             <ChevronDown
               size={14}
               className={cn(
-                "text-grey shrink-0 transition-transform",
+                "text-muted-foreground shrink-0 transition-transform",
                 openPanel === "dates" && "rotate-180"
               )}
               aria-hidden="true"
@@ -462,7 +465,7 @@ export default function ActivitySearchForm({
                 e.stopPropagation();
                 setDate(undefined);
               }}
-              className="mt-2 text-xs text-grey hover:text-foreground"
+              className="mt-2 text-xs text-muted-foreground hover:text-foreground"
             >
               Clear date
             </button>
@@ -486,7 +489,7 @@ export default function ActivitySearchForm({
           <ChevronDown
             size={14}
             className={cn(
-              "text-grey shrink-0 transition-transform",
+              "text-muted-foreground shrink-0 transition-transform",
               openPanel === "guests" && "rotate-180"
             )}
             aria-hidden="true"
@@ -498,7 +501,7 @@ export default function ActivitySearchForm({
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm font-semibold text-foreground">Travellers</div>
-                <div className="text-xs text-grey">All ages</div>
+                <div className="text-xs text-muted-foreground">All ages</div>
               </div>
               <div className="flex items-center gap-3">
                 <button
@@ -522,31 +525,27 @@ export default function ActivitySearchForm({
               </div>
             </div>
 
-            <button
-              onClick={() => setOpenPanel(null)}
-              className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-colors"
-            >
+            <Button onClick={() => setOpenPanel(null)} className="w-full">
               Done
-            </button>
+            </Button>
           </div>
         )}
       </div>
 
       {/* ── SEARCH BUTTON ─────────────────────────────────────────────────── */}
-      <button
+      {/* Primary submit CTA → shared Button (default variant). The variant now
+          provides bg-primary/text-white/rounded/font weight; we keep only the
+          explicit field height + padding via className so it still lines up
+          with the adjacent picker fields, plus shrink-0 and the icon gap. */}
+      <Button
+        size="lg"
         onClick={handleSearch}
-        className={cn(
-          "shrink-0 bg-primary hover:brightness-85 text-white font-extrabold",
-          variant === "hero"
-            ? "text-base h-[52px] px-6 rounded-xl"
-            : "text-sm h-[48px] px-5 rounded-lg",
-          "transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
-        )}
+        className="shrink-0 whitespace-nowrap"
         aria-label={variant === "hero" ? "Search activities" : "Search"}
       >
-        <Search size={variant === "hero" ? 20 : 16} aria-hidden="true" />
+        <Search aria-hidden="true" />
         {variant === "hero" ? "Search activities" : "Search"}
-      </button>
+      </Button>
     </div>
   );
 }

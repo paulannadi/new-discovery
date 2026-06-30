@@ -63,7 +63,7 @@ export default function AiChatBubble({ message }: AiChatBubbleProps) {
         {/* Ref footer — small grey card pointing the user at the canvas
             change this reply triggered. AI bubbles only. */}
         {!isUser && message.refCard && (
-          <div className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-grey-lightest rounded-md text-xs text-grey">
+          <div className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-grey-lightest rounded-md text-xs text-muted-foreground">
             <MapPin className="size-3" aria-hidden="true" />
             Updated on canvas:{" "}
             <strong className="text-foreground font-semibold">

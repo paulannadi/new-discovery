@@ -88,7 +88,7 @@ interface StickySummaryBarProps {
 // Map each item kind to a small line-style icon used in the expanded panel.
 // Mid-grey color so they read as supporting glyphs, not primary actions.
 function ItemIcon({ kind }: { kind: TimelineItem["kind"] }) {
-  const className = "size-5 text-grey shrink-0";
+  const className = "size-5 text-muted-foreground shrink-0";
   if (kind === "flight") return <Plane className={className} aria-hidden="true" />;
   if (kind === "accommodation") return <Building2 className={className} aria-hidden="true" />;
   if (kind === "activity") return <Binoculars className={className} aria-hidden="true" />;
@@ -282,13 +282,13 @@ export function StickySummaryBar({
             {/* Mobile: compact pax + dates icons */}
             <div className="flex lg:hidden flex-1 flex-col gap-0.5 text-xs text-foreground min-w-0">
               <span className="flex items-center gap-1.5">
-                <User size={13} className="text-grey shrink-0" aria-hidden="true" />
+                <User size={13} className="text-muted-foreground shrink-0" aria-hidden="true" />
                 <span className="truncate">
                   {adults} adult{adults !== 1 ? "s" : ""}
                 </span>
               </span>
               <span className="flex items-center gap-1.5">
-                <CalendarDays size={13} className="text-grey shrink-0" aria-hidden="true" />
+                <CalendarDays size={13} className="text-muted-foreground shrink-0" aria-hidden="true" />
                 <span className="truncate">
                   {format(startDate, "dd MMM")} – {format(endDate, "dd MMM yyyy")}
                 </span>
@@ -356,7 +356,7 @@ export function StickySummaryBar({
                   <div key={kind} className="flex flex-col gap-3">
                     {/* Section header — uppercase, light grey, tracked-out.
                         Matches the "DEPART / RETURN" labels in the hero. */}
-                    <h3 className="text-xs font-bold uppercase tracking-[0.08em] text-grey">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
                       {sectionLabel(kind)}
                     </h3>
 
@@ -410,7 +410,7 @@ export function StickySummaryBar({
                 Stopover hotel + Trip total). With no custom list we fall back to
                 a single "Paid before departure" line using the trip total. */}
             <div className="flex flex-col gap-3">
-              <h3 className="text-xs font-bold uppercase tracking-[0.08em] text-grey">
+              <h3 className="text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
                 Price breakdown
               </h3>
               {(priceBreakdown ?? [{ label: "Paid before departure", value: totalPriceLabel }]).map(
@@ -432,7 +432,7 @@ export function StickySummaryBar({
                         {line.labelNode ?? line.label}
                       </span>
                       {line.sub && (
-                        <span className="text-xs text-grey mt-0.5">{line.sub}</span>
+                        <span className="text-xs text-muted-foreground mt-0.5">{line.sub}</span>
                       )}
                     </span>
                     <span

@@ -32,12 +32,12 @@ export default function DiscoverySettingsPanel({ tabs }: { tabs: TabMeta[] }) {
       {/* ── Header ── */}
       <div className="px-4 pt-4 pb-3 border-b border-border">
         <h3 className="text-base font-bold text-foreground">Display settings</h3>
-        <p className="text-sm text-grey">Choose what shows on Discovery</p>
+        <p className="text-sm text-muted-foreground">Choose what shows on Discovery</p>
       </div>
 
       {/* ── Tab toggles ── */}
       <div className="px-2 py-2">
-        <p className="px-2 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-grey">Tabs</p>
+        <p className="px-2 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tabs</p>
         {tabs.map((tab) => {
           const isOn = settings.enabledTabs[tab.id];
           // Block turning off the final enabled tab so the page is never empty.
@@ -47,8 +47,8 @@ export default function DiscoverySettingsPanel({ tabs }: { tabs: TabMeta[] }) {
               <div className="flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 hover:bg-grey-lightest">
                 <div className="flex items-center gap-3">
                   {/* Reuse the tab's own lucide icon so the panel matches the tab bar */}
-                  <span className={isOn ? "text-foreground" : "text-grey"}>{tab.icon}</span>
-                  <span className={`text-sm font-semibold ${isOn ? "text-foreground" : "text-grey"}`}>
+                  <span className={isOn ? "text-foreground" : "text-muted-foreground"}>{tab.icon}</span>
+                  <span className={`text-sm font-semibold ${isOn ? "text-foreground" : "text-muted-foreground"}`}>
                     {tab.label}
                   </span>
                 </div>
@@ -65,7 +65,7 @@ export default function DiscoverySettingsPanel({ tabs }: { tabs: TabMeta[] }) {
                   Switching airline changes the routes + hub everywhere downstream. */}
               {tab.id === "stopover" && isOn && (
                 <div className="ml-9 mr-2 mb-2 mt-1 flex flex-col gap-2 border-l-2 border-border pl-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-grey">Airline</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Airline</p>
                   {AIRLINE_ORDER.map((airlineId) => {
                     const airline = STOPOVER_AIRLINES[airlineId];
                     const selected = settings.stopoverAirline === airlineId;
@@ -84,7 +84,7 @@ export default function DiscoverySettingsPanel({ tabs }: { tabs: TabMeta[] }) {
                           <span className={`text-sm font-semibold ${selected ? "text-primary" : "text-foreground"}`}>
                             {airline.name}
                           </span>
-                          <span className="flex items-center gap-1 text-xs text-grey">
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
                             <MapPin size={12} />
                             Hub: {airline.hubCity}
                           </span>
@@ -109,13 +109,13 @@ export default function DiscoverySettingsPanel({ tabs }: { tabs: TabMeta[] }) {
           Non-tab toggles. The AI Experience pill in the hero is hidden when off,
           so the demo can stay on the classic search experience. */}
       <div className="border-t border-border px-2 py-2">
-        <p className="px-2 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-grey">Features</p>
+        <p className="px-2 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Features</p>
         <div className="flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 hover:bg-grey-lightest">
           <div className="flex items-center gap-3">
-            <span className={settings.aiExperienceEnabled ? "text-foreground" : "text-grey"}>
+            <span className={settings.aiExperienceEnabled ? "text-foreground" : "text-muted-foreground"}>
               <Sparkles size={20} />
             </span>
-            <span className={`text-sm font-semibold ${settings.aiExperienceEnabled ? "text-foreground" : "text-grey"}`}>
+            <span className={`text-sm font-semibold ${settings.aiExperienceEnabled ? "text-foreground" : "text-muted-foreground"}`}>
               AI Experience
             </span>
           </div>

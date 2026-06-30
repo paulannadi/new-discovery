@@ -144,7 +144,7 @@ function StepCard({ step, index, onClick }: { step: Step; index: number; onClick
           "text-xs font-bold uppercase tracking-wide whitespace-nowrap",
           status === "current" && "text-foreground",
           status === "done" && "text-foreground",
-          status === "future" && "text-grey",
+          status === "future" && "text-muted-foreground",
         )}
       >
         {label}
@@ -237,7 +237,7 @@ export function FlightStepper({
             {i > 0 && (
               <ChevronRight
                 size={20}
-                className="text-grey shrink-0 self-center"
+                className="text-muted-foreground shrink-0 self-center"
                 aria-hidden="true"
               />
             )}

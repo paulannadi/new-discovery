@@ -86,7 +86,7 @@ export const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, is
       isSelected ? "border-foreground shadow-lg" : "border-transparent"
     )}>
       {/* Image Carousel */}
-      <div className="h-[200px] relative bg-gray-100 group">
+      <div className="h-[200px] relative bg-muted group">
         <ImageWithPlaceholder
           src={room.image}
           alt={room.name}
@@ -137,7 +137,7 @@ export const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, is
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-bold text-foreground">Cancellation policy</span>
-            <span className="text-xs text-grey">per person, per night</span>
+            <span className="text-xs text-muted-foreground">per person, per night</span>
           </div>
           <div className="flex flex-col gap-2">
             {room.cancellationPolicies.map((opt) => (
@@ -163,7 +163,7 @@ export const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, is
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-bold text-foreground">Extras</span>
-            <span className="text-xs text-grey">per person, per night</span>
+            <span className="text-xs text-muted-foreground">per person, per night</span>
           </div>
           <div className="flex flex-col gap-2">
             {room.extras.map((opt) => (
@@ -202,7 +202,7 @@ export const RoomCard = ({ room, initialBoard, initialCancellation, onSelect, is
           ) : (
             // Standalone hotel-detail flow — unchanged per-person rate + stay total.
             <>
-              <div className="text-right text-xs text-grey">{totalPrice}€ per person, per night</div>
+              <div className="text-right text-xs text-muted-foreground">{totalPrice}€ per person, per night</div>
               {/* Total for the full stay — the rate is per person, per night, so we
                   multiply by both the number of guests AND the number of nights. */}
               <div className="text-right text-sm font-bold text-foreground">

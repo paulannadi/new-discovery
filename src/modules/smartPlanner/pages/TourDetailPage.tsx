@@ -56,6 +56,9 @@ import {
   DialogTitle,
 } from "../../../shared/components/ui/dialog";
 import { cn } from "../../../shared/components/ui/utils";
+// Shared design-system Button — replaces hand-rolled action buttons so CTAs and
+// text-link actions match the rest of the product (variants/sizes baked in).
+import { Button } from "../../../shared/components/ui/button";
 import type { Tour, TourAttribute, TourStop, RoomAmenity } from "../../../types";
 // Shared star renderer used across the package/stopover flow — reused here so
 // the Room section's hotel rating looks identical to the rest of the product.
@@ -69,6 +72,8 @@ import { TourRouteMapInline } from "../components/TourRouteMap";
 // `priority` for the hero (above the fold) and lazy for the thumbnails and
 // modal gallery (below the fold or hidden until opened).
 import { ImageWithPlaceholder } from "../../../shared/components/loading";
+// Mock "ZIP code → city" resolver for the Individual option's door-to-door pickup.
+import { lookupCityFromZip } from "../utils/zipLookup";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -113,7 +118,7 @@ function TravelModeToggle({
           aria-pressed={mode === o.key}
           className={cn(
             "flex items-center justify-center gap-1.5 h-9 rounded-md text-xs font-bold transition-colors cursor-pointer",
-            mode === o.key ? "bg-card text-primary shadow-sm" : "text-grey hover:text-foreground"
+            mode === o.key ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
           )}
         >
           {o.key === "coach"
@@ -127,26 +132,37 @@ function TravelModeToggle({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AddressField — free-text pickup-address input used by the "Individual" travel
-// option in place of the departure-point dropdown. Styled to match the other
-// 48px booking fields (it's an <input>, so there's no panel to open).
+// ZipCodeField — pickup ZIP-code input used by the "Individual" travel option in
+// place of the departure-point dropdown. For door-to-door pickup we only need
+// the traveller's ZIP code (not a full street address) to plan the route.
+// Styled to match the other 48px booking fields (it's an <input>, so there's
+// no panel to open). `inputMode="numeric"` brings up the number pad on mobile.
 // ─────────────────────────────────────────────────────────────────────────────
-function AddressField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function ZipCodeField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  // Resolve the typed ZIP to a city (mock lookup). Null until a full, known
+  // ZIP is entered — then we show the city on the right so the traveller can
+  // confirm we recognised their location.
+  const city = lookupCityFromZip(value);
   return (
-    <div className="h-[48px] rounded-lg border border-border bg-card px-4 flex items-center gap-3 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+    <div className="h-[52px] rounded-xl border border-border bg-card px-4 flex items-center gap-3 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
       <MapPin size={16} className="text-primary shrink-0" aria-hidden="true" />
       <div className="flex flex-col flex-1 min-w-0">
-        <label className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
-          Pickup address
+        <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
+          Pickup ZIP code
         </label>
         <input
           type="text"
+          inputMode="numeric"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Enter your full address"
-          className="text-xs font-semibold text-foreground bg-transparent outline-none placeholder:text-grey placeholder:font-normal"
+          placeholder="Enter your ZIP code"
+          className="text-xs font-semibold text-foreground bg-transparent outline-none placeholder:text-muted-foreground placeholder:font-normal"
         />
       </div>
+      {/* Resolved city — only shown once the ZIP matches a known location. */}
+      {city && (
+        <span className="text-xs font-semibold text-primary shrink-0">{city}</span>
+      )}
     </div>
   );
 }
@@ -228,13 +244,10 @@ function RoomDetailsCard({ stop, sleeps, slug }: { stop: TourStop; sleeps: numbe
             </div>
           </div>
           {/* Change room — matches the reference card's edit affordance. */}
-          <button
-            type="button"
-            className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-primary hover:underline cursor-pointer"
-          >
+          <Button variant="link" size="sm" type="button" className="shrink-0 gap-1.5">
             <Pencil size={15} aria-hidden="true" />
             Change room
-          </button>
+          </Button>
         </div>
 
         {/* Pills — board type + occupancy */}
@@ -261,13 +274,15 @@ function RoomDetailsCard({ stop, sleeps, slug }: { stop: TourStop; sleeps: numbe
 
         {/* Show all / show fewer toggle — only when there are extra amenities */}
         {hasMore && (
-          <button
+          <Button
             type="button"
+            variant="link"
+            size="sm"
             onClick={() => setShowAll((v) => !v)}
-            className="self-start text-sm font-semibold text-primary hover:underline cursor-pointer"
+            className="self-start px-0"
           >
             {showAll ? "Show fewer facilities" : "Show all room facilities"}
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -279,7 +294,15 @@ function RoomDetailsCard({ stop, sleeps, slug }: { stop: TourStop; sleeps: numbe
 interface TourDetailPageProps {
   tour: Tour;
   onBack: () => void;
-  onBook: (tour: Tour, travelDate: string, adults: number, hotelPreference: string) => void;
+  onBook: (
+    tour: Tour,
+    travelDate: string,
+    adults: number,
+    hotelPreference: string,
+    // Which travel option was selected on a flexible coach tour. Always
+    // "coach" for tours without the coach-vs-individual choice.
+    travelMode: "coach" | "individual",
+  ) => void;
   // Label shown on the back button — defaults to "Back to all tours"
   backLabel?: string;
 }
@@ -328,7 +351,8 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
   //                and the per-person price uses the individual rate.
   type TravelMode = "coach" | "individual";
   const [travelMode, setTravelMode] = useState<TravelMode>("coach");
-  const [pickupAddress, setPickupAddress] = useState("");
+  // Door-to-door pickup ZIP code for the "Individual" travel option.
+  const [pickupZip, setPickupZip] = useState("");
 
   // Switch travel mode, closing any open panel. When switching to coach we drop
   // a previously-chosen non-Saturday date so the date field stays valid.
@@ -438,11 +462,11 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
       ? [{ before: new Date() }, (date: Date) => date.getDay() !== 6]
       : { before: new Date() };
 
-  // What we hand to onBook as the "preference": a pickup address for the
+  // What we hand to onBook as the "preference": a pickup ZIP code for the
   // individual option, otherwise the chosen departure point / hotel preference.
   const bookingPreference =
     showTravelModes && travelMode === "individual"
-      ? (pickupAddress || "Address to be confirmed")
+      ? (pickupZip || "ZIP to be confirmed")
       : hotelPreference;
 
   // Use the tour's real images (mainImage + gallery) instead of random picsum seeds.
@@ -541,12 +565,13 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
             </div>
 
             {/* "See all photos" button — overlaid bottom-right, same as PackageDetailPage */}
-            <button
+            <Button
+              variant="secondary"
               onClick={() => setPhotosOpen(true)}
-              className="absolute bottom-4 right-4 bg-card border border-primary text-primary text-sm font-semibold px-4 py-2 rounded-md flex items-center gap-2 hover:bg-primary hover:text-white transition-colors shadow-sm"
+              className="absolute bottom-4 right-4 gap-2 shadow-sm"
             >
               <LayoutGrid size={16} aria-hidden="true" /> See all photos
-            </button>
+            </Button>
           </div>
 
           {/* ── Tour title + quick facts — full width, no widget ── */}
@@ -567,10 +592,10 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                 <MapPin size={15} className="text-foreground shrink-0" aria-hidden="true" />
                 <span>{tour.locationsLabel}</span>
               </div>
-              <button className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+              <Button variant="link" size="sm" className="gap-1.5 px-0">
                 <MapPinned size={14} aria-hidden="true" />
                 Show on map
-              </button>
+              </Button>
             </div>
 
           </div>
@@ -716,7 +741,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
                     {/* Destinations list */}
                     <div className="px-5 pb-5 md:pl-0">
-                      <p className="text-xs font-bold text-grey uppercase tracking-wide mb-3">Destinations</p>
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">Destinations</p>
                       <div className="flex flex-col gap-3">
                         {tour.stops.map((stop, i) => (
                           <div key={stop.destinationName} className="flex items-start gap-3">
@@ -838,7 +863,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               <div className="px-5 pt-5 pb-5 border-b border-border">
                 <div className="flex flex-col items-end text-right">
                   {/* Small grey label: per-person rate + tour length */}
-                  <span className="text-grey text-xs">{currency}{perPerson.toLocaleString()} per person · {tour.duration}-day guided tour</span>
+                  <span className="text-muted-foreground text-xs">{currency}{perPerson.toLocaleString()} per person · {tour.duration}-day guided tour</span>
                   {/* Big bold total — same as hotel page */}
                   <span className="text-foreground font-bold text-2xl">Total for {adults} {adults === 1 ? "adult" : "adults"}: {currency}{totalPrice.toLocaleString()}</span>
                 </div>
@@ -850,7 +875,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   as the default background (not grey) */}
               <div ref={bookingRef} className="p-5 flex flex-col gap-3">
 
-                <p className="text-xs font-bold text-grey uppercase tracking-wide mb-1">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-1">
                   Customise your trip
                 </p>
 
@@ -864,7 +889,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   <button
                     onClick={() => setOpenPanel(openPanel === "date" ? null : "date")}
                     className={cn(
-                      "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                      "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                       openPanel === "date"
                         ? "border-primary ring-2 ring-primary/20 bg-card"
                         : "border-border bg-card hover:border-primary"
@@ -872,14 +897,14 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   >
                     <Calendar size={16} className="text-primary shrink-0" aria-hidden="true" />
                     <div className="flex flex-col flex-1 min-w-0">
-                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
                         Travel date
                       </span>
                       <span className="text-xs font-semibold text-foreground truncate">
                         {travelDate}
                       </span>
                     </div>
-                    <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "date" && "rotate-180")} aria-hidden="true" />
+                    <ChevronDown size={14} className={cn("text-muted-foreground shrink-0 transition-transform", openPanel === "date" && "rotate-180")} aria-hidden="true" />
                   </button>
 
                   {/* DayPicker panel — same style as PackageSearchForm / HotelDetailPage */}
@@ -907,7 +932,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   <button
                     onClick={() => setOpenPanel(openPanel === "guests" ? null : "guests")}
                     className={cn(
-                      "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                      "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                       openPanel === "guests"
                         ? "border-primary ring-2 ring-primary/20 bg-card"
                         : "border-border bg-card hover:border-primary"
@@ -915,7 +940,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   >
                     <Users size={16} className="text-primary shrink-0" aria-hidden="true" />
                     <div className="flex flex-col flex-1 min-w-0">
-                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
                         Travellers
                       </span>
                       <span className="text-xs font-semibold text-foreground">
@@ -923,7 +948,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                         {children > 0 ? ` · ${children} Child${children !== 1 ? "ren" : ""}` : ""}
                       </span>
                     </div>
-                    <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "guests" && "rotate-180")} aria-hidden="true" />
+                    <ChevronDown size={14} className={cn("text-muted-foreground shrink-0 transition-transform", openPanel === "guests" && "rotate-180")} aria-hidden="true" />
                   </button>
 
                   {/* Guest counter panel — same layout as PackageSearchForm */}
@@ -936,7 +961,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                         <div key={label} className="flex items-center justify-between">
                           <div>
                             <div className="text-sm font-semibold text-foreground">{label}</div>
-                            <div className="text-xs text-grey">{sub}</div>
+                            <div className="text-xs text-muted-foreground">{sub}</div>
                           </div>
                           <div className="flex items-center gap-3">
                             <button
@@ -958,25 +983,25 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                           </div>
                         </div>
                       ))}
-                      <button
+                      <Button
                         onClick={() => setOpenPanel(null)}
-                        className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-colors"
+                        className="w-full"
                       >
                         Done
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </div>
 
                 {/* ── Pickup address (individual) OR Departure point / Hotel preference ── */}
                 {showTravelModes && travelMode === "individual" ? (
-                  <AddressField value={pickupAddress} onChange={setPickupAddress} />
+                  <ZipCodeField value={pickupZip} onChange={setPickupZip} />
                 ) : (
                 <div className="relative">
                   <button
                     onClick={() => setOpenPanel(openPanel === "hotel" ? null : "hotel")}
                     className={cn(
-                      "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                      "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                       openPanel === "hotel"
                         ? "border-primary ring-2 ring-primary/20 bg-card"
                         : "border-border bg-card hover:border-primary"
@@ -986,12 +1011,12 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                       ? <Bus   size={16} className="text-primary shrink-0" aria-hidden="true" />
                       : <Hotel size={16} className="text-primary shrink-0" aria-hidden="true" />}
                     <div className="flex flex-col flex-1 min-w-0">
-                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
                         {preferenceLabel}
                       </span>
                       <span className="text-xs font-semibold text-foreground">{hotelPreference}</span>
                     </div>
-                    <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "hotel" && "rotate-180")} aria-hidden="true" />
+                    <ChevronDown size={14} className={cn("text-muted-foreground shrink-0 transition-transform", openPanel === "hotel" && "rotate-180")} aria-hidden="true" />
                   </button>
                   {openPanel === "hotel" && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-md z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
@@ -1017,12 +1042,13 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
               {/* ── CTA button — same as PackageDetailPage sidebar CTA ── */}
               <div className="px-5 pb-5">
-                <button
-                  onClick={() => onBook(tour, travelDate, adults, bookingPreference)}
-                  className="w-full bg-primary hover:brightness-85 text-white font-bold text-base py-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                <Button
+                  size="lg"
+                  onClick={() => onBook(tour, travelDate, adults, bookingPreference, showTravelModes ? travelMode : "coach")}
+                  className="w-full gap-2"
                 >
                   Start planning
-                </button>
+                </Button>
               </div>
 
             </div>
@@ -1067,7 +1093,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
         <div className="px-5 py-3 flex items-center justify-between gap-3">
           <div className="flex flex-col flex-1 min-w-0">
             {/* Small grey label */}
-            <span className="text-grey text-xs">
+            <span className="text-muted-foreground text-xs">
               {currency}{perPerson.toLocaleString()} per person
             </span>
             {/* Bold total */}
@@ -1078,26 +1104,28 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
           {/* Collapsed: primary "Customise" CTA (matches original footer layout) */}
           {!mobileSheetOpen && (
-            <button
+            <Button
               onClick={() => setMobileSheetOpen(true)}
-              className="flex items-center gap-2 bg-primary hover:brightness-85 text-white font-bold text-sm px-5 py-3 rounded-lg transition-colors shrink-0"
+              className="gap-2 shrink-0"
               aria-expanded={false}
               aria-label="Customise booking options"
             >
               Customise
-            </button>
+            </Button>
           )}
 
           {/* Expanded: secondary "Close" link (top-right, subtle) */}
           {mobileSheetOpen && (
-            <button
+            <Button
+              variant="link"
+              size="sm"
               onClick={() => { setMobileSheetOpen(false); setOpenPanel(null); }}
-              className="flex items-center gap-1 text-primary text-sm font-semibold shrink-0"
+              className="gap-1 shrink-0"
               aria-expanded={true}
               aria-label="Close booking options"
             >
               Close <X size={16} aria-hidden="true" />
-            </button>
+            </Button>
           )}
         </div>
 
@@ -1105,7 +1133,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
         {mobileSheetOpen && (<>
           <div className="px-5 pb-2 flex flex-col gap-3 animate-in slide-in-from-bottom-4 fade-in duration-200">
 
-            <p className="text-xs font-bold text-grey uppercase tracking-wide">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">
               Customise your trip
             </p>
 
@@ -1119,7 +1147,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               <button
                 onClick={() => setOpenPanel(openPanel === "date" ? null : "date")}
                 className={cn(
-                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                  "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                   openPanel === "date"
                     ? "border-primary ring-2 ring-primary/20 bg-card"
                     : "border-border bg-card hover:border-primary"
@@ -1127,10 +1155,10 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               >
                 <Calendar size={16} className="text-primary shrink-0" aria-hidden="true" />
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Travel date</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Travel date</span>
                   <span className="text-xs font-semibold text-foreground truncate">{travelDate}</span>
                 </div>
-                <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "date" && "rotate-180")} aria-hidden="true" />
+                <ChevronDown size={14} className={cn("text-muted-foreground shrink-0 transition-transform", openPanel === "date" && "rotate-180")} aria-hidden="true" />
               </button>
 
               {/* DayPicker — positioned above the field on mobile so it doesn't get cut off */}
@@ -1158,7 +1186,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               <button
                 onClick={() => setOpenPanel(openPanel === "guests" ? null : "guests")}
                 className={cn(
-                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                  "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                   openPanel === "guests"
                     ? "border-primary ring-2 ring-primary/20 bg-card"
                     : "border-border bg-card hover:border-primary"
@@ -1166,13 +1194,13 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
               >
                 <Users size={16} className="text-primary shrink-0" aria-hidden="true" />
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Travellers</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Travellers</span>
                   <span className="text-xs font-semibold text-foreground">
                     {adults} Adult{adults !== 1 ? "s" : ""}
                     {children > 0 ? ` · ${children} Child${children !== 1 ? "ren" : ""}` : ""}
                   </span>
                 </div>
-                <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "guests" && "rotate-180")} aria-hidden="true" />
+                <ChevronDown size={14} className={cn("text-muted-foreground shrink-0 transition-transform", openPanel === "guests" && "rotate-180")} aria-hidden="true" />
               </button>
 
               {/* Guest counter — opens upward on mobile */}
@@ -1185,7 +1213,7 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                     <div key={label} className="flex items-center justify-between">
                       <div>
                         <div className="text-sm font-semibold text-foreground">{label}</div>
-                        <div className="text-xs text-grey">{sub}</div>
+                        <div className="text-xs text-muted-foreground">{sub}</div>
                       </div>
                       <div className="flex items-center gap-3">
                         <button
@@ -1207,25 +1235,25 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                       </div>
                     </div>
                   ))}
-                  <button
+                  <Button
                     onClick={() => setOpenPanel(null)}
-                    className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-colors"
+                    className="w-full"
                   >
                     Done
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
 
             {/* ── Hotel preference (or Departure point for coach tours) ── */}
             {showTravelModes && travelMode === "individual" ? (
-              <AddressField value={pickupAddress} onChange={setPickupAddress} />
+              <ZipCodeField value={pickupZip} onChange={setPickupZip} />
             ) : (
             <div className="relative">
               <button
                 onClick={() => setOpenPanel(openPanel === "hotel" ? null : "hotel")}
                 className={cn(
-                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                  "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                   openPanel === "hotel"
                     ? "border-primary ring-2 ring-primary/20 bg-card"
                     : "border-border bg-card hover:border-primary"
@@ -1235,10 +1263,10 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
                   ? <Bus   size={16} className="text-primary shrink-0" aria-hidden="true" />
                   : <Hotel size={16} className="text-primary shrink-0" aria-hidden="true" />}
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">{preferenceLabel}</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">{preferenceLabel}</span>
                   <span className="text-xs font-semibold text-foreground">{hotelPreference}</span>
                 </div>
-                <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", openPanel === "hotel" && "rotate-180")} aria-hidden="true" />
+                <ChevronDown size={14} className={cn("text-muted-foreground shrink-0 transition-transform", openPanel === "hotel" && "rotate-180")} aria-hidden="true" />
               </button>
 
               {/* Dropdown options — opens upward on mobile */}
@@ -1266,12 +1294,12 @@ export default function TourDetailPage({ tour, onBack, onBook, backLabel = "Back
 
           {/* ── Primary CTA at the bottom of the expanded sheet ── */}
           <div className="px-5 pb-4 pt-2">
-            <button
-              onClick={() => onBook(tour, travelDate, adults, bookingPreference)}
-              className="w-full bg-primary hover:brightness-85 text-white font-bold text-sm py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+            <Button
+              onClick={() => onBook(tour, travelDate, adults, bookingPreference, showTravelModes ? travelMode : "coach")}
+              className="w-full gap-2"
             >
               Start planning
-            </button>
+            </Button>
           </div>
         </>)}
 

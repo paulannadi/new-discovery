@@ -59,6 +59,14 @@ export type TransferItem = {
   vehicle: string;                     // e.g. "Private car"
   // Coach operator brand for this leg. Defaults to M-TOURS in the card.
   operator?: { name: string; tagline?: string };
+  // Door-to-door pickup (the "Individual" travel option on coach tours).
+  // When true the TransferCard swaps the coach-seat UI for an "Update ZIP code"
+  // action and drops the seat-number label — there's no fixed coach seat,
+  // the traveller is collected from their own address.
+  doorToDoor?: boolean;
+  // The traveller's pickup ZIP code for door-to-door transfers. Pre-fills the
+  // ZIP-code drawer; only meaningful when `doorToDoor` is true.
+  pickupZip?: string;
 };
 
 export type TimelineItem =
@@ -430,6 +438,14 @@ export function seedTimeline(
         // so we use a short single-noun mode rather than a long description.
         const vehicleLabel = "Bus";
 
+        // "Individual" travel option → door-to-door pickup from the traveller's
+        // own address. In this mode `pickup` IS that address (TourDetailPage
+        // forwards it in place of a departure point), so we flag both legs as
+        // door-to-door and pass the address through for the card's "Update
+        // address" drawer. "Coach" mode leaves these unset and keeps the
+        // normal seat-selection UI.
+        const isDoorToDoor = ctx.tour.travelMode === "individual";
+
         items.push({
           kind: "transfer",
           id: `transfer-bus-out-${pickup}`,
@@ -438,6 +454,8 @@ export function seedTimeline(
           to: firstHotel,
           vehicle: vehicleLabel,
           operator: ctx.tour.operator,
+          doorToDoor: isDoorToDoor,
+          pickupZip: isDoorToDoor ? pickup : undefined,
         });
 
         items.push(...stopsToTimelineItems(ctx.tour.stops!, ctx.tour.transfers ?? []));
@@ -450,6 +468,8 @@ export function seedTimeline(
           to: pickup,
           vehicle: vehicleLabel,
           operator: ctx.tour.operator,
+          doorToDoor: isDoorToDoor,
+          pickupZip: isDoorToDoor ? pickup : undefined,
         });
         break;
       }

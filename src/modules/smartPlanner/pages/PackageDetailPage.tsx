@@ -62,6 +62,7 @@ import {
 // inline hex <style> the live (non-cached) date fields used.
 import { Calendar as DateCalendar } from "../../../shared/components/ui/calendar";
 import { cn } from "../../../shared/components/ui/utils";
+import { Button } from "../../../shared/components/ui/button";
 import LeafletMap from "../../../shared/components/LeafletMap";
 import { hotelDescription, nearbyPOIs, locationCoords } from "../../../shared/utils/hotelUtils";
 // ImageWithPlaceholder — reserves space, lazy-loads, fades in on load.
@@ -194,7 +195,7 @@ function PriceTrendChart({
 
   return (
     <div className="mb-4">
-      <div className="text-xs font-semibold text-grey uppercase tracking-wide mb-2">
+      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
         Price trend
       </div>
       <div className="flex items-end gap-[2px] h-[40px]">
@@ -218,7 +219,7 @@ function PriceTrendChart({
           );
         })}
       </div>
-      <div className="flex justify-between mt-1 text-xs text-grey">
+      <div className="flex justify-between mt-1 text-xs text-muted-foreground">
         <span>
           {months[0] ? format(new Date(months[0] + "-01"), "MMM yyyy") : ""}
         </span>
@@ -231,7 +232,7 @@ function PriceTrendChart({
           </span>
         )}
       </div>
-      <div className="flex gap-3 mt-1.5 text-xs text-grey">
+      <div className="flex gap-3 mt-1.5 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
           <span className="w-2 h-2 rounded-full bg-success inline-block" />
           Best price
@@ -327,7 +328,7 @@ function FlightCard({
           </div>
           <div className="w-full flex items-center gap-1">
             <div className="flex-1 h-[1px] bg-border" />
-            <Plane size={12} className="text-grey shrink-0" aria-hidden="true" />
+            <Plane size={12} className="text-muted-foreground shrink-0" aria-hidden="true" />
             <div className="flex-1 h-[1px] bg-border" />
           </div>
           {/* "Direct" in green — fill_A7KTJI = #16A34A in Figma */}
@@ -356,10 +357,10 @@ function FlightCard({
           <Luggage size={13} className="shrink-0" aria-hidden="true" />
           <span>Hand luggage included</span>
         </div>
-        {/* "Add baggage and extras →" — text button, fill_CTT1AZ (#2681FF) */}
-        <button className="text-sm font-semibold text-primary flex items-center gap-1 hover:underline shrink-0">
+        {/* "Add baggage and extras" — text button, fill_CTT1AZ (#2681FF) */}
+        <Button variant="link" size="sm" className="shrink-0">
           Add baggage and extras
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -695,12 +696,13 @@ export default function PackageDetailPage({
 
             {/* "See all photos" secondary button — overlaid bottom-right.
                 Figma: Type=Secondary, text "See all photos", primary text */}
-            <button
+            <Button
+              variant="secondary"
               onClick={() => setPhotosOpen(true)}
-              className="absolute bottom-4 right-4 bg-white border border-primary text-primary text-sm font-semibold px-4 py-2 rounded-sm flex items-center gap-2 hover:bg-primary hover:text-white transition-colors shadow-sm"
+              className="absolute bottom-4 right-4 shadow-sm"
             >
               ⊞ See all photos
-            </button>
+            </Button>
           </div>
 
           {/* ── HOTEL IDENTITY ROW ──────────────────────────────────────────
@@ -721,12 +723,13 @@ export default function PackageDetailPage({
                   reviewScore={pkg.hotel.trustYou.rating / 10}
                   reviewCount={pkg.hotel.trustYou.reviewCount}
                 />
-                <button
+                <Button
+                  variant="link"
+                  size="sm"
                   onClick={() => setReviewsOpen(true)}
-                  className="text-sm text-foreground underline hover:no-underline"
                 >
                   {pkg.hotel.trustYou.reviewCount.toLocaleString()} reviews
-                </button>
+                </Button>
               </div>
 
               {/* Hotel name + star rating — AccommodationStar handles full/half/empty star logic */}
@@ -754,13 +757,15 @@ export default function PackageDetailPage({
                 <span>{pkg.hotel.location}</span>
               </div>
               {/* "Show on map" link — same style as TourDetailPage */}
-              <button
+              <Button
+                variant="link"
+                size="sm"
                 onClick={() => setShowMapModal(true)}
-                className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                className="gap-1.5"
               >
                 <MapPinned size={14} aria-hidden="true" />
                 Show on map
-              </button>
+              </Button>
             </div>
 
           </div>
@@ -901,10 +906,10 @@ export default function PackageDetailPage({
                   Selected room
                 </h3>
                 {/* "Change room" — text button with pencil icon */}
-                <button className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                <Button variant="link" size="sm" className="gap-1.5">
                   <Pencil size={13} aria-hidden="true" />
                   Change room
-                </button>
+                </Button>
               </div>
 
               {/* Room card — bg-card, rounded-lg, shadow */}
@@ -953,12 +958,14 @@ export default function PackageDetailPage({
                         ))}
                       </div>
                     </div>
-                    <button
+                    <Button
+                      variant="link"
+                      size="sm"
                       onClick={() => setRoomFacilitiesOpen(true)}
-                      className="mt-4 text-sm font-semibold text-primary hover:underline transition-all self-start"
+                      className="mt-4 self-start px-0"
                     >
                       Show all room facilities
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -975,10 +982,10 @@ export default function PackageDetailPage({
                     Selected flights
                   </h3>
                 </div>
-                <button className="text-sm font-semibold text-primary hover:underline flex items-center gap-1">
+                <Button variant="link" size="sm" className="gap-1">
                   <Pencil size={13} aria-hidden="true" />
                   Change flights
-                </button>
+                </Button>
               </div>
               <div className="flex flex-col gap-3">
                 <FlightCard leg={pkg.flights.outbound} direction="Outbound" />
@@ -1010,12 +1017,14 @@ export default function PackageDetailPage({
                 <p className="text-base text-foreground leading-normal">
                   {desc.long}
                 </p>
-                <button
+                <Button
+                  variant="link"
+                  size="sm"
                   onClick={() => setDescriptionOpen(true)}
-                  className="mt-4 text-sm font-semibold text-primary flex items-center gap-1 hover:underline"
+                  className="mt-4 self-start px-0"
                 >
                   Read more about the hotel
-                </button>
+                </Button>
               </div>
 
               {/* Divider */}
@@ -1108,12 +1117,14 @@ export default function PackageDetailPage({
                   reviewScore={pkg.hotel.trustYou.rating / 10}
                   reviewCount={pkg.hotel.trustYou.reviewCount}
                 />
-                <button
+                <Button
+                  variant="link"
+                  size="sm"
                   onClick={() => setReviewsOpen(true)}
-                  className="text-xs text-foreground underline hover:no-underline text-left mt-1"
+                  className="mt-1 px-0 justify-start"
                 >
                   {pkg.hotel.trustYou.reviewCount.toLocaleString()} verified reviews
-                </button>
+                </Button>
               </div>
 
               {/* Right column — horizontally scrollable cards + "See all" below */}
@@ -1138,26 +1149,27 @@ export default function PackageDetailPage({
                       </p>
 
                       {/* "See details" — text button, primary, Paragraph Bold/Small Bold */}
-                      <button className="text-xs font-bold text-primary hover:underline text-left mt-2 mb-1">
+                      <Button variant="link" size="sm" className="mt-2 mb-1 px-0 justify-start">
                         See details
-                      </button>
+                      </Button>
 
                       {/* Date */}
                       <div className="text-base text-foreground">{review.date}</div>
 
                       {/* "Verified review" — Paragraph Regular/Small, grey */}
-                      <div className="text-xs text-grey">Verified review</div>
+                      <div className="text-xs text-muted-foreground">Verified review</div>
                     </div>
                   ))}
                 </div>
 
                 {/* "See all 472 reviews" — Paragraph Bold/Default Bold, primary */}
-                <button
+                <Button
+                  variant="link"
                   onClick={() => setReviewsOpen(true)}
-                  className="text-base font-bold text-primary hover:underline text-left"
+                  className="px-0 justify-start self-start"
                 >
                   See all {pkg.hotel.trustYou.reviewCount.toLocaleString()} reviews
-                </button>
+                </Button>
               </div>
 
             </div>
@@ -1187,7 +1199,7 @@ export default function PackageDetailPage({
               <div className="px-5 pt-5 pb-5 border-b border-border">
                 <div className="flex flex-col items-end text-right">
                   {/* Small grey label: per-person rate + package details */}
-                  <span className="text-grey text-xs">{currSym}{activePrice.toLocaleString()} per person · Flight + hotel · {nights} nights</span>
+                  <span className="text-muted-foreground text-xs">{currSym}{activePrice.toLocaleString()} per person · Flight + hotel · {nights} nights</span>
                   {/* Big bold total — same as hotel page */}
                   <span className="text-foreground font-bold text-2xl">Total for {adults} adults: {currSym}{totalPrice.toLocaleString()}</span>
                 </div>
@@ -1209,7 +1221,7 @@ export default function PackageDetailPage({
                   </div>
                 ) : (
                   <div>
-                    <p className="text-xs text-grey mb-3 leading-relaxed">
+                    <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
                       This price is for a specific departure. Pick a different
                       date to request an updated quote.
                     </p>
@@ -1217,7 +1229,7 @@ export default function PackageDetailPage({
                       <button
                         onClick={() => setDatePanelOpen(o => !o)}
                         className={cn(
-                          "h-[48px] rounded-sm border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                          "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                           datePanelOpen
                             ? "border-primary ring-2 ring-primary/20 bg-card"
                             : "border-border bg-card hover:border-primary"
@@ -1225,12 +1237,12 @@ export default function PackageDetailPage({
                       >
                         <CalendarDays size={16} className="text-primary shrink-0" aria-hidden="true" />
                         <div className="flex flex-col flex-1 min-w-0">
-                          <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Travel date</span>
+                          <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Travel date</span>
                           <span className="text-xs font-semibold text-foreground truncate">
                             {selectedDate ? format(new Date(selectedDate), "EEE, d MMM yyyy") : "Pick a date"}
                           </span>
                         </div>
-                        <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", datePanelOpen && "rotate-180")} aria-hidden="true" />
+                        <ChevronDown size={14} className={cn("text-muted-foreground shrink-0 transition-transform", datePanelOpen && "rotate-180")} aria-hidden="true" />
                       </button>
                       {datePanelOpen && (
                         <div className="absolute top-[calc(100%+8px)] left-0 z-50 bg-card rounded-xl shadow-lg border border-border p-4 animate-in fade-in zoom-in-95 duration-150">
@@ -1254,19 +1266,19 @@ export default function PackageDetailPage({
                     {/* Compact room/board summary */}
                     <div className="mt-3 bg-card border border-border rounded-lg p-3 flex flex-col gap-2">
                       <div className="flex justify-between text-xs">
-                        <span className="text-grey">Room</span>
+                        <span className="text-muted-foreground">Room</span>
                         <span className="font-medium text-foreground text-right max-w-[55%]">
                           {pkg.room.roomType}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-grey">Board</span>
+                        <span className="text-muted-foreground">Board</span>
                         <span className="font-medium text-foreground">
                           {pkg.room.boardType}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-grey">Cancellation</span>
+                        <span className="text-muted-foreground">Cancellation</span>
                         <span className="font-medium text-success">
                           Free until 14 days
                         </span>
@@ -1278,12 +1290,13 @@ export default function PackageDetailPage({
 
               {/* ── CTA button ───────────────────────────────────────────── */}
               <div className="px-5 pb-5 bg-card rounded-b-lg">
-                <button
+                <Button
+                  size="lg"
                   onClick={() => onBook(pkg, selectedDate)}
-                  className="w-full bg-primary hover:brightness-85 text-white font-bold text-base py-4 rounded-lg transition-colors"
+                  className="w-full"
                 >
                   Personalise Your Holiday
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -1329,7 +1342,7 @@ export default function PackageDetailPage({
         <div className="px-5 py-3 flex items-center justify-between gap-3">
           <div className="flex flex-col flex-1 min-w-0">
             {/* Small grey label — per-person rate + nights */}
-            <span className="text-grey text-xs">
+            <span className="text-muted-foreground text-xs">
               {currSym}{activePrice.toLocaleString()} per person · {nights} nights
             </span>
             {/* Bold total */}
@@ -1340,26 +1353,28 @@ export default function PackageDetailPage({
 
           {/* Collapsed: primary "Personalise" CTA opens the sheet */}
           {!mobileSheetOpen && (
-            <button
+            <Button
               onClick={() => setMobileSheetOpen(true)}
-              className="flex items-center gap-2 bg-primary hover:brightness-85 text-white font-bold text-sm px-5 py-3 rounded-lg transition-colors shrink-0"
+              className="shrink-0"
               aria-expanded={false}
               aria-label="Open booking options"
             >
               Personalise
-            </button>
+            </Button>
           )}
 
           {/* Expanded: subtle "Close" link in the top-right */}
           {mobileSheetOpen && (
-            <button
+            <Button
+              variant="link"
+              size="sm"
               onClick={() => { setMobileSheetOpen(false); setMobileDatePanelOpen(false); }}
-              className="flex items-center gap-1 text-primary text-sm font-semibold shrink-0"
+              className="gap-1 shrink-0"
               aria-expanded={true}
               aria-label="Close booking options"
             >
               Close <X size={16} aria-hidden="true" />
-            </button>
+            </Button>
           )}
         </div>
 
@@ -1367,7 +1382,7 @@ export default function PackageDetailPage({
         {mobileSheetOpen && (<>
           <div className="px-5 pb-2 flex flex-col gap-3 animate-in slide-in-from-bottom-4 fade-in duration-200">
 
-            <p className="text-xs font-bold text-grey uppercase tracking-wide">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">
               Pick your travel date
             </p>
 
@@ -1388,7 +1403,7 @@ export default function PackageDetailPage({
             ) : (
               // ── Non-cached (live): single date picker + room summary ──
               <div>
-                <p className="text-xs text-grey mb-3 leading-relaxed">
+                <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
                   This price is for a specific departure. Pick a different
                   date to request an updated quote.
                 </p>
@@ -1396,7 +1411,7 @@ export default function PackageDetailPage({
                   <button
                     onClick={() => setMobileDatePanelOpen(o => !o)}
                     className={cn(
-                      "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors w-full text-left",
+                      "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors w-full text-left",
                       mobileDatePanelOpen
                         ? "border-primary ring-2 ring-primary/20 bg-card"
                         : "border-border bg-card hover:border-primary"
@@ -1404,12 +1419,12 @@ export default function PackageDetailPage({
                   >
                     <CalendarDays size={16} className="text-primary shrink-0" aria-hidden="true" />
                     <div className="flex flex-col flex-1 min-w-0">
-                      <span className="text-xs font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Travel date</span>
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Travel date</span>
                       <span className="text-xs font-semibold text-foreground truncate">
                         {selectedDate ? format(new Date(selectedDate), "EEE, d MMM yyyy") : "Pick a date"}
                       </span>
                     </div>
-                    <ChevronDown size={14} className={cn("text-grey shrink-0 transition-transform", mobileDatePanelOpen && "rotate-180")} aria-hidden="true" />
+                    <ChevronDown size={14} className={cn("text-muted-foreground shrink-0 transition-transform", mobileDatePanelOpen && "rotate-180")} aria-hidden="true" />
                   </button>
                   {mobileDatePanelOpen && (
                     // bottom-[calc(100%+8px)] = opens upward so the calendar
@@ -1435,19 +1450,19 @@ export default function PackageDetailPage({
                 {/* Compact room/board/cancellation summary */}
                 <div className="mt-3 bg-card border border-border rounded-lg p-3 flex flex-col gap-2">
                   <div className="flex justify-between text-xs">
-                    <span className="text-grey">Room</span>
+                    <span className="text-muted-foreground">Room</span>
                     <span className="font-medium text-foreground text-right max-w-[55%]">
                       {pkg.room.roomType}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-grey">Board</span>
+                    <span className="text-muted-foreground">Board</span>
                     <span className="font-medium text-foreground">
                       {pkg.room.boardType}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-grey">Cancellation</span>
+                    <span className="text-muted-foreground">Cancellation</span>
                     <span className="font-medium text-success">
                       Free until 14 days
                     </span>
@@ -1460,12 +1475,12 @@ export default function PackageDetailPage({
 
           {/* ── Primary CTA at the bottom of the expanded sheet ── */}
           <div className="px-5 pb-4 pt-2">
-            <button
+            <Button
               onClick={() => onBook(pkg, selectedDate)}
-              className="w-full bg-primary hover:brightness-85 text-white font-bold text-sm py-3.5 rounded-lg transition-colors"
+              className="w-full"
             >
               Personalise Your Holiday
-            </button>
+            </Button>
           </div>
         </>)}
 
@@ -1539,7 +1554,7 @@ export default function PackageDetailPage({
           <div className="mt-2">
             {AMENITY_GROUPS.map((group) => (
               <div key={group.label} className="mb-5">
-                <div className="text-xs font-bold uppercase tracking-wider text-grey mb-2 mt-3 first:mt-0">
+                <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2 mt-3 first:mt-0">
                   {group.label}
                 </div>
                 <div className="grid grid-cols-2 gap-x-6 gap-y-3">
@@ -1559,7 +1574,7 @@ export default function PackageDetailPage({
             ))}
             {pkg.hotel.amenities.length > 0 && (
               <div className="mb-5">
-                <div className="text-xs font-bold uppercase tracking-wider text-grey mb-2">
+                <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
                   From this property
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -1647,7 +1662,7 @@ export default function PackageDetailPage({
             {Object.entries(ROOM_FACILITIES_FULL).map(
               ([category, items]) => (
                 <div key={category} className="mb-5">
-                  <div className="text-xs font-bold uppercase tracking-wider text-grey mb-3">
+                  <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
                     {category}
                   </div>
                   <div className="grid grid-cols-2 gap-y-2 gap-x-4">

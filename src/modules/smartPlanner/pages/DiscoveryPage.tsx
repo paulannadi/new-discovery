@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { cn } from "../../../shared/components/ui/utils";
+// Shared shadcn/ui Button — used for real action CTAs (search, view-all, apply).
+import { Button } from "../../../shared/components/ui/button";
 import { PageContainer } from "../../../shared/components/PageContainer";
 // AccommodationStar renders the real star icons (same component as production TripBuilder)
 import AccommodationStar from "../../../shared/components/AccommodationStar";
@@ -1052,18 +1054,18 @@ export default function DiscoveryPage({
                             className="text-primary shrink-0"
                           />
                           <div className="flex flex-col items-start flex-1 min-w-0">
-                            <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
                               Destination
                             </span>
                             <span
-                              className={cn("text-sm font-semibold truncate w-full", hotelLocation ? "text-foreground" : "text-grey")}
+                              className={cn("text-sm font-semibold truncate w-full", hotelLocation ? "text-foreground" : "text-muted-foreground")}
                             >
                               {hotelLocation || "Where are you going?"}
                             </span>
                           </div>
                           <ChevronDown
                             size={16}
-                            className={`text-grey shrink-0 transition-transform ${
+                            className={`text-muted-foreground shrink-0 transition-transform ${
                               hotelOpenPanel === "destination"
                                 ? "rotate-180"
                                 : ""
@@ -1075,11 +1077,11 @@ export default function DiscoveryPage({
                           <div className="absolute top-full left-0 mt-2 w-full min-w-[280px] bg-card rounded-xl shadow-xl border border-border z-50 overflow-hidden">
                             <div className="p-3 border-b border-muted">
                               <div className="flex items-center gap-2 bg-grey-light rounded-lg px-3 py-2">
-                                <Search size={16} className="text-grey" />
+                                <Search size={16} className="text-muted-foreground" />
                                 <input
                                   type="text"
                                   placeholder="Search destination..."
-                                  className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-grey"
+                                  className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                                   value={hotelLocation}
                                   onChange={(e) =>
                                     setHotelLocation(e.target.value)
@@ -1089,7 +1091,7 @@ export default function DiscoveryPage({
                               </div>
                             </div>
                             <div className="p-2">
-                              <p className="text-[10px] font-bold text-grey uppercase tracking-wide px-3 py-2">
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide px-3 py-2">
                                 Popular destinations
                               </p>
                               {POPULAR_DESTINATIONS.filter(
@@ -1152,7 +1154,7 @@ export default function DiscoveryPage({
                               className="text-primary shrink-0"
                             />
                             <div className="flex flex-col items-start flex-1 min-w-0">
-                              <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+                              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
                                 Check-in – Check-out
                               </span>
                               <span className="text-sm font-semibold text-foreground truncate w-full">
@@ -1161,7 +1163,7 @@ export default function DiscoveryPage({
                             </div>
                             <ChevronDown
                               size={16}
-                              className={`text-grey shrink-0 transition-transform ${
+                              className={`text-muted-foreground shrink-0 transition-transform ${
                                 hotelOpenPanel === "dates" ? "rotate-180" : ""
                               }`}
                             />
@@ -1203,7 +1205,7 @@ export default function DiscoveryPage({
                             className="text-primary shrink-0"
                           />
                           <div className="flex flex-col items-start flex-1 min-w-0">
-                            <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
                               Travellers
                             </span>
                             <span className="text-sm font-semibold text-foreground truncate w-full">
@@ -1212,7 +1214,7 @@ export default function DiscoveryPage({
                           </div>
                           <ChevronDown
                             size={16}
-                            className={`text-grey shrink-0 transition-transform ${
+                            className={`text-muted-foreground shrink-0 transition-transform ${
                               hotelOpenPanel === "guests" ? "rotate-180" : ""
                             }`}
                           />
@@ -1230,8 +1232,10 @@ export default function DiscoveryPage({
                                     Room {index + 1}
                                   </span>
                                   {hotelRooms.length > 1 && (
-                                    <button
-                                      className="text-xs text-red-500 hover:underline font-medium"
+                                    <Button
+                                      variant="link"
+                                      size="sm"
+                                      className="text-destructive px-0 h-auto"
                                       onClick={() =>
                                         setHotelRooms(
                                           hotelRooms.filter(
@@ -1241,7 +1245,7 @@ export default function DiscoveryPage({
                                       }
                                     >
                                       Remove
-                                    </button>
+                                    </Button>
                                   )}
                                 </div>
                                 <div className="flex items-center justify-between mb-2">
@@ -1249,7 +1253,7 @@ export default function DiscoveryPage({
                                     <div className="text-sm font-medium text-foreground">
                                       Adults
                                     </div>
-                                    <div className="text-xs text-grey">
+                                    <div className="text-xs text-muted-foreground">
                                       Age 18+
                                     </div>
                                   </div>
@@ -1270,7 +1274,7 @@ export default function DiscoveryPage({
                                     <div className="text-sm font-medium text-foreground">
                                       Children
                                     </div>
-                                    <div className="text-xs text-grey">
+                                    <div className="text-xs text-muted-foreground">
                                       Under 18
                                     </div>
                                   </div>
@@ -1289,8 +1293,9 @@ export default function DiscoveryPage({
                               </div>
                             ))}
                             {hotelRooms.length < 5 && (
-                              <button
-                                className="mt-3 w-full h-[36px] border border-dashed border-primary rounded-lg text-primary text-xs font-bold hover:bg-primary/10 transition-colors"
+                              <Button
+                                variant="tertiary"
+                                className="mt-3 w-full"
                                 onClick={() =>
                                   setHotelRooms([
                                     ...hotelRooms,
@@ -1303,25 +1308,26 @@ export default function DiscoveryPage({
                                 }
                               >
                                 + Add another room
-                              </button>
+                              </Button>
                             )}
-                            <button
-                              className="mt-3 w-full h-[40px] bg-primary hover:brightness-85 text-white font-bold rounded-lg text-sm transition-all"
+                            <Button
+                              className="mt-3 w-full"
                               onClick={() => setHotelOpenPanel(null)}
                             >
                               Done
-                            </button>
+                            </Button>
                           </div>
                         )}
                       </div>
                     {/* w-full on mobile so button spans the full width; lg:w-auto restores shrink behaviour on desktop */}
-                    <button
-                      className="w-full lg:w-auto bg-primary hover:brightness-85 text-white font-extrabold text-base h-[52px] px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
+                    <Button
+                      size="lg"
+                      className="w-full lg:w-auto"
                       onClick={handleHotelSearch}
                     >
-                      <Search size={20} />
+                      <Search />
                       Search Hotels
-                    </button>
+                    </Button>
                   </div>
                 )}
 
@@ -1488,7 +1494,8 @@ export default function DiscoveryPage({
                   filtered to the active type (the list page reads this
                   criterion to scope results). */}
               <div className="mt-5 md:mt-6 flex justify-end">
-                <button
+                <Button
+                  variant="secondary"
                   onClick={() =>
                     onActivitySearch({
                       destination: "",
@@ -1498,10 +1505,9 @@ export default function DiscoveryPage({
                       dateTo: "",
                     })
                   }
-                  className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
                 >
                   View all {ACTIVITY_TYPE_OPTIONS.find((o) => o.id === activeActivityType)?.label} activities
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -1546,7 +1552,8 @@ export default function DiscoveryPage({
 
             {/* View-all CTA — same locked criteria as the search panel */}
             <div className="mt-5 md:mt-6 flex justify-end">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() =>
                   onActivitySearch({
                     destination: "",
@@ -1556,10 +1563,9 @@ export default function DiscoveryPage({
                     dateTo: "",
                   })
                 }
-                className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
               >
                 View all cruises
-              </button>
+              </Button>
             </div>
 
           </PageContainer>
@@ -1597,7 +1603,8 @@ export default function DiscoveryPage({
             </div>
 
             <div className="mt-5 md:mt-6 flex justify-end">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() =>
                   onActivitySearch({
                     destination: "",
@@ -1607,10 +1614,9 @@ export default function DiscoveryPage({
                     dateTo: "",
                   })
                 }
-                className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
               >
                 View all events
-              </button>
+              </Button>
             </div>
 
           </PageContainer>
@@ -1715,8 +1721,8 @@ export default function DiscoveryPage({
             </div>
 
             <div className="flex justify-center">
-              <button
-                className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
+              <Button
+                variant="secondary"
                 onClick={() =>
                   onHotelSearch({
                     location: "Any destination",
@@ -1726,7 +1732,7 @@ export default function DiscoveryPage({
                 }
               >
                 View all hotels (148)
-              </button>
+              </Button>
             </div>
 
           </PageContainer>
@@ -1795,7 +1801,7 @@ export default function DiscoveryPage({
                         className="w-5 h-3.5 rounded-sm object-cover"
                       />
                       {route.from}
-                      <ArrowRight size={14} className="text-grey mx-0.5" />
+                      <ArrowRight size={14} className="text-muted-foreground mx-0.5" />
                       <img
                         src={`https://flagcdn.com/w160/${route.toFlag}.png`}
                         alt={route.to}
@@ -1904,7 +1910,8 @@ export default function DiscoveryPage({
             </div>
 
             <div className="px-[max(1rem,calc((100vw-80rem)/2))] md:px-[max(1.5rem,calc((100vw-80rem)/2))] lg:px-[max(3rem,calc((100vw-80rem)/2))] flex justify-end">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => onHolidaySearch({
                   from: "London (LHR)",
                   to: "Anywhere",
@@ -1918,10 +1925,9 @@ export default function DiscoveryPage({
                   // Pre-select the travel style filter so the list opens already filtered
                   initialFilters: { style: activeTourStyle },
                 })}
-                className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
               >
                 View all {activeTourStyle} tours (35)
-              </button>
+              </Button>
             </div>
 
           </section>
@@ -1982,7 +1988,8 @@ export default function DiscoveryPage({
             </div>
 
             <div className="px-[max(1rem,calc((100vw-80rem)/2))] md:px-[max(1.5rem,calc((100vw-80rem)/2))] lg:px-[max(3rem,calc((100vw-80rem)/2))] flex justify-end">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => onHolidaySearch({
                   from: "London (LHR)",
                   to: activeCountry,
@@ -1996,10 +2003,9 @@ export default function DiscoveryPage({
                   // Pre-select the country filter so the list opens already filtered
                   initialFilters: { country: activeCountry },
                 })}
-                className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
               >
                 View all {activeCountry} tours (22)
-              </button>
+              </Button>
             </div>
 
           </section>
@@ -2155,7 +2161,8 @@ export default function DiscoveryPage({
             )}
 
             <div className="px-[max(1rem,calc((100vw-80rem)/2))] md:px-[max(1.5rem,calc((100vw-80rem)/2))] lg:px-[max(3rem,calc((100vw-80rem)/2))] flex justify-end">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => onHolidaySearch({
                   from: "London (LHR)",
                   to: "Anywhere",
@@ -2169,10 +2176,9 @@ export default function DiscoveryPage({
                   // Pre-select the trip type filter so the list opens already filtered
                   initialFilters: { tripType: activeTripType },
                 })}
-                className="border border-primary text-primary font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/10 transition-colors"
               >
                 View all {TRIP_TYPES.find((t) => t.id === activeTripType)?.label} holidays
-              </button>
+              </Button>
             </div>
 
           </section>
@@ -2183,7 +2189,7 @@ export default function DiscoveryPage({
 
       {/* Footer */}
       <div className="text-center py-8 border-t border-border">
-        <p className="text-grey text-xs">
+        <p className="text-muted-foreground text-xs">
           © 2026 Nezasa · TripBuilder · Over 500,000 hotels worldwide
         </p>
       </div>
@@ -2202,13 +2208,15 @@ export default function DiscoveryPage({
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
               <h2 className="text-xl font-bold text-foreground">Choose styles</h2>
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
                 onClick={() => setStyleModalOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-grey-lightest transition-colors text-muted-foreground"
                 aria-label="Close"
               >
                 <X size={18} />
-              </button>
+              </Button>
             </div>
 
             {/* Scrollable grid */}
@@ -2252,18 +2260,19 @@ export default function DiscoveryPage({
                   ? `Select up to ${MAX_STYLES} styles · ${MAX_STYLES - draftStyles.length} slot${MAX_STYLES - draftStyles.length === 1 ? "" : "s"} remaining`
                   : "All 5 slots filled · deselect one to swap it for another"}
               </p>
-              <button
+              <Button
+                variant="tertiary"
                 onClick={() => setStyleModalOpen(false)}
-                className="shrink-0 px-5 py-2.5 text-sm font-bold text-foreground border border-border rounded-lg hover:bg-grey-lightest transition-colors"
+                className="shrink-0"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={applyStyles}
-                className="shrink-0 px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                className="shrink-0"
               >
                 Apply
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -2286,13 +2295,15 @@ export default function DiscoveryPage({
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
               <h2 className="text-xl font-bold text-foreground">Choose destinations</h2>
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
                 onClick={() => setDestinationModalOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-grey-lightest transition-colors text-muted-foreground"
                 aria-label="Close"
               >
                 <X size={18} />
-              </button>
+              </Button>
             </div>
 
             {/* Scrollable grid of all destinations */}
@@ -2346,18 +2357,19 @@ export default function DiscoveryPage({
                   ? `Select up to ${MAX_DESTINATIONS} destinations · ${MAX_DESTINATIONS - draftDestinations.length} slot${MAX_DESTINATIONS - draftDestinations.length === 1 ? "" : "s"} remaining`
                   : "All 5 slots filled · deselect one to swap it for another"}
               </p>
-              <button
+              <Button
+                variant="tertiary"
                 onClick={() => setDestinationModalOpen(false)}
-                className="shrink-0 px-5 py-2.5 text-sm font-bold text-foreground border border-border rounded-lg hover:bg-grey-lightest transition-colors"
+                className="shrink-0"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={applyDestinations}
-                className="shrink-0 px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                className="shrink-0"
               >
                 Apply
-              </button>
+              </Button>
             </div>
           </div>
         </div>

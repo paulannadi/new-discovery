@@ -37,7 +37,7 @@ import { ALL_ACTIVITIES } from "../../../mocks/activities";
 import ActivitySearchForm, { CRUISE_DESTINATION_GROUPS } from "../components/ActivitySearchForm";
 import { SearchSummary } from "../components/SearchSummary";
 import { format, parseISO } from "date-fns";
-import { ActivityCard } from "../components/ActivityCard";
+import { ActivityResultCard } from "../components/ActivityResultCard";
 // Loading kit — vertical SkeletonCards while activities "load" briefly
 // (matches the doc's 1s–3s tier), then a 60ms staggered reveal.
 import { SkeletonCard, StaggeredList } from "../../../shared/components/loading";
@@ -400,7 +400,7 @@ export default function ActivityListPage({
           className="absolute top-full mt-2 z-30 bg-card rounded-xl shadow-xl border border-border p-5 min-w-[280px] flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150"
         >
           <div>
-            <p className="text-xs font-bold text-grey uppercase tracking-wide mb-2">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">
               Price per person
             </p>
             <div className="flex items-center justify-between text-sm font-semibold text-foreground">
@@ -410,7 +410,7 @@ export default function ActivityListPage({
           </div>
           {/* Two simple range inputs — keep things lightweight and accessible */}
           <div className="flex flex-col gap-3">
-            <label className="flex flex-col gap-1 text-xs text-grey">
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
               Minimum
               <input
                 type="range"
@@ -427,7 +427,7 @@ export default function ActivityListPage({
                 className="accent-primary"
               />
             </label>
-            <label className="flex flex-col gap-1 text-xs text-grey">
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
               Maximum
               <input
                 type="range"
@@ -447,7 +447,7 @@ export default function ActivityListPage({
           </div>
           <button
             onClick={() => setPriceRange([priceBounds.min, priceBounds.max])}
-            className="text-xs text-grey hover:text-foreground self-start"
+            className="text-xs text-muted-foreground hover:text-foreground self-start"
           >
             Reset
           </button>
@@ -603,7 +603,7 @@ export default function ActivityListPage({
             ) : (
               <StaggeredList className="flex flex-col gap-4">
                 {filteredActivities.map((activity) => (
-                  <ActivityCard
+                  <ActivityResultCard
                     key={activity.activityId}
                     activity={activity}
                     onSelect={onViewDetail}

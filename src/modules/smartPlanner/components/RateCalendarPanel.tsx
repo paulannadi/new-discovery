@@ -138,7 +138,7 @@ export function RateCalendarPanel({
       {/* Day name headers */}
       <div className="grid grid-cols-7 gap-0.5 mb-1">
         {dayNames.map(d => (
-          <div key={d} className="text-xs font-bold text-grey text-center py-1">{d}</div>
+          <div key={d} className="text-xs font-bold text-muted-foreground text-center py-1">{d}</div>
         ))}
       </div>
 
@@ -173,14 +173,14 @@ export function RateCalendarPanel({
 
           // Day number text colour — past dates always grey, regardless of availability
           const dayNumClass = isPast
-            ? "text-grey"
+            ? "text-muted-foreground"
             : isDeparture
             ? "text-primary-foreground"
             : isReturn || isStayDay
             ? "text-primary"
             : isAvailable
             ? "text-foreground"
-            : "text-grey";
+            : "text-muted-foreground";
 
           // Price text colour follows the same hierarchy
           const priceClass = isDeparture

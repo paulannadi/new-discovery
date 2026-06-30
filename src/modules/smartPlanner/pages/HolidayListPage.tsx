@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "../../../shared/components/ui/utils";
+import { Button } from "../../../shared/components/ui/button";
 import type { HolidaySearchCriteria } from "../../../App";
 import type { UnifiedPackage } from "../../../types";
 import PackageSearchForm from "../components/PackageSearchForm";
@@ -513,16 +514,17 @@ export default function HolidayListPage({
                     {searchCriteria.from || "London"} → {searchCriteria.to || "Anywhere"}
                   </span>
                 </div>
-                <div className="text-grey text-xs mt-0.5 ml-6">
+                <div className="text-muted-foreground text-xs mt-0.5 ml-6">
                   {searchDateLabel} · {(searchCriteria.adults || 2) + (searchCriteria.children || 0)} Guests · {searchCriteria.nights || 7} nights
                 </div>
               </div>
-              <button
-                className="text-primary font-bold text-sm px-4 py-2 bg-grey-light rounded-lg shrink-0"
+              <Button
+                variant="ghost"
+                className="bg-grey-light text-primary font-bold shrink-0"
                 onClick={() => setIsMobileSearchExpanded(true)}
               >
                 Edit
-              </button>
+              </Button>
             </div>
           )}
 
@@ -592,12 +594,14 @@ export default function HolidayListPage({
           />
 
           {activeFilterCount > 0 && (
-            <button
+            <Button
+              variant="link"
+              size="sm"
               onClick={resetFilters}
-              className="text-primary text-sm font-bold hover:underline ml-3 shrink-0"
+              className="ml-3 shrink-0"
             >
               Reset all
-            </button>
+            </Button>
           )}
 
         </PageContainer>
@@ -654,7 +658,7 @@ export default function HolidayListPage({
             {/* Progress bar — fills over 5s for non-cached destinations, then fades out.
                 Same visual pattern as HotelListPage but with a longer duration. */}
             {showLoadingBar && (
-              <div className={`h-1 w-full bg-gray-200/50 rounded-full overflow-hidden transition-opacity duration-500 ${loadingProgress >= 100 ? "opacity-0" : "opacity-100"}`}>
+              <div className={`h-1 w-full bg-muted rounded-full overflow-hidden transition-opacity duration-500 ${loadingProgress >= 100 ? "opacity-0" : "opacity-100"}`}>
                 <div
                   className="h-full bg-primary transition-all duration-75 ease-linear"
                   style={{ width: `${loadingProgress}%` }}
@@ -696,15 +700,12 @@ export default function HolidayListPage({
           {/* Empty state — no results after filtering */}
           {filteredAndSorted.length === 0 && packages.length > 0 && (
             <div className="bg-card rounded-xl border border-border p-12 text-center flex flex-col items-center">
-              <Search size={40} className="text-grey mb-4" />
+              <Search size={40} className="text-muted-foreground mb-4" />
               <div className="text-lg font-bold text-foreground mb-2">No holidays match your filters</div>
               <div className="text-sm text-muted-foreground mb-6">Try adjusting the price range, stars, or board type.</div>
-              <button
-                onClick={resetFilters}
-                className="bg-primary text-white font-bold px-5 py-2.5 rounded-lg hover:brightness-85 transition-colors"
-              >
+              <Button onClick={resetFilters}>
                 Clear all filters
-              </button>
+              </Button>
             </div>
           )}
 
@@ -854,12 +855,15 @@ export default function HolidayListPage({
         <div className="md:hidden fixed inset-0 z-50 bg-card flex flex-col animate-in slide-in-from-bottom duration-300">
           <div className="flex items-center justify-between p-4 border-b border-border">
             <h2 className="text-lg font-bold text-foreground">Filters</h2>
-            <button
-              className="p-2 hover:bg-grey-light rounded-full"
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              aria-label="Close"
               onClick={() => setIsMobileFiltersOpen(false)}
             >
               <X size={24} className="text-foreground" />
-            </button>
+            </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6 pb-24">
@@ -917,12 +921,23 @@ export default function HolidayListPage({
           </div>
 
           <div className="sticky bottom-0 bg-card px-4 py-4 border-t border-border">
-            <button
-              onClick={() => setIsMobileFiltersOpen(false)}
-              className="w-full bg-primary text-white font-bold text-sm py-3 rounded-xl hover:brightness-85 transition-colors"
-            >
-              Show {filteredAndSorted.length} holiday{filteredAndSorted.length !== 1 ? "s" : ""}
-            </button>
+            <div className="flex gap-4">
+              <Button
+                variant="tertiary"
+                size="lg"
+                className="flex-1"
+                onClick={resetFilters}
+              >
+                Clear all
+              </Button>
+              <Button
+                size="lg"
+                onClick={() => setIsMobileFiltersOpen(false)}
+                className="flex-1"
+              >
+                Show {filteredAndSorted.length} holiday{filteredAndSorted.length !== 1 ? "s" : ""}
+              </Button>
+            </div>
           </div>
         </div>
       )}

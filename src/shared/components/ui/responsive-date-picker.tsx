@@ -154,7 +154,7 @@ export function ResponsiveDatePicker({
                 {title}
               </DrawerTitle>
               <DrawerClose asChild>
-                <button className="text-grey p-1" aria-label="Close">
+                <button className="text-muted-foreground p-1" aria-label="Close">
                   <X size={18} aria-hidden="true" />
                 </button>
               </DrawerClose>

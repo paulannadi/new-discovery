@@ -360,7 +360,7 @@ export default function FlightListPage({
             fades out once results arrive. Sits just above the results list. */}
         {showLoadingBar && (
           <div
-            className={`h-1 w-full bg-gray-200/50 rounded-full overflow-hidden transition-opacity duration-500 mb-4 ${loadingProgress >= 100 ? "opacity-0" : "opacity-100"}`}
+            className={`h-1 w-full bg-muted rounded-full overflow-hidden transition-opacity duration-500 mb-4 ${loadingProgress >= 100 ? "opacity-0" : "opacity-100"}`}
           >
             <div
               className="h-full bg-primary transition-all duration-75 ease-linear"

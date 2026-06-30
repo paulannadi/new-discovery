@@ -73,7 +73,7 @@ export default function AiCanvasHeader({
       <div className="absolute inset-x-3 md:inset-x-4 bottom-3 flex items-center gap-4 rounded-xl border border-white/70 bg-white/95 backdrop-blur-md px-3.5 md:px-4 py-2.5 shadow-[0_8px_24px_rgba(0,0,0,0.18)]">
         {/* Depart */}
         <div className="flex flex-col leading-tight">
-          <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.06em] text-grey">
+          <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
             Depart
           </span>
           <span className="mt-0.5 text-xs md:text-sm font-bold text-foreground">
@@ -91,7 +91,7 @@ export default function AiCanvasHeader({
 
         {/* Return */}
         <div className="flex flex-col leading-tight">
-          <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.06em] text-grey">
+          <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
             Return
           </span>
           <span className="mt-0.5 text-xs md:text-sm font-bold text-foreground">
@@ -104,7 +104,7 @@ export default function AiCanvasHeader({
         {/* Running total — read-only mini-meter so the user always sees the
             cost without scrolling to the bottom of the timeline. */}
         <div className="hidden md:flex flex-col leading-tight">
-          <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-grey">
+          <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
             Total
           </span>
           <span
@@ -114,7 +114,7 @@ export default function AiCanvasHeader({
             ].join(" ")}
           >
             {formatEuros(spent)}{" "}
-            <span className="text-grey font-semibold">/ {formatEuros(budget)}</span>
+            <span className="text-muted-foreground font-semibold">/ {formatEuros(budget)}</span>
           </span>
         </div>
 

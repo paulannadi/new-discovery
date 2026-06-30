@@ -23,20 +23,20 @@ export function AccommodationCard({ item }: { item: AccommodationItem }) {
       {/* Date range header — sits outside the card, like live SmartPlanner */}
       <p className="font-semibold mb-3 md:mb-4 text-foreground">
         {format(checkIn, "EEE, dd MMM yyyy")} – {format(checkOut, "dd MMM yyyy")}
-        <span className="text-grey font-normal">
+        <span className="text-muted-foreground font-normal">
           {" · "}
           {nights} night{nights !== 1 ? "s" : ""}
         </span>
       </p>
 
-      <div className="border border-border rounded-lg md:rounded-3xl shadow-sm">
-        <div className="bg-card rounded-lg md:rounded-3xl grid md:grid-cols-[160px_1fr] lg:grid-cols-[270px_1fr] md:grid-rows-[250px]">
+      <div className="border border-border rounded-xl shadow-sm">
+        <div className="bg-card rounded-xl grid md:grid-cols-[160px_1fr] lg:grid-cols-[270px_1fr] md:grid-rows-[250px]">
           {/* Hotel image — full width on mobile, fixed column on desktop.
               ImageWithPlaceholder reserves the space + lazy-loads. */}
           <ImageWithPlaceholder
             src={hotel.image}
             alt={hotel.name}
-            containerClassName="block w-full h-32 md:h-full max-md:rounded-t-lg md:rounded-l-3xl"
+            containerClassName="block w-full h-32 md:h-full max-md:rounded-t-xl md:rounded-l-xl"
           />
 
           {/* Content area — two columns on md+: info | actions */}
@@ -82,7 +82,7 @@ export function AccommodationCard({ item }: { item: AccommodationItem }) {
                 </div>
                 {showPrice && hotel.price > 0 && (
                   <div className="text-right">
-                    <div className="text-xs text-grey">From</div>
+                    <div className="text-xs text-muted-foreground">From</div>
                     <div className="text-base font-bold text-foreground">
                       €{hotel.price}/night
                     </div>

@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { Button } from "../../../../shared/components/ui/button";
 import type { TransferItem } from "../../utils/seedTimeline";
 import { SeatChartDrawer } from "./SeatChartDrawer";
+import { ZipCodeDrawer } from "./ZipCodeDrawer";
 
 // Mock schedule data — TransferItem doesn't carry real timetable info yet.
 // These match a typical M-TOURS daytime coach run; if we add real data later
@@ -50,6 +51,14 @@ export function TransferCard({ item, passengerCount = 1 }: TransferCardProps) {
     SEED_SEATS.slice(0, passengerCount),
   );
 
+  // Door-to-door transfers (the "Individual" travel option) have no coach
+  // seat — the traveller is collected from their own area. For those legs we
+  // show an "Update ZIP code" action + ZIP-code drawer instead of the
+  // seat-selection UI, and drop the seat-number label entirely.
+  const isDoorToDoor = !!item.doorToDoor;
+  const [zipDrawerOpen, setZipDrawerOpen] = useState(false);
+  const [pickupZip, setPickupZip] = useState(item.pickupZip ?? "");
+
   return (
     <div>
       {/* Date subtitle + kebab menu — sits above the white card, aligned with
@@ -70,8 +79,8 @@ export function TransferCard({ item, passengerCount = 1 }: TransferCardProps) {
       </div>
 
       {/* White card */}
-      <div className="border border-border shadow-sm rounded-lg md:rounded-3xl">
-        <div className="bg-card p-4 md:p-6 rounded-lg md:flex md:gap-6 md:rounded-3xl">
+      <div className="border border-border shadow-sm rounded-xl">
+        <div className="bg-card p-4 md:p-6 rounded-xl md:flex md:gap-6">
           {/* MAIN COLUMN — operator, schedule, amenities */}
           <div className="space-y-5 md:grow">
             {/* Schedule row: operator | dep | non-stop bar | arr */}
@@ -140,38 +149,64 @@ export function TransferCard({ item, passengerCount = 1 }: TransferCardProps) {
               Mobile: row-reverse → button on the right, seat label on the left.
               Desktop: stacked + right-aligned → seat label above the button. */}
           <div className="mt-6 md:mt-0 max-md:pt-6 md:w-[160px] lg:w-[220px] md:min-w-[160px] max-md:border-t border-border md:border-l flex flex-row-reverse md:flex-col justify-between items-center md:items-end gap-3">
-            <Button
-              variant="outline"
-              className="max-sm:w-full"
-              onClick={() => setSeatDrawerOpen(true)}
-            >
-              Change seat
-            </Button>
-            {/* Current seat(s) — small label so it doesn't compete with the
-                CTA but is still visible next to the "Change seat" action.
-                "Seat 12A" for a solo trip, "Seats 12A, 12B" for couples, etc. */}
-            <p className="text-xs text-muted-foreground">
-              {currentSeats.length === 1 ? "Seat" : "Seats"}{" "}
-              <span className="font-bold text-foreground">
-                {currentSeats.join(", ")}
-              </span>
-            </p>
+            {isDoorToDoor ? (
+              /* Door-to-door (Individual option): edit the pickup ZIP code.
+                 No seat-number label below — there's no coach seat. */
+              <Button
+                variant="outline"
+                className="max-sm:w-full"
+                onClick={() => setZipDrawerOpen(true)}
+              >
+                Update ZIP code
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  className="max-sm:w-full"
+                  onClick={() => setSeatDrawerOpen(true)}
+                >
+                  Change seat
+                </Button>
+                {/* Current seat(s) — small label so it doesn't compete with the
+                    CTA but is still visible next to the "Change seat" action.
+                    "Seat 12A" for a solo trip, "Seats 12A, 12B" for couples. */}
+                <p className="text-xs text-muted-foreground">
+                  {currentSeats.length === 1 ? "Seat" : "Seats"}{" "}
+                  <span className="font-bold text-foreground">
+                    {currentSeats.join(", ")}
+                  </span>
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Seat-chart drawer — slides in from the right when the user clicks
-          "Change seat". Mirrors the M-TOURS Figma flow. */}
-      <SeatChartDrawer
-        open={seatDrawerOpen}
-        onOpenChange={setSeatDrawerOpen}
-        from={item.from}
-        to={item.to}
-        date={item.date}
-        passengerCount={passengerCount}
-        currentSeatIds={currentSeats}
-        onConfirm={setCurrentSeats}
-      />
+      {/* Action drawer — door-to-door legs edit the pickup ZIP code; all other
+          legs open the coach seat chart. Both slide in from the right. */}
+      {isDoorToDoor ? (
+        <ZipCodeDrawer
+          open={zipDrawerOpen}
+          onOpenChange={setZipDrawerOpen}
+          from={item.from}
+          to={item.to}
+          date={item.date}
+          currentZip={pickupZip}
+          onConfirm={setPickupZip}
+        />
+      ) : (
+        <SeatChartDrawer
+          open={seatDrawerOpen}
+          onOpenChange={setSeatDrawerOpen}
+          from={item.from}
+          to={item.to}
+          date={item.date}
+          passengerCount={passengerCount}
+          currentSeatIds={currentSeats}
+          onConfirm={setCurrentSeats}
+        />
+      )}
     </div>
   );
 }

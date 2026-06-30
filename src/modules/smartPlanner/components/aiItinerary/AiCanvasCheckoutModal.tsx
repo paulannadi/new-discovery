@@ -130,33 +130,33 @@ export default function AiCanvasCheckoutModal({
                   <div className="text-base font-extrabold truncate">
                     {state.trip.title}
                   </div>
-                  <div className="text-xs text-grey mt-0.5">
+                  <div className="text-xs text-muted-foreground mt-0.5">
                     {dateRange} · {span}
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-grey">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Total
                   </div>
                   <div className="text-xl font-extrabold">{formatEuros(spent)}</div>
                 </div>
               </div>
 
-              <div className="text-[10px] font-bold uppercase tracking-wider text-grey mb-2">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">
                 Including
               </div>
               <div className="flex flex-col gap-1.5 mb-5">
                 {allItems.slice(0, 6).map((it) => (
                   <div key={it.id} className="flex items-center gap-2.5 text-sm">
-                    <Tag className="size-3 text-grey shrink-0" aria-hidden="true" />
+                    <Tag className="size-3 text-muted-foreground shrink-0" aria-hidden="true" />
                     <span className="flex-1 text-foreground truncate">
                       {itemTitle(it)}
                     </span>
-                    <span className="text-grey shrink-0">{itemPrice(it)}</span>
+                    <span className="text-muted-foreground shrink-0">{itemPrice(it)}</span>
                   </div>
                 ))}
                 {allItems.length > 6 && (
-                  <div className="text-xs text-grey pl-5">
+                  <div className="text-xs text-muted-foreground pl-5">
                     + {allItems.length - 6} more items
                   </div>
                 )}
@@ -194,7 +194,7 @@ export default function AiCanvasCheckoutModal({
             <div className="text-2xl font-extrabold tracking-tight mb-2">
               You're going to Lisbon.
             </div>
-            <div className="text-sm text-grey mb-6 max-w-md mx-auto leading-relaxed">
+            <div className="text-sm text-muted-foreground mb-6 max-w-md mx-auto leading-relaxed">
               Confirmation{" "}
               <strong className="text-foreground font-semibold">
                 #{confirmationNumber}

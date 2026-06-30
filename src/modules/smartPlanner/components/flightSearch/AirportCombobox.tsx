@@ -115,13 +115,13 @@ export function AirportCombobox({
             aria-hidden="true"
           />
           <div className="flex flex-col flex-1 min-w-0">
-            <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">
               {label}
             </span>
             <span
               className={cn(
                 "text-sm font-semibold truncate",
-                value ? "text-foreground" : "text-grey font-normal",
+                value ? "text-foreground" : "text-muted-foreground font-normal",
               )}
             >
               {display || placeholder}

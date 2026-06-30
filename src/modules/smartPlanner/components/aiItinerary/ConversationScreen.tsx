@@ -237,7 +237,7 @@ export default function ConversationScreen({
                     <span className="absolute inline-flex size-full rounded-full bg-primary opacity-50 animate-ping" />
                     <span className="relative inline-flex size-2 rounded-full bg-primary" />
                   </span>
-                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-grey">
+                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
                     AI Trip Concierge
                   </div>
                 </div>
@@ -246,7 +246,7 @@ export default function ConversationScreen({
                     ? `Planning your ${state.trip.title}`
                     : "Let's find your trip"}
                 </div>
-                <div className="text-xs text-grey mt-1">
+                <div className="text-xs text-muted-foreground mt-1">
                   {inItinerary
                     ? `${state.trip.travelersLabel} · ${state.trip.nights} night${
                         state.trip.nights !== 1 ? "s" : ""
@@ -262,7 +262,7 @@ export default function ConversationScreen({
                 onClick={() => setChatMinimized(true)}
                 aria-label="Minimize chat"
                 title="Minimize chat"
-                className="hidden md:inline-flex size-8 rounded-lg text-grey hover:text-foreground shrink-0"
+                className="hidden md:inline-flex size-8 rounded-lg text-muted-foreground hover:text-foreground shrink-0"
               >
                 <PanelLeftClose className="size-4" aria-hidden="true" />
               </Button>
@@ -294,7 +294,7 @@ export default function ConversationScreen({
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8 rounded-lg text-grey hover:text-foreground"
+                className="size-8 rounded-lg text-muted-foreground hover:text-foreground"
                 onClick={() =>
                   showToast.info("Attach panel would open here.")
                 }
@@ -310,12 +310,12 @@ export default function ConversationScreen({
                   if (e.key === "Enter") handleSend();
                 }}
                 placeholder="Reply to the AI…"
-                className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-grey"
+                className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
               />
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8 rounded-lg text-grey hover:text-foreground"
+                className="size-8 rounded-lg text-muted-foreground hover:text-foreground"
                 onClick={() =>
                   showToast.info("Voice input would start here.")
                 }
@@ -554,7 +554,7 @@ function MobileTabButton({
         "relative px-3 py-1.5 text-xs font-medium rounded-full transition-colors flex items-center gap-1.5",
         active
           ? "bg-primary text-primary-foreground shadow-sm"
-          : "text-grey hover:text-foreground",
+          : "text-muted-foreground hover:text-foreground",
       ].join(" ")}
     >
       {icon}

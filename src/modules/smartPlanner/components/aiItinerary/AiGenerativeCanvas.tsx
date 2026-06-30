@@ -71,14 +71,14 @@ export default function AiGenerativeCanvas({
             <span className="absolute inline-flex size-full rounded-full bg-primary opacity-50 animate-ping" />
             <span className="relative inline-flex size-2 rounded-full bg-primary" />
           </span>
-          <span className="text-[10px] font-extrabold uppercase tracking-wider text-grey">
+          <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
             Generated for you
           </span>
         </div>
         <h2 className="text-lg font-extrabold tracking-tight text-balance">
           {meta.heading}
         </h2>
-        <p className="text-sm text-grey mt-1 text-pretty">{meta.subtext}</p>
+        <p className="text-sm text-muted-foreground mt-1 text-pretty">{meta.subtext}</p>
       </motion.div>
 
       {/* 2-up grid; collapses to a single column when the panel is narrow. */}

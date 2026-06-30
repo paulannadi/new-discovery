@@ -1054,7 +1054,7 @@ export default function App() {
             setCurrentPage(tourDetailBackPage);
             window.scrollTo(0, 0);
           }}
-          onBook={(tour, _travelDate, _adults, hotelPreference) => {
+          onBook={(tour, _travelDate, _adults, hotelPreference, travelMode) => {
             // Pass the full route through so SmartPlanner can render every
             // stop (hotel + per-stop activities) and inter-stop transfer the
             // detail page promised, not just a single tour card.
@@ -1085,6 +1085,9 @@ export default function App() {
                 startDateISO: startISO,
                 departurePoint: isCoachTour ? hotelPreference : undefined,
                 operator: tour.operator,
+                // "individual" → door-to-door pickup; seedTimeline uses this to
+                // render an "Update address" action instead of seat selection.
+                travelMode,
               },
             });
             setCurrentPage("smart-planner");

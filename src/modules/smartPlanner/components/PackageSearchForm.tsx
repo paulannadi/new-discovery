@@ -34,6 +34,8 @@ import "react-day-picker/dist/style.css";
 import { useIsMobile } from "../../../shared/components/ui/use-mobile";
 // cn: utility for combining Tailwind classes conditionally
 import { cn } from "../../../shared/components/ui/utils";
+// Shared shadcn/ui Button — used for the real action CTAs below (Apply / Done / Search).
+import { Button } from "../../../shared/components/ui/button";
 // Shared responsive date picker: dropdown on desktop, bottom drawer on mobile.
 // The dates field below now uses this instead of its own hand-rolled drawer.
 import { ResponsiveDatePicker } from "../../../shared/components/ui/responsive-date-picker";
@@ -282,14 +284,15 @@ export default function PackageSearchForm({
 
   // ── Sizing tokens by variant ──────────────────────────────────────────────
 
-  const h         = variant === "hero" ? "h-[52px]" : "h-[48px]";
-  const r         = variant === "hero" ? "rounded-xl" : "rounded-lg";
-  const labelCls  = "text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5";
+  // Search fields use ONE size everywhere (hero landing + compact list-page bar)
+  // so the search UI is identical wherever it appears — 52px, rounded-xl. `variant`
+  // now only drives layout (grid vs single row), not size.
+  const h         = "h-[52px]";
+  const r         = "rounded-xl";
+  const labelCls  = "text-[10px] font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5";
   // text-base (16px) on mobile: iOS Safari auto-zooms any input with font-size < 16px.
   // md:text-sm brings the tighter desktop size back at 768px+.
-  const valueCls  = variant === "hero"
-    ? "text-base md:text-sm font-semibold"
-    : "text-base md:text-xs font-semibold";
+  const valueCls  = "text-base md:text-sm font-semibold";
   const iconSize  = variant === "hero" ? 18 : 16;
   const fieldGap  = variant === "hero" ? "gap-3" : "gap-2";
 
@@ -326,7 +329,7 @@ export default function PackageSearchForm({
                 "relative py-3 px-5 text-xs font-bold transition-colors",
                 dateMode === mode
                   ? "text-primary"
-                  : "text-grey hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               {mode === "specific" ? (
@@ -473,7 +476,7 @@ export default function PackageSearchForm({
       {/* w-full on mobile (stretches inside the drawer); md:w-[480px] restores the fixed width on desktop */}
       {dateMode === "flexible" && (
         <div className="p-4 w-full md:w-[480px]">
-          <p className="text-xs text-grey mb-3">
+          <p className="text-xs text-muted-foreground mb-3">
             Select one or more months to see the best deals
           </p>
           {/* 2 columns on mobile (month cards need space); 3 columns on md+ */}
@@ -519,7 +522,7 @@ export default function PackageSearchForm({
                           ? "text-primary"
                           : isAvailable
                           ? "text-foreground"
-                          : "text-grey"
+                          : "text-muted-foreground"
                       )}
                     >
                       {label}
@@ -536,15 +539,15 @@ export default function PackageSearchForm({
           </div>
 
           {selectedMonths.length > 0 && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 setOpenPanel(null);
               }}
-              className="mt-4 w-full bg-primary hover:brightness-85 text-white font-bold text-sm py-2.5 rounded-lg transition-colors"
+              className="mt-4 w-full"
             >
               Apply →
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -580,11 +583,11 @@ export default function PackageSearchForm({
           <Plane size={iconSize} className="text-primary shrink-0" aria-hidden="true" />
           <div className="flex flex-col flex-1 min-w-0">
             <span className={labelCls}>Flying from</span>
-            <span className={cn(valueCls, from ? "text-foreground" : "text-grey font-normal", "truncate")}>
+            <span className={cn(valueCls, from ? "text-foreground" : "text-muted-foreground font-normal", "truncate")}>
               {from || "Departure city"}
             </span>
           </div>
-          <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+          <ChevronDown size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
         </div>
 
         {openPanel === "from" && (
@@ -600,7 +603,7 @@ export default function PackageSearchForm({
                     setOpenPanel(null);
                   }}
                 >
-                  <Plane size={14} className="text-grey" aria-hidden="true" />
+                  <Plane size={14} className="text-muted-foreground" aria-hidden="true" />
                   {city}
                 </button>
               )
@@ -629,7 +632,7 @@ export default function PackageSearchForm({
               type="text"
               value={toQuery}
               placeholder="Destination"
-              className={cn("bg-transparent", valueCls, "text-foreground outline-none placeholder:text-grey placeholder:font-normal w-full")}
+              className={cn("bg-transparent", valueCls, "text-foreground outline-none placeholder:text-muted-foreground placeholder:font-normal w-full")}
               onChange={(e) => {
                 setToQuery(e.target.value);
                 setTo(e.target.value);
@@ -642,7 +645,7 @@ export default function PackageSearchForm({
           </div>
           {toQuery && (
             <button
-              className="text-grey hover:text-foreground shrink-0"
+              className="text-muted-foreground hover:text-foreground shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
                 setToQuery("");
@@ -664,7 +667,7 @@ export default function PackageSearchForm({
           // md:right-auto md:min-w-[300px]: restores the natural min-width on desktop.
           <div className="absolute top-[calc(100%+8px)] left-0 right-0 z-50 bg-card rounded-xl shadow-xl border border-border py-2 min-w-0 max-h-[340px] overflow-y-auto animate-in fade-in zoom-in-95 duration-150 md:right-auto md:min-w-[300px]">
             {filteredDests.length === 0 ? (
-              <div className="px-4 py-3 text-xs text-grey">
+              <div className="px-4 py-3 text-xs text-muted-foreground">
                 No destinations found
               </div>
             ) : (
@@ -672,7 +675,7 @@ export default function PackageSearchForm({
                 {/* Popular (cached) destinations */}
                 {cachedDests.length > 0 && (
                   <>
-                    <div className="px-4 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-grey">
+                    <div className="px-4 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Popular
                     </div>
                     {cachedDests.map((dest) => (
@@ -684,7 +687,7 @@ export default function PackageSearchForm({
                           handleSelectDestination(dest);
                         }}
                       >
-                        <MapPin size={14} className="text-grey shrink-0" aria-hidden="true" />
+                        <MapPin size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
                         <span className="flex-1">{dest.label}</span>
                         <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full shrink-0">
                           Popular
@@ -700,7 +703,7 @@ export default function PackageSearchForm({
                     {cachedDests.length > 0 && (
                       <div className="mx-4 my-1.5 border-t border-grey-light" />
                     )}
-                    <div className="px-4 pt-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-grey">
+                    <div className="px-4 pt-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       All destinations
                     </div>
                     {nonCachedDests.map((dest) => (
@@ -712,7 +715,7 @@ export default function PackageSearchForm({
                           handleSelectDestination(dest);
                         }}
                       >
-                        <MapPin size={14} className="text-grey shrink-0" aria-hidden="true" />
+                        <MapPin size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
                         <span className="flex-1">{dest.label}</span>
                       </button>
                     ))}
@@ -741,7 +744,7 @@ export default function PackageSearchForm({
               {nights} nights
             </span>
           </div>
-          <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+          <ChevronDown size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
         </div>
 
         {openPanel === "duration" && (
@@ -805,13 +808,13 @@ export default function PackageSearchForm({
                   (dateMode === "specific" && dateRange?.from) ||
                   (dateMode === "flexible" && selectedMonths.length > 0)
                     ? "text-foreground"
-                    : "text-grey font-normal"
+                    : "text-muted-foreground font-normal"
                 )}
               >
                 {dateSummary}
               </span>
             </div>
-            <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+            <ChevronDown size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
           </div>
         }
       >
@@ -832,7 +835,7 @@ export default function PackageSearchForm({
               {guestSummary}
             </span>
           </div>
-          <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+          <ChevronDown size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
         </div>
 
         {openPanel === "guests" && (
@@ -844,7 +847,7 @@ export default function PackageSearchForm({
               <div key={label} className="flex items-center justify-between">
                 <div>
                   <div className="text-sm font-semibold text-foreground">{label}</div>
-                  <div className="text-xs text-grey">{sub}</div>
+                  <div className="text-xs text-muted-foreground">{sub}</div>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
@@ -869,32 +872,26 @@ export default function PackageSearchForm({
               </div>
             ))}
 
-            <button
+            <Button
               onClick={() => setOpenPanel(null)}
-              className="w-full bg-primary text-white font-bold text-sm py-2.5 rounded-lg hover:brightness-85 transition-colors"
+              className="w-full"
             >
               Done
-            </button>
+            </Button>
           </div>
         )}
       </div>
 
       {/* ── SEARCH BUTTON ─────────────────────────────────────────────────── */}
-      <button
+      <Button
+        size="lg"
         onClick={handleSearch}
-        className={cn(
-          // md:col-span-6 → spans the full tablet grid width on its own row 3.
-          "shrink-0 md:col-span-6 bg-primary hover:brightness-85 text-white font-extrabold",
-          variant === "hero"
-            ? "text-base h-[52px] px-6 rounded-xl"
-            : "text-sm h-[48px] px-5 rounded-lg",
-          "transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
-        )}
+        className="shrink-0 md:col-span-6 whitespace-nowrap"
         aria-label={variant === "hero" ? "Search Holidays" : "Search"}
       >
-        <Search size={variant === "hero" ? 20 : 16} aria-hidden="true" />
+        <Search aria-hidden="true" />
         {variant === "hero" ? "Search Holidays" : "Search"}
-      </button>
+      </Button>
     </div>
   );
 }

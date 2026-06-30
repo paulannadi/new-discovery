@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planner Copilot → Smart Planner — flow concept</title>
+<style>
+  :root{
+    --pink-1:#ffd9e0; --pink-2:#f3b8d0; --lilac:#cda8e6; --blue:#5b8def;
+    --ink:#2a2533; --muted:#7c7488; --card:#ffffff; --glass:rgba(255,255,255,.28);
+    --glass-strong:rgba(255,255,255,.55); --line:rgba(0,0,0,.07);
+    --shadow:0 18px 50px rgba(120,60,110,.18);
+  }
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+    color:var(--ink); background:#ece9f1;
+    display:flex; flex-direction:column; align-items:center; min-height:100vh;
+  }
+
+  /* ---- control bar ---- */
+  .controls{
+    width:100%; display:flex; gap:14px; align-items:center; justify-content:center;
+    padding:14px; background:#1f1b27; color:#fff; position:sticky; top:0; z-index:50;
+    flex-wrap:wrap;
+  }
+  .controls .label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
+  .seg{display:flex; background:#34303d; border-radius:999px; padding:4px}
+  .seg button{
+    border:0; background:transparent; color:#cfc9d8; font-weight:600; font-size:13px;
+    padding:7px 16px; border-radius:999px; cursor:pointer; transition:.15s;
+  }
+  .seg button.active{background:#fff; color:#1f1b27}
+  .ghost-btn{
+    border:1px solid rgba(255,255,255,.25); background:transparent; color:#fff;
+    font-size:13px; font-weight:600; padding:8px 16px; border-radius:999px; cursor:pointer;
+  }
+  .ghost-btn:hover{background:rgba(255,255,255,.1)}
+  .hint{font-size:12px;color:#b9b2c8;max-width:340px;line-height:1.4}
+
+  /* ---- device frame ---- */
+  .stage-wrap{flex:1; width:100%; display:flex; justify-content:center; align-items:flex-start; padding:26px 16px 60px}
+  .device{
+    position:relative; background:#fff; overflow:hidden; box-shadow:var(--shadow);
+    transition:width .35s ease, height .35s ease, border-radius .35s ease;
+  }
+  .device.mobile{width:390px; height:780px; border-radius:42px; border:11px solid #14101b}
+  .device.desktop{width:min(1040px,94vw); height:680px; border-radius:16px; border:1px solid #d6d0e0}
+  .device.desktop::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:34px;
+    background:#f3f0f8; border-bottom:1px solid #e4def0; z-index:6;
+  }
+  .device.desktop::after{
+    content:"● ● ●"; position:absolute; top:7px; left:14px; font-size:11px;
+    color:#c9c2d8; letter-spacing:3px; z-index:7;
+  }
+  .device.desktop .screen{top:34px; height:calc(100% - 34px)}
+
+  .screen{position:absolute; inset:0; overflow:hidden}
+
+  /* ---- shared gradient ---- */
+  .grad{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(120% 90% at 10% 0%, var(--pink-1) 0%, transparent 55%),
+      radial-gradient(120% 110% at 100% 0%, var(--lilac) 0%, transparent 60%),
+      linear-gradient(160deg, var(--pink-2), #e8c4dd 55%, #d9b6e8);
+  }
+
+  /* ---- ENTRY ---- */
+  .entry{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; padding:30px; z-index:2; text-align:center}
+  .toggle-pill{display:flex; align-items:center; gap:10px; background:var(--glass);
+    backdrop-filter:blur(8px); border-radius:999px; padding:9px 16px; color:#fff;
+    font-weight:700; font-size:14px; margin-bottom:26px}
+  .switch{width:42px;height:24px;border-radius:999px;background:var(--blue);position:relative;flex:none}
+  .switch i{position:absolute;top:3px;left:21px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+  .switch.off{background:rgba(255,255,255,.4)} .switch.off i{left:3px}
+  .entry h1{color:#fff; font-size:34px; line-height:1.1; margin:0 0 26px; font-weight:800;
+    text-shadow:0 2px 18px rgba(150,60,120,.25); letter-spacing:-.5px}
+  .device.mobile .entry h1{font-size:28px}
+  .promptbar{width:100%; max-width:620px; background:#fff; border-radius:18px; display:flex;
+    align-items:center; gap:10px; padding:14px 14px 14px 18px; box-shadow:var(--shadow)}
+  .promptbar .plus{font-size:22px; color:#9b93a8; flex:none}
+  .promptbar input{border:0; outline:0; flex:1; font-size:16px; color:var(--ink); background:transparent}
+  .promptbar .mic{color:#9b93a8; font-size:18px; flex:none}
+  .promptbar .send{width:44px;height:42px;border:0;border-radius:12px;background:#b9c9f5;color:#fff;
+    font-size:18px;cursor:pointer;flex:none;transition:.15s}
+  .promptbar .send:hover{background:var(--blue)}
+  .chips{display:flex; gap:12px; margin-top:18px; flex-wrap:wrap; justify-content:center}
+  .chip{background:var(--glass); backdrop-filter:blur(8px); border:0; color:#fff; font-weight:600;
+    font-size:14px; padding:11px 18px; border-radius:999px; cursor:pointer; transition:.15s}
+  .chip:hover{background:var(--glass-strong); color:#3a2f44}
+
+  /* ---- CONVERSATION ---- */
+  .convo{position:absolute; inset:0; display:flex; flex-direction:column; z-index:3}
+  .convo-head{padding:14px 18px; display:flex; align-items:center; gap:10px;
+    background:rgba(255,255,255,.55); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); z-index:4}
+  .spark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--lilac),var(--blue));
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex:none}
+  .convo-head b{font-size:15px}
+  .convo-head .sub{font-size:12px;color:var(--muted);margin-top:1px}
+  /* brief summary bar */
+  .brief{display:flex;gap:7px;flex-wrap:wrap;padding:10px 18px;background:rgba(255,255,255,.4);
+    border-bottom:1px solid var(--line);min-height:0;transition:.2s}
+  .brief:empty{display:none}
+  .brief .bchip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 11px;
+    font-size:12px;font-weight:600;color:#5a5168;display:flex;gap:6px;align-items:center}
+  .brief .bchip b{color:var(--ink)}
+  .thread{flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:14px;
+    background:linear-gradient(180deg,#faf7fd,#f3eef9)}
+  .msg{max-width:82%; padding:12px 15px; border-radius:16px; font-size:14.5px; line-height:1.45;
+    animation:rise .35s ease}
+  .msg.ai{align-self:flex-start; background:#fff; border:1px solid var(--line); border-bottom-left-radius:5px}
+  .msg.me{align-self:flex-end; background:linear-gradient(135deg,var(--blue),#7aa0f2); color:#fff;
+    border-bottom-right-radius:5px}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .cardrow{display:grid; gap:12px; align-self:stretch;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); animation:rise .4s ease}
+  .gcard{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;
+    transition:.18s; box-shadow:0 4px 14px rgba(90,60,110,.07)}
+  .gcard:hover{transform:translateY(-3px); box-shadow:0 12px 26px rgba(90,60,110,.16)}
+  .gcard.sel{outline:2.5px solid var(--blue); outline-offset:-2px}
+  .gcard .ph{height:84px; background-size:cover; background-position:center; position:relative}
+  .gcard .ph .tag{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.45);color:#fff;font-size:10px;
+    font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.04em}
+  .gcard .body{padding:10px 12px}
+  .gcard .body .t{font-weight:700;font-size:14px}
+  .gcard .body .d{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+  .gcard.template{display:flex;align-items:center;gap:12px;padding:12px}
+  .gcard.template .ic{width:42px;height:42px;border-radius:11px;flex:none;
+    background:linear-gradient(135deg,#ffcadf,#c7b1ee);display:flex;align-items:center;justify-content:center;font-size:20px}
+
+  .quicks{display:flex;gap:9px;flex-wrap:wrap;align-self:flex-start;animation:rise .4s ease}
+  .quick{background:#fff;border:1px solid #d9d2e6;color:#5a4f6c;border-radius:999px;padding:9px 15px;
+    font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s}
+  .quick:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+  .building{align-self:flex-start;display:flex;align-items:center;gap:10px;color:var(--muted);
+    font-size:13px;font-weight:600;padding:6px 2px}
+  .building .dots{display:flex;gap:4px}
+  .building .dots i{width:7px;height:7px;border-radius:50%;background:var(--lilac);animation:bounce 1s infinite}
+  .building .dots i:nth-child(2){animation-delay:.15s}.building .dots i:nth-child(3){animation-delay:.3s}
+  @keyframes bounce{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
+
+  /* composer */
+  .composer{padding:12px 16px;background:#fff;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
+  .composer input{flex:1;border:1px solid #e2dcec;border-radius:999px;padding:11px 16px;font-size:14px;outline:0}
+  .composer .send{width:40px;height:40px;border:0;border-radius:50%;background:var(--blue);color:#fff;font-size:16px;cursor:pointer;flex:none}
+
+  /* ---- READY tooltip / control ---- */
+  .ready-toast{position:absolute;left:50%;transform:translateX(-50%);bottom:92px;z-index:30;
+    background:#1f1b27;color:#fff;padding:12px 18px;border-radius:14px;font-size:14px;font-weight:600;
+    display:flex;align-items:center;gap:12px;box-shadow:0 12px 30px rgba(0,0,0,.3);animation:pop .4s ease}
+  .ready-toast .go{background:var(--blue);border:0;color:#fff;font-weight:700;font-size:13px;padding:8px 14px;
+    border-radius:9px;cursor:pointer}
+  .ready-toast::after{content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%) rotate(45deg);
+    width:14px;height:14px;background:#1f1b27}
+  @keyframes pop{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+  /* ---- ITINERARY (Smart Planner) ---- */
+  .planner{position:absolute;inset:0;background:#f6f3fb;display:flex;flex-direction:column;z-index:5;
+    transform:translateY(100%);transition:transform .45s cubic-bezier(.6,.05,.2,1);overflow:hidden}
+  .planner.show{transform:none}
+  .device.desktop .planner{transform:translateX(100%)}
+  .device.desktop .planner.show{transform:none}
+  .planner-head{padding:14px 18px;background:#fff;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:12px;flex:none}
+  .planner-head .back{border:0;background:#f0ecf7;border-radius:9px;width:34px;height:34px;font-size:16px;cursor:pointer;color:#5a4f6c}
+  .planner-head .ttl b{font-size:15px}.planner-head .ttl .s{font-size:12px;color:var(--muted)}
+  .meters{display:flex;gap:8px;margin-left:auto}
+  .meter{background:#f3eef9;border-radius:10px;padding:6px 11px;text-align:center;min-width:58px}
+  .meter .v{font-weight:800;font-size:14px}.meter .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .planner-body{flex:1;display:flex;overflow:hidden}
+  .days{flex:1;overflow-y:auto;padding:16px}
+  .day{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:12px;
+    box-shadow:0 3px 10px rgba(90,60,110,.05)}
+  .day .dh{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+  .day .num{width:26px;height:26px;border-radius:8px;background:var(--blue);color:#fff;font-weight:700;font-size:12px;
+    display:flex;align-items:center;justify-content:center;flex:none}
+  .day .dh b{font-size:14px}.day .dh span{font-size:12px;color:var(--muted);margin-left:auto}
+  .day .row{display:flex;align-items:center;gap:9px;font-size:13px;color:#4c4458;padding:5px 0}
+  .day .row .ic{width:24px;text-align:center}
+  .summary{width:280px;flex:none;background:#fff;border-left:1px solid var(--line);padding:16px;overflow-y:auto}
+  .device.mobile .summary{display:none}
+  .summary h4{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .sline{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .sline.total{border:0;font-weight:800;font-size:16px;margin-top:6px}
+  .summary .cta{width:100%;margin-top:14px;border:0;background:var(--blue);color:#fff;font-weight:700;
+    padding:13px;border-radius:11px;font-size:14px;cursor:pointer}
+
+  /* persistent conversation affordance */
+  .convo-pill{position:absolute;left:50%;transform:translateX(-50%);bottom:18px;z-index:20;
+    background:#1f1b27;color:#fff;border:0;border-radius:999px;padding:12px 20px;font-size:13.5px;font-weight:700;
+    display:none;align-items:center;gap:9px;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28)}
+  .planner.show ~ .convo-pill{display:flex}
+  .device.desktop .convo-pill{left:auto;right:18px;bottom:18px;transform:none}
+  .convo-pill .pulse{width:8px;height:8px;border-radius:50%;background:#7af2b0}
+
+  .mode-note{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:40;
+    background:rgba(31,27,39,.82);color:#fff;font-size:11.5px;font-weight:600;padding:6px 13px;border-radius:999px;
+    pointer-events:none;opacity:0;transition:.3s}
+  .mode-note.show{opacity:1}
+</style>
+</head>
+<body>
+  <div class="controls">
+    <span class="label">View as</span>
+    <div class="seg" id="seg">
+      <button data-mode="mobile" class="active">📱 Mobile</button>
+      <button data-mode="desktop">🖥 Desktop</button>
+    </div>
+    <button class="ghost-btn" id="restart">↻ Restart</button>
+    <span class="hint" id="hint">Mobile: when ready, the conversation <b>peeks/minimizes</b> and the itinerary slides up in the same surface.</span>
+  </div>
+
+  <div class="stage-wrap">
+    <div class="device mobile" id="device">
+      <div class="screen">
+        <div class="grad"></div>
+        <div class="mode-note" id="modeNote"></div>
+
+        <!-- ENTRY -->
+        <div class="entry" id="entry">
+          <div class="toggle-pill">AI Experience <span class="switch" id="aiSwitch"><i></i></span></div>
+          <h1>You dream it.<br>We'll plan it.</h1>
+          <div class="promptbar">
+            <span class="plus">+</span>
+            <input id="entryInput" placeholder="Tell us anything — destination, dates, the vibe…">
+            <span class="mic">🎙</span>
+            <button class="send" id="entrySend">➤</button>
+          </div>
+          <div class="chips">
+            <button class="chip" data-seed="vibe">✨ Pick a vibe</button>
+            <button class="chip" data-seed="link">🔗 Paste a link for inspiration</button>
+            <button class="chip" data-seed="trending">🧭 Show me trending places</button>
+          </div>
+        </div>
+
+        <!-- CONVERSATION -->
+        <div class="convo" id="convo" style="display:none">
+          <div class="convo-head">
+            <div class="spark">✦</div>
+            <div><b>Planner Copilot</b><div class="sub" id="convoSub">Listening…</div></div>
+          </div>
+          <div class="brief" id="brief"></div>
+          <div class="thread" id="thread"></div>
+          <div class="composer">
+            <input id="convoInput" placeholder="Keep talking — refine anything…">
+            <button class="send" id="convoSend">➤</button>
+          </div>
+        </div>
+
+        <!-- READY toast -->
+        <!-- injected dynamically -->
+
+        <!-- ITINERARY -->
+        <div class="planner" id="planner">
+          <div class="planner-head">
+            <button class="back" id="plannerBack">‹</button>
+            <div class="ttl"><b>Portugal — 14 days</b><div class="s">2 travellers · 12–26 Sep</div></div>
+            <div class="meters">
+              <div class="meter"><div class="v">14</div><div class="k">days</div></div>
+              <div class="meter"><div class="v">€3,180</div><div class="k">pp</div></div>
+              <div class="meter"><div class="v">Easy</div><div class="k">pace</div></div>
+            </div>
+          </div>
+          <div class="planner-body">
+            <div class="days" id="days"></div>
+            <div class="summary">
+              <h4>Trip summary</h4>
+              <div class="sline"><span>Return flights (2)</span><b>€840</b></div>
+              <div class="sline"><span>Hotels · 13 nights</span><b>€4,420</b></div>
+              <div class="sline"><span>Car hire · 10 days</span><b>€590</b></div>
+              <div class="sline"><span>Activities (4)</span><b>€510</b></div>
+              <div class="sline total"><span>Total</span><span>€6,360</span></div>
+              <button class="cta">Proceed to checkout</button>
+            </div>
+          </div>
+        </div>
+        <button class="convo-pill" id="convoPill"><span class="pulse"></span> Planner Copilot · tap to refine</button>
+
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  var mode = "mobile";
+  var device = document.getElementById("device");
+  var thread = document.getElementById("thread");
+  var brief  = document.getElementById("brief");
+  var modeNote = document.getElementById("modeNote");
+  var briefState = {};
+
+  var IMG = {
+    portugal:"https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=400&q=60",
+    greece:"https://images.unsplash.com/photo-1533105079780-92b9be482077?w=400&q=60",
+    thailand:"https://images.unsplash.com/photo-1528181304800-259b08848526?w=400&q=60",
+    lisbon:"https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=400&q=60",
+    algarve:"https://images.unsplash.com/photo-1581323803974-3a1e9d70079c?w=400&q=60",
+    porto:"https://images.unsplash.com/photo-1555881400-69a2b8edf5e8?w=400&q=60"
+  };
+
+  /* ---------- helpers ---------- */
+  function el(html){var d=document.createElement("div");d.innerHTML=html.trim();return d.firstChild;}
+  function scroll(){thread.scrollTop=thread.scrollHeight;}
+  function msg(side,text,delay){
+    setTimeout(function(){
+      thread.appendChild(el('<div class="msg '+side+'">'+text+'</div>')); scroll();
+    }, delay||0);
+  }
+  function setBrief(k,v){
+    briefState[k]=v; renderBrief();
+  }
+  function renderBrief(){
+    brief.innerHTML="";
+    var labels={dest:"📍",vibe:"🌴",dur:"🗓",pax:"👥",dates:"📅"};
+    Object.keys(briefState).forEach(function(k){
+      brief.appendChild(el('<span class="bchip">'+(labels[k]||"")+' <b>'+briefState[k]+'</b></span>'));
+    });
+  }
+  function building(cb){
+    var b=el('<div class="building"><span>Building your trip</span><span class="dots"><i></i><i></i><i></i></span></div>');
+    thread.appendChild(b); scroll();
+    setTimeout(function(){ b.remove(); cb&&cb(); }, 1600);
+  }
+
+  /* ---------- conversation script ---------- */
+  function startConvo(seed){
+    document.getElementById("entry").style.display="none";
+    document.getElementById("convo").style.display="flex";
+    thread.innerHTML=""; briefState={}; renderBrief();
+    document.getElementById("convoSub").textContent="Thinking about your trip…";
+
+    var opener = {
+      vibe:"I want somewhere relaxed — beaches and really good food, about 2 weeks.",
+      link:"Saw this reel — chasing that slow-coast, great-food vibe for ~2 weeks.",
+      trending:"Show me something warm and relaxed, beaches + food, around 2 weeks.",
+      typed:null
+    }[seed] || seed;
+
+    msg("me", opener, 100);
+    setBrief("vibe","Beach + food, relaxed");
+    setBrief("dur","~14 days");
+
+    msg("ai","Lovely — slow coast and great food, two weeks. A few places nail that. Which pulls you?", 700);
+    setTimeout(countryCards, 1100);
+  }
+
+  function countryCards(){
+    var row = el('<div class="cardrow"></div>');
+    [["portugal","Portugal","Seafood, slow Algarve coast, Lisbon buzz"],
+     ["greece","Greece","Island-hopping, tavernas, long lunches"],
+     ["thailand","Thailand","Beaches, street food, easy pace"]
+    ].forEach(function(c){
+      var card=el('<div class="gcard"><div class="ph" style="background-image:url('+IMG[c[0]]+')"><span class="tag">COUNTRY</span></div><div class="body"><div class="t">'+c[1]+'</div><div class="d">'+c[2]+'</div></div></div>');
+      card.onclick=function(){ pickCountry(c[1]); };
+      row.appendChild(card);
+    });
+    thread.appendChild(row); scroll();
+  }
+
+  function pickCountry(name){
+    msg("me", name + " ✨");
+    setBrief("dest", name);
+    document.getElementById("convoSub").textContent="Shaping a "+name+" route…";
+    msg("ai","Great pick. Want to base it on a route we love, or choose your own regions?", 600);
+    setTimeout(function(){
+      // template card + city cards
+      var tpl=el('<div class="cardrow"><div class="gcard template"><div class="ic">🗺</div><div class="body"><div class="t">Classic Portugal · 14 days</div><div class="d">Our most-booked route — Lisbon → Algarve → Porto</div></div></div></div>');
+      tpl.firstChild.onclick=function(){ chooseDates("Classic Portugal template"); };
+      thread.appendChild(tpl);
+
+      var row=el('<div class="cardrow"></div>');
+      [["lisbon","Lisbon","2–3 nights · city + food"],
+       ["algarve","Algarve","4–5 nights · beaches"],
+       ["porto","Porto","2 nights · river + wine"]
+      ].forEach(function(c){
+        var card=el('<div class="gcard"><div class="ph" style="background-image:url('+IMG[c[0]]+')"><span class="tag">REGION</span></div><div class="body"><div class="t">'+c[1]+'</div><div class="d">'+c[2]+'</div></div></div>');
+        card.onclick=function(){ card.classList.toggle("sel"); };
+        row.appendChild(card);
+      });
+      thread.appendChild(row); scroll();
+
+      var q=el('<div class="quicks"><button class="quick">Use the template ✓</button><button class="quick">Just my picks →</button></div>');
+      q.children[0].onclick=function(){ chooseDates("Classic Portugal template"); };
+      q.children[1].onclick=function(){ chooseDates("your selected regions"); };
+      thread.appendChild(q); scroll();
+    }, 1000);
+  }
+
+  function chooseDates(basis){
+    msg("me", "Let's go with " + basis + ".");
+    msg("ai","Perfect. When are you travelling, and how many of you?", 600);
+    setTimeout(function(){
+      var q=el('<div class="quicks"><button class="quick">12–26 Sep · 2 people</button><button class="quick">Flexible · 2 people</button><button class="quick">October · family of 4</button></div>');
+      Array.prototype.forEach.call(q.children,function(btn){
+        btn.onclick=function(){
+          msg("me", btn.textContent);
+          var parts=btn.textContent.split("·");
+          setBrief("dates", parts[0].trim());
+          setBrief("pax", parts[1]?parts[1].trim():"2 people");
+          goReady();
+        };
+      });
+      thread.appendChild(q); scroll();
+    }, 900);
+  }
+
+  function goReady(){
+    document.getElementById("convoSub").textContent="Putting it together…";
+    building(function(){
+      msg("ai","Done — I've laid out your 14 days. Take a look whenever you're ready. ✨");
+      showReadyToast();
+    });
+  }
+
+  /* ---------- ready control (mode-dependent) ---------- */
+  function showReadyToast(){
+    var existing=document.getElementById("readyToast"); if(existing) existing.remove();
+    var label = mode==="mobile" ? "Peek itinerary" : "Open itinerary";
+    var toast=el('<div class="ready-toast" id="readyToast">🎉 Your itinerary is ready! <button class="go">'+label+'</button></div>');
+    toast.querySelector(".go").onclick=openItinerary;
+    document.querySelector(".screen").appendChild(toast);
+  }
+
+  function openItinerary(){
+    var t=document.getElementById("readyToast"); if(t) t.remove();
+    buildDays();
+    document.getElementById("planner").classList.add("show");
+    flashNote(mode==="mobile"
+      ? "Conversation minimized to a pill — tap it to keep refining"
+      : "Switched to Smart Planner — conversation tucked to the side");
+  }
+
+  function buildDays(){
+    var days=document.getElementById("days");
+    if(days.dataset.built) return; days.dataset.built="1";
+    var data=[
+      ["1","Lisbon","Arrive · Alfama walk","✈️ Flight in · TAP","🏨 Hotel das Janelas","🍽 Time Out Market"],
+      ["2","Lisbon","Sintra day trip","🚗 Pick up car","🏰 Pena Palace","🍷 Sunset, Bairro Alto"],
+      ["3","Algarve","Drive south to the coast","🚗 2h45 scenic drive","🏖 Praia da Marinha","🦐 Cataplana dinner"],
+      ["6","Algarve","Boat + caves morning","⛵ Benagil sea caves","🏖 Beach afternoon",""],
+      ["9","Porto","North to the river city","🚗 Coastal road","🛏 Boutique riverside",""],
+      ["12","Porto","Douro valley wine day","🍇 Vineyard tour","🚆 Return prep",""]
+    ];
+    data.forEach(function(d){
+      var rows="";
+      for(var i=3;i<d.length;i++){ if(d[i]) rows+='<div class="row"><span class="ic">'+d[i].split(" ")[0]+'</span><span>'+d[i].substring(d[i].indexOf(" ")+1)+'</span></div>'; }
+      days.appendChild(el('<div class="day"><div class="dh"><span class="num">'+d[0]+'</span><b>'+d[1]+'</b><span>'+d[2]+'</span></div>'+rows+'</div>'));
+    });
+  }
+
+  function flashNote(txt){
+    modeNote.textContent=txt; modeNote.classList.add("show");
+    setTimeout(function(){ modeNote.classList.remove("show"); }, 2600);
+  }
+
+  /* ---------- pill / back ---------- */
+  document.getElementById("convoPill").onclick=function(){
+    document.getElementById("planner").classList.remove("show");
+    flashNote("Back in the conversation — itinerary updates quietly as you talk");
+  };
+  document.getElementById("plannerBack").onclick=function(){
+    document.getElementById("planner").classList.remove("show");
+  };
+
+  /* ---------- entry triggers ---------- */
+  document.getElementById("entrySend").onclick=function(){
+    var v=document.getElementById("entryInput").value.trim();
+    startConvo(v || "vibe");
+  };
+  document.getElementById("entryInput").addEventListener("keydown",function(e){ if(e.key==="Enter") document.getElementById("entrySend").click(); });
+  Array.prototype.forEach.call(document.querySelectorAll(".chip"),function(c){
+    c.onclick=function(){ startConvo(c.dataset.seed); };
+  });
+  document.getElementById("convoSend").onclick=function(){
+    var v=document.getElementById("convoInput").value.trim(); if(!v) return;
+    msg("me",v); document.getElementById("convoInput").value="";
+    setTimeout(function(){ msg("ai","Got it — I've nudged the plan. Open the itinerary to see the change reflected."); },500);
+  };
+  document.getElementById("convoInput").addEventListener("keydown",function(e){ if(e.key==="Enter") document.getElementById("convoSend").click(); });
+  document.getElementById("aiSwitch").onclick=function(){ this.classList.toggle("off"); };
+
+  /* ---------- mode switch ---------- */
+  var hint=document.getElementById("hint");
+  Array.prototype.forEach.call(document.querySelectorAll("#seg button"),function(b){
+    b.onclick=function(){
+      document.querySelectorAll("#seg button").forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active");
+      mode=b.dataset.mode;
+      device.className="device "+mode;
+      hint.innerHTML = mode==="mobile"
+        ? 'Mobile: when ready, the conversation <b>peeks/minimizes</b> and the itinerary slides up in the same surface.'
+        : 'Desktop: when ready, the same control does a <b>full-switch</b> to Smart Planner; conversation tucks to a side pill.';
+      var rt=document.getElementById("readyToast");
+      if(rt) rt.querySelector(".go").textContent = mode==="mobile" ? "Peek itinerary" : "Open itinerary";
+    };
+  });
+
+  /* ---------- restart ---------- */
+  document.getElementById("restart").onclick=function(){
+    document.getElementById("planner").classList.remove("show");
+    document.getElementById("days").innerHTML=""; document.getElementById("days").dataset.built="";
+    var rt=document.getElementById("readyToast"); if(rt) rt.remove();
+    thread.innerHTML=""; briefState={}; renderBrief();
+    document.getElementById("convo").style.display="none";
+    document.getElementById("entry").style.display="flex";
+    document.getElementById("entryInput").value="";
+  };
+})();
+</script>
+</body>
+</html>

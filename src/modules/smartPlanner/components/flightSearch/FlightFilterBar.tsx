@@ -48,6 +48,7 @@ import {
 } from "../../../../shared/components/ui/popover";
 import { Checkbox } from "../../../../shared/components/ui/checkbox";
 import { Slider } from "../../../../shared/components/ui/slider";
+import { Button } from "../../../../shared/components/ui/button";
 import { cn } from "../../../../shared/components/ui/utils";
 // Shared secondary-pill styling so this bar matches DiscoveryPage's
 // Flights tab and the FlightSearchForm.
@@ -290,13 +291,14 @@ export function FlightFilterBar({ filters, onChange, availableAirlines, resultCo
               })}
             </div>
             {filters.airlines.length > 0 && (
-              <button
-                type="button"
+              <Button
+                variant="link"
+                size="sm"
                 onClick={() => onChange(update(filters, "airlines", []))}
-                className="mt-2 w-full text-xs font-bold text-primary hover:underline text-left px-2"
+                className="mt-2 w-full justify-start px-2"
               >
                 Clear airlines
-              </button>
+              </Button>
             )}
           </PopoverContent>
         </Popover>
@@ -329,13 +331,14 @@ export function FlightFilterBar({ filters, onChange, availableAirlines, resultCo
               })}
             </div>
             {filters.departureTimes.length > 0 && (
-              <button
-                type="button"
+              <Button
+                variant="link"
+                size="sm"
                 onClick={() => onChange(update(filters, "departureTimes", []))}
-                className="mt-2 w-full text-xs font-bold text-primary hover:underline text-left px-2"
+                className="mt-2 w-full justify-start px-2"
               >
                 Clear times
-              </button>
+              </Button>
             )}
           </PopoverContent>
         </Popover>
@@ -408,13 +411,16 @@ export function FlightFilterBar({ filters, onChange, availableAirlines, resultCo
           <div className="bg-card rounded-t-3xl p-6 pb-12 flex flex-col gap-4 animate-in slide-in-from-bottom duration-300 z-10">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg font-extrabold text-foreground">Sort by</h3>
-              <button
+              <Button
                 type="button"
-                className="p-2 hover:bg-grey-light rounded-full"
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
+                aria-label="Close"
                 onClick={() => setMobileSortOpen(false)}
               >
                 <X size={20} className="text-foreground" aria-hidden="true" />
-              </button>
+              </Button>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -439,13 +445,16 @@ export function FlightFilterBar({ filters, onChange, availableAirlines, resultCo
         <div className="md:hidden fixed inset-0 z-50 bg-card flex flex-col animate-in slide-in-from-bottom duration-300">
           <div className="flex items-center justify-between p-4 border-b border-border">
             <h2 className="text-lg font-extrabold text-foreground">Filters</h2>
-            <button
+            <Button
               type="button"
-              className="p-2 hover:bg-grey-light rounded-full"
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              aria-label="Close"
               onClick={() => setMobileFiltersOpen(false)}
             >
               <X size={24} className="text-foreground" aria-hidden="true" />
-            </button>
+            </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-8 pb-24">
@@ -521,20 +530,21 @@ export function FlightFilterBar({ filters, onChange, availableAirlines, resultCo
           {/* Footer — Clear all + Show N flights, same as the hotel sheet. */}
           <div className="p-4 border-t border-border bg-card pb-8">
             <div className="flex gap-4">
-              <button
-                type="button"
-                className="flex-1 py-3 font-extrabold text-foreground underline"
+              <Button
+                variant="tertiary"
+                size="lg"
+                className="flex-1"
                 onClick={() => onChange(DEFAULT_FILTERS)}
               >
                 Clear all
-              </button>
-              <button
-                type="button"
-                className="flex-[2] bg-primary text-white font-extrabold py-3 rounded-lg"
+              </Button>
+              <Button
+                size="lg"
+                className="flex-1"
                 onClick={() => setMobileFiltersOpen(false)}
               >
                 {resultCount !== undefined ? `Show ${resultCount} flights` : "Show flights"}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

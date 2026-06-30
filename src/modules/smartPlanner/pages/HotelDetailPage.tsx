@@ -546,7 +546,7 @@ export default function HotelDetailPage({
                 /* Clickable field box — active state adds a blue ring, matching PackageSearchForm's fieldBase() */
                 <div
                   className={cn(
-                    "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors cursor-pointer",
+                    "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors cursor-pointer",
                     openSearchPanel === "checkIn"
                       ? "border-primary ring-2 ring-primary/20 bg-white"
                       : "border-border bg-white hover:border-primary"
@@ -555,16 +555,16 @@ export default function HotelDetailPage({
                 >
                   <CalendarDays size={16} className="text-primary shrink-0" aria-hidden="true" />
                   <div className="flex flex-col flex-1 min-w-0">
-                    <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Check-in</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Check-in</span>
                     {/* format() converts the ISO string ("2026-04-10") to "Apr 10, 2026" */}
                     <span className={cn(
                       "text-sm font-semibold truncate",
-                      searchDates.checkIn ? "text-foreground" : "text-grey font-normal"
+                      searchDates.checkIn ? "text-foreground" : "text-muted-foreground font-normal"
                     )}>
                       {searchDates.checkIn ? format(parseISO(searchDates.checkIn), "MMM d, yyyy") : "Add date"}
                     </span>
                   </div>
-                  <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+                  <ChevronDown size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
                 </div>
               }
               mode="single"
@@ -588,7 +588,7 @@ export default function HotelDetailPage({
               trigger={
                 <div
                   className={cn(
-                    "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors cursor-pointer",
+                    "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors cursor-pointer",
                     openSearchPanel === "checkOut"
                       ? "border-primary ring-2 ring-primary/20 bg-white"
                       : "border-border bg-white hover:border-primary"
@@ -597,15 +597,15 @@ export default function HotelDetailPage({
                 >
                   <CalendarDays size={16} className="text-primary shrink-0" aria-hidden="true" />
                   <div className="flex flex-col flex-1 min-w-0">
-                    <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Check-out</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Check-out</span>
                     <span className={cn(
                       "text-sm font-semibold truncate",
-                      searchDates.checkOut ? "text-foreground" : "text-grey font-normal"
+                      searchDates.checkOut ? "text-foreground" : "text-muted-foreground font-normal"
                     )}>
                       {searchDates.checkOut ? format(parseISO(searchDates.checkOut), "MMM d, yyyy") : "Add date"}
                     </span>
                   </div>
-                  <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+                  <ChevronDown size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
                 </div>
               }
               mode="single"
@@ -624,7 +624,7 @@ export default function HotelDetailPage({
             <div className="relative flex-1">
               <div
                 className={cn(
-                  "h-[48px] rounded-lg border px-4 flex items-center gap-3 transition-colors cursor-pointer",
+                  "h-[52px] rounded-xl border px-4 flex items-center gap-3 transition-colors cursor-pointer",
                   openSearchPanel === "guests"
                     ? "border-primary ring-2 ring-primary/20 bg-white"
                     : "border-border bg-white hover:border-primary"
@@ -633,7 +633,7 @@ export default function HotelDetailPage({
               >
                 <Users size={16} className="text-primary shrink-0" aria-hidden="true" />
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-[10px] font-bold text-grey uppercase tracking-wide leading-none mb-0.5">Guests & Rooms</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Guests & Rooms</span>
                   <span className="text-sm font-semibold text-foreground truncate">
                     {localRoomConfig.reduce((sum, r) => sum + r.adults, 0)} Adult{localRoomConfig.reduce((sum, r) => sum + r.adults, 0) !== 1 ? 's' : ''}
                     {localRoomConfig.reduce((sum, r) => sum + r.children, 0) > 0 &&
@@ -642,7 +642,7 @@ export default function HotelDetailPage({
                     {' · '}{localRoomConfig.length} Room{localRoomConfig.length !== 1 ? 's' : ''}
                   </span>
                 </div>
-                <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+                <ChevronDown size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
               </div>
 
               {/* Guests dropdown panel — w-full on mobile so it doesn't overflow; capped at 300px on larger screens */}
@@ -670,7 +670,7 @@ export default function HotelDetailPage({
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="text-sm text-foreground">Adults</div>
-                          <div className="text-xs text-grey">Age 18+</div>
+                          <div className="text-xs text-muted-foreground">Age 18+</div>
                         </div>
                         <div className="flex items-center gap-3">
                           <button
@@ -695,7 +695,7 @@ export default function HotelDetailPage({
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="text-sm text-foreground">Children</div>
-                          <div className="text-xs text-grey">Age 2–17</div>
+                          <div className="text-xs text-muted-foreground">Age 2–17</div>
                         </div>
                         <div className="flex items-center gap-3">
                           <button
@@ -724,15 +724,15 @@ export default function HotelDetailPage({
                   ))}
 
                   {/* Add room button — max 6 rooms */}
-                  {/* outline variant = low-emphasis addition action; dashed border signals "add" affordance */}
+                  {/* secondary variant = low-emphasis addition action with a solid primary border */}
                   {localRoomConfig.length < 6 && (
                     <Button
-                      variant="outline"
+                      variant="tertiary"
                       onClick={() => {
                         const newId = Math.max(...localRoomConfig.map(r => r.id)) + 1;
                         setLocalRoomConfig(prev => [...prev, { id: newId, adults: 2, children: 0 }]);
                       }}
-                      className="w-full h-[36px] border-dashed border-primary text-primary hover:bg-primary/10"
+                      className="w-full h-[36px]"
                     >
                       + Add another room
                     </Button>
@@ -744,11 +744,11 @@ export default function HotelDetailPage({
             {/* ── Update Search button — matches PackageSearchForm's search button style ── */}
             {/* default variant = main search action; w-full on mobile, auto-width on large screens */}
             <Button
-              variant="default"
+              size="lg"
               onClick={() => { setOpenSearchPanel(null); handleSearchUpdate(); }}
-              className="w-full lg:w-auto shrink-0 h-[48px] px-5 whitespace-nowrap"
+              className="w-full lg:w-auto shrink-0 whitespace-nowrap"
             >
-              <Search size={16} aria-hidden="true" />
+              <Search aria-hidden="true" />
               {isSearching ? 'Searching...' : 'Update Search'}
             </Button>
           </div>
@@ -772,7 +772,7 @@ export default function HotelDetailPage({
                       className={cn(
                         "flex items-center gap-2 px-6 py-3 font-bold text-sm border-b-2 transition-colors relative",
                         isDisabled
-                          ? "border-transparent text-grey cursor-not-allowed"
+                          ? "border-transparent text-muted-foreground cursor-not-allowed"
                           : isActive
                             ? "border-primary text-primary"
                             : "border-transparent text-foreground hover:text-foreground hover:border-primary"
@@ -827,11 +827,11 @@ export default function HotelDetailPage({
                         ))}
                       </div>
                     ) : (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
-                        <p className="text-yellow-900 font-bold text-sm">
+                      <div className="bg-warning/10 border border-warning/30 rounded-xl p-6 text-center">
+                        <p className="text-foreground font-bold text-sm">
                           No rooms available for {getTotalGuests(config)} guest{getTotalGuests(config) > 1 ? 's' : ''}
                         </p>
-                        <p className="text-yellow-700 text-xs mt-2">
+                        <p className="text-muted-foreground text-xs mt-2">
                           Please try adjusting your guest configuration on the search page.
                         </p>
                       </div>
@@ -874,11 +874,11 @@ export default function HotelDetailPage({
                         ))}
                       </div>
                     ) : (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
-                        <p className="text-yellow-900 font-bold text-sm">
+                      <div className="bg-warning/10 border border-warning/30 rounded-xl p-6 text-center">
+                        <p className="text-foreground font-bold text-sm">
                           No rooms available for {getTotalGuests(config)} guest{getTotalGuests(config) > 1 ? 's' : ''}
                         </p>
-                        <p className="text-yellow-700 text-xs mt-2">
+                        <p className="text-muted-foreground text-xs mt-2">
                           Please try adjusting your guest configuration on the search page.
                         </p>
                       </div>
@@ -992,7 +992,7 @@ export default function HotelDetailPage({
                   >
                     <MapPin size={12} className="text-primary shrink-0" aria-hidden="true" />
                     <span className="font-medium text-foreground">{poi.label}</span>
-                    <span className="text-grey">· {poi.distance}</span>
+                    <span className="text-muted-foreground">· {poi.distance}</span>
                   </span>
                 ))}
               </div>
@@ -1046,7 +1046,7 @@ export default function HotelDetailPage({
                     See details
                   </Button>
                   <div className="text-base text-foreground">{review.date}</div>
-                  <div className="text-xs text-grey">Verified review</div>
+                  <div className="text-xs text-muted-foreground">Verified review</div>
                 </div>
               ))}
             </div>
@@ -1093,7 +1093,7 @@ export default function HotelDetailPage({
                         Room {index + 1} <Users size={12} aria-hidden="true" /> {config.adults + config.children}:
                       </span>
                       <span className="text-xs text-foreground truncate min-w-0">
-                        {sel ? sel.room.name : <span className="text-grey italic">Selecting now</span>}
+                        {sel ? sel.room.name : <span className="text-muted-foreground italic">Selecting now</span>}
                       </span>
                     </div>
                   );
@@ -1102,7 +1102,7 @@ export default function HotelDetailPage({
               {/* Price + button */}
               <div className="flex items-center justify-between gap-3">
                 <div className="flex flex-col">
-                  <span className="text-grey text-xs">{totalPrice}€ per person, per night</span>
+                  <span className="text-muted-foreground text-xs">{totalPrice}€ per person, per night</span>
                   <span className="text-foreground font-bold text-base">Total for {nights} night{nights !== 1 ? 's' : ''}: {totalPrice * nights}€</span>
                 </div>
                 <Tooltip>
@@ -1116,7 +1116,7 @@ export default function HotelDetailPage({
                         "inline-flex shrink-0 px-4 py-2.5 rounded-lg font-bold text-sm transition-all select-none items-center gap-2",
                         allRoomsSelected
                           ? "bg-primary hover:brightness-85 text-white cursor-pointer shadow-lg"
-                          : "bg-border text-grey cursor-not-allowed"
+                          : "bg-border text-muted-foreground cursor-not-allowed"
                       )}
                     >
                       Book
@@ -1135,7 +1135,7 @@ export default function HotelDetailPage({
             <div className="hidden sm:flex items-center justify-between gap-6">
               {/* Left: Per-room breakdown */}
               <div className="flex flex-col gap-2">
-                <span className="text-grey text-xs font-semibold uppercase tracking-wide">Room Selection</span>
+                <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">Room Selection</span>
                 {localRoomConfig.map((config, index) => {
                   const sel = roomSelections[config.id];
                   const cancelLabel = sel?.room.cancellationPolicies.find(p => p.id === sel.cancelOption)?.label;
@@ -1159,7 +1159,7 @@ export default function HotelDetailPage({
                           {sel.room.name} · {cancelLabel} · {boardLabel}
                         </span>
                       ) : (
-                        <span className="text-sm text-grey italic shrink-0">· Selecting now</span>
+                        <span className="text-sm text-muted-foreground italic shrink-0">· Selecting now</span>
                       )}
                     </div>
                   );
@@ -1169,7 +1169,7 @@ export default function HotelDetailPage({
               {/* Right: Price & CTA */}
               <div className="flex items-center gap-6">
                 <div className="flex flex-col items-end">
-                  <span className="text-grey text-xs">{totalPrice}€ per person, per night</span>
+                  <span className="text-muted-foreground text-xs">{totalPrice}€ per person, per night</span>
                   <span className="text-foreground font-bold text-2xl">Total for {nights} night{nights !== 1 ? 's' : ''}: {totalPrice * nights}€</span>
                 </div>
                 <Tooltip>
@@ -1183,7 +1183,7 @@ export default function HotelDetailPage({
                         "inline-flex px-6 py-3 rounded-lg font-bold text-base transition-all select-none items-center gap-2",
                         allRoomsSelected
                           ? "bg-primary hover:brightness-85 text-white cursor-pointer shadow-lg"
-                          : "bg-border text-grey cursor-not-allowed"
+                          : "bg-border text-muted-foreground cursor-not-allowed"
                       )}
                     >
                       Book
@@ -1214,7 +1214,7 @@ export default function HotelDetailPage({
           <div className="mt-2 flex flex-col gap-6">
             {HOTEL_AMENITY_GROUPS.map((group) => (
               <div key={group.label}>
-                <div className="text-xs font-bold uppercase tracking-wider text-grey mb-3">
+                <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
                   {group.label}
                 </div>
                 <div className="grid grid-cols-2 gap-y-2 gap-x-4">

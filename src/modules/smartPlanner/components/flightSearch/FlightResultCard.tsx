@@ -54,21 +54,22 @@ type FlightResultCardProps = {
 
 // Small coloured pill that highlights "Cheapest" / "Best" / "Fastest".
 // Sits above the price in the right column.
+//
+// Built on the shared <Badge> so it matches the app's other badges (shape,
+// padding, weight). "Best"/"Cheapest" share the green "good deal" tint via a
+// className override on the outline variant; "Fastest" uses the neutral
+// `secondary` token so it reads as distinct — no more hardcoded purple.
 function ResultBadge({ label }: { label: "Best" | "Cheapest" | "Fastest" }) {
-  const styles = {
-    Best: "bg-success/10 text-success border-success/20",
-    Cheapest: "bg-success/10 text-success border-success/20",
-    Fastest: "bg-purple-50 text-purple-700 border-purple-100",
-  };
+  if (label === "Fastest") {
+    return <Badge variant="secondary">{label}</Badge>;
+  }
   return (
-    <span
-      className={cn(
-        "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold border",
-        styles[label],
-      )}
+    <Badge
+      variant="outline"
+      className="bg-success/10 text-success border-success/20"
     >
       {label}
-    </span>
+    </Badge>
   );
 }
 
@@ -153,7 +154,7 @@ function JourneySegment({
           <div className="w-full flex items-center gap-1">
             <span className="size-1.5 rounded-full bg-foreground/40 shrink-0" />
             <div className="flex-1 h-px bg-border" />
-            <Plane size={12} className="text-grey shrink-0" aria-hidden="true" />
+            <Plane size={12} className="text-muted-foreground shrink-0" aria-hidden="true" />
             <div className="flex-1 h-px bg-border" />
             <span className="size-1.5 rounded-full bg-foreground/40 shrink-0" />
           </div>
@@ -367,7 +368,7 @@ export function FlightResultCard({
               </span>
               <div className="w-full flex items-center gap-1">
                 <div className="flex-1 h-px bg-border" />
-                <Plane size={12} className="text-grey shrink-0" aria-hidden="true" />
+                <Plane size={12} className="text-muted-foreground shrink-0" aria-hidden="true" />
                 <div className="flex-1 h-px bg-border" />
               </div>
               <span className="text-sm text-foreground">

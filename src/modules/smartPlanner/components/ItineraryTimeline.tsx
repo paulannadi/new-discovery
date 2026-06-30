@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { Button } from "../../../shared/components/ui/button";
 import { AccommodationCard } from "./products/AccommodationCard";
-import { ActivityCard } from "./products/ActivityCard";
+import { ActivityProductCard } from "./products/ActivityProductCard";
 import { FlightCard } from "./products/FlightCard";
 import { TransferCard } from "./products/TransferCard";
 import type { TimelineItem } from "../utils/seedTimeline";
@@ -131,7 +131,7 @@ function TimelineRow({
         >
           {item.kind === "flight" && <FlightCard item={item} />}
           {item.kind === "accommodation" && <AccommodationCard item={item} />}
-          {item.kind === "activity" && <ActivityCard item={item} />}
+          {item.kind === "activity" && <ActivityProductCard item={item} />}
           {/* TransferCard needs the passenger count so the seat-chart drawer
               knows how many seats the traveller must pick. */}
           {item.kind === "transfer" && <TransferCard item={item} passengerCount={passengerCount} />}

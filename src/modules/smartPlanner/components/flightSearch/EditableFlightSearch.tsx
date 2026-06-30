@@ -52,7 +52,7 @@ export function EditableFlightSearch({ criteria, onUpdateSearch }: EditableFligh
           type="button"
           onClick={() => setExpanded(false)}
           aria-label="Collapse search criteria"
-          className="flex items-center justify-center size-8 rounded-lg text-grey hover:bg-grey-lightest hover:text-foreground transition-colors"
+          className="flex items-center justify-center size-8 rounded-lg text-muted-foreground hover:bg-grey-lightest hover:text-foreground transition-colors"
         >
           <ChevronUp size={18} aria-hidden="true" />
         </button>

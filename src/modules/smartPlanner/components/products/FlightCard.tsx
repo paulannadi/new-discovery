@@ -36,8 +36,8 @@ export function FlightCard({ item }: { item: FlightItem }) {
       {/* Date label sits OUTSIDE the card — matches live SmartPlanner pattern */}
       <p className="font-semibold mb-3 md:mb-4 text-foreground">{headerLabel}</p>
 
-      <div className="border border-border shadow-sm rounded-lg md:rounded-3xl">
-        <div className="bg-card p-4 md:p-6 rounded-lg md:flex md:gap-6 md:rounded-3xl">
+      <div className="border border-border shadow-sm rounded-xl">
+        <div className="bg-card p-4 md:p-6 rounded-xl md:flex md:gap-6">
           {/* MAIN COLUMN — airline → flight bar → baggage */}
           <div className="space-y-5 md:grow">
             {/* Flight row: airline pill | departure | bar | arrival */}

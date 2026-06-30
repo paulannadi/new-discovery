@@ -1,5 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// ActivityCard — single Activity result on the ActivityListPage.
+// ActivityResultCard — single Activity result on the ActivityListPage.
+// (Renamed from ActivityCard to disambiguate from the itinerary
+//  ActivityProductCard in components/products/.)
 //
 // Layout matches TourCard exactly so cruises, walks, and bike tours visually
 // belong with the existing tour cards:
@@ -17,10 +19,10 @@ import {
   Calendar,
   Clock,
   Star,
-  ArrowRight,
 } from "lucide-react";
 import type { Activity } from "../../../types";
 import { cn } from "../../../shared/components/ui/utils";
+import { Button } from "../../../shared/components/ui/button";
 import { ACTIVITY_TYPE_OPTIONS } from "./ActivitySearchForm";
 // ImageWithPlaceholder reserves space + lazy-loads + fades the image in,
 // per our loading patterns doc. Replaces the bare <img> tag below.
@@ -37,19 +39,19 @@ function currencySymbol(currency: string): string {
   return map[currency] ?? currency + " ";
 }
 
-interface ActivityCardProps {
+interface ActivityResultCardProps {
   activity: Activity;
   onSelect?: (activity: Activity) => void;
   onHover?: (isHovering: boolean) => void;
   isHovered?: boolean;
 }
 
-export function ActivityCard({
+export function ActivityResultCard({
   activity,
   onSelect,
   onHover,
   isHovered,
-}: ActivityCardProps) {
+}: ActivityResultCardProps) {
   // Light fade-in on mount — same effect as TourCard so they animate together
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -191,16 +193,15 @@ export function ActivityCard({
               </span>
             </div>
             {/* CTA — full-width on narrow cards for an easy tap target, auto-width at ≥680px */}
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 onSelect?.(activity);
               }}
-              className="w-full @[680px]:w-auto justify-center bg-primary hover:brightness-85 text-primary-foreground font-extrabold text-sm px-5 py-2.5 rounded-lg transition-all flex items-center gap-2"
+              className="w-full @[680px]:w-auto"
             >
               View details
-              <ArrowRight size={15} aria-hidden="true" />
-            </button>
+            </Button>
           </div>
         </div>
       </div>

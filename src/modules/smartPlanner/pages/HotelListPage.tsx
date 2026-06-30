@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { cn } from "../../../shared/components/ui/utils";
+import { Button } from "../../../shared/components/ui/button";
 import { BackButton } from "../../../shared/components/BackButton";
 import { PageContainer } from "../../../shared/components/PageContainer";
 import { SearchSummary } from "../components/SearchSummary";
@@ -39,7 +40,6 @@ import {
   Sparkles,
   ShieldCheck,
   List,
-  ArrowRight,
   Hotel
 } from "lucide-react";
 import * as Slider from "@radix-ui/react-slider";
@@ -420,13 +420,12 @@ const HotelCard = ({ hotel, displayPrice, displayLocation, onSelect, onHover, is
             )}
           </div>
           {/* Blue CTA button — full-width on mobile for an easier tap target, auto-width on md+ */}
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); onSelect(); }}
-            className="w-full md:w-auto justify-center bg-primary hover:brightness-85 text-white font-extrabold text-sm px-5 py-2.5 rounded-lg transition-all flex items-center gap-2"
+            className="w-full md:w-auto justify-center"
           >
             View details
-            <ArrowRight size={15} aria-hidden="true" />
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -844,8 +843,8 @@ export default function HotelListPage({
               <Slider.Track className="bg-grey-light relative grow rounded-full h-[6px]">
                 <Slider.Range className="absolute bg-primary rounded-full h-full" />
               </Slider.Track>
-              <Slider.Thumb className="block w-5 h-5 bg-primary shadow-md rounded-full hover:bg-blue-600 focus:outline-none border-[3px] border-white cursor-grab active:cursor-grabbing" />
-              <Slider.Thumb className="block w-5 h-5 bg-primary shadow-md rounded-full hover:bg-blue-600 focus:outline-none border-[3px] border-white cursor-grab active:cursor-grabbing" />
+              <Slider.Thumb className="block w-5 h-5 bg-primary shadow-md rounded-full hover:bg-primary/90 focus:outline-none border-[3px] border-white cursor-grab active:cursor-grabbing" />
+              <Slider.Thumb className="block w-5 h-5 bg-primary shadow-md rounded-full hover:bg-primary/90 focus:outline-none border-[3px] border-white cursor-grab active:cursor-grabbing" />
             </Slider.Root>
             <div className="flex justify-between mt-4 text-sm font-extrabold text-foreground">
               <div className="px-3 py-1 rounded border border-border">${priceRange[0]}</div>
@@ -953,7 +952,7 @@ export default function HotelListPage({
                     setOpenDropdown(null);
                   }}
                 >
-                  <MapPin size={14} className="text-grey" aria-hidden="true" />
+                  <MapPin size={14} className="text-muted-foreground" aria-hidden="true" />
                   {city}
                 </div>
               ))}
@@ -969,7 +968,7 @@ export default function HotelListPage({
             <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto">
               <div className="flex justify-between items-center pb-2 border-b border-muted">
                 <span className="font-extrabold text-foreground">Rooms</span>
-                <span className="text-sm text-grey">{rooms.length}</span>
+                <span className="text-sm text-muted-foreground">{rooms.length}</span>
               </div>
 
               {rooms.map((room, index) => (
@@ -977,12 +976,14 @@ export default function HotelListPage({
                   <div className="flex justify-between items-center">
                     <span className="font-extrabold text-sm text-foreground">Room {index + 1}</span>
                     {rooms.length > 1 && (
-                      <button
+                      <Button
+                        variant="link"
+                        size="sm"
                         onClick={() => removeRoom(index)}
-                        className="text-xs text-red-600 font-medium hover:underline"
+                        className="text-destructive px-0 h-auto"
                       >
                         Remove
-                      </button>
+                      </Button>
                     )}
                   </div>
 
@@ -990,7 +991,7 @@ export default function HotelListPage({
                   <div className="flex justify-between items-center pl-2">
                     <div className="flex flex-col">
                       <span className="text-sm text-muted-foreground">Adults</span>
-                      <span className="text-xs text-grey">Age 18+</span>
+                      <span className="text-xs text-muted-foreground">Age 18+</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
@@ -1014,7 +1015,7 @@ export default function HotelListPage({
                   <div className="flex justify-between items-center pl-2">
                     <div className="flex flex-col">
                       <span className="text-sm text-muted-foreground">Children</span>
-                      <span className="text-xs text-grey">Under 18</span>
+                      <span className="text-xs text-muted-foreground">Under 18</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
@@ -1036,12 +1037,13 @@ export default function HotelListPage({
                 </div>
               ))}
 
-              <button
-                className="w-full py-2 border border-dashed border-primary text-primary font-extrabold text-sm rounded-lg hover:bg-primary/5 transition-colors mt-2"
+              <Button
+                variant="tertiary"
+                className="w-full mt-2"
                 onClick={addRoom}
               >
                 + Add another room
-              </button>
+              </Button>
             </div>
           </div>
         );
@@ -1127,7 +1129,7 @@ export default function HotelListPage({
             {/* Location Input */}
             <div
               className={cn(
-                "border rounded-lg h-[48px] flex items-center px-4 gap-3 w-full lg:flex-1 cursor-pointer transition-colors",
+                "border rounded-xl h-[52px] flex items-center px-4 gap-3 w-full lg:flex-1 cursor-pointer transition-colors",
                 openDropdown === 'location'
                   ? "border-primary ring-2 ring-primary/20 bg-card"
                   : "border-border bg-white hover:border-primary"
@@ -1136,10 +1138,10 @@ export default function HotelListPage({
             >
               <MapPin size={16} className="text-primary shrink-0" aria-hidden="true" />
               <div className="flex flex-col flex-1 min-w-0">
-                <span className="text-[10px] font-extrabold text-grey uppercase tracking-wide leading-none mb-0.5">Destination</span>
+                <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Destination</span>
                 <span className="text-sm font-semibold text-foreground truncate">{location}</span>
               </div>
-              <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+              <ChevronDown size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
             </div>
 
             {/* Date Picker — responsive: dropdown on desktop, bottom drawer on
@@ -1154,7 +1156,7 @@ export default function HotelListPage({
               trigger={
                 <div
                   className={cn(
-                    "border rounded-lg h-[48px] flex items-center px-4 gap-3 w-full cursor-pointer transition-colors",
+                    "border rounded-xl h-[52px] flex items-center px-4 gap-3 w-full cursor-pointer transition-colors",
                     openDropdown === 'date'
                       ? "border-primary ring-2 ring-primary/20 bg-card"
                       : "border-border bg-white hover:border-primary"
@@ -1163,17 +1165,17 @@ export default function HotelListPage({
                 >
                   <CalendarIcon size={16} className="text-primary shrink-0" aria-hidden="true" />
                   <div className="flex flex-col flex-1 min-w-0">
-                    <span className="text-[10px] font-extrabold text-grey uppercase tracking-wide leading-none mb-0.5">Check-in – Check-out</span>
+                    <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Check-in – Check-out</span>
                     <span className={cn(
                       "text-sm font-semibold truncate",
-                      dateRange?.from ? "text-foreground" : "text-grey font-normal"
+                      dateRange?.from ? "text-foreground" : "text-muted-foreground font-normal"
                     )}>
                       {dateRange?.from
                         ? `${format(dateRange.from, "MMM d")} – ${dateRange.to ? format(dateRange.to, "MMM d, yyyy") : "?"}`
                         : "Add dates"}
                     </span>
                   </div>
-                  <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+                  <ChevronDown size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
                 </div>
               }
             >
@@ -1199,12 +1201,11 @@ export default function HotelListPage({
                   className="p-0"
                 />
                 <div className="flex justify-end mt-4 pt-4 border-t border-muted">
-                  <button
-                    className="bg-primary text-white text-sm font-extrabold px-4 py-2 rounded-lg hover:brightness-85"
+                  <Button
                     onClick={() => setOpenDropdown(null)}
                   >
                     Apply Dates
-                  </button>
+                  </Button>
                 </div>
               </div>
             </ResponsiveDatePicker>
@@ -1212,7 +1213,7 @@ export default function HotelListPage({
             {/* Guests */}
             <div
               className={cn(
-                "border rounded-lg h-[48px] flex items-center px-4 gap-3 w-full lg:flex-1 cursor-pointer transition-colors",
+                "border rounded-xl h-[52px] flex items-center px-4 gap-3 w-full lg:flex-1 cursor-pointer transition-colors",
                 openDropdown === 'guests'
                   ? "border-primary ring-2 ring-primary/20 bg-card"
                   : "border-border bg-white hover:border-primary"
@@ -1221,17 +1222,18 @@ export default function HotelListPage({
             >
               <Users size={16} className="text-primary shrink-0" aria-hidden="true" />
               <div className="flex flex-col flex-1 min-w-0">
-                <span className="text-[10px] font-extrabold text-grey uppercase tracking-wide leading-none mb-0.5">Travellers</span>
+                <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wide leading-none mb-0.5">Travellers</span>
                 <span className="text-sm font-semibold text-foreground truncate">
                   {totalGuests} Guest{totalGuests !== 1 ? 's' : ''} · {rooms.length} Room{rooms.length > 1 ? 's' : ''}
                 </span>
               </div>
-              <ChevronDown size={14} className="text-grey shrink-0" aria-hidden="true" />
+              <ChevronDown size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
             </div>
 
             {/* Search Button */}
-            <button
-              className="bg-primary hover:brightness-85 text-white font-extrabold px-8 h-[48px] rounded-lg transition-all w-full lg:w-auto flex items-center justify-center gap-2"
+            <Button
+              size="lg"
+              className="w-full lg:w-auto gap-2"
               onClick={() => {
                 handleSearch();
                 setIsMobileSearchExpanded(false);
@@ -1239,7 +1241,7 @@ export default function HotelListPage({
             >
               <Search size={18} aria-hidden="true" />
               Search
-            </button>
+            </Button>
           </div>
           )}
         </PageContainer>
@@ -1334,12 +1336,14 @@ export default function HotelListPage({
           />
 
           {(selectedBoardTypes.length > 0 || selectedAmenities.length > 0 || selectedCancellation.length > 0 || selectedStars.length > 0 || priceRange[0] > 0 || priceRange[1] < 500 || sortOption !== 'recommended') && (
-            <button
+            <Button
+              variant="link"
+              size="sm"
               onClick={resetFilters}
-              className="text-primary text-sm font-extrabold hover:underline ml-3"
+              className="ml-3 px-0"
             >
               Reset all
-            </button>
+            </Button>
           )}
         </PageContainer>
       </div>
@@ -1349,7 +1353,7 @@ export default function HotelListPage({
         <div className="bg-card border border-border rounded-xl flex items-center h-[48px] w-full">
            {/* Sort Button */}
            <button
-             className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground active:bg-gray-50 transition-colors first:rounded-l-xl"
+             className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground active:bg-muted transition-colors first:rounded-l-xl"
              onClick={() => setIsMobileSortOpen(true)}
            >
              <ArrowUpDown size={14} aria-hidden="true" />
@@ -1360,7 +1364,7 @@ export default function HotelListPage({
 
            {/* Filters Button */}
            <button
-             className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground active:bg-gray-50 transition-colors"
+             className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground active:bg-muted transition-colors"
              onClick={() => setIsMobileFiltersOpen(true)}
            >
              <SlidersHorizontal size={14} aria-hidden="true" />
@@ -1372,7 +1376,7 @@ export default function HotelListPage({
 
            {!hideSearch && (
            <button
-             className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground active:bg-gray-50 transition-colors last:rounded-r-xl"
+             className="flex-1 h-full flex items-center justify-center gap-2 text-sm font-semibold text-foreground active:bg-muted transition-colors last:rounded-r-xl"
              onClick={() => setMobileView(mobileView === 'list' ? 'map' : 'list')}
            >
              {mobileView === 'list' ? <MapIcon size={14} aria-hidden="true" /> : <List size={14} aria-hidden="true" />}
@@ -1427,7 +1431,7 @@ export default function HotelListPage({
             {/* Loading Bar */}
             {showLoadingBar && (
               <div className={cn(
-                "h-1 w-full bg-gray-200/50 rounded-full overflow-hidden transition-opacity duration-500",
+                "h-1 w-full bg-muted rounded-full overflow-hidden transition-opacity duration-500",
                 loadingProgress >= 100 ? 'opacity-0' : 'opacity-100'
               )}>
                 <div
@@ -1486,16 +1490,17 @@ export default function HotelListPage({
                 })()}
               </StaggeredList>
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 bg-card rounded-xl border border-dashed border-gray-200">
-                <Search size={48} className="text-gray-300 mb-4" aria-hidden="true" />
-                <h3 className="text-lg font-extrabold text-gray-700">No hotels found</h3>
-                <p className="text-gray-500 mt-2">Try changing your dates or removing some filters.</p>
-                <button
-                  className="mt-6 text-primary font-extrabold hover:underline"
+              <div className="flex flex-col items-center justify-center py-20 bg-card rounded-xl border border-dashed border-border">
+                <Search size={48} className="text-muted-foreground mb-4" aria-hidden="true" />
+                <h3 className="text-lg font-extrabold text-foreground">No hotels found</h3>
+                <p className="text-muted-foreground mt-2">Try changing your dates or removing some filters.</p>
+                <Button
+                  variant="link"
+                  className="mt-6"
                   onClick={resetFilters}
                 >
                   Clear all filters
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -1548,12 +1553,15 @@ export default function HotelListPage({
         <div className="md:hidden fixed inset-0 z-50 bg-card flex flex-col animate-in slide-in-from-bottom duration-300">
           <div className="flex items-center justify-between p-4 border-b border-border">
             <h2 className="text-lg font-extrabold text-foreground">Filters</h2>
-            <button
-              className="p-2 hover:bg-grey-light rounded-full"
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              aria-label="Close"
               onClick={() => setIsMobileFiltersOpen(false)}
             >
               <X size={24} className="text-foreground" aria-hidden="true" />
-            </button>
+            </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-8 pb-24">
@@ -1571,8 +1579,8 @@ export default function HotelListPage({
                 <Slider.Track className="bg-grey-light relative grow rounded-full h-[6px]">
                   <Slider.Range className="absolute bg-primary rounded-full h-full" />
                 </Slider.Track>
-                <Slider.Thumb className="block w-6 h-6 bg-primary shadow-md rounded-full hover:bg-blue-600 focus:outline-none border-[3px] border-white cursor-grab active:cursor-grabbing" />
-                <Slider.Thumb className="block w-6 h-6 bg-primary shadow-md rounded-full hover:bg-blue-600 focus:outline-none border-[3px] border-white cursor-grab active:cursor-grabbing" />
+                <Slider.Thumb className="block w-6 h-6 bg-primary shadow-md rounded-full hover:bg-primary/90 focus:outline-none border-[3px] border-white cursor-grab active:cursor-grabbing" />
+                <Slider.Thumb className="block w-6 h-6 bg-primary shadow-md rounded-full hover:bg-primary/90 focus:outline-none border-[3px] border-white cursor-grab active:cursor-grabbing" />
               </Slider.Root>
               <div className="flex justify-between text-sm font-extrabold text-foreground">
                 <div className="px-4 py-2 rounded-lg border border-border">${priceRange[0]}</div>
@@ -1658,18 +1666,21 @@ export default function HotelListPage({
 
           <div className="p-4 border-t border-border bg-card pb-8">
             <div className="flex gap-4">
-              <button
-                className="flex-1 py-3 font-extrabold text-foreground underline"
+              <Button
+                variant="tertiary"
+                size="lg"
+                className="flex-1"
                 onClick={resetFilters}
               >
                 Clear all
-              </button>
-              <button
-                className="flex-[2] bg-primary text-white font-extrabold py-3 rounded-lg"
+              </Button>
+              <Button
+                size="lg"
+                className="flex-1"
                 onClick={() => setIsMobileFiltersOpen(false)}
               >
                 Show {filteredAndSortedHotels.length} hotels
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -1684,12 +1695,15 @@ export default function HotelListPage({
            <div className="bg-card rounded-t-3xl p-6 pb-12 flex flex-col gap-4 animate-in slide-in-from-bottom duration-300 z-10">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="text-lg font-extrabold text-foreground">Sort by</h3>
-                <button
-                  className="p-2 hover:bg-grey-light rounded-full"
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  aria-label="Close"
                   onClick={() => setIsMobileSortOpen(false)}
                 >
                   <X size={20} className="text-foreground" aria-hidden="true" />
-                </button>
+                </Button>
               </div>
 
               <div className="flex flex-col gap-2">

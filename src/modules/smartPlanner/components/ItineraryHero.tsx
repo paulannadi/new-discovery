@@ -225,7 +225,7 @@ export function ItineraryHero({
             <div className="flex items-center gap-4 md:gap-6 md:flex-1 md:max-w-sm min-w-0">
               {/* Depart */}
               <div className="flex flex-col leading-tight">
-                <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-grey">
+                <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
                   Depart
                 </span>
                 <span className="mt-0.5 text-sm md:text-[15px] font-bold text-foreground">
@@ -243,7 +243,7 @@ export function ItineraryHero({
 
               {/* Return */}
               <div className="flex flex-col leading-tight">
-                <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-grey">
+                <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
                   Return
                 </span>
                 <span className="mt-0.5 text-sm md:text-[15px] font-bold text-foreground">

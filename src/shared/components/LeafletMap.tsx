@@ -143,8 +143,17 @@ const MapCentreUpdater = ({
 //
 // `isHighlighted` makes the badge blue so it pops when a card is hovered.
 // ─────────────────────────────────────────────────────────────────────────────
+// Resolve the theme's primary colour at runtime — Leaflet builds raw HTML
+// strings, so it can't read Tailwind/CSS variables. This keeps highlighted
+// markers in sync with a custom primary instead of a hardcoded blue.
+const getPrimaryColor = (): string =>
+  getComputedStyle(document.documentElement)
+    .getPropertyValue("--primary")
+    .trim() || "#2681ff";
+
 const createPriceIcon = (price: string, isHighlighted: boolean) => {
-  const bg = isHighlighted ? "#2681FF" : "#333743";
+  // Highlighted = themed primary; resting = neutral dark slate badge chrome.
+  const bg = isHighlighted ? getPrimaryColor() : "#333743";
   // Estimate the rendered width so we can centre the badge on its lat/lng point.
   // Each character in the 12px bold font is ~7.5px wide; add 16px for left+right padding.
   const estimatedWidth = Math.round(price.length * 7.5 + 16);
@@ -175,8 +184,8 @@ const createPriceIcon = (price: string, isHighlighted: boolean) => {
 };
 
 // Default plain pin icon (used when no price is provided, e.g. destination pins)
-const createDestinationIcon = (isHighlighted: boolean) => {
-  const bg = isHighlighted ? "#2681FF" : "#2681FF";
+const createDestinationIcon = (_isHighlighted: boolean) => {
+  const bg = getPrimaryColor();
   const html = `
     <div style="
       width: 14px;
