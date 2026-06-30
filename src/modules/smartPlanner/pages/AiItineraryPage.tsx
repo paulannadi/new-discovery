@@ -19,15 +19,23 @@ interface AiItineraryPageProps {
   // Pre-filled prompt — the brief composed in the moodboard composer on
   // Discovery. Becomes the first user message in the conversation.
   initialPrompt?: string;
+  // Persona seam (Phase 7). Defaults to the B2C guided "consumer" experience.
+  // The "agent" variant is stubbed only for now (see ConversationScreen).
+  mode?: "consumer" | "agent";
 }
 
 export default function AiItineraryPage({
   onBack,
   initialPrompt,
+  mode = "consumer",
 }: AiItineraryPageProps) {
   return (
     <div className="h-screen bg-background flex flex-col">
-      <ConversationScreen seedPrompt={initialPrompt ?? ""} onNewTrip={onBack} />
+      <ConversationScreen
+        seedPrompt={initialPrompt ?? ""}
+        onNewTrip={onBack}
+        mode={mode}
+      />
     </div>
   );
 }

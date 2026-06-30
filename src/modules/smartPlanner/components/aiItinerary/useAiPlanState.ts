@@ -40,12 +40,48 @@ import type { FlightData, HotelData } from "../../pages/SmartPlannerPage";
 
 export interface TripMeta {
   title: string;
+  // Clean place name for the context chip (the `title` is a phrase like
+  // "Lisbon city break", so we keep a tidy destination separately). This is
+  // the LIVE source of truth the brief chips read — never an accumulated copy.
+  destination: string;
   startDate: Date;
   endDate: Date;
   travelersLabel: string;
   nights: number;
   budget: number;
   heroImage: string;
+}
+
+// ─── The running "trip brief" ──────────────────────────────────────────────
+//
+// As the conversation advances, the AI gradually learns these "slots" about
+// the trip. They power two things:
+//   1. The brief chips shown at the top of the conversation (the visible
+//      shared state — "📍 Lisbon · 📅 12–20 Jun · 👥 2 adults").
+//   2. The READINESS rule (see `computeReadiness`) — once enough slots are
+//      filled, the itinerary is considered "ready" and we reveal it.
+//
+// Everything is a plain string because these are *display* values for a
+// prototype, not parsed dates/numbers. Each is optional — they fill in over
+// the course of the conversation.
+export interface TripBrief {
+  vibe?: string; // e.g. "Culture & food"
+  destination?: string; // e.g. "Portugal", then refined to "Lisbon"
+  duration?: string; // e.g. "6 nights"
+  dates?: string; // e.g. "12–20 Jun"
+  travellers?: string; // e.g. "2 adults"
+}
+
+// READY_SLOTS rule — the single, tweakable definition of "ready".
+//
+// The trip is ready to reveal once we know WHERE they're going, for HOW LONG
+// (either a duration or concrete dates is enough), and WHO is travelling.
+// Keep this rule here so "what counts as ready" lives in exactly one place.
+export function computeReadiness(brief: TripBrief): boolean {
+  const hasDestination = Boolean(brief.destination);
+  const hasWhen = Boolean(brief.duration || brief.dates);
+  const hasTravellers = Boolean(brief.travellers);
+  return hasDestination && hasWhen && hasTravellers;
 }
 
 export interface PlanMessage {
@@ -80,6 +116,17 @@ export interface PlanState {
   // Which canvas stage the right side is currently showing.
   canvasStage: CanvasStage;
   trip: TripMeta;
+  // The running brief the conversation fills in (see TripBrief). Drives the
+  // brief chips AND the readiness rule.
+  brief: TripBrief;
+  // Once-only latch. Set true the first time the trip becomes ready and we
+  // show the "Your itinerary is ready!" announcement. Never reset except on a
+  // full "start over" — this is what stops the toast re-nagging on later edits.
+  readyAnnounced: boolean;
+  // True after the AI has asked "when are you travelling, and how many?" and is
+  // waiting for the user to tap a date/travellers quick-reply. This is the step
+  // that flips readiness on, so it sits between picking a place and the reveal.
+  awaitingDates: boolean;
   items: TimelineItem[];
   messages: PlanMessage[];
   pendingActions: ActionId[];
@@ -531,6 +578,7 @@ function buildInitialState(seedPrompt: string): PlanState {
     canvasStage: "countries",
     trip: {
       title: "Lisbon city break",
+      destination: "Lisbon",
       startDate: TRIP_START,
       endDate: TRIP_END,
       travelersLabel: "2 adults",
@@ -538,6 +586,12 @@ function buildInitialState(seedPrompt: string): PlanState {
       budget: 2400,
       heroImage: LISBON_IMG,
     },
+    // The conversation opens with the user's vibe already understood (it came
+    // from the moodboard composer on Discovery). Destination/dates/travellers
+    // are still blank — they fill in as the user picks cards and answers.
+    brief: { vibe: "Culture & food" },
+    readyAnnounced: false,
+    awaitingDates: false,
     items,
     messages: [
       { id: newMsgId(), role: "user", text: userBrief },
@@ -561,6 +615,27 @@ function buildInitialState(seedPrompt: string): PlanState {
 // Suggestion chips offered the moment the itinerary stage is reached, so the
 // user has somewhere to go after the trip is drafted.
 const ITINERARY_START_ACTIONS: ActionId[] = ["sintra", "lock56", "michelin", "cheaper"];
+
+// ─── Dates + travellers quick replies ──────────────────────────────────────
+//
+// After a place is chosen, the AI asks "when are you travelling, and how
+// many?". These are the tappable quick-reply options. Each one writes its
+// `dates` + `travellers` into the brief — which is the step that finally flips
+// readiness on. The first option matches the pre-built June itinerary exactly;
+// the others are believable variations (the underlying draft stays the same in
+// this prototype, which the AI's reply quietly acknowledges).
+export interface DateOption {
+  id: string;
+  label: string; // shown on the chip AND echoed as the user's message
+  dates: string; // → brief.dates
+  travellers: string; // → brief.travellers
+}
+
+export const DATE_OPTIONS: DateOption[] = [
+  { id: "jun", label: "12–20 Jun · 2 adults", dates: "12–20 Jun", travellers: "2 adults" },
+  { id: "flex", label: "Flexible dates · 2 adults", dates: "Flexible", travellers: "2 adults" },
+  { id: "later", label: "Later this summer · 2 adults", dates: "This summer", travellers: "2 adults" },
+];
 
 // Short labels for each canvas stage — used by the demo stage-switcher.
 export const STAGE_LABEL: Record<CanvasStage, string> = {
@@ -800,7 +875,19 @@ const ACTIONS: Record<ActionId, ActionDef> = {
     aiMsg: "Restored. Welcome back to the full 8-day Lisbon trip.",
     aiRef: "Restored 8 days",
     next: ["michelin", "cheaper", "shorter"],
-    apply: (_s) => buildInitialState(""),
+    // IMPORTANT: this is a SCOPED edit, not a reset. We only restore the trip
+    // days + dates from a fresh build — we must NOT touch `canvasStage`,
+    // `brief`, `readyAnnounced` or `awaitingDates`, or the user would get
+    // bounced back to the country picker and the "ready" toast would re-fire.
+    apply: (s) => {
+      const fresh = buildInitialState("");
+      return {
+        ...s,
+        trip: fresh.trip,
+        items: fresh.items,
+        justAddedIds: new Set(),
+      };
+    },
   },
 };
 
@@ -829,67 +916,151 @@ export function useAiPlanState(seedPrompt: string) {
   }, []);
 
   // Pick a generative-canvas card (a country, city or template). Pushes the
-  // choice into the conversation as a user+AI exchange, then advances the
-  // canvas stage: countries → cities, and cities/templates → the itinerary.
+  // choice into the conversation as a user+AI exchange, then advances the flow:
+  //   • countries → cities (narrow down the place)
+  //   • cities / templates → ask for dates + travellers (NOT the itinerary yet)
+  //
+  // Crucially, picking a place no longer reveals the itinerary directly. It
+  // records the destination + duration into the brief and asks "when, and how
+  // many?". That dates step (see `chooseDates`) is what finally flips readiness.
   const pickSuggestion = useCallback((cardId: string) => {
     setState((s) => {
       const stage = s.canvasStage;
       const card = cardsForStage(stage).find((c) => c.id === cardId);
       if (!card) return s;
 
-      // Countries narrow to cities; everything else resolves to the itinerary.
-      const nextStage: CanvasStage = stage === "countries" ? "cities" : "itinerary";
-
-      const tailored = PICK_COPY[cardId];
-      let user: string;
-      let ai: string;
-      let ref: string;
-      if (tailored) {
-        ({ user, ai, ref } = tailored);
-      } else if (stage === "countries") {
-        // Non-Portugal country: be transparent that the demo's deep inventory
-        // is Portugal, then continue the same flow.
-        user = `Let's look at ${card.title}.`;
-        ai = `Nice — **${card.title}** is a great fit too. For this preview my richest inventory is **Portugal**, so I'll walk you through that flow; it works the same for ${card.title} once it's connected.`;
-        ref = "Showing Portugal";
-      } else {
-        // Non-Lisbon city: load the ready Lisbon base plan as a starting point.
-        user = `Can we center it on ${card.title}?`;
-        ai = `**${card.title}**'s a lovely choice. I've loaded my ready **Lisbon** base plan as a starting point — we can re-base it to ${card.title} from here. Take a look in Smart Planner.`;
-        ref = "Itinerary drafted";
+      // ── Country step: narrow to cities, record the country in the brief ──
+      if (stage === "countries") {
+        const tailored = PICK_COPY[cardId];
+        let user: string;
+        let ai: string;
+        let ref: string;
+        if (tailored) {
+          ({ user, ai, ref } = tailored);
+        } else {
+          // Non-Portugal country: be transparent that the demo's deep
+          // inventory is Portugal, then continue the same flow.
+          user = `Let's look at ${card.title}.`;
+          ai = `Nice — **${card.title}** is a great fit too. For this preview my richest inventory is **Portugal**, so I'll walk you through that flow; it works the same for ${card.title} once it's connected.`;
+          ref = "Showing Portugal";
+        }
+        return {
+          ...s,
+          canvasStage: "cities",
+          brief: { ...s.brief, destination: card.title },
+          messages: [
+            ...s.messages,
+            { id: newMsgId(), role: "user", text: user },
+            { id: newMsgId(), role: "ai", text: ai, refCard: ref },
+          ],
+        };
       }
+
+      // ── Place step (a city or a template): record destination + duration,
+      //    then ASK FOR DATES instead of jumping to the itinerary. ──
+      const tailored = PICK_COPY[cardId];
+      // For a template the destination is the country it covers, so keep the
+      // existing brief destination; for a city, refine to the city name.
+      const isTemplate = cardId.startsWith("tmpl-");
+      const destination = isTemplate
+        ? s.brief.destination ?? card.title
+        : card.title;
+
+      // The user's line — reuse tailored copy where we have it.
+      const user =
+        tailored?.user ??
+        (isTemplate
+          ? `Load the ${card.title} template.`
+          : `Can we center it on ${card.title}?`);
+
+      // The AI now asks for dates rather than announcing a draft. Keeping this
+      // copy in one place (not in PICK_COPY) means every place lands on the
+      // same dates question.
+      const ai = `Perfect — **${card.title}** it is. When are you travelling, and how many of you?`;
 
       return {
         ...s,
-        canvasStage: nextStage,
-        pendingActions:
-          nextStage === "itinerary" ? ITINERARY_START_ACTIONS : s.pendingActions,
+        // Stay on the "cities" cards visually; the dates question renders as
+        // quick replies in the conversation. We only move canvasStage to
+        // "itinerary" once dates are picked (in `chooseDates`).
+        brief: {
+          ...s.brief,
+          destination,
+          duration: `${s.trip.nights} nights`,
+        },
+        awaitingDates: true,
         messages: [
           ...s.messages,
           { id: newMsgId(), role: "user", text: user },
-          { id: newMsgId(), role: "ai", text: ai, refCard: ref },
+          { id: newMsgId(), role: "ai", text: ai, refCard: "Just need your dates" },
         ],
       };
     });
   }, []);
 
-  // Jump straight to a canvas stage — used by the demo stage-switcher so the
-  // designer can preview each state. Drops a short note in the chat so the
-  // transcript stays coherent.
+  // Answer the dates + travellers question. This is the moment the trip
+  // becomes "ready": we write the final brief slots, advance the canvas to the
+  // itinerary stage, and offer the first round of refine chips. The component
+  // watches `isItineraryReady` (derived below) to fire the one-time toast.
+  const chooseDates = useCallback((optionId: string) => {
+    setState((s) => {
+      const opt = DATE_OPTIONS.find((o) => o.id === optionId);
+      if (!opt) return s;
+      return {
+        ...s,
+        canvasStage: "itinerary",
+        awaitingDates: false,
+        brief: { ...s.brief, dates: opt.dates, travellers: opt.travellers },
+        pendingActions: ITINERARY_START_ACTIONS,
+        messages: [
+          ...s.messages,
+          { id: newMsgId(), role: "user", text: opt.label },
+          {
+            id: newMsgId(),
+            role: "ai",
+            text: "Done — I've laid out your trip day by day. Take a look whenever you're ready. ✨",
+            refCard: "Itinerary ready",
+          },
+        ],
+      };
+    });
+  }, []);
+
+  // Jump straight to a canvas stage — used by the DEBUG-only stage switcher
+  // (gated behind ?debug=1) so the designer can preview each state. Drops a
+  // short note in the chat so the transcript stays coherent. When jumping to
+  // the itinerary we also fill any empty brief slots so readiness is satisfied
+  // (otherwise the preview would show an itinerary that state says isn't ready).
   const setCanvasStage = useCallback((stage: CanvasStage) => {
     setState((s) => {
       if (s.canvasStage === stage) return s;
-      const note =
-        stage === "itinerary"
-          ? "Here's the full **Smart Planner** itinerary — the final step of the flow."
-          : `Showing the **${STAGE_LABEL[stage].toLowerCase()}** suggestions.`;
+      const jumpingToItinerary = stage === "itinerary";
+      const note = jumpingToItinerary
+        ? "Here's the full **Smart Planner** itinerary — the final step of the flow."
+        : `Showing the **${STAGE_LABEL[stage].toLowerCase()}** suggestions.`;
       return {
         ...s,
         canvasStage: stage,
-        pendingActions: stage === "itinerary" ? ITINERARY_START_ACTIONS : [],
+        awaitingDates: false,
+        brief: jumpingToItinerary
+          ? {
+              vibe: s.brief.vibe ?? "Culture & food",
+              destination: s.brief.destination ?? "Lisbon",
+              duration: s.brief.duration ?? `${s.trip.nights} nights`,
+              dates: s.brief.dates ?? "12–20 Jun",
+              travellers: s.brief.travellers ?? "2 adults",
+            }
+          : s.brief,
+        pendingActions: jumpingToItinerary ? ITINERARY_START_ACTIONS : [],
         messages: [...s.messages, { id: newMsgId(), role: "ai", text: note }],
       };
     });
+  }, []);
+
+  // Flip the once-only "ready announced" latch. The component calls this the
+  // first time it shows the ready toast, so the toast never re-fires.
+  const markReadyAnnounced = useCallback(() => {
+    setState((s) => (s.readyAnnounced ? s : { ...s, readyAnnounced: true }));
   }, []);
 
   // Cycle the outbound or inbound flight to the next alternative in its pool.
@@ -978,11 +1149,19 @@ export function useAiPlanState(seedPrompt: string) {
     setState(buildInitialState(""));
   }, []);
 
+  // DERIVED readiness — recomputed from the brief on every render so there's
+  // no second source of truth to keep in sync. `readyAnnounced` (in state) is
+  // the separate once-only latch for the toast.
+  const isItineraryReady = computeReadiness(state.brief);
+
   return {
     state,
+    isItineraryReady,
     runAction,
     pickSuggestion,
+    chooseDates,
     setCanvasStage,
+    markReadyAnnounced,
     swapFlight,
     pickHotelAlt,
     closeHotelDrawer,

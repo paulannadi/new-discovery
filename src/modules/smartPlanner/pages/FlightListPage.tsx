@@ -275,7 +275,9 @@ export default function FlightListPage({
             criteria. Full-bleed background, inner content constrained to the
             same max-w-5xl as the results below so everything stays aligned. */}
       <header className="bg-card border-b border-border">
-        <PageContainer tier="narrow" className="px-4 py-4">
+        {/* `px-4 md:px-6` matches the white strip on every other stopover step
+            so the back button + search row sit at the same inset throughout. */}
+        <PageContainer tier="narrow" className="px-4 md:px-6 py-4">
 
           {/* 1. Back to discovery */}
           <BackButton label="Back to discovery" onClick={onBack} className="mb-3" />
@@ -291,7 +293,12 @@ export default function FlightListPage({
         </PageContainer>
       </header>
 
-      <PageContainer as="main" tier="narrow" className="px-4 py-6 md:py-8">
+      {/* `px-4 md:px-6` keeps the same horizontal inset as the white strip
+          above and as steps 2–4. `pt-4` drops the stepper exactly 16px below
+          the white strip — matching the `pt-4` grey band on the other steps
+          (was `py-6 md:py-8`, which sat the stepper 24/32px lower). Bottom
+          padding stays generous (`pb-6 md:pb-8`) for the scrolling results. */}
+      <PageContainer as="main" tier="narrow" className="px-4 md:px-6 pt-4 pb-6 md:pb-8">
 
         {/* 4. Stepper — one card per flight leg (+ a stopover-hotel card when
             the round trip opted into a stopover).

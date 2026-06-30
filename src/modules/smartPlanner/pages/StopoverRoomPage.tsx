@@ -26,6 +26,9 @@ import {
   Users,
   ArrowRight,
 } from "lucide-react";
+// `format` renders a Date ("Fri, 3 Jul"); `addDays` derives the check-out date
+// (check-in + nights) for the room title's date line.
+import { format, addDays } from "date-fns";
 import { Button } from "../../../shared/components/ui/button";
 // cn = a tiny helper that joins Tailwind class strings together and lets us
 // switch classes on/off conditionally (used for the field's active/hover state).
@@ -85,6 +88,85 @@ const MOCK_REVIEWS = [
   { score: "8/10", label: "Good",      text: "Comfortable room and a great breakfast before our onward flight.",               date: "Feb 03, 2026" },
   { score: "9/10", label: "Excellent", text: "Lovely pool to relax by while we waited for our connection.",                    date: "Jan 21, 2026" },
 ];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// StopoverHotelSummaryCard
+//
+// A compact header for the room step: a thumbnail, the hotel name + star class,
+// the stopover dates, the city, and the guest rating — plus a "See hotel
+// details" link that smooth-scrolls down to the full hotel showcase already on
+// this page (photos / description / amenities / map, under id="hotel-showcase").
+//
+// It reuses the SAME AccommodationStar + RatingBlock components the showcase and
+// the booking summary use, so the hotel reads identically across the whole flow.
+// ─────────────────────────────────────────────────────────────────────────────
+function StopoverHotelSummaryCard({
+  hotel,
+  city,
+}: {
+  hotel: StopoverHotel;
+  city: string;
+}) {
+  // "See hotel details" doesn't navigate anywhere — the full hotel showcase is
+  // lower down on THIS page, so we smooth-scroll to it. `block: "start"` lines
+  // the section up to the top of the viewport (its `scroll-mt-4` adds breathing
+  // room above so the heading isn't flush against the edge).
+  const scrollToDetails = () => {
+    document
+      .getElementById("hotel-showcase")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <div className="bg-card rounded-xl border border-border p-4 flex items-center gap-3">
+      {/* Thumbnail — ImageWithPlaceholder reserves the space and fades the photo
+          in, so the card never jumps while the image loads. Sized (56px) to
+          roughly match the rating+link column's height, so it fills the card
+          vertically instead of floating centred — that keeps the gap around it
+          even on all four sides (matching the 12px padding). */}
+      <ImageWithPlaceholder
+        src={hotel.image}
+        alt={hotel.name}
+        rounded="rounded-lg"
+        containerClassName="w-14 h-14 shrink-0"
+      />
+
+      {/* Middle column — name + stars, then the location. `min-w-0` lets a long
+          hotel name truncate instead of shoving the right-hand column off the
+          edge. */}
+      <div className="flex-1 min-w-0 flex flex-col gap-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          <h3 className="text-base md:text-lg font-bold text-foreground leading-tight">
+            {hotel.name}
+          </h3>
+          <AccommodationStar rating={hotel.stars} offerName={hotel.name} offerId={hotel.id} size={16} />
+        </div>
+
+        {/* Location — kept in the primary text colour (black) now that the
+            dates are gone, so the second line still reads as real content. */}
+        <div className="flex items-center gap-1.5 text-sm text-foreground">
+          <MapPin size={15} className="shrink-0" aria-hidden="true" />
+          {city}
+        </div>
+      </div>
+
+      {/* Right — the guest rating badge, with "See hotel details" stacked right
+          beneath it (right-aligned), separated by a tiny `gap-2`. The link is a
+          quiet primary-coloured tertiary action; no arrow per our CTA rule —
+          it scrolls down, not away. */}
+      <div className="shrink-0 flex flex-col items-end gap-2">
+        <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
+        <button
+          type="button"
+          onClick={scrollToDetails}
+          className="text-sm font-semibold text-primary hover:underline"
+        >
+          See hotel details
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function StopoverRoomPage({
   hotel,
@@ -368,6 +450,12 @@ export default function StopoverRoomPage({
     ? "Allocate all travellers to a room to continue."
     : "Select a room for each traveller to continue.";
 
+  // Stay dates for the room title's subtitle. Check-in = the first flight leg's
+  // date (the day the traveller flies out); check-out = check-in + nights. Both
+  // null if the search carried no dates — then we just show the night count.
+  const checkInDate = flightLegs[0]?.dateISO ? new Date(flightLegs[0].dateISO) : null;
+  const checkOutDate = checkInDate ? addDays(checkInDate, nights) : null;
+
   return (
     <div className="bg-grey-lightest min-h-screen pb-28">
 
@@ -400,39 +488,51 @@ export default function StopoverRoomPage({
       </div>
 
       {/* ── ROOM SELECTION (primary focus) ───────────────────────────────────── */}
-      <PageContainer tier="narrow" className="px-4 md:px-6 pt-8 flex flex-col gap-2">
-        {/* "Room for 2 travellers in Hotel Palazzo Doglio" — totalGuests sums
-            adults + children across the whole room configuration, and we name the
-            chosen hotel right in the title now that the top card is gone.
+      {/* `pt-7` (28px), not `pt-8`, so the stepper→card gap is exactly 40px:
+          the grey stepper band above ends with `pb-3` (12px), and 12 + 28 = 40.
+          `gap-10` (40px) then puts the SAME 40px between the hotel card and the
+          title row below it, so the card has equal breathing room top & bottom. */}
+      <PageContainer tier="narrow" className="px-4 md:px-6 pt-7 flex flex-col gap-10">
+        {/* Hotel summary card — the small header Paula asked for. It carries the
+            hotel name, dates, city, rating and a "See hotel details" link, so
+            the traveller always sees which hotel they're choosing a room for. */}
+        <StopoverHotelSummaryCard hotel={hotel} city={city} />
 
-            Layout + sizing mirror the previous steps (Flights, Stopover hotel)
-            so the step titles stay consistent: icon + text in a top-aligned row
-            (`items-start gap-2.5`, icon nudged down with `mt-1`), and the title
-            uses the same `text-lg md:text-xl ... leading-tight` instead of the
-            larger `text-2xl` it had before. */}
-        <div className="flex items-start gap-2.5">
-          <Bed size={22} className="text-primary shrink-0 mt-1" aria-hidden="true" />
-          <div>
-            <h2 className="text-lg md:text-xl font-extrabold text-foreground leading-tight">
-              Room for {totalGuests} traveller{totalGuests !== 1 ? "s" : ""} in {hotel.name}
-            </h2>
-            {/* Context line — ties the room choice back to the stopover stay. */}
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {nights} night{nights !== 1 ? "s" : ""} in {city}
-              {" · "}
-              {totalAdults} adult{totalAdults !== 1 ? "s" : ""}
-              {totalChildren > 0 && ` · ${totalChildren} child${totalChildren !== 1 ? "ren" : ""}`}
-            </p>
+        {/* Title + room allocation share ONE row: the "Room for N travellers"
+            heading on the left, the Guests & Rooms field on the right. They
+            stack on mobile (`flex-col`) and sit side by side, top-aligned, from
+            `sm` up. The gap above this row comes from the container's `gap-10`
+            (40px) — matching the gap above the card. */}
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+
+          {/* Step title — the card above already names the hotel/dates/city, so
+              this just states the task. Bed icon + `text-lg md:text-xl
+              font-extrabold` keeps it consistent with the other steps' titles. */}
+          <div className="flex items-start gap-2.5">
+            <Bed size={22} className="text-primary shrink-0 mt-1" aria-hidden="true" />
+            <div>
+              <h2 className="text-lg md:text-xl font-extrabold text-foreground leading-tight">
+                Room for {totalGuests} traveller{totalGuests !== 1 ? "s" : ""}
+              </h2>
+              {/* Stay dates (day + month, no weekday) + nights. Falls back to
+                  just the night count if the search carried no dates. */}
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {checkInDate && checkOutDate &&
+                  `${format(checkInDate, "d MMM")} – ${format(checkOutDate, "d MMM yyyy")} · `}
+                {nights} night{nights !== 1 ? "s" : ""}
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* ── Guests & Rooms field ───────────────────────────────────────────
-            The SAME field + dropdown the hotel detail page uses, but with one
-            rule changed: the total traveller count is locked (it comes from the
-            flights), so the user can only SPLIT those travellers across rooms —
-            they can't add or remove travellers, only place them. The "+" buttons
-            below switch off once everyone has been allocated. */}
-        <div ref={guestsRef} className="relative mt-2 w-full sm:max-w-[360px]">
+          {/* ── Guests & Rooms field ─────────────────────────────────────────
+              The SAME field + dropdown the hotel detail page uses, but with one
+              rule changed: the total traveller count is locked (it comes from the
+              flights), so the user can only SPLIT those travellers across rooms —
+              they can't add or remove travellers, only place them. The "+" buttons
+              below switch off once everyone has been allocated.
+              Fixed width on desktop (`sm:w-[320px]`) so it sits neatly at the end
+              of the title row; full width when stacked on mobile. */}
+          <div ref={guestsRef} className="relative w-full sm:w-[320px] shrink-0">
           {/* Clickable field box — active state adds a blue ring, matching the
               hotel page's field style. */}
           <div
@@ -570,8 +670,20 @@ export default function StopoverRoomPage({
                   + Add another room
                 </Button>
               )}
+
+              {/* Update — closes the dropdown. The room split already applies
+                  live as you tap the +/− steppers, so this is the explicit
+                  "done" affordance. Primary variant since it moves you on. */}
+              <Button
+                variant="default"
+                onClick={() => setGuestsOpen(false)}
+                className="w-full h-[40px]"
+              >
+                Update
+              </Button>
             </div>
           )}
+          </div>
         </div>
       </PageContainer>
 
@@ -647,17 +759,24 @@ export default function StopoverRoomPage({
             {/* Hotel header — the name + star class + rating + location, moved
                 down here from the (now removed) top card so the room choice leads
                 the page and the hotel's own details live with the rest of its info. */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-2xl font-bold text-foreground">{hotel.name}</h2>
-                <AccommodationStar rating={hotel.stars} offerName={hotel.name} offerId={hotel.id} size={16} />
-              </div>
-              <div className="flex items-center gap-3 flex-wrap text-sm text-foreground">
-                <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
-                <span className="flex items-center gap-1 text-muted-foreground">
+            {/* Header row — name/stars + location stacked on the left, the guest
+                rating badge pulled out to the right (matching the summary card
+                up top). `justify-between` pushes them apart; `min-w-0` lets a
+                long hotel name wrap instead of shoving the rating off the edge. */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-col gap-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="text-2xl font-bold text-foreground">{hotel.name}</h2>
+                  <AccommodationStar rating={hotel.stars} offerName={hotel.name} offerId={hotel.id} size={16} />
+                </div>
+                {/* Location — primary text colour (black), not muted grey. */}
+                <span className="flex items-center gap-1 text-sm text-foreground">
                   <MapPin size={14} className="shrink-0" aria-hidden="true" />
                   {city}
                 </span>
+              </div>
+              <div className="shrink-0">
+                <RatingBlock reviewScore={hotel.rating} reviewCount={hotel.reviewCount} />
               </div>
             </div>
             <div className="relative">

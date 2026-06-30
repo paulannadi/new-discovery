@@ -11,6 +11,7 @@
 import { MapPin, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { cn } from "../../../../shared/components/ui/utils";
 import type { PlanMessage } from "./useAiPlanState";
 
 interface AiChatBubbleProps {
@@ -22,19 +23,12 @@ export default function AiChatBubble({ message }: AiChatBubbleProps) {
 
   return (
     <div
-      className={[
-        "flex gap-2.5 mb-4",
-        isUser ? "flex-row-reverse" : "flex-row",
-      ].join(" ")}
+      className={cn("flex gap-2.5 mb-4", isUser ? "flex-row-reverse" : "flex-row")}
     >
-      {/* Avatar — small square pill with role-coloured background */}
+      {/* Avatar — small round pill. Both roles use the brand primary so the
+          conversation reads as one accent; the icon/label distinguishes them. */}
       <div
-        className={[
-          "size-7 shrink-0 rounded-full inline-flex items-center justify-center text-xs font-extrabold",
-          isUser
-            ? "bg-foreground text-background"
-            : "bg-primary text-primary-foreground",
-        ].join(" ")}
+        className="size-7 shrink-0 rounded-full inline-flex items-center justify-center text-xs font-extrabold bg-primary text-primary-foreground"
         aria-hidden="true"
       >
         {isUser ? "You" : <Sparkles className="size-3.5" />}
@@ -43,12 +37,12 @@ export default function AiChatBubble({ message }: AiChatBubbleProps) {
       {/* Bubble — fills the column, max-width keeps the bubble from running
           edge-to-edge on wide screens. */}
       <div
-        className={[
+        className={cn(
           "rounded-xl px-3.5 py-3 text-sm leading-relaxed border max-w-[92%]",
           isUser
-            ? "bg-foreground text-background border-foreground"
+            ? "bg-primary text-primary-foreground border-primary"
             : "bg-card text-foreground border-border",
-        ].join(" ")}
+        )}
       >
         {/* Body — split on newlines so paragraphs stack. */}
         {message.text.split("\n").map((paragraph, i) => (

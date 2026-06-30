@@ -9,6 +9,7 @@
 
 import type { ReactNode } from "react";
 
+import { cn } from "../../../../shared/components/ui/utils";
 import type { ActionId } from "./useAiPlanState";
 import { getActionLabel } from "./useAiPlanState";
 
@@ -52,12 +53,12 @@ function SuggestionChip({
     <button
       type="button"
       onClick={onClick}
-      className={[
+      className={cn(
         "text-xs font-semibold rounded-full px-3 py-1.5 transition-colors border",
         variant === "primary"
           ? "bg-primary text-primary-foreground border-primary hover:brightness-90"
           : "bg-card text-foreground border-border hover:border-primary hover:text-primary",
-      ].join(" ")}
+      )}
     >
       {children}
     </button>
